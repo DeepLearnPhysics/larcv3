@@ -31,8 +31,8 @@ $(PACKAGE_BUILDDIR)/%.o: %.cxx %.h
 	@$(CXX) $(CXXFLAGS) $(INCFLAGS) -DLARCV_NUMPY=$(LARCV_NUMPY) -c $< -o $@
 
 $(PYLIB): $(WRAP).o $(OBJECTS)
-	@echo $(PYLIB)
-	@$(SOMAKER) $(SOFLAGS) $(OBJECTS) $(WRAP).o -o $(LARCV_LIBDIR)/$@ -lstdc++ $(PYTHONLIB)
+	# @echo $(PYLIB)
+	@$(SOMAKER) $(SOFLAGS) $(OBJECTS) $(WRAP).o -o $(LARCV_LIBDIR)/$@  $(LDFLAGS) -lstdc++ $(PYTHONLIB)
 
 
 

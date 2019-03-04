@@ -9,7 +9,7 @@ OSNAMEMODE      = $(OSNAME)
 
 include $(LARCV_BASEDIR)/Makefile/Makefile.${OSNAME}
 
-CORE_SUBDIRS := base
+CORE_SUBDIRS := base dataformat
 # ifeq ($(LARCV_NUMPY),1)
 # CORE_SUBDIRS += PyUtil
 # endif
