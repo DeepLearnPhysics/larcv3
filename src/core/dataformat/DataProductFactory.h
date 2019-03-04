@@ -16,8 +16,8 @@
 
 #include <iostream>
 #include <map>
-#include "larcv/core/Base/larcv_base.h"
-#include "larcv/core/Base/larbys.h"
+#include "larcv/core/base/larcv_base.h"
+#include "larcv/core/base/larbys.h"
 #include "EventBase.h"
 #include "DataFormatTypes.h"
 #include <sstream>
@@ -61,7 +61,7 @@ namespace larcv {
     /// Factory registration method (should be called by global factory instance in algorithm header)
     void add_factory(std::string type, larcv::DataProductFactoryBase* factory);
 
-    /// Factory creation method (should be called by clients, possibly you!)
+    /// Factory creation method (should åbe called by clients, possibly you!)
     inline EventBase* create(const std::string& type, const std::string& producer) {
       return create(ProducerName_t(type,producer));
     }

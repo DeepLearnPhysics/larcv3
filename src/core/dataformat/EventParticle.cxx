@@ -1,12 +1,12 @@
-#ifndef EVENTPARTICLE_CXX
-#define EVENTPARTICLE_CXX
+// #ifndef EVENTPARTICLE_CXX
+// #define EVENTPARTICLE_CXX
 
-#include "EventParticle.h"
+// #include "EventParticle.h"
 
-namespace larcv{
-  /// Global larcv::SBClusterFactory to register ClusterAlgoFactory
-  static EventParticleFactory __global_EventParticleFactory__;
+// namespace larcv{
+//   /// Global larcv::SBClusterFactory to register ClusterAlgoFactory
+//   static EventParticleFactory __global_EventParticleFactory__;
 
-}
+// }
 
-#endif
+// #endif

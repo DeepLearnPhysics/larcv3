@@ -1,10 +1,11 @@
 #ifndef __LARCV_VOXEL3DMETA_CXX__
 #define __LARCV_VOXEL3DMETA_CXX__
 
-#include "Voxel3DMeta.h"
+#include "VoxelMeta.h"
 #include "larcv/core/Base/larbys.h"
-#include <algorithm>
-#include <sstream>
+// #include <algorithm>
+// #include <sstream>
+
 namespace larcv {
 
   Voxel3DMeta::Voxel3DMeta()
@@ -12,7 +13,6 @@ namespace larcv {
 
   void Voxel3DMeta::clear()
   {
-    (BBox3D)(*this) = BBox3D();
     _valid = false;
     _xnum = _ynum = _znum = 0;
     _xlen = _ylen = _zlen = -1.;

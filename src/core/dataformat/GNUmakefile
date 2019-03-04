@@ -1,11 +1,11 @@
 #
 # This is an example GNUmakefile for my packages
 #
-PACKAGE_NAME = DataFormat
+PACKAGE_NAME = dataformat
 
 # specific names for this package
 SOURCES = $(wildcard *.cxx)
-FMWK_HEADERS = LinkDef.h
+FMWK_HEADERS = 
 HEADERS = $(filter-out $(FMWK_HEADERS), $(wildcard *.h))
 HEADERS_DEST = larcv/core/$(PACKAGE_NAME)
 
@@ -20,7 +20,7 @@ OSNAMEMODE      = $(OSNAME)
 
 include $(LARCV_BASEDIR)/Makefile/Makefile.${OSNAME}
 
-LDFLAGS += -L$(LARCV_LIBDIR) -lLArCVBase
+# LDFLAGS += -L$(LARCV_LIBDIR) -l:_base.so
 # call the common GNUmakefile
 include $(LARCV_BASEDIR)/Makefile/GNUmakefile.CORE
 

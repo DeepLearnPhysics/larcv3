@@ -1,9 +1,10 @@
 #ifndef __DATAFORMATTYPES_H__
 #define __DATAFORMATTYPES_H__
 
-#include "larcv/core/Base/LArCVTypes.h"
+#include "larcv/core/base/LArCVTypes.h"
 #include <vector>
 #include <set>
+
 namespace larcv {
 
   /// Invalid rep for vector index

@@ -15,8 +15,7 @@
 #define VOXEL3DMETA_H
 
 #include "DataFormatTypes.h"
-#include "BBox.h"
-#include <array>
+
 
 namespace larcv {
 
@@ -24,7 +23,7 @@ namespace larcv {
      \class Voxel3DMeta
      @brief Meta data for defining voxels (ID, size, position) and voxelized volume (coordinate, size)
   */
-  class Voxel3DMeta : public BBox3D{
+  class Voxel3DMeta {
   public:
     /// Default ctor
     Voxel3DMeta();
@@ -45,7 +44,7 @@ namespace larcv {
     void clear();
     /// Uniry == operator
     inline bool operator ==(const Voxel3DMeta& rhs) const
-    { return ((BBox3D)(rhs) == (BBox3D)(*this) &&
+    { return  (// ((BBox3D)(rhs) == (BBox3D)(*this) &&
               _xlen == rhs._xlen && _ylen == rhs._ylen && _zlen == rhs._zlen &&
               _xnum == rhs._xnum && _ynum == rhs._ynum && _znum == rhs._znum); }
     /// Uniry != operator

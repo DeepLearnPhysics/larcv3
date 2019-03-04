@@ -4,17 +4,17 @@
 #include "Particle.h"
 #include <set>
 #include <sstream>
-#include "larcv/core/Base/larbys.h"
+#include "larcv/core/base/larbys.h"
 
 namespace larcv {
 
-  const BBox2D& Particle::boundingbox_2d(ProjectionID_t id) const
-  {
-    std::stringstream ss;
-    if(id < _bb2d_v.size()) return _bb2d_v[id];
-    ss << "BBox2D not stored for ProjectionID_t " << id << std::endl;
-    throw larbys(ss.str());
-  }
+  // const BBox2D& Particle::boundingbox_2d(ProjectionID_t id) const
+  // {
+  //   std::stringstream ss;
+  //   if(id < _bb2d_v.size()) return _bb2d_v[id];
+  //   ss << "BBox2D not stored for ProjectionID_t " << id << std::endl;
+  //   throw larbys(ss.str());
+  // }
 
   std::string Particle::dump() const
   {
@@ -30,10 +30,10 @@ namespace larcv {
        << buf.str() << "Deposit  Energy  = " << energy_deposit() << std::endl
        << buf.str() << "Creation Process = " << creation_process() << std::endl;
 
-    ss << buf.str() << "BBox3D: " << _bb3d.dump();
-    buf << "    ";
-    for(size_t i=0; i<_bb2d_v.size(); ++i)
-      ss << buf.str() << "Plane " << i << " BBox2D: " << _bb2d_v[i].dump();
+    // ss << buf.str() << "BBox3D: " << _bb3d.dump();
+    // buf << "    ";
+    // for(size_t i=0; i<_bb2d_v.size(); ++i)
+    //   ss << buf.str() << "Plane " << i << " BBox2D: " << _bb2d_v[i].dump();
 
     return ss.str();
   }
