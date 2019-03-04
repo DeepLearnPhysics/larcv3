@@ -33,13 +33,13 @@ $(PACKAGE_BUILDDIR)/%.o: %.cxx %.h
 
 $(PYLIB): $(WRAP).o $(OBJECTS)
 	@echo $(PYLIB)
-	@$(SOMAKER) $(SOFLAGS) $(OBJECTS) $(WRAP).o -o $(LARCV_LIBDIR)/$@ -lstdc++ $(shell python-config --ldflags)
+	@$(SOMAKER) $(SOFLAGS) $(OBJECTS) $(WRAP).o -o $(LARCV_LIBDIR)/$@ -lstdc++ $(PYTHONLIB)
 
 
 
 $(WRAP).o: $(WRAP).cxx
 	@echo "Compile python bindings"
-	@$(CXX) $(CXXFLAGS) $(INCFLAGS) $(PYTHONFLAGS) -c $< -o $@
+	@$(CXX) $(CXXFLAGS) $(INCFLAGS) $(PYTHONINC) -c $< -o $@
 
 $(WRAP).cxx: $(PACKAGE_NAME).i
 	@echo "Generate python bindings"
