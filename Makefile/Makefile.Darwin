@@ -1,10 +1,10 @@
 #COMPILER:
 CC              = gcc
 CXX             = $(LARCV_CXX)
-#LINKER          = libtool
-#SOMAKER         = libtool 
 LINKER          = $(LARCV_CXX)
 SOMAKER         = $(LARCV_CXX)
+PYTHONINC       = $(shell python-config --includes)
+PYTHONLIB       = $(shell python-config --ldflags)
 
 #######"-O" FLAG: (not always ideal with debugging info)
 CFLAGS          += -O3
@@ -55,7 +55,7 @@ DLLFLAGS        += -fPIC
 ##########
 CFLAGS          += -fsigned-char -pipe -DHAVE_LONG_LONG  
 CFLAGS          += -fno-common -O3 -D_CORE_$(shell uname -s)_
-CXXFLAGS        += -fsigned-char -pipe -DHAVE_LONG_LONG  
+CXXFLAGS        += -fsigned-char -pipe -DHAVE_LONG_LONG -std=c++11
 CXXFLAGS        += -fno-common -O3 -Wno-deprecated -D_CORE_$(shell uname -s)_
 
 
