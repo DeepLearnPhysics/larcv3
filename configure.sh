@@ -73,7 +73,7 @@ mkdir -p $LARCV_LIBDIR;
 mkdir -p $LARCV_BINDIR;
 
 export LD_LIBRARY_PATH=$LARCV_LIBDIR:$LD_LIBRARY_PATH
-export PYTHONPATH=$LARCV_BASEDIR/python:$PYTHONPATH
+export PYTHONPATH=$LARCV_LIBDIR:$PYTHONPATH
 
 export LARCV_CXX=clang++
 if [ -z `command -v $LARCV_CXX` ]; then
