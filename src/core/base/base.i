@@ -11,6 +11,7 @@
 #include "ConfigManager.h"
 using namespace larcv;
 %}
+%include "std_string.i"
 %include "LArCVTypes.h"
 %include "larcv_logger.h"
 %include "larcv_base.h"

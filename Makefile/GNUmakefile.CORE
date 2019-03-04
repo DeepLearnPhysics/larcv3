@@ -5,10 +5,8 @@ SHLIB=libLArCV${PACKAGE_NAME}.so
 
 PACKAGE_BUILDDIR = $(LARCV_BUILDDIR)/$(PACKAGE_NAME)
 PACKAGE_INCDIR   = $(LARCV_INCDIR)/$(HEADERS_DEST)
-$(shell mkdir -p $(LARCV_BUILDDIR))
-$(shell mkdir -p $(LARCV_LIBDIR))
-$(shell mkdir -p $(LARCV_BINDIR))
-$(shell mkdir -p $(PACKAGE_BUILDDIR))
+
+
 
 ifdef HEADERS_DEST
 $(shell mkdir -p $(PACKAGE_INCDIR))
@@ -20,8 +18,9 @@ PYLIB   = _$(PACKAGE_NAME).so
 
 all: pre_build main_build pkg_build 
 
-pre_build:
-
+pre_build: 
+	$(shell mkdir -p $(PACKAGE_BUILDDIR))
+	
 main_build: pre_build $(OBJECTS) $(WRAP).o install_header
 
 pkg_build: $(PYLIB)
