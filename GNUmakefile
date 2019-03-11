@@ -22,7 +22,7 @@ APP_SUBDIRS :=
 
 .phony: all clean
 
-all: directories obj  
+all: directories obj 
 
 directories:
 	@mkdir -p $(LARCV_BUILDDIR)
@@ -52,12 +52,3 @@ obj: $(LARCV_LIBDIR)/larcv/__init__.py
 	@for i in $(CORE_SUBDIRS); do ( echo "$i" && echo "Compiling $$i..." && cd $(LARCV_COREDIR)/$$i && $(MAKE) && echo "done" ) || exit $$?; done
 	@echo Building app...
 	@for i in $(APP_SUBDIRS); do ( echo "" && echo "Compiling $$i..." && cd $(LARCV_APPDIR)/$$i && $(MAKE) ) || exit $$?; done
-
-lib: obj
-	@ if [ `python ${LARCV_BASEDIR}/bin/libarg.py build` ]; then \
-	    echo Linking library...; \
-	    $(SOMAKER) $(SOFLAGS) $(shell python $(LARCV_BASEDIR)/bin/libarg.py); \
-	  else \
-	   echo Nothing to be done for lib...; \
-	fi
-	@echo
