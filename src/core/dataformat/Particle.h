@@ -11,8 +11,8 @@
 /** \addtogroup core_DataFormat
 
     @{*/
-#ifndef __PARTICLE_H__
-#define __PARTICLE_H__
+#ifndef __LARCV_PARTICLE_H__
+#define __LARCV_PARTICLE_H__
 
 #include <iostream>
 #include "Vertex.h"

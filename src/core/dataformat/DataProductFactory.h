@@ -11,8 +11,8 @@
 /** \addtogroup DataFormat
 
     @{*/
-#ifndef __DATAPRODUCTFACTORY_H__
-#define __DATAPRODUCTFACTORY_H__
+#ifndef __LARCV_DATAPRODUCTFACTORY_H__
+#define __LARCV_DATAPRODUCTFACTORY_H__
 
 #include <iostream>
 #include <map>

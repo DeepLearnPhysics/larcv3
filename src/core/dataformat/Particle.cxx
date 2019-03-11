@@ -1,5 +1,5 @@
-#ifndef __PARTICLE_CXX__
-#define __PARTICLE_CXX__
+#ifndef __LARCV_PARTICLE_CXX__
+#define __LARCV_PARTICLE_CXX__
 
 #include "Particle.h"
 #include <set>

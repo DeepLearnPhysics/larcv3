@@ -1,5 +1,5 @@
-// #ifndef LARCV_EVENTVOXEL2D_CXX
-// #define LARCV_EVENTVOXEL2D_CXX
+// #ifndef __LARCV_EVENTVOXEL2D_CXX
+// #define __LARCV_EVENTVOXEL2D_CXX
 
 // #include "EventVoxel2D.h"
 

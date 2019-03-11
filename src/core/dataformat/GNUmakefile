@@ -20,7 +20,9 @@ OSNAMEMODE      = $(OSNAME)
 
 include $(LARCV_BASEDIR)/Makefile/Makefile.${OSNAME}
 
-# LDFLAGS += -L$(LARCV_LIBDIR) -l:_base.so
+INCFLAGS += -I/opt/local/include
+
+LDFLAGS += -L$(LARCV_LIBDIR) -lbase -L/opt/local/lib -lhdf5_cpp -lhdf5 -lhdf5_hl
 # call the common GNUmakefile
 include $(LARCV_BASEDIR)/Makefile/GNUmakefile.CORE
 

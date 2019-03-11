@@ -1,5 +1,5 @@
-// #ifndef EVENTPARTICLE_CXX
-// #define EVENTPARTICLE_CXX
+// #ifndef __LARCV_EVENTPARTICLE_CXX
+// #define __LARCV_EVENTPARTICLE_CXX
 
 // #include "EventParticle.h"
 

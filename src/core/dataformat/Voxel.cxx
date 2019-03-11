@@ -77,7 +77,7 @@ namespace larcv {
     if(_voxel_v.empty() ||
        id < _voxel_v.front().id() ||
        id > _voxel_v.back().id())
-      return kINVALID_VOXEL;
+      return larcv::kINVALID_VOXEL::getInstance();
 
     Voxel vox(id,0.);
     // Else do log(N) search
@@ -85,7 +85,7 @@ namespace larcv {
     if( (*iter).id() == id ) return (*iter);
     else {
       //std::cout << "Returning invalid voxel since lower_bound had an id " << (*iter).id() << std::endl;
-      return kINVALID_VOXEL;
+      return larcv::kINVALID_VOXEL::getInstance();
     }
   }
 
@@ -186,12 +186,12 @@ namespace larcv {
       _voxel_vv[id].id(id);
   }
 
-  inline void VoxelSetArray::insert(const std::vector<larcv::VoxelSet>& voxel_vv)
-  {
-    _voxel_vv = voxel_vv;
-    for(size_t id=0; id<_voxel_vv.size(); ++id)
-      _voxel_vv[id].id(id);
-  }
+  // inline void VoxelSetArray::insert(const std::vector<larcv::VoxelSet>& voxel_vv)
+  // {
+  //   _voxel_vv = voxel_vv;
+  //   for(size_t id=0; id<_voxel_vv.size(); ++id)
+  //     _voxel_vv[id].id(id);
+  // }
 
   void VoxelSetArray::emplace(larcv::VoxelSet&& voxel_v)
   {

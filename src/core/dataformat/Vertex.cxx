@@ -9,17 +9,18 @@
 namespace larcv {
 
   // Interaction ID default constructor
-  Vertex::Vertex()
-    : _x(0)
-    , _y(0)
-    , _z(0)
-    , _t(0)
-  {approx();}
+  // Vertex::Vertex()
+  //   : _x(0)
+  //   , _y(0)
+  //   , _z(0)
+  //   , _t(0)
+  // {approx();}
 
   Vertex::Vertex(double x, double y, double z, double t)
     : _x(x), _y(y), _z(z), _t(t)
-  {approx();}
-
+  // {approx();}
+  {}
+  
   void Vertex::reset(){
     _x = _y = _z = _t = 0;
   }
@@ -30,7 +31,7 @@ namespace larcv {
     _y = y;
     _z = z;
     _t = t;
-    approx();
+    // approx();
   }
 
   const larcv::Point2D Vertex::as_point2d(larcv::PointType_t point_type) const
@@ -83,13 +84,13 @@ namespace larcv {
     return ss.str();
   }
 
-  void Vertex::approx()
-  {
-    _x = (double)( ((double)((signed long long)(_x * 1.e6)) * 1.e-6 ));
-    _y = (double)( ((double)((signed long long)(_y * 1.e6)) * 1.e-6 ));
-    _z = (double)( ((double)((signed long long)(_z * 1.e6)) * 1.e-6 ));
-    _t = (double)( ((double)((signed long long)(_t * 1.e6)) * 1.e-6 ));
-  }
+  // void Vertex::approx()
+  // {
+  //   _x = (double)( ((double)((signed long long)(_x * 1.e6)) * 1.e-6 ));
+  //   _y = (double)( ((double)((signed long long)(_y * 1.e6)) * 1.e-6 ));
+  //   _z = (double)( ((double)((signed long long)(_z * 1.e6)) * 1.e-6 ));
+  //   _t = (double)( ((double)((signed long long)(_t * 1.e6)) * 1.e-6 ));
+  // }
 }
 
 #endif

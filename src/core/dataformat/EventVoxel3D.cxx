@@ -1,5 +1,5 @@
-// #ifndef EVENTVOXEL3D_CXX
-// #define EVENTVOXEL3D_CXX
+// #ifndef __EVENTVOXEL3D_CXX
+// #define __EVENTVOXEL3D_CXX
 
 // #include "EventVoxel3D.h"
 

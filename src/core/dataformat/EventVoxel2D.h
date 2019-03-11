@@ -11,8 +11,8 @@
 // /** \addtogroup core_DataFormat
 
 //     @{*/
-// #ifndef LARCV_EVENTVOXEL2D_H
-// #define LARCV_EVENTVOXEL2D_H
+// #ifndef __LARCV_EVENTVOXEL2D_H
+// #define __LARCV_EVENTVOXEL2D_H
 
 // #include <iostream>
 // #include "EventBase.h"

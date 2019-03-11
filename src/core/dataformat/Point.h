@@ -11,8 +11,8 @@
 /** \addtogroup DataFormat
 
     @{*/
-#ifndef LARCV_POINT_H
-#define LARCV_POINT_H
+#ifndef __LARCV_POINT_H
+#define __LARCV_POINT_H
 
 #include <iostream>
 #include <cmath>

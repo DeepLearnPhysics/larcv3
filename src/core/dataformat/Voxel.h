@@ -11,8 +11,8 @@
 /** \addtogroup core_DataFormat
 
     @{*/
-#ifndef LARCV_VOXEL_H
-#define LARCV_VOXEL_H
+#ifndef __LARCV_VOXEL_H
+#define __LARCV_VOXEL_H
 
 #include "DataFormatTypes.h"
 namespace larcv {
@@ -82,9 +82,59 @@ namespace larcv {
   private:
     VoxelID_t _id; ///< voxel id
     float  _value; ///< Pixel Value
+
+#ifndef SWIG
+  public: 
+    static H5::CompType get_datatype() {
+      H5::CompType datatype(sizeof(Voxel));
+      datatype.insertMember("id", offsetof(Voxel, _id), H5::PredType::NATIVE_ULLONG);
+      datatype.insertMember("value", offsetof(Voxel, _value), H5::PredType::NATIVE_FLOAT);
+      return datatype;
+    }
+#endif
+
+
   };
 
-  static const larcv::Voxel kINVALID_VOXEL(kINVALID_VOXELID,0.);
+
+  class kINVALID_VOXEL : public Voxel
+    {
+    public:
+        static kINVALID_VOXEL& getInstance()
+        {
+            static kINVALID_VOXEL    instance; // Guaranteed to be destroyed.
+                                  // Instantiated on first use.
+            return instance;
+        }
+    private:
+        kINVALID_VOXEL() {}                    // Constructor? (the {} brackets) are needed here.
+
+        // // C++ 03
+        // // ========
+        // // Don't forget to declare these two. You want to make sure they
+        // // are unacceptable otherwise you may accidentally get copies of
+        // // your singleton appearing.
+        // kINVALID_VOXEL(kINVALID_VOXEL const&);              // Don't Implement
+        // void operator=(kINVALID_VOXEL const&); // Don't implement
+
+        // C++ 11
+        // =======
+        // We can use the better technique of deleting the methods
+        // we don't want.
+    public:
+        kINVALID_VOXEL(kINVALID_VOXEL const&)  = delete;
+        void operator=(kINVALID_VOXEL const&)  = delete;
+
+        // Note: Scott Meyers mentions in his Effective Modern
+        //       C++ book, that deleted functions should generally
+        //       be public as it results in better error messages
+        //       due to the compilers behavior to check accessibility
+        //       before deleted status
+  };
+
+
+  // static const larcv::Voxel kINVALID_VOXEL(kINVALID_VOXELID,0.);
+
 
   /**
      \class VoxelSet
@@ -213,7 +263,7 @@ namespace larcv {
     /// Move an arrray of VoxelSet. Each element's InstanceID_t gets updated
     void emplace(std::vector<larcv::VoxelSet>&& voxel_vv);
     /// Set an array of VoxelSet. Each element's InstanceID_t gets updated
-    void insert(const std::vector<larcv::VoxelSet>& voxel_vv);
+    // void insert(const std::vector<larcv::VoxelSet>& voxel_vv);
     /// Move a VoxelSet into a collection. The InstanceID_t is respected.
     void emplace(larcv::VoxelSet&& voxel_v);
     /// Set a VoxelSet into a collection. The InstanceID_t is respected.

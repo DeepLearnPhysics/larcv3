@@ -9,7 +9,7 @@ namespace larcv {
   class Vertex {
   public:
     /// Particle ID default constructor
-    Vertex();
+    Vertex() = default;
     Vertex(double x, double y, double z, double t);
 
     /// Reset function
@@ -29,7 +29,8 @@ namespace larcv {
     inline double t() const { return _t; }
 
     /// Default destructor
-    virtual ~Vertex(){};
+    // The virtual destructor must be removed to make the data layout standard in C++ specifications
+    // virtual ~Vertex(){};
 
     inline bool operator== (const Vertex& rhs) const
     {
@@ -61,7 +62,22 @@ namespace larcv {
 
     double _x, _y, _z, _t;
 
-    void approx();
+    // What does this function do?
+    // void approx();
+
+#ifndef SWIG
+  public: 
+    static H5::CompType get_datatype() {
+      H5::CompType datatype(sizeof(Vertex));
+      datatype.insertMember("x", offsetof(Vertex, _x), H5::PredType::NATIVE_DOUBLE);
+      datatype.insertMember("y", offsetof(Vertex, _y), H5::PredType::NATIVE_DOUBLE);
+      datatype.insertMember("z", offsetof(Vertex, _z), H5::PredType::NATIVE_DOUBLE);
+      datatype.insertMember("t", offsetof(Vertex, _t), H5::PredType::NATIVE_DOUBLE);
+      return datatype;
+    }
+#endif
+    
+
   };
 }
 

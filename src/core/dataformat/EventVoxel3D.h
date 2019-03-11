@@ -11,8 +11,8 @@
 // /** \addtogroup core_DataFormat
 
 //     @{*/
-// #ifndef LARCV_EVENTVOXEL3D_H
-// #define LARCV_EVENTVOXEL3D_H
+// #ifndef __LARCV_EVENTVOXEL3D_H
+// #define __LARCV_EVENTVOXEL3D_H
 
 // #include <iostream>
 // #include "EventBase.h"

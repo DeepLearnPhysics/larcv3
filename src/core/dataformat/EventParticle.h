@@ -11,8 +11,8 @@
 // /** \addtogroup DataFormat
 
 //     @{*/
-// #ifndef EVENTPARTICLE_H
-// #define EVENTPARTICLE_H
+// #ifndef __LARCV_EVENTPARTICLE_H
+// #define __LARCV_EVENTPARTICLE_H
 
 // #include "EventBase.h"
 // #include "Particle.h"
