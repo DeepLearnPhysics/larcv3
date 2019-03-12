@@ -86,6 +86,17 @@ class EventID {
     _event = event;
   }
 
+#ifndef SWIG
+  public: 
+    static H5::CompType get_datatype() {
+      H5::CompType datatype(sizeof(EventID));
+      datatype.insertMember("run",    offsetof(EventID, _run),    H5::PredType::NATIVE_ULLONG);
+      datatype.insertMember("subrun", offsetof(EventID, _subrun), H5::PredType::NATIVE_ULLONG);
+      datatype.insertMember("event",  offsetof(EventID, _event),  H5::PredType::NATIVE_ULLONG);
+      return datatype;
+    }
+#endif
+
  private:
   size_t _run;     ///< LArSoft run number
   size_t _subrun;  ///< LArSoft sub-run number

@@ -134,9 +134,11 @@ namespace larcv {
     // void   prepare_input();
     size_t register_producer(const ProducerName_t& name);
 
+    void append_event_id();
+
     IOMode_t    _io_mode;
     bool        _prepared;
-    H5::H5File  * _out_file;
+    H5::H5File  _out_file;
     // size_t      _in_tree_index;
     size_t      _out_tree_index;
     // size_t      _in_tree_entries;
@@ -160,7 +162,9 @@ namespace larcv {
     std::vector<bool> _store_id_bool;
     // std::vector<bool> _read_id_bool;
 
-    
+    // IOManager has to control the EventID dataset it's self for the output file.
+    H5::DataSet _out_event_id_ds;
+
   };
 
 }

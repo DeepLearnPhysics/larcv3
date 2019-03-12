@@ -6,6 +6,8 @@
 #include "larcv/core/base/LArCVBaseUtilFunc.h"
 #include <algorithm>
 
+#define EVENT_ID_CHUNK_SIZE 10
+
 #include <mutex>
 std::mutex __ioman_mtx;
 namespace larcv {
@@ -14,7 +16,7 @@ namespace larcv {
     : larcv_base(name)
     , _io_mode          ( mode          )
     , _prepared         ( false         )
-    , _out_file         ( nullptr       )
+    // , _out_file         ( nullptr       )
     // , _in_tree_index    ( 0             )
     , _out_tree_index   ( 0             )
     // , _in_tree_entries  ( 0             )
@@ -135,14 +137,31 @@ namespace larcv {
       if (_out_file_name.empty()) throw larbys("Must set output file name!");
       LARCV_INFO() << "Opening an output file: " << _out_file_name << std::endl;
       // _out_file = TFile::Open(_out_file_name.c_str(), "RECREATE");
-      _out_file = new H5::H5File(_out_file_name.c_str(), H5F_ACC_TRUNC);
+      _out_file = H5::H5File(_out_file_name.c_str(), H5F_ACC_TRUNC);
 
       // Create the top level groups in the output file.
-      _out_file -> createGroup("/Events");
-      _out_file -> createGroup("/Data");
+      _out_file.createGroup("/Events");
+      _out_file.createGroup("/Data");
 
-      //////TODO
-      /// Create the output file here
+      // Create the output EventID dataset:
+      hsize_t starting_dim[] = {0};
+      hsize_t maxsize_dim[] = {H5S_UNLIMITED};
+
+      // Create a dataspace of rank 1, starting with 0 entries as above, growing to 
+      // unlimited entries.
+      H5::DataSpace dataspace(1, starting_dim, maxsize_dim);
+      LARCV_DEBUG() << "EventID Dataspace Created for new file" << std::endl;
+      /*
+       * Modify dataset creation properties, i.e. enable chunking.
+       */
+      H5::DSetCreatPropList cparms;
+      hsize_t chunk_dims[1] = {EVENT_ID_CHUNK_SIZE};
+      cparms.setChunk( 1, chunk_dims );
+
+
+      _out_event_id_ds = _out_file.createDataSet("Events/event_id", larcv::EventID::get_datatype(), dataspace, cparms);
+
+
 
     }
 
@@ -185,11 +204,10 @@ namespace larcv {
   {
     LARCV_DEBUG() << "start" << std::endl;
 
-    std::string tree_name = name.first + "_" + name.second + "_tree";
-    std::string tree_desc = name.second + " tree";
-    std::string br_name = name.first + "_" + name.second + "_branch";
+    std::string group_name = name.first + "_" + name.second + "_group";
+    std::string group_loc  = "/Data/" + group_name;
 
-    LARCV_INFO() << "Requested to register a producer: " << name.second << " (TTree " << tree_name << ")" << std::endl;
+    LARCV_INFO() << "Requested to register a producer: " << name.second << " (Group " << group_name << ")" << std::endl;
 
     auto in_iter = _key_list.find(name);
 
@@ -222,7 +240,7 @@ namespace larcv {
     // if (_io_mode != kWRITE) {
     //   LARCV_INFO() << "kREAD/kBOTH mode: creating an input TChain" << std::endl;
     //   LARCV_DEBUG() << "Branch name: " << br_name << " data pointer: " << _product_ptr_v[id] << std::endl;
-    //   auto in_tree_ptr = new TChain(tree_name.c_str(), tree_desc.c_str());
+    //   auto in_tree_ptr = new TChain(group_name.c_str(), tree_desc.c_str());
     //   in_tree_ptr->SetBranchAddress(br_name.c_str(), &(_product_ptr_v[id]));
     //   _in_tree_v[id] = in_tree_ptr;
     //   _in_tree_index_v.push_back(kINVALID_SIZE);
@@ -230,12 +248,13 @@ namespace larcv {
     // }
 
     if (_io_mode != kREAD) {
-      LARCV_INFO() << "kWRITE/kBOTH mode: creating an output TTree" << std::endl;
-      LARCV_DEBUG() << "Branch name: " << br_name << " data pointer: " << _product_ptr_v[id] << "(" << id << "/" << _product_ptr_v.size() << ")" << std::endl;
+      LARCV_INFO() << "kWRITE/kBOTH mode: creating an output group" << std::endl;
+      LARCV_DEBUG() << "Data pointer: " << _product_ptr_v[id] << "(" << id << "/" << _product_ptr_v.size() << ")" << std::endl;
       // _out_file->cd();
-      _out_tree_v[id] = new H5::Group(_out_file -> createGroup(tree_desc.c_str()));
+      _out_tree_v[id] = new H5::Group(_out_file.createGroup(group_loc.c_str()));
+      _product_ptr_v[id] -> initialize(_out_tree_v[id]);
       // auto out_br_ptr = _out_tree_v[id]->Branch(br_name.c_str(), &(_product_ptr_v[id]));
-      LARCV_DEBUG() << "Created TTree @ " << _out_tree_v[id] << " ... TBranch @ " << tree_desc.c_str() << std::endl;
+      LARCV_DEBUG() << "Created Group @ " << _out_tree_v[id] << std::endl;
       //// TODO
       // Link the eventbase tree here?
     }
@@ -419,6 +438,9 @@ namespace larcv {
         // }
       }
 
+      // First, update the eventID tree
+      this->append_event_id();
+
       for (size_t i = 0; i < _out_tree_v.size(); ++i) {
         auto& t = _out_tree_v[i];
         auto& p = _product_ptr_v[i];
@@ -458,10 +480,59 @@ namespace larcv {
 
     clear_entry();
 
+
     _out_tree_entries += 1;
     _out_tree_index += 1;
 
     return true;
+  }
+
+  void IOManager::append_event_id(){
+
+    //////////////////////////////////////////////////////////////////
+    // First, we get information about the current status of the dataset:
+    //////////////////////////////////////////////////////////////////
+
+
+    // Get the dataspace of the event ID dataset:
+    H5::DataSpace dataspace = _out_event_id_ds.getSpace();
+
+    // Get the dataset current size
+    // The eventID table is exclusively rank-1
+    hsize_t dims_current[1];
+    // hsize_t * dims_current = new hsize_t[rank];
+    int n_dims = dataspace.getSimpleExtentDims(dims_current, NULL);
+    
+
+    // Create a dimension for the data to add (which is the hyperslab data)
+    hsize_t dims_of_slab[1];
+    // For EventID, only adding one object per event
+    dims_of_slab[0] = 1;
+
+    //////////////////////////////////////////////////////////////////
+    // Now we need to extend the dataset to accomodate the new dimensions
+    //////////////////////////////////////////////////////////////////
+
+    // Create a size vector for the FULL dataset: previous + current
+    hsize_t size[1];
+    size[0] = dims_current[0] + dims_of_slab[0];
+
+
+    // Extend the dataset to accomodate the new data
+    _out_event_id_ds.extend(size);
+
+    // Now, select as a hyperslab the last section of data for writing:
+    dataspace = _out_event_id_ds.getSpace();
+    dataspace.selectHyperslab(H5S_SELECT_SET, dims_of_slab, dims_current);
+
+
+    // Define memory space:
+    H5::DataSpace memspace(1, dims_of_slab);
+
+    // Write the new data
+    _out_event_id_ds.write(&_event_id, EventID::get_datatype(), memspace, dataspace);
+
+
   }
 
   void IOManager::clear_entry()
@@ -653,8 +724,8 @@ namespace larcv {
         }
       }
       LARCV_NORMAL() << "Closing output file" << std::endl;
-      _out_file->close();
-      delete _out_file;
+      _out_file.close();
+      // delete _out_file;
       // _out_file = nullptr;
     }
 

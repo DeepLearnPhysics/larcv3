@@ -4,6 +4,7 @@
 #include "Particle.h"
 #include <set>
 #include <sstream>
+#include "larcv/core/base/larcv_logger.h"
 #include "larcv/core/base/larbys.h"
 
 namespace larcv {
@@ -38,31 +39,20 @@ namespace larcv {
     return ss.str();
   }
 
-  void ParticleSet::set(const std::vector<larcv::Particle>& part_v)
-  {
-    _part_v = part_v;
-    for(size_t i=0; i<_part_v.size(); ++i)
-      _part_v[i].id(i);
+  void Particle::creation_process (const std::string& proc) { 
+    if (proc.size() < PARTICLE_PROCESS_STRLEN){
+      std::copy(proc.begin(), proc.end(),_process); 
+    }
+    else{
+      LARCV_CRITICAL() << "Can not use a string longer than 64 characters in Particle creation_process!" << std::endl;
+      throw larbys();
+    }
+  }
+  std::string Particle::creation_process() const { 
+    return std::string(_process); 
   }
 
-  void ParticleSet::append(const larcv::Particle& part)
-  {
-    _part_v.push_back(part);
-    _part_v.back().id(_part_v.size()-1);
-  }
 
-  void ParticleSet::emplace_back(larcv::Particle&& part)
-  {
-    _part_v.emplace_back(std::move(part));
-    _part_v.back().id(_part_v.size()-1);
-  }
-
-  void ParticleSet::emplace(std::vector<larcv::Particle>&& part_v)
-  {
-    _part_v = std::move(part_v);
-    for(size_t i=0; i<_part_v.size(); ++i)
-      _part_v[i].id(i);
-  }
 }
 
 #endif

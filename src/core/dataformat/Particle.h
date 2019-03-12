@@ -19,6 +19,9 @@
 // #include "BBox.h"
 #include "DataFormatTypes.h"
 
+// In hdf5, strings are fixed length so we set the maximum length here:
+#define PARTICLE_PROCESS_STRLEN 64
+
 namespace larcv {
 
   /**
@@ -81,7 +84,7 @@ namespace larcv {
     inline double       distance_travel () const { return _dist_travel;     }
     inline double       energy_init     () const { return _energy_init;     }
     inline double       energy_deposit  () const { return _energy_deposit;  }
-    inline const std::string& creation_process() const { return _process; }
+           std::string  creation_process() const;
     
     // const BBox2D& boundingbox_2d(ProjectionID_t id) const;
     // inline const std::vector<larcv::BBox2D>& boundingbox_2d() const { return _bb2d_v; }
@@ -132,7 +135,7 @@ namespace larcv {
     inline void distance_travel ( double dist ) { _dist_travel = dist; }
     inline void energy_init     (double e)           { _energy_init = e;    }
     inline void energy_deposit  (double e)           { _energy_deposit = e; }
-    inline void creation_process (const std::string& proc) { _process = proc; }
+           void creation_process (const std::string& proc);
     // inline void boundingbox_2d(const std::vector<larcv::BBox2D>& bb_v) { _bb2d_v = bb_v; }
     // inline void boundingbox_2d(const BBox2D& bb, ProjectionID_t id) { _bb2d_v.resize(id+1); _bb2d_v[id] = bb; }
     // inline void boundingbox_3d(const BBox3D& bb) { _bb3d = bb; }
@@ -150,6 +153,44 @@ namespace larcv {
     inline void ancestor_position (double x, double y, double z, double t) { _ancestor_vtx = Vertex(x,y,z,t); }
 
     std::string dump() const;
+
+#ifndef SWIG
+  public: 
+    static H5::CompType get_datatype() {
+      H5::CompType datatype(sizeof(Particle));
+
+      // Get the compound types:
+      H5::StrType string_type(0, PARTICLE_PROCESS_STRLEN);
+
+      datatype.insertMember("id",               offsetof(Particle, _id),               larcv::get_datatype<InstanceID_t>());
+      datatype.insertMember("mcst_index",       offsetof(Particle, _mcst_index),       larcv::get_datatype<MCSTIndex_t>());
+      datatype.insertMember("mct_index",        offsetof(Particle, _mct_index),        larcv::get_datatype<MCTIndex_t>());
+      datatype.insertMember("shape",            offsetof(Particle, _shape),            larcv::get_datatype<ShapeType_t>());
+      datatype.insertMember("current_type",     offsetof(Particle, _current_type),     larcv::get_datatype<short>());
+      datatype.insertMember("interaction_type", offsetof(Particle, _interaction_type), larcv::get_datatype<short>());
+      datatype.insertMember("trackid",          offsetof(Particle, _trackid),          larcv::get_datatype<unsigned int>());
+      datatype.insertMember("pdg",              offsetof(Particle, _pdg),              larcv::get_datatype<int>());
+      datatype.insertMember("px",               offsetof(Particle, _px),               larcv::get_datatype<double>());
+      datatype.insertMember("py",               offsetof(Particle, _py),               larcv::get_datatype<double>());
+      datatype.insertMember("pz",               offsetof(Particle, _pz),               larcv::get_datatype<double>());
+      datatype.insertMember("vtx",              offsetof(Particle, _vtx),              Vertex::get_datatype());
+      datatype.insertMember("end_pt",           offsetof(Particle, _end_pt),           Vertex::get_datatype());
+      datatype.insertMember("first_step",       offsetof(Particle, _first_step),       Vertex::get_datatype());
+      datatype.insertMember("last_step",        offsetof(Particle, _last_step),        Vertex::get_datatype());
+      datatype.insertMember("dist_travel",      offsetof(Particle, _dist_travel),      larcv::get_datatype<double>());
+      datatype.insertMember("energy_init",      offsetof(Particle, _energy_init),      larcv::get_datatype<double>());
+      datatype.insertMember("energy_deposit",   offsetof(Particle, _energy_deposit),   larcv::get_datatype<double>());
+      datatype.insertMember("process",          offsetof(Particle, _process),          string_type);
+      datatype.insertMember("parent_trackid",   offsetof(Particle, _parent_trackid),   larcv::get_datatype<unsigned int>());
+      datatype.insertMember("parent_pdg",       offsetof(Particle, _parent_pdg),       larcv::get_datatype<int>());
+      datatype.insertMember("parent_vtx",       offsetof(Particle, _parent_vtx),       Vertex::get_datatype());
+      datatype.insertMember("ancestor_trackid", offsetof(Particle, _ancestor_trackid), larcv::get_datatype<unsigned int>());
+      datatype.insertMember("ancestor_pdg",     offsetof(Particle, _ancestor_pdg),     larcv::get_datatype<int>());
+      datatype.insertMember("ancestor_vtx",     offsetof(Particle, _ancestor_vtx),     Vertex::get_datatype());
+
+      return datatype;
+    }
+#endif
 
   private:
 
@@ -172,7 +213,7 @@ namespace larcv {
     double       _dist_travel; ///< filled only if MCTrack origin: distance measured along the trajectory
     double       _energy_init; ///< initial energy of the particle
     double       _energy_deposit; ///< deposited energy of the particle in the detector
-    std::string  _process;     ///< string identifier of the particle's creation process from Geant4
+    char         _process[PARTICLE_PROCESS_STRLEN];     ///< string identifier of the particle's creation process from Geant4
     // std::vector<larcv::BBox2D> _bb2d_v; ///< bounding box of particle's trajectory in 2D projections. index = ProjectionID_t
     // larcv::BBox3D _bb3d; ///< bounding box of particle's trajectory in 3D
     // int _num_voxels; ///< Number of voxels in the particle's 3D cluster.
@@ -189,32 +230,7 @@ namespace larcv {
 
   };
 
-  /**
-     \class ParticleSet
-     \brief Particle/Interaction collection
-  */
-  class ParticleSet {
-  public:
-    ParticleSet() {}
-    virtual ~ParticleSet() {}
-
-    void clear() { _part_v.clear(); }
-
-    inline const std::vector<larcv::Particle>& as_vector() const
-    { return _part_v; }
-
-    void set(const std::vector<larcv::Particle>& part_v);
-
-    void append(const larcv::Particle& part);
-
-    void emplace_back(larcv::Particle&& part);
-
-    void emplace(std::vector<larcv::Particle>&& part_v);
-
-  private:
-
-    std::vector<larcv::Particle> _part_v; ///< a collection of particles (index maintained)
-  };
+  
 }
 #endif
 /** @} */ // end of doxygen group
