@@ -46,10 +46,11 @@ namespace larcv {
 
     inline const std::vector<larcv::Particle>& as_vector() const
     { return _part_v; }
-
+#ifndef SWIG
     void initialize(H5::Group * group);
     void serialize (H5::Group * group);
     void deserialize(H5::Group * group, size_t entry);
+#endif
 
   private:
 
@@ -58,13 +59,14 @@ namespace larcv {
   };
 }
 
+
 #include "IOManager.h"
 namespace larcv {
 
   // Template instantiation for IO
   template<> inline std::string product_unique_name<larcv::EventParticle>() { return "particle"; }
-  template EventParticle& IOManager::get_data<larcv::EventParticle>(const std::string&);
-  template EventParticle& IOManager::get_data<larcv::EventParticle>(const ProducerID_t);
+  template<> EventParticle& IOManager::get_data<larcv::EventParticle>(const std::string&);
+  template<> EventParticle& IOManager::get_data<larcv::EventParticle>(const ProducerID_t);
 
   /**
      \class larcv::EventParticle
@@ -83,6 +85,8 @@ namespace larcv {
 
   
 }
+
+
 #endif
 /** @} */ // end of doxygen group 
 

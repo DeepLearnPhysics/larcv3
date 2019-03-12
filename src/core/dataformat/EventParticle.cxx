@@ -42,6 +42,126 @@ namespace larcv{
 
   void EventParticle::serialize(H5::Group * group){
 
+    std::cout << "Serialize called" << std::endl;
+
+    // Serialization is a multi step process.  
+    // - First, we update the data table.
+    //  - fetch the dataset from the group
+    //  - Note the total size of the dataset as the 'first' extents object
+    //  - extend the dataset by _part_v.size() elements
+    //  - Note 'first' + _part_v.size() as the 'last' extents object
+    //  - select a hyperslab of the last _part_v.size() elements
+    //  - write the data to the group
+    // - Create an extents object from first and last
+    // - Get the extents dataset.
+    //  - Extend the extents dataset by 1
+    //  - Append the latest extents
+    // Return
+
+
+    /////////////////////////////////////////////////////////
+    // Create the new extents object
+    /////////////////////////////////////////////////////////
+    Extents_t next_extents;
+
+
+
+    /////////////////////////////////////////////////////////
+    // Get and extend the particles dataset
+    /////////////////////////////////////////////////////////
+    H5::DataSet particles_dataset = group->openDataSet("particles");
+
+    // Get a dataspace inside this file:
+    H5::DataSpace particles_dataspace = particles_dataset.getSpace();
+
+    // Get the dataset current size
+    hsize_t particles_dims_current[1];
+    particles_dataspace.getSimpleExtentDims(particles_dims_current, NULL);
+
+    // Make a note of the first index:
+    next_extents.first = particles_dims_current[0];
+
+    // Create a dimension for the data to add (which is the hyperslab data)
+    hsize_t particles_slab_dims[1];
+    particles_slab_dims[0] = _part_v.size();
+
+
+    // Create a size vector for the FULL dataset: previous + current
+    hsize_t particles_size[1];
+    particles_size[0] = particles_dims_current[0] + particles_slab_dims[0];
+
+    // Make a note of the last index:
+    next_extents.last = particles_size[0];
+
+
+    // Extend the dataset to accomodate the new data
+    particles_dataset.extend(particles_size);
+
+
+    /////////////////////////////////////////////////////////
+    // Write the new particles to the dataset
+    /////////////////////////////////////////////////////////
+
+    // Select as a hyperslab the last section of data for writing:
+    particles_dataspace = particles_dataset.getSpace();
+    particles_dataspace.selectHyperslab(H5S_SELECT_SET, particles_slab_dims, particles_dims_current);
+
+    // Define memory space:
+    H5::DataSpace particles_memspace(1, particles_slab_dims);
+
+
+    // Write the new data
+    particles_dataset.write(&(_part_v[0]), larcv::Particle::get_datatype(), particles_memspace, particles_dataspace);
+
+
+
+    /////////////////////////////////////////////////////////
+    // Get the extents dataset
+    /////////////////////////////////////////////////////////
+
+    H5::DataSet extents_dataset = group->openDataSet("extents");
+
+    // Get a dataspace inside this file:
+    H5::DataSpace extents_dataspace = extents_dataset.getSpace();
+
+
+    // Get the dataset current size
+    hsize_t extents_dims_current[1];
+    extents_dataspace.getSimpleExtentDims(extents_dims_current, NULL);
+
+    // Create a dimension for the data to add (which is the hyperslab data)
+    hsize_t extents_slab_dims[1];
+    extents_slab_dims[0] = 1;
+
+
+    // Create a size vector for the FULL dataset: previous + current
+    hsize_t extents_size[1];
+    extents_size[0] = extents_dims_current[0] + extents_slab_dims[0];
+
+    // Extend the dataset to accomodate the new data
+    extents_dataset.extend(extents_size);
+
+
+    /////////////////////////////////////////////////////////
+    // Write the new extents entry to the dataset
+    /////////////////////////////////////////////////////////
+
+    // Now, select as a hyperslab the last section of data for writing:
+    extents_dataspace = extents_dataset.getSpace();
+    extents_dataspace.selectHyperslab(H5S_SELECT_SET, extents_slab_dims, extents_dims_current);
+
+    // Define memory space:
+    H5::DataSpace extents_memspace(1, extents_slab_dims);
+
+
+    // Write the new data
+    extents_dataset.write(&(next_extents), larcv::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
+
+
+    /////////////////////////////////////////////////////////
+    // Serialized!
+    /////////////////////////////////////////////////////////
+
 
     return;
   }

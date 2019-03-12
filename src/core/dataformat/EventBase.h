@@ -19,7 +19,6 @@
 #include "DataFormatTypes.h"
 
 // There is no need to generate an explicit wrapper for EventBase, since it's virtual
-#ifndef SWIG
 
 namespace larcv {
   // class IOManager;
@@ -33,21 +32,14 @@ namespace larcv {
     friend class DataProductFactory;
   public:
     
-    /// Default constructor
-    virtual EventBase() = 0;
-
-    /// Default destructor
-    virtual ~EventBase() = 0;
-    /// Set all run/subrun/event to kINVALID_SIZE
-
     void clear() {};
-    virtual void initialize(H5::Group *) = 0;
-    virtual void serialize(H5::Group * group) = 0;
-    virtual void deserialize(H5::Group * group, size_t entry) = 0;
-
+#ifndef SWIG
+    void initialize(H5::Group *) {};
+    void serialize(H5::Group * group) {};
+    void deserialize(H5::Group * group, size_t entry) {};
+#endif
   };
 }
-#endif
 
 #endif //inc guard
 /** @} */ // end of doxygen group 
