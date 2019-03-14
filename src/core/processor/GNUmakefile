@@ -1,7 +1,7 @@
 #
 # This is an example GNUmakefile for my packages
 #
-PACKAGE_NAME = dataformat
+PACKAGE_NAME = processor
 
 # specific names for this package
 SOURCES = $(wildcard *.cxx)
@@ -20,12 +20,15 @@ OSNAMEMODE      = $(OSNAME)
 
 include $(LARCV_BASEDIR)/Makefile/Makefile.${OSNAME}
 
-INCFLAGS += -I$(LARCV_H5INCDIR)
-
-LDFLAGS += -L$(LARCV_LIBDIR) -lbase -L$(LARCV_H5LIBDIR) -lhdf5_cpp -lhdf5 -lhdf5_hl
+LDFLAGS += -L$(LARCV_LIBDIR) -lbase -ldataformat -L$(LARCV_H5LIBDIR) -lhdf5_cpp -lhdf5 -lhdf5_hl 
 # call the common GNUmakefile
 include $(LARCV_BASEDIR)/Makefile/GNUmakefile.CORE
 
-pkg_build: # nothing extra to do in this package
-pkg_clean: # nothing extra to do in this package
-
+pkg_build:
+	@cp -f bin/run_processor $(LARCV_BINDIR)/run_processor
+	@cp -f bin/run_processor.py $(LARCV_BINDIR)/run_processor.py
+	@cp -f bin/run_processordb $(LARCV_BINDIR)/run_processordb
+pkg_clean:
+	@rm -f $(LARCV_BINDIR)/run_processor
+	@rm -f $(LARCV_BINDIR)/run_processor.py
+	@rm -f $(LARCV_BINDIR)/run_processordb

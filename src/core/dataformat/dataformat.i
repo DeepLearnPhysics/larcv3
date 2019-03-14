@@ -13,9 +13,7 @@
 
 using namespace larcv;
 %}
-%newobject IOManager::get_data;
-%factory(EventBase*, EventParticle);
-
+%include "larcv/core/base/base.i"
 %include "std_string.i"
 %include "DataFormatTypes.h"
 %include "Point.h"

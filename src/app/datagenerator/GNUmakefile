@@ -1,13 +1,17 @@
 #
 # This is an example GNUmakefile for my packages
 #
-PACKAGE_NAME = Processor
+PACKAGE_NAME = datagenerator
 
 # specific names for this package
 SOURCES = $(wildcard *.cxx)
-FMWK_HEADERS = LinkDef.h
+FMWK_HEADERS = stack_trace.h
 HEADERS = $(filter-out $(FMWK_HEADERS), $(wildcard *.h))
 HEADERS_DEST = larcv/core/$(PACKAGE_NAME)
+#IMPS = $(wildcard *.inl)
+
+
+USE_OPENCV=$(LARCV_OPENCV)
 
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
@@ -20,15 +24,9 @@ OSNAMEMODE      = $(OSNAME)
 
 include $(LARCV_BASEDIR)/Makefile/Makefile.${OSNAME}
 
-LDFLAGS += -L$(LARCV_LIBDIR) -lLArCVBase -lLArCVDataFormat
 # call the common GNUmakefile
 include $(LARCV_BASEDIR)/Makefile/GNUmakefile.CORE
 
-pkg_build:
-	@cp -f bin/run_processor $(LARCV_BINDIR)/run_processor
-	@cp -f bin/run_processor.py $(LARCV_BINDIR)/run_processor.py
-	@cp -f bin/run_processordb $(LARCV_BINDIR)/run_processordb
-pkg_clean:
-	@rm -f $(LARCV_BINDIR)/run_processor
-	@rm -f $(LARCV_BINDIR)/run_processor.py
-	@rm -f $(LARCV_BINDIR)/run_processordb
+pkg_build: # nothing extra to do in this package
+pkg_clean: # nothing extra to do in this package
+

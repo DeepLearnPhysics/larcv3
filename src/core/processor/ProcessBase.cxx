@@ -11,10 +11,9 @@ namespace larcv {
     , _proc_count ( 0  )
     , _id         ( kINVALID_SIZE )
     , _profile    ( false )
-    , _fout       ( nullptr )
   {}
 
-  bool ProcessBase::is(const std::string question) const
+  bool ProcessBase::_is_(const std::string question) const
   { return false; }
 
   void ProcessBase::_configure_(const PSet& cfg)

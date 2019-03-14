@@ -18,7 +18,7 @@
 #include "Particle.h"
 #include "DataProductFactory.h"
 
-
+class EventParticle;
 
 namespace larcv {
   /**
@@ -37,7 +37,7 @@ namespace larcv {
 
     /// Data clear method
     inline void clear()
-    { EventBase::clear(); _part_v.clear();}
+    { std::cout<< "Clearing" << std::endl; EventBase::clear(); _part_v.clear();}
 
     void set(const std::vector<larcv::Particle>& part_v);
     void append(const larcv::Particle& part);
@@ -46,11 +46,18 @@ namespace larcv {
 
     inline const std::vector<larcv::Particle>& as_vector() const
     { return _part_v; }
-#ifndef SWIG
-    void initialize(H5::Group * group);
-    void serialize (H5::Group * group);
+
+    inline size_t size() const {return _part_v.size();}
+
+// #ifndef SWIG
+    void initialize (H5::Group * group);
+    void serialize  (H5::Group * group);
     void deserialize(H5::Group * group, size_t entry);
-#endif
+// #endif
+
+    static EventParticle * to_particle(EventBase * e){
+      return (EventParticle *) e;
+    }
 
   private:
 
@@ -64,9 +71,12 @@ namespace larcv {
 namespace larcv {
 
   // Template instantiation for IO
-  template<> inline std::string product_unique_name<larcv::EventParticle>() { return "particle"; }
-  template<> EventParticle& IOManager::get_data<larcv::EventParticle>(const std::string&);
-  template<> EventParticle& IOManager::get_data<larcv::EventParticle>(const ProducerID_t);
+  template<> 
+  inline std::string product_unique_name<larcv::EventParticle>() { return "particle"; }
+  template<> 
+  EventParticle& IOManager::get_data<larcv::EventParticle>(const std::string&);
+  template<> 
+  EventParticle& IOManager::get_data<larcv::EventParticle>(const ProducerID_t);
 
   /**
      \class larcv::EventParticle

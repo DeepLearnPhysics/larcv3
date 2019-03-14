@@ -16,11 +16,15 @@
 
 #include <iostream>
 #include <map>
-#include "larcv/core/Base/larcv_base.h"
+#include "larcv/core/base/larcv_base.h"
 #include "ProcessBase.h"
 
 #include <mutex>
+
+#ifndef SWIG
 static std::mutex __procfactory_mtx;
+#endif
+
 namespace larcv {
 
   /**

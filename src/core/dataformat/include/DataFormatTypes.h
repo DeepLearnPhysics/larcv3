@@ -1,7 +1,7 @@
 #ifndef __LARCV_DATAFORMATTYPES_H__
 #define __LARCV_DATAFORMATTYPES_H__
 
-#include "larcv/core/base/LArCVTypes.h"
+#include "LArCVTypes.h"
 #include "H5Cpp.h"
 #include <vector>
 #include <set>

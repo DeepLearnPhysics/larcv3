@@ -38,7 +38,7 @@ namespace larcv{
   }
 
 ////////Serialization is hidden from SWIG:
-#ifndef SWIG
+// #ifndef SWIG
 
   void EventParticle::serialize(H5::Group * group){
 
@@ -245,8 +245,8 @@ namespace larcv{
     return;
   }
 
-#endif // swig
+// #endif // swig
 
-}
+} // larcv
 
 #endif

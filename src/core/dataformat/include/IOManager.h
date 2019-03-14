@@ -17,15 +17,12 @@
 #include <iostream>
 #include <map>
 #include <set>
-// #include <TTree.h>
-// #include <TChain.h>
-// #include <TFile.h>
 
 #include "H5Cpp.h"
 
-#include "larcv/core/base/larcv_base.h"
-#include "larcv/core/base/larbys.h"
-#include "larcv/core/base/PSet.h"
+#include "larcv_base.h"
+#include "larbys.h"
+#include "PSet.h"
 #include "EventBase.h"
 #include "EventID.h"
 
@@ -45,7 +42,7 @@ namespace larcv {
     IOManager(IOMode_t mode = kREAD, std::string name = "IOManager");
 
     /// Configuration PSet construction so you don't have to call setter functions
-    // IOManager(const PSet& cfg);
+    IOManager(const PSet& cfg);
 
     /// Configuration PSet file construction so you don't have to call setter functions
     IOManager(std::string config_file, std::string name = "IOManager");
@@ -55,39 +52,40 @@ namespace larcv {
     /// IO mode accessor
     IOMode_t io_mode() const { return _io_mode;}
     void reset();
-    // void add_in_file(const std::string filename, const std::string dirname = "");
-    // void clear_in_file();
+    void add_in_file(const std::string filename, const std::string dirname = "");
+    void clear_in_file();
     void set_out_file(const std::string name);
     ProducerID_t producer_id(const ProducerName_t& name) const;
     void configure(const PSet& cfg);
     bool initialize();
-    // bool read_entry(const size_t index, bool force_reload = false);
+    bool read_entry(const size_t index, bool force_reload = false);
     bool save_entry();
     void finalize();
     void clear_entry();
     void set_id(const size_t run, const size_t subrun, const size_t event);
-    // size_t current_entry() const { return _in_tree_index; }
+    size_t current_entry() const { return _in_group_index; }
 
     size_t get_n_entries_out() const
-    { return _out_tree_entries;}
+    { return _out_group_entries;}
 
     std::string get_file_out_name() const
     { return _out_file_name;}
 
-    // size_t get_n_entries() const
-    // { return (_in_tree_entries ? _in_tree_entries : _out_tree_entries); }
+    size_t get_n_entries() const
+    { return (_in_group_entries ? _in_group_entries : _out_group_entries); }
 
     EventBase* get_data(const std::string& type, const std::string& producer);
     EventBase* get_data(const ProducerID_t id);
-
     //
     // Some template class getter for auto-cast
     //
 
-    template <class T> T& get_data(const std::string& producer)
+    template <class T> 
+    T& get_data(const std::string& producer)
     { return *((T*)(this->get_data(product_unique_name<T>(), producer))); }
 
-    template <class T> T& get_data(const ProducerID_t id)
+    template <class T> 
+    T& get_data(const ProducerID_t id)
     {
       if (id >= _product_type_v.size()) {
         LARCV_CRITICAL() << "Invalid producer id: " << id << " requested " << std::endl;
@@ -126,12 +124,12 @@ namespace larcv {
       return res;
     }
 
-    // const std::vector<std::string>& file_list() const
-    // { return _in_file_v; }
+    const std::vector<std::string>& file_list() const
+    { return _in_file_v; }
 
   private:
     void   set_id();
-    // void   prepare_input();
+    void   prepare_input();
     size_t register_producer(const ProducerName_t& name);
 
     void append_event_id();
@@ -139,28 +137,28 @@ namespace larcv {
     IOMode_t    _io_mode;
     bool        _prepared;
     H5::H5File  _out_file;
-    // size_t      _in_tree_index;
-    size_t      _out_tree_index;
-    // size_t      _in_tree_entries;
-    size_t      _out_tree_entries;
+    size_t      _in_group_index;
+    size_t      _out_group_index;
+    size_t      _in_group_entries;
+    size_t      _out_group_entries;
     EventID   _event_id;
     EventID   _set_event_id;
     EventID   _last_event_id;
     std::string _out_file_name;
-    // std::vector<std::string>     _in_file_v;
-    // std::vector<std::string>     _in_dir_v;
+    std::vector<std::string>        _in_file_v;
+    std::vector<std::string>        _in_dir_v;
     std::map<larcv::ProducerName_t, larcv::ProducerID_t> _key_list;
-    std::vector<H5::Group*>         _out_tree_v;
-    // std::vector<H5::Group*>      _in_tree_v;
-    // std::vector<size_t>          _in_tree_index_v;
-    // std::vector<size_t>          _in_tree_entries_v;
-    size_t _product_ctr;
+    std::vector<H5::Group*>         _out_group_v;
+    std::vector<H5::Group*>         _in_group_v;
+    std::vector<size_t>             _in_group_index_v;
+    std::vector<size_t>             _in_group_entries_v;
+    size_t                          _product_ctr;
     std::vector<larcv::EventBase*> _product_ptr_v;
     std::vector<std::string>       _product_type_v;
     std::map<std::string,std::set<std::string> > _store_only;
-    // std::map<std::string,std::set<std::string> > _read_only;
+    std::map<std::string,std::set<std::string> > _read_only;
     std::vector<bool> _store_id_bool;
-    // std::vector<bool> _read_id_bool;
+    std::vector<bool> _read_id_bool;
 
     // IOManager has to control the EventID dataset it's self for the output file.
     H5::DataSet _out_event_id_ds;

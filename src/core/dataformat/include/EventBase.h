@@ -15,7 +15,7 @@
 #define __LARCV_EVENTBASE_H
 
 #include <iostream>
-#include "larcv/core/base/larcv_base.h"
+#include "larcv_base.h"
 #include "DataFormatTypes.h"
 
 // There is no need to generate an explicit wrapper for EventBase, since it's virtual
@@ -33,11 +33,11 @@ namespace larcv {
   public:
     
     void clear() {};
-#ifndef SWIG
-    void initialize(H5::Group *) {};
-    void serialize(H5::Group * group) {};
+// #ifndef SWIG
+    void initialize(H5::Group *) {std::cout << "huh" << std::endl;};
+    void serialize(H5::Group * group) {std::cout << "huh2" << std::endl;};
     void deserialize(H5::Group * group, size_t entry) {};
-#endif
+// #endif
   };
 }
 

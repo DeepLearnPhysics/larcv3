@@ -16,8 +16,8 @@
 
 #include <iostream>
 #include <map>
-#include "larcv/core/base/larcv_base.h"
-#include "larcv/core/base/larbys.h"
+#include "larcv_base.h"
+#include "larbys.h"
 #include "EventBase.h"
 #include "DataFormatTypes.h"
 #include <sstream>

@@ -15,7 +15,7 @@
 #define PROCESSDRIVER_H
 
 #include <vector>
-#include "larcv/core/DataFormat/IOManager.h"
+#include "larcv/core/dataformat/IOManager.h"
 #include "ProcessBase.h"
 
 namespace larcv {
@@ -82,7 +82,7 @@ namespace larcv {
     // Information access methods
     //
     /// Returns larcv::EventBase object that contains an "ID" (run/event integers)
-    inline const EventBase& event_id() const 
+    inline const EventID& event_id() const 
     { return ( _io.io_mode() == larcv::IOManager::kREAD ? _io.event_id() : _io.last_event_id()); }
     /// Returns a unique ID (integer) assigned for a process module (provide the module's name in argument)
     ProcessID_t process_id(std::string name) const;
@@ -102,7 +102,7 @@ namespace larcv {
   private:
 
     bool _process_entry_();
-#ifndef __CINT__
+#ifndef SWIG
     size_t _batch_start_entry;
     size_t _batch_num_entry;
     size_t _current_entry;
@@ -113,8 +113,6 @@ namespace larcv {
     std::map<std::string,larcv::ProcessID_t> _proc_m;
     std::vector<larcv::ProcessBase*> _proc_v;
     bool _processing;
-    TFile* _fout;    
-    std::string _fout_name;
     bool _has_event_creator;
 #endif
   };

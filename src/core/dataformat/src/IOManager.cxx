@@ -3,7 +3,7 @@
 
 #include "IOManager.h"
 #include "DataProductFactory.h"
-#include "larcv/core/base/LArCVBaseUtilFunc.h"
+#include "LArCVBaseUtilFunc.h"
 #include <algorithm>
 
 #define EVENT_ID_CHUNK_SIZE 10
@@ -14,31 +14,30 @@ namespace larcv {
 
   IOManager::IOManager(IOMode_t mode, std::string name)
     : larcv_base(name)
-    , _io_mode          ( mode          )
-    , _prepared         ( false         )
+    , _io_mode           ( mode          )
+    , _prepared          ( false         )
     // , _out_file         ( nullptr       )
-    // , _in_tree_index    ( 0             )
-    , _out_tree_index   ( 0             )
-    // , _in_tree_entries  ( 0             )
-    , _out_tree_entries ( 0             )
-    , _out_file_name    ( ""            )
-    // , _in_file_v        ()
-    // , _in_dir_v         ()
-    , _key_list         ()
-    , _out_tree_v       ()
-    // , _in_tree_v        ()
-    // , _in_tree_index_v  ()
-    , _product_ctr      (0)
-    , _product_ptr_v    ()
-    , _product_type_v   ()
+    , _in_group_index    ( 0             )
+    , _out_group_index   ( 0             )
+    , _in_group_entries  ( 0             )
+    , _out_group_entries ( 0             )
+    , _out_file_name     ( ""            )
+    , _in_file_v         ()
+    , _in_dir_v          ()
+    , _key_list          ()
+    , _out_group_v       ()
+    , _in_group_v        ()
+    , _product_ctr       (0)
+    , _product_ptr_v     ()
+    , _product_type_v    ()
   { reset(); }
 
-  // IOManager::IOManager(const PSet& cfg)
-  //   : IOManager(kREAD, cfg.get<std::string>("Name"))
-  // {
-  //   reset();
-  //   configure(cfg);
-  // }
+  IOManager::IOManager(const PSet& cfg)
+    : IOManager(kREAD, cfg.get<std::string>("Name"))
+  {
+    reset();
+    configure(cfg);
+  }
 
   IOManager::IOManager(std::string config_file, std::string name)
     : IOManager(kREAD, name)
@@ -62,11 +61,11 @@ namespace larcv {
     configure(cfg);
   }
 
-  // void IOManager::add_in_file(const std::string filename, const std::string dirname)
-  // { _in_file_v.push_back(filename); _in_dir_v.push_back(dirname); }
+  void IOManager::add_in_file(const std::string filename, const std::string dirname)
+  { _in_file_v.push_back(filename); _in_dir_v.push_back(dirname); }
 
-  // void IOManager::clear_in_file()
-  // { _in_file_v.clear(); }
+  void IOManager::clear_in_file()
+  { _in_file_v.clear(); }
 
   void IOManager::set_out_file(const std::string name)
   { _out_file_name = name; }
@@ -89,17 +88,17 @@ namespace larcv {
     _io_mode = (IOMode_t)(cfg.get<unsigned short>("IOMode"));
     _out_file_name = cfg.get<std::string>("OutFileName", "");
 
-    // // Figure out input files
-    // _in_file_v.clear();
-    // _in_file_v = cfg.get<std::vector<std::string> >("InputFiles", _in_file_v);
-    // _in_dir_v.clear();
-    // _in_dir_v = cfg.get<std::vector<std::string> >("InputDirs", _in_dir_v);
-    // if (_in_dir_v.empty()) _in_dir_v.resize(_in_file_v.size(), "");
-    // if (_in_dir_v.size() != _in_file_v.size()) {
-    //   LARCV_CRITICAL() << "# of input file (" << _in_file_v.size()
-    //                    << ") != # of input dir (" << _in_dir_v.size() << ")!" << std::endl;
-    //   throw larbys();
-    // }
+    // Figure out input files
+    _in_file_v.clear();
+    _in_file_v = cfg.get<std::vector<std::string> >("InputFiles", _in_file_v);
+    _in_dir_v.clear();
+    _in_dir_v = cfg.get<std::vector<std::string> >("InputDirs", _in_dir_v);
+    if (_in_dir_v.empty()) _in_dir_v.resize(_in_file_v.size(), "");
+    if (_in_dir_v.size() != _in_file_v.size()) {
+      LARCV_CRITICAL() << "# of input file (" << _in_file_v.size()
+                       << ") != # of input dir (" << _in_dir_v.size() << ")!" << std::endl;
+      throw larbys();
+    }
 
     std::vector<std::string> store_only_name;
     std::vector<std::string> store_only_type;
@@ -114,18 +113,18 @@ namespace larcv {
       val.insert(store_only_name[i]);
     }
 
-    // std::vector<std::string> read_only_name;
-    // std::vector<std::string> read_only_type;
-    // read_only_name = cfg.get<std::vector<std::string> >("ReadOnlyName", read_only_name);
-    // read_only_type = cfg.get<std::vector<std::string> >("ReadOnlyType", read_only_type);
-    // if (read_only_name.size() != read_only_type.size()) {
-    //   LARCV_CRITICAL() << "ReadOnlyName and ReadOnlyType has different lengths!" << std::endl;
-    //   throw larbys();
-    // }
-    // for (size_t i = 0; i < read_only_name.size(); ++i) {
-    //   auto& val = _read_only[read_only_type[i]];
-    //   val.insert(read_only_name[i]);
-    // }
+    std::vector<std::string> read_only_name;
+    std::vector<std::string> read_only_type;
+    read_only_name = cfg.get<std::vector<std::string> >("ReadOnlyName", read_only_name);
+    read_only_type = cfg.get<std::vector<std::string> >("ReadOnlyType", read_only_type);
+    if (read_only_name.size() != read_only_type.size()) {
+      LARCV_CRITICAL() << "ReadOnlyName and ReadOnlyType has different lengths!" << std::endl;
+      throw larbys();
+    }
+    for (size_t i = 0; i < read_only_name.size(); ++i) {
+      auto& val = _read_only[read_only_type[i]];
+      val.insert(read_only_name[i]);
+    }
   }
 
   bool IOManager::initialize()
@@ -165,16 +164,16 @@ namespace larcv {
 
     }
 
-    // if (_io_mode != kWRITE) {
-    //   prepare_input();
-    //   if (!_in_tree_entries) {
-    //     LARCV_ERROR() << "Found 0 entries from input files..." << std::endl;
-    //     return false;
-    //   }
-    //   LARCV_NORMAL() << "Prepared input with " << _in_tree_entries << " entries..." << std::endl;
-    //   _read_id_bool.clear();
-    //   _read_id_bool.resize(_product_ctr, true);
-    // }
+    if (_io_mode != kWRITE) {
+      prepare_input();
+      if (!_in_group_entries) {
+        LARCV_ERROR() << "Found 0 entries from input files..." << std::endl;
+        return false;
+      }
+      LARCV_NORMAL() << "Prepared input with " << _in_group_entries << " entries..." << std::endl;
+      _read_id_bool.clear();
+      _read_id_bool.resize(_product_ctr, true);
+    }
 
 
     // // Now handle "store-only" configuration
@@ -193,8 +192,8 @@ namespace larcv {
     //   for (auto const& id : store_only_id) _store_id_bool.at(id) = true;
     // }
 
-    // _in_tree_index = 0;
-    _out_tree_index = 0;
+    // _in_group_index = 0;
+    _out_group_index = 0;
     _prepared = true;
 
     return true;
@@ -240,164 +239,174 @@ namespace larcv {
     // if (_io_mode != kWRITE) {
     //   LARCV_INFO() << "kREAD/kBOTH mode: creating an input TChain" << std::endl;
     //   LARCV_DEBUG() << "Branch name: " << br_name << " data pointer: " << _product_ptr_v[id] << std::endl;
-    //   auto in_tree_ptr = new TChain(group_name.c_str(), tree_desc.c_str());
-    //   in_tree_ptr->SetBranchAddress(br_name.c_str(), &(_product_ptr_v[id]));
-    //   _in_tree_v[id] = in_tree_ptr;
-    //   _in_tree_index_v.push_back(kINVALID_SIZE);
-    //   _in_tree_entries_v.push_back(0);
+    //   auto in_group_ptr = new TChain(group_name.c_str(), group_desc.c_str());
+    //   in_group_ptr->SetBranchAddress(br_name.c_str(), &(_product_ptr_v[id]));
+    //   _in_group_v[id] = in_group_ptr;
+    //   _in_group_index_v.push_back(kINVALID_SIZE);
+    //   _in_group_entries_v.push_back(0);
     // }
 
     if (_io_mode != kREAD) {
       LARCV_INFO() << "kWRITE/kBOTH mode: creating an output group" << std::endl;
       LARCV_DEBUG() << "Data pointer: " << _product_ptr_v[id] << "(" << id << "/" << _product_ptr_v.size() << ")" << std::endl;
       // _out_file->cd();
-      _out_tree_v[id] = new H5::Group(_out_file.createGroup(group_loc.c_str()));
-      _product_ptr_v[id] -> initialize(_out_tree_v[id]);
-      // auto out_br_ptr = _out_tree_v[id]->Branch(br_name.c_str(), &(_product_ptr_v[id]));
-      LARCV_DEBUG() << "Created Group @ " << _out_tree_v[id] << std::endl;
+      _out_group_v[id] = new H5::Group(_out_file.createGroup(group_loc.c_str()));
+      _product_ptr_v[id] -> initialize(_out_group_v[id]);
+      // auto out_br_ptr = _out_group_v[id]->Branch(br_name.c_str(), &(_product_ptr_v[id]));
+      LARCV_DEBUG() << "Created Group @ " << _out_group_v[id] << std::endl;
       //// TODO
-      // Link the eventbase tree here?
+      // Link the eventbase group here?
     }
 
     return id;
   }
 
-  // void IOManager::prepare_input()
-  // {
-  //   LARCV_DEBUG() << "start" << std::endl;
-  //   if (_product_ctr) {
-  //     LARCV_CRITICAL() << "Cannot call prepare_input before calling reset()!" << std::endl;
-  //     throw larbys();
-  //   }
+  void IOManager::prepare_input()
+  {
+    LARCV_DEBUG() << "start" << std::endl;
+    if (_product_ctr) {
+      LARCV_CRITICAL() << "Cannot call prepare_input before calling reset()!" << std::endl;
+      throw larbys();
+    }
 
-  //   LARCV_INFO() << "Start inspecting " << _in_file_v.size() << "files" << std::endl;
-  //   for (size_t i = 0; i < _in_file_v.size(); ++i) {
+    // This function serves several purposes:
+    // - It opens each file which ensures it exists
+    // - It reads the eventID table and determines how many entries are in the file
+    // - It looks at subgroups in the "Data" group and uses that to determine
+    //   which products are available
 
-  //     auto const& fname = _in_file_v[i];
-  //     auto const& dname = _in_dir_v[i];
+    // The following variables are populated:
+    // _in_group_entries_v
 
-  //     TFile *fin = TFile::Open(fname.c_str(), "READ");
-  //     if (!fin) {
-  //       LARCV_CRITICAL() << "Open attempt failed for a file: " << fname << std::endl;
-  //       throw larbys();
-  //     }
 
-  //     LARCV_NORMAL() << "Opening a file in READ mode: " << fname << std::endl;
-  //     TDirectoryFile* fin_dir = 0;
-  //     if (dname.empty()) fin_dir = fin;
-  //     else {
-  //       TObject* obj = fin->Get(dname.c_str());
-  //       if (!obj || std::string(obj->ClassName()) != "TDirectoryFile") {
-  //         LARCV_CRITICAL() << "Could not locate TDirectoryFile: " << dname << std::endl;
-  //         throw larbys();
-  //       }
-  //       fin_dir = (TDirectoryFile*)obj;
-  //     }
 
-  //     TList* key_list = fin_dir->GetListOfKeys();
-  //     TIter key_iter(key_list);
-  //     std::set<std::string> processed_object;
-  //     while (1) {
-  //       TObject* obj = key_iter.Next();
-  //       if (!obj) break;
-  //       if (processed_object.find(obj->GetName()) != processed_object.end()) continue;
-  //       obj = fin_dir->Get(obj->GetName());
-  //       LARCV_DEBUG() << "Found object " << obj->GetName() << " (type=" << obj->ClassName() << ")" << std::endl;
-  //       processed_object.insert(obj->GetName());
+    LARCV_INFO() << "Start inspecting " << _in_file_v.size() << "files" << std::endl;
+    for (size_t i = 0; i < _in_file_v.size(); ++i) {
 
-  //       if (std::string(obj->ClassName()) != "TTree") {
-  //         LARCV_DEBUG() << "Skipping " << obj->GetName() << " ... (not TTree)" << std::endl;
-  //         continue;
-  //       }
+      auto const& fname = _in_file_v[i];
+      auto const& dname = _in_dir_v[i];
 
-  //       std::string obj_name = obj->GetName();
+      H5::H5File *fin = new H5::H5File(fname.c_str(), H5F_ACC_RDONLY);
+      if (!fin) {
+        LARCV_CRITICAL() << "Open attempt failed for a file: " << fname << std::endl;
+        throw larbys();
+      }
 
-  //       char c[2] = "_";
-  //       if (obj_name.find_first_of(c) > obj_name.size() ||
-  //           obj_name.find_first_of(c) == obj_name.find_last_of(c)) {
-  //         LARCV_INFO() << "Skipping " << obj->GetName() << " ... (not LArCV TTree)" << std::endl;
-  //         continue;
-  //       }
+      LARCV_NORMAL() << "Opening a file in READ mode: " << fname << std::endl;
 
-  //       std::string type_name( obj_name.substr(0, obj_name.find_first_of(c)) );
-  //       std::string suffix( obj_name.substr(obj_name.find_last_of(c) + 1, obj_name.size() - obj_name.find_last_of(c)) );
-  //       std::string producer_name( obj_name.substr(obj_name.find_first_of(c) + 1, obj_name.find_last_of(c) - obj_name.find_first_of(c) - 1) );
+      // Each file has (or should have) two groups: "Data" and "Events"
+      H5::Group data   = fin->openGroup("/Data");
+      H5::Group events = fin->openGroup("/Events");
 
-  //       if (suffix != "tree") {
-  //         LARCV_INFO() << "Skipping " << obj->GetName() << " ... (not LArCV TTree)" << std::endl;
-  //         continue;
-  //       }
+      // Vist the extents group and determine how many events
+      for (size_t i = 0; i < events.getNumObjs(); ++i){
+        std::cout << data.getObjnameByIdx(i) << std::endl;
+      }
 
-  //       // If read-only is specified and not in a list, skip
-  //       if (_read_only.size()) {
-  //         bool skip = true;
-  //         auto const& type_name_iter = _read_only.find(type_name);
-  //         if(type_name_iter != _read_only.end()) {
-  //           auto const& type_name_s = (*type_name_iter).second;
-  //           auto const& name_iter = type_name_s.find(producer_name);
-  //           if(name_iter != type_name_s.end()) skip = false;
-  //         }
-  //         if (skip) {
-  //           LARCV_NORMAL() << "Skipping: producer=" << producer_name << " type= " << type_name << std::endl;
-  //           continue;
-  //         }
-  //         LARCV_INFO() << "Not skipping: producer=" << producer_name << " type= " << type_name << std::endl;
-  //       }
+    //   TList* key_list = fin_dir->GetListOfKeys();
+    //   TIter key_iter(key_list);
+    //   std::set<std::string> processed_object;
+    //   while (1) {
+    //     TObject* obj = key_iter.Next();
+    //     if (!obj) break;
+    //     if (processed_object.find(obj->GetName()) != processed_object.end()) continue;
+    //     obj = fin_dir->Get(obj->GetName());
+    //     LARCV_DEBUG() << "Found object " << obj->GetName() << " (type=" << obj->ClassName() << ")" << std::endl;
+    //     processed_object.insert(obj->GetName());
 
-  //       auto id = register_producer(ProducerName_t(type_name, producer_name));
-  //       LARCV_INFO() << "Registered: producer=" << producer_name << " Key=" << id << std::endl;
-  //       _in_tree_v[id]->AddFile(fname.c_str());
-  //     }
-  //   }
+    //     if (std::string(obj->ClassName()) != "Tgroup") {
+    //       LARCV_DEBUG() << "Skipping " << obj->GetName() << " ... (not Tgroup)" << std::endl;
+    //       continue;
+    //     }
 
-  //   if (!_in_tree_v.front()) {
-  //     _in_tree_entries = 0;
-  //     return;
-  //   }
+    //     std::string obj_name = obj->GetName();
 
-  //   // Get tree entries
-  //   _in_tree_entries = kINVALID_SIZE;
-  //   for (size_t id = 0; id < _in_tree_v.size(); ++id) {
-  //     auto& t = _in_tree_v[id];
-  //     if (!t) break;
-  //     size_t tmp_entries = t->GetEntries();
-  //     t->GetEntry(0);
-  //     LARCV_INFO() << "TTree " << t->GetName() << " has " << tmp_entries << " entries" << std::endl;
-  //     if (_in_tree_entries == kINVALID_SIZE) _in_tree_entries = tmp_entries;
-  //     else _in_tree_entries = (_in_tree_entries < tmp_entries ? _in_tree_entries : tmp_entries);
-  //     _in_tree_entries_v[id] = tmp_entries;
-  //   }
+    //     char c[2] = "_";
+    //     if (obj_name.find_first_of(c) > obj_name.size() ||
+    //         obj_name.find_first_of(c) == obj_name.find_last_of(c)) {
+    //       LARCV_INFO() << "Skipping " << obj->GetName() << " ... (not LArCV Tgroup)" << std::endl;
+    //       continue;
+    //     }
 
-  // }
+    //     std::string type_name( obj_name.substr(0, obj_name.find_first_of(c)) );
+    //     std::string suffix( obj_name.substr(obj_name.find_last_of(c) + 1, obj_name.size() - obj_name.find_last_of(c)) );
+    //     std::string producer_name( obj_name.substr(obj_name.find_first_of(c) + 1, obj_name.find_last_of(c) - obj_name.find_first_of(c) - 1) );
 
-  // bool IOManager::read_entry(const size_t index, bool force_reload)
-  // {
-  //   LARCV_DEBUG() << "start" << std::endl;
-  //   if (_io_mode == kWRITE) {
-  //     LARCV_WARNING() << "Nothing to read in kWRITE mode..." << std::endl;
-  //     return false;
-  //   }
-  //   if (!_prepared) {
-  //     LARCV_CRITICAL() << "Cannot be called before initialize()!" << std::endl;
-  //     throw larbys();
-  //   }
-  //   if (index >= _in_tree_entries) {
-  //     LARCV_ERROR() << "Input only has " << _in_tree_entries << " entries!" << std::endl;
-  //     return false;
-  //   }
-  //   if (_in_tree_index != index) {
-  //     _in_tree_index = index;
-  //     _event_id.clear();
-  //     _set_event_id.clear();
-  //   } else if (force_reload) {
-  //     _in_tree_index = index;
-  //     for (auto& v : _in_tree_index_v) v = kINVALID_SIZE;
-  //     _event_id.clear();
-  //     _set_event_id.clear();
-  //   }
-  //   LARCV_DEBUG() << "Current input tree index: " << _in_tree_index << std::endl;
-  //   return true;
-  // }
+    //     if (suffix != "group") {
+    //       LARCV_INFO() << "Skipping " << obj->GetName() << " ... (not LArCV Tgroup)" << std::endl;
+    //       continue;
+    //     }
+
+    //     // If read-only is specified and not in a list, skip
+    //     if (_read_only.size()) {
+    //       bool skip = true;
+    //       auto const& type_name_iter = _read_only.find(type_name);
+    //       if(type_name_iter != _read_only.end()) {
+    //         auto const& type_name_s = (*type_name_iter).second;
+    //         auto const& name_iter = type_name_s.find(producer_name);
+    //         if(name_iter != type_name_s.end()) skip = false;
+    //       }
+    //       if (skip) {
+    //         LARCV_NORMAL() << "Skipping: producer=" << producer_name << " type= " << type_name << std::endl;
+    //         continue;
+    //       }
+    //       LARCV_INFO() << "Not skipping: producer=" << producer_name << " type= " << type_name << std::endl;
+    //     }
+
+    //     auto id = register_producer(ProducerName_t(type_name, producer_name));
+    //     LARCV_INFO() << "Registered: producer=" << producer_name << " Key=" << id << std::endl;
+    //     _in_group_v[id]->AddFile(fname.c_str());
+    //   }
+    }
+
+    // if (!_in_group_v.front()) {
+    //   _in_group_entries = 0;
+    //   return;
+    // }
+
+    // // Get group entries
+    // _in_group_entries = kINVALID_SIZE;
+    // for (size_t id = 0; id < _in_group_v.size(); ++id) {
+    //   auto& t = _in_group_v[id];
+    //   if (!t) break;
+    //   size_t tmp_entries = t->GetEntries();
+    //   t->GetEntry(0);
+    //   LARCV_INFO() << "Tgroup " << t->GetName() << " has " << tmp_entries << " entries" << std::endl;
+    //   if (_in_group_entries == kINVALID_SIZE) _in_group_entries = tmp_entries;
+    //   else _in_group_entries = (_in_group_entries < tmp_entries ? _in_group_entries : tmp_entries);
+    //   _in_group_entries_v[id] = tmp_entries;
+    // }
+
+  }
+
+  bool IOManager::read_entry(const size_t index, bool force_reload)
+  {
+    LARCV_DEBUG() << "start" << std::endl;
+    if (_io_mode == kWRITE) {
+      LARCV_WARNING() << "Nothing to read in kWRITE mode..." << std::endl;
+      return false;
+    }
+    if (!_prepared) {
+      LARCV_CRITICAL() << "Cannot be called before initialize()!" << std::endl;
+      throw larbys();
+    }
+    if (index >= _in_group_entries) {
+      LARCV_ERROR() << "Input only has " << _in_group_entries << " entries!" << std::endl;
+      return false;
+    }
+    if (_in_group_index != index) {
+      _in_group_index = index;
+      _event_id.clear();
+      _set_event_id.clear();
+    } else if (force_reload) {
+      _in_group_index = index;
+      for (auto& v : _in_group_index_v) v = kINVALID_SIZE;
+      _event_id.clear();
+      _set_event_id.clear();
+    }
+    LARCV_DEBUG() << "Current input group index: " << _in_group_index << std::endl;
+    return true;
+  }
 
   bool IOManager::save_entry()
   {
@@ -413,11 +422,11 @@ namespace larcv {
       return false;
     }
 
-    // in kBOTH mode make sure all TTree entries are read-in
+    // in kBOTH mode make sure all Tgroup entries are read-in
     // if (_io_mode == kBOTH) {
-    //   for (size_t id = 0; id < _in_tree_index_v.size(); ++id) {
+    //   for (size_t id = 0; id < _in_group_index_v.size(); ++id) {
     //     if (_store_id_bool.size() && (id >= _store_id_bool.size() || !_store_id_bool[id])) continue;
-    //     if (_in_tree_index_v[id] == _in_tree_index) continue;
+    //     if (_in_group_index_v[id] == _in_group_index) continue;
     //     get_data(id);
     //   }
     // }
@@ -438,13 +447,15 @@ namespace larcv {
         // }
       }
 
-      // First, update the eventID tree
+      // First, update the eventID group
       this->append_event_id();
 
-      for (size_t i = 0; i < _out_tree_v.size(); ++i) {
-        auto& t = _out_tree_v[i];
+      for (size_t i = 0; i < _out_group_v.size(); ++i) {
+        auto& t = _out_group_v[i];
         auto& p = _product_ptr_v[i];
+        std::cout << "here "  << _product_type_v[i] << std::endl;
         if (!t) break;
+        std::cout << "here2 " << _product_type_v[i]  << std::endl;
         // TODO = address this debug line with the updated API
         // LARCV_DEBUG() << "Saving " << t-GetName>() << " entry " << t->GetEntries() << std::endl;
         // t->write();
@@ -468,7 +479,7 @@ namespace larcv {
 
       for (size_t i = 0; i < _store_id_bool.size(); ++i) {
         if (!_store_id_bool[i]) continue;
-        auto& t = _out_tree_v[i];
+        auto& t = _out_group_v[i];
         auto& p = _product_ptr_v[i];
         LARCV_DEBUG() << "Saving " << t->fromClass() 
                       // << " entry " << t->GetEntries() 
@@ -481,8 +492,8 @@ namespace larcv {
     clear_entry();
 
 
-    _out_tree_entries += 1;
-    _out_tree_index += 1;
+    _out_group_entries += 1;
+    _out_group_index += 1;
 
     return true;
   }
@@ -592,8 +603,8 @@ namespace larcv {
         LARCV_NORMAL() << type << " created w/ producer name " << producer << " but won't be stored in file (kREAD mode)" << std::endl;
       } 
       // else {
-      //   //for (size_t i = 0; i < _in_tree_index; ++i) _out_tree_v[id]->Fill();
-      //   LARCV_NORMAL() << "Created Group " << _out_tree_v[id]->fromClass() << " (id=" << id << ") w/ " << _in_tree_index << " entries..." << std::endl;
+      //   //for (size_t i = 0; i < _in_group_index; ++i) _out_group_v[id]->Fill();
+      //   LARCV_NORMAL() << "Created Group " << _out_group_v[id]->fromClass() << " (id=" << id << ") w/ " << _in_group_index << " entries..." << std::endl;
       // }
     }
     return get_data(id);
@@ -609,14 +620,14 @@ namespace larcv {
       throw larbys();
     }
 
-    // if (_io_mode != kWRITE && _in_tree_index != kINVALID_SIZE &&
-    //     _in_tree_index_v[id] != _in_tree_index &&
+    // if (_io_mode != kWRITE && _in_group_index != kINVALID_SIZE &&
+    //     _in_group_index_v[id] != _in_group_index &&
     //     (id >= _read_id_bool.size() || _read_id_bool[id])) {
 
-    //   if (_in_tree_entries_v[id]) {
-    //     LARCV_DEBUG() << "Reading in TTree " << _in_tree_v[id]->GetName() << " index " << _in_tree_index << std::endl;
-    //     _in_tree_v[id]->GetEntry(_in_tree_index);
-    //     _in_tree_index_v[id] = _in_tree_index;
+    //   if (_in_group_entries_v[id]) {
+    //     LARCV_DEBUG() << "Reading in Tgroup " << _in_group_v[id]->GetName() << " index " << _in_group_index << std::endl;
+    //     _in_group_v[id]->GetEntry(_in_group_index);
+    //     _in_group_index_v[id] = _in_group_index;
     //   }
 
     //   auto& ptr = _product_ptr_v[id];
@@ -672,7 +683,7 @@ namespace larcv {
       _event_id = _set_event_id;
     }
 
-    LARCV_INFO() << "Setting event id for output trees: " << _event_id.event_key() << std::endl;
+    LARCV_INFO() << "Setting event id for output groups: " << _event_id.event_key() << std::endl;
 
     for (size_t i = 0; i < _product_ptr_v.size(); ++i) {
 
@@ -700,13 +711,13 @@ namespace larcv {
 
     // if (_io_mode != kWRITE) {
     //   LARCV_INFO() << "Deleting input TChains" << std::endl;
-    //   for (auto& t : _in_tree_v) {if (!t) break; delete t;};
+    //   for (auto& t : _in_group_v) {if (!t) break; delete t;};
     // }
 
     if (_io_mode != kREAD) {
       // _out_file->cd();
       if (_store_id_bool.empty()) {
-        for (auto& t : _out_tree_v) {
+        for (auto& t : _out_group_v) {
           if (!t) break;
           LARCV_NORMAL() << "Writing " << t->fromClass() 
                          // << " with " << t->GetEntries() << " entries" 
@@ -716,7 +727,7 @@ namespace larcv {
       } else {
         for (size_t i = 0; i < _store_id_bool.size(); ++i) {
           if (!_store_id_bool[i]) continue;
-          auto& t = _out_tree_v[i];
+          auto& t = _out_group_v[i];
           LARCV_NORMAL() << "Writing " << t->fromClass() 
                          // << " with " << t->GetEntries() << " entries" 
                          << std::endl;
@@ -740,21 +751,21 @@ namespace larcv {
     LARCV_DEBUG() << "start" << std::endl;
     _event_id.clear();
     _set_event_id.clear();
-    // _in_tree_v.clear();
-    // _in_tree_v.resize(1000, nullptr);
-    // _in_tree_entries_v.clear();
-    // _in_tree_entries_v.resize(1000, 0);
-    // _in_tree_index_v.clear();
-    _out_tree_v.clear();
-    _out_tree_v.resize(1000, nullptr);
+    // _in_group_v.clear();
+    // _in_group_v.resize(1000, nullptr);
+    // _in_group_entries_v.clear();
+    // _in_group_entries_v.resize(1000, 0);
+    // _in_group_index_v.clear();
+    _out_group_v.clear();
+    _out_group_v.resize(1000, nullptr);
     _product_ptr_v.clear();
     _product_ptr_v.resize(1000, nullptr);
     _product_type_v.clear();
     _product_type_v.resize(1000, "");
     _product_ctr = 0;
-    // _in_tree_index = 0;
-    _out_tree_index = 0;
-    // _in_tree_entries = 0;
+    // _in_group_index = 0;
+    _out_group_index = 0;
+    // _in_group_entries = 0;
     _prepared = false;
     _out_file_name = "";
     // _in_file_v.clear();
