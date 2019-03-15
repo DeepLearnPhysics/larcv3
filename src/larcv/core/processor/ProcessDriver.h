@@ -15,7 +15,7 @@
 #define PROCESSDRIVER_H
 
 #include <vector>
-#include "larcv/core/dataformat/IOManager.h"
+#include "core/dataformat/IOManager.h"
 #include "ProcessBase.h"
 
 namespace larcv {

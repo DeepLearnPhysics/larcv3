@@ -14,8 +14,8 @@
 #ifndef PROCESSBASE_H
 #define PROCESSBASE_H
 
-#include "larcv/core/base/Watch.h"
-#include "larcv/core/dataformat/IOManager.h"
+#include "core/base/Watch.h"
+#include "core/dataformat/IOManager.h"
 #include "ProcessorTypes.h"
 
 namespace larcv {

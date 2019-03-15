@@ -5,7 +5,7 @@
 #include <random>
 #include <sstream>
 #include "ProcessFactory.h"
-#include "larcv/core/base/LArCVBaseUtilFunc.h"
+#include "core/base/LArCVBaseUtilFunc.h"
 namespace larcv {
 
 ProcessDriver::ProcessDriver(std::string name)

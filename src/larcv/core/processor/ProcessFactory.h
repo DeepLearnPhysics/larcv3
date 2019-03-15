@@ -16,7 +16,7 @@
 
 #include <iostream>
 #include <map>
-#include "larcv/core/base/larcv_base.h"
+#include "core/base/larcv_base.h"
 #include "ProcessBase.h"
 
 #include <mutex>
