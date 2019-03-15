@@ -3,8 +3,8 @@
 
 #include <sstream>
 #include "Vertex.h"
-#include "larbys.h"
-#include "larcv_logger.h"
+#include "core/base/larbys.h"
+#include "core/base/larcv_logger.h"
 
 namespace larcv {
 

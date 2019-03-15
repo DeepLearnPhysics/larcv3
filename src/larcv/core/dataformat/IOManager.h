@@ -20,9 +20,9 @@
 
 #include "H5Cpp.h"
 
-#include "larcv_base.h"
-#include "larbys.h"
-#include "PSet.h"
+#include "core/base/larcv_base.h"
+#include "core/base/larbys.h"
+#include "core/base/PSet.h"
 #include "EventBase.h"
 #include "EventID.h"
 

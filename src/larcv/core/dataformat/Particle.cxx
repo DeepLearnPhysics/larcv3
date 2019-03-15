@@ -4,8 +4,8 @@
 #include "Particle.h"
 #include <set>
 #include <sstream>
-#include "larcv_logger.h"
-#include "larbys.h"
+#include "core/base/larcv_logger.h"
+#include "core/base/larbys.h"
 
 namespace larcv {
 

@@ -15,7 +15,7 @@
 #define __LARCV_EVENTBASE_H
 
 #include <iostream>
-#include "larcv_base.h"
+#include "core/base/larcv_base.h"
 #include "DataFormatTypes.h"
 
 // There is no need to generate an explicit wrapper for EventBase, since it's virtual

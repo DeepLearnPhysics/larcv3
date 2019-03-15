@@ -3,7 +3,7 @@
 
 #include "IOManager.h"
 #include "DataProductFactory.h"
-#include "LArCVBaseUtilFunc.h"
+#include "core/base/LArCVBaseUtilFunc.h"
 #include <algorithm>
 
 #define EVENT_ID_CHUNK_SIZE 10
