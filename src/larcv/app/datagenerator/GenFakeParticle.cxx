@@ -2,7 +2,7 @@
 #define __GENFAKEPARTICLE_CXX__
 
 #include "GenFakeParticle.h"
-#include "larcv/core/dataformat/EventParticle.h"
+#include "core/dataformat/EventParticle.h"
 
 namespace larcv {
 

@@ -74,9 +74,9 @@ namespace larcv {
   template<> 
   inline std::string product_unique_name<larcv::EventParticle>() { return "particle"; }
   template<> 
-  EventParticle& IOManager::get_data<larcv::EventParticle>(const std::string&);
+  EventParticle& IOManager::get_data(const std::string&);
   template<> 
-  EventParticle& IOManager::get_data<larcv::EventParticle>(const ProducerID_t);
+  EventParticle& IOManager::get_data(const ProducerID_t);
 
   /**
      \class larcv::EventParticle

@@ -1,4 +1,4 @@
-%module base
+%module larcv
 %{
 /* Put header files here or function declarations like below */
 #include "core/base/LArCVTypes.h"

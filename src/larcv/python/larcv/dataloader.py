@@ -95,8 +95,8 @@ class larcv_data (object):
          time.sleep(0.005)
          sleep_ctr+=1
          if sleep_ctr%1000 ==0:
-            print 'queueing...'
-            print 'Data dim:',
+            print( 'queueing...')
+            print( 'Data dim:',)
             
       #sleep_ctr=0
       #while sleep_ctr<40:
@@ -110,11 +110,11 @@ class larcv_data (object):
          self.time_data_read += (self._read_end_time - self._read_start_time)
 
       if self._verbose:
-         print
-         print 'Data size:',self._proc.data().size()
-         print 'Label size:',self._proc.labels().size()
-         print 'Batch size:',self._proc.processed_entries().size()
-         print 'Total process counter:',self._proc.process_ctr()
+         print()
+         print( 'Data size:',self._proc.data().size())
+         print( 'Label size:',self._proc.labels().size())
+         print( 'Batch size:',self._proc.processed_entries().size())
+         print( 'Total process counter:',self._proc.process_ctr())
 
       ctime = time.time()
       #np_data = larcv.as_ndarray(self._proc.data()).reshape(self._batch,self._proc.data().size()/self._batch)#.astype(np.float32)
@@ -143,9 +143,9 @@ class larcv_data (object):
       return (self._data,np_label)
 
 def sig_kill(signal,frame):
-   print '\033[95mSIGINT detected.\033[00m Finishing the program gracefully.'
+   print( '\033[95mSIGINT detected.\033[00m Finishing the program gracefully.')
    for name,ptr in larcv_data._instance_m.iteritems():
-      print 'Terminating filler:',name
+      print( 'Terminating filler:',name)
       ptr.reset()
 
 signal.signal(signal.SIGINT,  sig_kill)

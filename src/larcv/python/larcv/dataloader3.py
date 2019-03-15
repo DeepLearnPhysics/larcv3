@@ -1,6 +1,5 @@
 #import ROOT,sys,time,os,signal
 from larcv import larcv
-import ROOT as rt
 import sys,time,os,signal
 import numpy as np
 import threading

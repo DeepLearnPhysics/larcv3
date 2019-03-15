@@ -14,8 +14,9 @@
 #ifndef __GENFAKEPARTICLE_H__
 #define __GENFAKEPARTICLE_H__
 
-#include "larcv/core/processor/ProcessBase.h"
-#include "larcv/core/processor/ProcessFactory.h"
+#include "core/processor/ProcessBase.h"
+#include "core/processor/ProcessFactory.h"
+#include "core/dataformat/EventParticle.h"
 
 #include <vector>
 #include <string>

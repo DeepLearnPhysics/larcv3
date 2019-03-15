@@ -1,16 +1,16 @@
 %module processor
 %{
 /* Put header files here or function declarations like below */
-#include "ProcessorTypes.h"
-#include "ProcessBase.h"
-#include "ProcessDriver.h"
-#include "ProcessFactory.h"
+#include "core/processor/ProcessorTypes.h"
+#include "core/processor/ProcessBase.h"
+#include "core/processor/ProcessDriver.h"
+#include "core/processor/ProcessFactory.h"
 
 using namespace larcv;
 %}
 
-%include "ProcessorTypes.h"
-%include "ProcessBase.h"
-%include "ProcessDriver.h"
-%include "ProcessFactory.h"
+%include "core/processor/ProcessorTypes.h"
+%include "core/processor/ProcessBase.h"
+%include "core/processor/ProcessDriver.h"
+%include "core/processor/ProcessFactory.h"
 
