@@ -29,7 +29,7 @@ namespace larcv {
 
   struct Extents_t{
     unsigned int first;
-    unsigned int last;
+    unsigned int n;
   };
 
   /// "ID" for Voxel3D

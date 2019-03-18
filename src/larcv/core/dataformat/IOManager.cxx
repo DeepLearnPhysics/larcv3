@@ -411,7 +411,6 @@ namespace larcv {
   bool IOManager::save_entry()
   {
     LARCV_DEBUG() << "start" << std::endl;
-
     if (!_prepared) {
       LARCV_CRITICAL() << "Cannot be called before initialize()!" << std::endl;
       throw larbys();
@@ -434,6 +433,7 @@ namespace larcv {
     LARCV_INFO() << "Saving new entry " << std::endl;
 
     set_id();
+    std::cout << "Saving new entry3" << std::endl;
 
     if (_store_id_bool.empty()) {
 
@@ -460,6 +460,7 @@ namespace larcv {
         // LARCV_DEBUG() << "Saving " << t-GetName>() << " entry " << t->GetEntries() << std::endl;
         // t->write();
         p->serialize(t);
+        std::cout << "here 3" << std::endl;
         p->clear();
       }
 
@@ -488,6 +489,7 @@ namespace larcv {
         p->clear();
       }
     }
+    std::cout << "Saving new entry4" << std::endl;
 
     clear_entry();
 

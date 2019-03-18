@@ -37,12 +37,14 @@ namespace larcv{
       _part_v[i].id(i);
   }
 
+  void EventParticle::clear(){ 
+    std::cout<< "Clearing" << std::endl; _part_v.clear();
+  }
 ////////Serialization is hidden from SWIG:
 // #ifndef SWIG
 
   void EventParticle::serialize(H5::Group * group){
 
-    std::cout << "Serialize called" << std::endl;
 
     // Serialization is a multi step process.  
     // - First, we update the data table.
@@ -91,7 +93,7 @@ namespace larcv{
     particles_size[0] = particles_dims_current[0] + particles_slab_dims[0];
 
     // Make a note of the last index:
-    next_extents.last = particles_size[0];
+    next_extents.n = _part_v.size();
 
 
     // Extend the dataset to accomodate the new data
@@ -176,7 +178,6 @@ namespace larcv{
       throw larbys();
     }
 
-    std::cout << "Initialize Called" << std::endl;
 
     // For particles, we store a flat table of particles and an extents table.
 

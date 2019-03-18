@@ -28,6 +28,8 @@
 
 //#include "ProductMap.h"
 namespace larcv {
+
+
   /**
     \class IOManager
     \brief LArCV file IO hanlder class: it can read/write LArCV file.
@@ -81,11 +83,11 @@ namespace larcv {
     //
 
     template <class T> 
-    T& get_data(const std::string& producer)
+    inline T& get_data(const std::string& producer)
     { return *((T*)(this->get_data(product_unique_name<T>(), producer))); }
 
     template <class T> 
-    T& get_data(const ProducerID_t id)
+    inline T& get_data(const ProducerID_t id)
     {
       if (id >= _product_type_v.size()) {
         LARCV_CRITICAL() << "Invalid producer id: " << id << " requested " << std::endl;

@@ -38,7 +38,7 @@ namespace larcv{
   H5::DataType get_datatype<Extents_t>()          {
     H5::CompType datatype(sizeof(Extents_t));
     datatype.insertMember("first", offsetof(struct Extents_t, first), get_datatype<unsigned int>());
-    datatype.insertMember("last",  offsetof(struct Extents_t, last),  get_datatype<unsigned int>());
+    datatype.insertMember("N",  offsetof(struct Extents_t, n),  get_datatype<unsigned int>());
     return datatype;
   }
 

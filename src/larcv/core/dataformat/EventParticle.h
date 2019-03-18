@@ -35,9 +35,8 @@ namespace larcv {
     /// Default destructor
     ~EventParticle(){}
 
-    /// Data clear method
-    inline void clear()
-    { std::cout<< "Clearing" << std::endl; EventBase::clear(); _part_v.clear();}
+
+    
 
     void set(const std::vector<larcv::Particle>& part_v);
     void append(const larcv::Particle& part);
@@ -50,6 +49,8 @@ namespace larcv {
     inline size_t size() const {return _part_v.size();}
 
 // #ifndef SWIG
+    /// Data clear method
+    void clear();
     void initialize (H5::Group * group);
     void serialize  (H5::Group * group);
     void deserialize(H5::Group * group, size_t entry);
@@ -73,10 +74,10 @@ namespace larcv {
   // Template instantiation for IO
   template<> 
   inline std::string product_unique_name<larcv::EventParticle>() { return "particle"; }
-  template<> 
-  EventParticle& IOManager::get_data(const std::string&);
-  template<> 
-  EventParticle& IOManager::get_data(const ProducerID_t);
+  // template<> 
+  // inline EventParticle& IOManager::get_data(const std::string&);
+  // template<> 
+  // inline EventParticle& IOManager::get_data(const ProducerID_t);
 
   /**
      \class larcv::EventParticle

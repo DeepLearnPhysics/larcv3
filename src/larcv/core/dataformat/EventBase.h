@@ -32,11 +32,11 @@ namespace larcv {
     friend class DataProductFactory;
   public:
     
-    void clear() {};
-// #ifndef SWIG
-    void initialize(H5::Group *) {std::cout << "huh" << std::endl;};
-    void serialize(H5::Group * group) {std::cout << "huh2" << std::endl;};
-    void deserialize(H5::Group * group, size_t entry) {};
+    virtual void clear() = 0;
+    virtual void initialize(H5::Group *) = 0;
+    virtual void serialize(H5::Group * group) = 0;
+    virtual void deserialize(H5::Group * group, size_t entry) = 0;
+
 // #endif
   };
 }
