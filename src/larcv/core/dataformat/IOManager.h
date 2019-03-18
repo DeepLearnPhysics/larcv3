@@ -6,6 +6,7 @@
  * \brief Class def header for a class larcv::IOManager
  *
  * @author drinkingkazu
+ * @author coreyjadams
  */
 
 /** \addtogroup core_DataFormat
@@ -65,16 +66,16 @@ namespace larcv {
     void finalize();
     void clear_entry();
     void set_id(const size_t run, const size_t subrun, const size_t event);
-    size_t current_entry() const { return _in_group_index; }
+    size_t current_entry() const { return _in_index; }
 
     size_t get_n_entries_out() const
-    { return _out_group_entries;}
+    { return _out_entries;}
 
     std::string get_file_out_name() const
     { return _out_file_name;}
 
     size_t get_n_entries() const
-    { return (_in_group_entries ? _in_group_entries : _out_group_entries); }
+    { return (_in_entries_total ? _in_entries_total : _out_entries); }
 
     EventBase* get_data(const std::string& type, const std::string& producer);
     EventBase* get_data(const ProducerID_t id);
@@ -136,27 +137,61 @@ namespace larcv {
 
     void append_event_id();
 
+    // The hdf5 model enforces the same number of entries per group,
+    // since the entry list is defined per file.
+
+    // IOManager supports only one output file, but multiple input files.
+    // Files are checked for consistency in which groups are present.
+
+    // General Parameters
     IOMode_t    _io_mode;
     bool        _prepared;
-    H5::H5File  _out_file;
-    size_t      _in_group_index;
-    size_t      _out_group_index;
-    size_t      _in_group_entries;
-    size_t      _out_group_entries;
+
+
+    // Output Parameters
+    // Name of the output file
+    H5::H5File  _out_file; 
+    // Current output index
+    size_t      _out_index;
+    // Total output entries 
+    size_t      _out_entries;
+    // Output groups.  Since these are stored and need to be initialized, this is a member:
+    std::vector<H5::Group*>         _out_group_v;
+    // Output file name:
+    std::string _out_file_name;
+
+    // Input Parameters
+    // Current index in the input files
+    size_t      _in_index;
+    // Total number of input entries
+    size_t      _in_entries_total;
+    // Index of currently active file
+    size_t      _in_active_file_index;
+    // List of input file names:
+    std::vector<std::string>        _in_file_v;
+    // List of input directory names:
+    std::vector<std::string>        _in_dir_v;
+    // Currently open file:
+    H5::H5File  _in_open_file;
+
+   
+    // List of total entries in input files?
+    std::vector<size_t>             _in_entries_v;
+    // List of producer/product pairs in the input files
+    std::map<larcv::ProducerName_t, larcv::ProducerID_t> _in_key_list;
+
+    // Event id information:
     EventID   _event_id;
     EventID   _set_event_id;
     EventID   _last_event_id;
-    std::string _out_file_name;
-    std::vector<std::string>        _in_file_v;
-    std::vector<std::string>        _in_dir_v;
+
+    // Keeping track of products and producers:
     std::map<larcv::ProducerName_t, larcv::ProducerID_t> _key_list;
-    std::vector<H5::Group*>         _out_group_v;
-    std::vector<H5::Group*>         _in_group_v;
-    std::vector<size_t>             _in_group_index_v;
-    std::vector<size_t>             _in_group_entries_v;
-    size_t                          _product_ctr;
+    size_t                         _product_ctr;
     std::vector<larcv::EventBase*> _product_ptr_v;
     std::vector<std::string>       _product_type_v;
+
+    // General IO:
     std::map<std::string,std::set<std::string> > _store_only;
     std::map<std::string,std::set<std::string> > _read_only;
     std::vector<bool> _store_id_bool;

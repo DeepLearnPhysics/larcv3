@@ -81,7 +81,11 @@ There are several steps in the workflow of data serialization.  I will first des
     * Each class serializes it's own data into it's tabular format, and clears it's internal data buffers.
 
 
+## IO Data Management on entry-by-entry basis
 
+When reading and writing files simulatenously, the following workflow is supported:
+* Multiple input files are supported.  Files are assumed to be "distinct" in that they do not contain events spread across files.  Instead, each event is entirely contained within one file.  Therefore, the list of producers in each file and their respective products is checked to match across all files, and an exception is raised if it fails.
+* Only one input file can be accessed at one time efficiently.  There is one "open" file, which iterates to the next file at it's end of file.  Random access introduces overhead of jumping between files.
 
 
 

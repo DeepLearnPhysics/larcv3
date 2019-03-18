@@ -243,6 +243,60 @@ namespace larcv{
   }
 
   void EventParticle::deserialize(H5::Group * group, size_t entry){
+    
+    // Deserialization is, in some ways, easier than serialization.
+    // We just have to read data from the file, and wrap it into an std::vector.
+
+ 
+
+    /////////////////////////////////////////////////////////
+    // Get the extents information from extents dataset
+    /////////////////////////////////////////////////////////
+
+    H5::DataSet extents_dataset = group->openDataSet("extents");
+
+    // Get a dataspace inside this file:
+    H5::DataSpace extents_dataspace = extents_dataset.getSpace();
+
+
+    // // Get the dataset current size
+    // hsize_t extents_dims_current[1];
+    // extents_dataspace.getSimpleExtentDims(extents_dims_current, NULL);
+
+    // Create a dimension for the data to add (which is the hyperslab data)
+    hsize_t extents_slab_dims[1];
+    extents_slab_dims[0] = 1;
+
+    hsize_t extents_offset[1];
+    extents_offset[0] = entry;
+
+
+    // // Create a size vector for the FULL dataset: previous + current
+    // hsize_t extents_size[1];
+    // extents_size[0] = extents_dims_current[0] + extents_slab_dims[0];
+
+    // // Extend the dataset to accomodate the new data
+    // extents_dataset.extend(extents_size);
+
+
+    /////////////////////////////////////////////////////////
+    // Write the new extents entry to the dataset
+    /////////////////////////////////////////////////////////
+
+    // Now, select as a hyperslab the last section of data for writing:
+    // extents_dataspace = extents_dataset.getSpace();
+    extents_dataspace.selectHyperslab(H5S_SELECT_SET, extents_slab_dims, extents_offset);
+
+    // Define memory space:
+    H5::DataSpace extents_memspace(1, extents_slab_dims);
+
+    Extents_t input_extents;
+    // Write the new data
+    extents_dataset.read(&(input_extents), larcv::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
+
+
+
+
     return;
   }
 
