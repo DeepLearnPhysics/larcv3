@@ -689,8 +689,8 @@ EventBase* IOManager::get_data(const size_t id) {
     std::string group_name = _product_type_v[id];
     group_name = "Data/" + group_name + "_" + _producer_name_v[id] + "_group";
 
-    std::cout << "_in_index: " << _in_index << std::endl;
-    std::cout << "_current_offset: " << _current_offset << std::endl;
+    // std::cout << "_in_index: " << _in_index << std::endl;
+    // std::cout << "_current_offset: " << _current_offset << std::endl;
 
     H5::Group group = _in_open_file.openGroup(group_name);
     _product_ptr_v[id]->deserialize(&group, _in_index - _current_offset);

@@ -15,6 +15,7 @@
 using namespace larcv;
 %}
 %include "std_string.i"
+%include "std_vector.i"
 %include "core/dataformat/DataFormatTypes.h"
 %include "core/dataformat/Point.h"
 %include "core/dataformat/Vertex.h"
@@ -26,3 +27,5 @@ using namespace larcv;
 %include "core/dataformat/IOManager.h"
 %include "core/dataformat/EventParticle.h"
 
+// Add templates for the dataproducts that get wrapped vectors:
+%template(VectorOfParticle) std::vector<larcv::Particle>;

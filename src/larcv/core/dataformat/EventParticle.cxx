@@ -247,7 +247,7 @@ namespace larcv{
     // Deserialization is, in some ways, easier than serialization.
     // We just have to read data from the file, and wrap it into an std::vector.
 
-    std::cout << "Deserialize entry " << entry << std::endl;
+    // std::cout << "Deserialize entry " << entry << std::endl;
 
     /////////////////////////////////////////////////////////
     // Get the extents information from extents dataset
@@ -280,7 +280,7 @@ namespace larcv{
 
 
     /////////////////////////////////////////////////////////
-    // Write the new extents entry to the dataset
+    // Read this extents entry to the dataset
     /////////////////////////////////////////////////////////
 
     // Now, select as a hyperslab the last section of data for writing:
@@ -294,9 +294,42 @@ namespace larcv{
     // Write the new data
     extents_dataset.read(&(input_extents), larcv::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
 
-    std::cout << " Extents start: " << input_extents.first << ", end: "
-              << input_extents.first + input_extents.n << std::endl;
+    // std::cout << " Extents start: " << input_extents.first << ", end: "
+    //           << input_extents.first + input_extents.n << std::endl;
 
+
+    // Next, open the relevant sections of the data 
+
+    // If there are no particles, dont read anything:
+    if ( input_extents.n == 0){
+        return;
+    }
+
+    H5::DataSet particles_dataset = group->openDataSet("particles");
+
+    // Get a dataspace inside this file:
+    H5::DataSpace particles_dataspace = particles_dataset.getSpace();
+
+    // Create a dimension for the data to add (which is the hyperslab data)
+    hsize_t particles_slab_dims[1];
+    particles_slab_dims[0] = input_extents.n;
+
+    hsize_t particles_offset[1];
+    particles_offset[0] = input_extents.first;
+
+    // Now, select as a hyperslab the last section of data for writing:
+    // extents_dataspace = extents_dataset.getSpace();
+    particles_dataspace.selectHyperslab(H5S_SELECT_SET, particles_slab_dims, particles_offset);
+
+
+    H5::DataSpace particles_memspace(1, particles_slab_dims);
+
+    // Reserve space for reading in particles:
+    _part_v.resize(input_extents.n);
+
+    particles_dataset.read(&(_part_v[0]), larcv::Particle::get_datatype(), particles_memspace, particles_dataspace);
+
+    
 
     return;
   }
