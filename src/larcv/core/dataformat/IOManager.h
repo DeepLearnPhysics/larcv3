@@ -59,6 +59,7 @@ namespace larcv {
     void clear_in_file();
     void set_out_file(const std::string name);
     ProducerID_t producer_id(const ProducerName_t& name) const;
+    std::string product_type(const size_t id) const;
     void configure(const PSet& cfg);
     bool initialize();
     bool read_entry(const size_t index, bool force_reload = false);
@@ -163,6 +164,7 @@ namespace larcv {
     // Input Parameters
     // Current index in the input files
     size_t      _in_index;
+    size_t      _current_offset;
     // Total number of input entries
     size_t      _in_entries_total;
     // Index of currently active file
@@ -187,9 +189,10 @@ namespace larcv {
 
     // Keeping track of products and producers:
     std::map<larcv::ProducerName_t, larcv::ProducerID_t> _key_list;
-    size_t                         _product_ctr;
-    std::vector<larcv::EventBase*> _product_ptr_v;
-    std::vector<std::string>       _product_type_v;
+    size_t                          _product_ctr;
+    std::vector<larcv::EventBase*>  _product_ptr_v;
+    std::vector<std::string>        _product_type_v;
+    std::vector<std::string>        _producer_name_v;
 
     // General IO:
     std::map<std::string,std::set<std::string> > _store_only;

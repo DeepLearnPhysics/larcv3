@@ -247,7 +247,7 @@ namespace larcv{
     // Deserialization is, in some ways, easier than serialization.
     // We just have to read data from the file, and wrap it into an std::vector.
 
- 
+    std::cout << "Deserialize entry " << entry << std::endl;
 
     /////////////////////////////////////////////////////////
     // Get the extents information from extents dataset
@@ -294,7 +294,8 @@ namespace larcv{
     // Write the new data
     extents_dataset.read(&(input_extents), larcv::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
 
-
+    std::cout << " Extents start: " << input_extents.first << ", end: "
+              << input_extents.first + input_extents.n << std::endl;
 
 
     return;
