@@ -89,6 +89,32 @@ When reading and writing files simulatenously, the following workflow is support
 
 
 
+### Some details of the Data Model.
+
+## Voxels
+
+Voxels are the core data storage object for sparse data.  There is no distinction on disk between a voxel in 2D and a voxel in 3D, as each voxel is just a combination of a value (float) and index (size_t).  Individual voxels are not useful, instead collections of voxels are useful.  The following combinations are the most useful:
+1. A single collection of voxels representing a sparse image.  This can be in either 2D or 3D.
+2. A collection of collection of voxels.  This is either a set of sparse images in 2D, or could be a set of cluster information (instance masks) in 3D.
+3. A collection of collection of collection of voxels.  This is only applicable to a set of instance masks in 2D, across multiple planes.
+
+The fundamental serialization unit is a VoxelSet, aka std::array<larcv::Voxel>.  So, condidtion 1 above is a very simple serialization model.  This is represented as a SparseImage in larcv.  EventSparse will contain an array of SparseImages which will be either a single element (for a 3D event) or multiple elements (for a 2D event).
+
+For seriallizing cluster information, EventCluster will be used.  This object will store an array of Cluster set information, one for each prjection, or just one for 3D.  A cluster set is an array of VoxelSets, so it will be stored as std::vector< larcv::VoxelSet * >.  The pointers allow a little more flexibity at creation time for adding voxels.
+
+Both EventSparse and EventCluster will have a 1 to 1 correspondance with ImageMeta objects.  ImageMeta will provide a flexible correspondance between voxel index and real coordinates, as well as generic useful functions for getting information about the space the image lives in.
+
+To be concrete, EventSparse will handle the IO for sparse 2D and sparse 3D images.  It will read in a set of VOxels from file and map them to a std::vector<larcv::VoxelSet>, where each element of the array represents a unique projection ID.
+
+EventCluster will handle IO for cluster 2D and cluster3D images.  It will read a flat table of voxels and map them to an std::vector<larcv::VoxelSetArray>.
+
+In both cases, the ImageMeta will be stored in the attributes for the datasets.
+
+
+
+
+
+
 
 
 
