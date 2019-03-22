@@ -319,7 +319,6 @@ void IOManager::prepare_input() {
     // Vist the extents group and determine how many events are present:
 
     H5::DataSet extents = events.openDataSet("event_id");
-
     // Number of objects:
     hsize_t dims_current[1];
     extents.getSpace().getSimpleExtentDims(dims_current, NULL);
@@ -328,16 +327,20 @@ void IOManager::prepare_input() {
     LARCV_INFO() << "File " << fname << " has " << dims_current[0] << " entries"
                  << std::endl;
 
-    // Next, visit the available groups and see what producers are available.
+    // Append the number of events:
+    _in_entries_v.push_back(dims_current[0]);
+    _in_entries_total += dims_current[0];
 
+    
+    // Next, visit the available groups and see what producers are available.
     std::set<std::string> processed_object;
-    for (size_t i_obj = 0; i_obj < events.getNumObjs(); ++i_obj) {
+    for (size_t i_obj = 0; i_obj < data.getNumObjs(); ++i_obj) {
       std::string obj_name = data.getObjnameByIdx(i_obj);
       processed_object.insert(obj_name);
       char c[2] = "_";
       if (obj_name.find_first_of(c) > obj_name.size() ||
           obj_name.find_first_of(c) == obj_name.find_last_of(c)) {
-        LARCV_INFO() << "Skipping " << obj_name << " ... (not LArCV Group)"
+        std::cout << "Skipping " << obj_name << " ... (not LArCV Group)"
                      << std::endl;
         continue;
       }
@@ -393,9 +396,7 @@ void IOManager::prepare_input() {
         }
       }
 
-      // Append the number of events:
-      _in_entries_v.push_back(dims_current[0]);
-      _in_entries_total += dims_current[0];
+
     }
     // After looping over all the objects, make sure there are none missing.
     // We've made sure every one found is supposed to be there, so it suffices
@@ -405,6 +406,8 @@ void IOManager::prepare_input() {
       throw larbys();
     }
   }
+
+
 
   // As preparation, open the first file:
   _in_open_file =
