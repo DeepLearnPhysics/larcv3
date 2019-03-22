@@ -30,4 +30,6 @@ using namespace larcv;
 %include "core/dataformat/EventParticle.h"
 
 // Add templates for the dataproducts that get wrapped vectors:
+%template(VectorOfVoxel) std::vector<larcv::Voxel>;
+%template(VectorOfVoxelSet) std::vector<larcv::VoxelSet>;
 %template(VectorOfParticle) std::vector<larcv::Particle>;
