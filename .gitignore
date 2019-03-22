@@ -19,7 +19,6 @@ doc/*
 *.db
 *.log
 *.dat
-!*CMakeLists.txt
 *.txt
 *.bin
 *.root
