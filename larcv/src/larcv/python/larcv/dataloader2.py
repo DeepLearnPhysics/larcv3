@@ -1,6 +1,6 @@
 #import ROOT,sys,time,os,signal
 from larcv import larcv
-import ROOT as rt
+# import ROOT as rt
 import sys,time,os,signal
 import numpy as np
 
@@ -236,10 +236,10 @@ class larcv_threadio (object):
          storage.set_data(next_storage_id, batch_data)
 
       if not store_entries: self._tree_entries = None
-      else: self._tree_entries = rt.std.vector('size_t')(self._proc.processed_entries(next_storage_id))
+      # else: self._tree_entries = rt.std.vector('size_t')(self._proc.processed_entries(next_storage_id))
 
       if not store_event_ids: self._event_ids = None
-      else: self._event_ids = rt.std.vector('larcv::EventBase')(self._proc.processed_events(next_storage_id))
+      # else: self._event_ids = rt.std.vector('larcv::EventBase')(self._proc.processed_events(next_storage_id))
 
       self._current_storage_id = next_storage_id
       self._current_storage_state = 1
