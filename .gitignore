@@ -43,3 +43,5 @@ app/Supera/APILArSoft/supera.fcl
 .DS_Store
 *.pdf
 *.o
+*.h5
+_skbuild
