@@ -44,3 +44,5 @@ app/Supera/APILArSoft/supera.fcl
 *.o
 *.h5
 _skbuild
+larcv.egg-info
+dist
