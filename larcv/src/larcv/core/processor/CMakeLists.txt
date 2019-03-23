@@ -8,10 +8,10 @@ add_library(${name} OBJECT ${SOURCES})
 target_link_libraries(${name} PUBLIC base dataformat) 
 
 
-find_package(Python ${PYTHON_VERSION} REQUIRED COMPONENTS Development)
-find_package(PythonInterp ${PYTHON_BINDING_PYTHON_VERSION})
+# find_package(Python ${PYTHON_VERSION} REQUIRED COMPONENTS Development)
+# find_package(PythonInterp ${PYTHON_BINDING_PYTHON_VERSION})
 
-message(${PYTHON_VERSION_MAJOR})
+# message(${PYTHON_VERSION_MAJOR})
 
 find_package(SWIG REQUIRED COMPONENTS C CXX)
 include(${SWIG_USE_FILE})
