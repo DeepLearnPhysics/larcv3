@@ -5,7 +5,7 @@ python:
 
 before_install:
 
-  - sudo apt-get install cmake libhdf5-serial-dev swig
+  - sudo apt-get install cmake libhdf5-serial-dev swig python-dev
 
 install:
   - pip install scikit-build
