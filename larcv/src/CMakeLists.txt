@@ -9,8 +9,10 @@ set(CMAKE_PACKAGE_DIR "larcv")
 
 # set(CMAKE_SHARED_LINKER_FLAGS "-Wl, --export-all-symbols")
 # set(CMAKE_SHARED_LINKER_FLAGS "-Wl, --no-as-needed")
-add_link_options("-Wl")
-add_link_options("-all_load")
+set (CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
+
+# add_link_options("-Wl")
+# add_link_options("-all_load")
 
 set(H5_INCLUDE_DIR "/opt/local/include")
 set(H5_LIB_DIR "/opt/local/lib")
