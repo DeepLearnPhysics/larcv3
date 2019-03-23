@@ -10,7 +10,6 @@ doc/*
 *.db
 *.log
 *.dat
-*.txt
 *.bin
 *~
 *.pyc
