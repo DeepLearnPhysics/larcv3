@@ -3,7 +3,7 @@ python:
   - 2.7
   - 3.6
 install:
-  - pip install skbuild
+  - pip install scikit-build
   - pip install .
 branches:
   only:
