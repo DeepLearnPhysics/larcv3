@@ -18,6 +18,6 @@ setup(
     },
     packages=['larcv'],
     install_requires =[
-        'skbuild'
+        'scikit-build'
     ]
 )
