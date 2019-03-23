@@ -22,3 +22,5 @@ branches:
 #     git config --global user.email me@example.com
   # email:
     # on_success: always
+
+script: pytest tests/
