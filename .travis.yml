@@ -5,8 +5,7 @@ python:
 
 before_install:
 
-  # Here we just install Miniconda, which you shouldn't have to change.
-  - sudo apt-get install cmake hdf5 swig
+  - sudo apt-get install cmake libhdf5-serial-dev swig
 
 install:
   - python setup.py install
