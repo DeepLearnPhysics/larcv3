@@ -3,7 +3,8 @@ python:
   - 2.7
   - 3.6
 install:
-  - pip install scikit-build cmake
+  - conda install cmake swig hdf5
+  - pip install numpy scikit-build 
   - python setup.py install
 branches:
   only:
