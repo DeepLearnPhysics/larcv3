@@ -1,20 +1,23 @@
-sudo: required
 language: python
+python:
+  - 2.7
+  - 3.6
+install:
+  - pip install .
 branches:
   only:
     - develop
-services:
-- docker
-install:
-- docker build -t larcv2_image -f .Dockerfile .
-script:
-- docker run --name test_build larcv2_image python -c "import larcv"
-notifications:
+# services:
+# - docker
+# install:
+# - docker build -t larcv2_image -f .Dockerfile .
+# script:
+# - docker run --name test_build larcv2_image python -c "import larcv"
+# notifications:
 # Emails are sent to the committer's git-configured email address by default,
 # but only if they have access to the repository.  To enable Travis on your
 # public fork of Caffe, just go to travis-ci.org and flip the switch on for
 # your Caffe fork.  To configure your git email address, use:
 #     git config --global user.email me@example.com
-  email:
-    on_success: always
-    on_failure: always
+  # email:
+    # on_success: always
