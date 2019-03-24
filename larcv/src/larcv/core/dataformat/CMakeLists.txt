@@ -9,8 +9,8 @@ project(${name})
 file(GLOB SOURCES *.cxx)
 
 add_library(${name} OBJECT ${SOURCES})
-target_link_libraries(dataformat PUBLIC ${HDF5_CXX_LIBRARIES}) 
-target_link_libraries(dataformat PUBLIC base) 
+target_link_libraries(${name} PUBLIC ${HDF5_CXX_LIBRARIES} base) 
+# target_link_libraries(${name} PUBLIC base) 
 
 
 # find_package(Python ${PYTHON_VERSION} REQUIRED COMPONENTS Development)
