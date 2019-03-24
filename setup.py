@@ -9,12 +9,12 @@ setup(
     ],
     # extra_link_args=["-stdlib=libc++", "-mmacosx-version-min=10.9"],
     include_package_data=True,
-    author=['Corey Adams', 'Kazuhiro Terao', 'Taritree'],
+    author=['Corey Adams', 'Kazuhiro Terao', 'Taritree Wongjirad'],
     description='C++ IO and Preprocessing package for sparse neutrino data, with H5 for IO and python bindings.',
     license='MIT',
     keywords='larcv larcv3 neutrinos hdf5 h5 deep learning',
     project_urls={
-        'Source Code': 'nowhere.com'
+        'Source Code': 'https://github.com/coreyjadams/larcv2'
     },
     packages=['larcv'],
     install_requires =[
