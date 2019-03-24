@@ -9,7 +9,7 @@ project(${name})
 file(GLOB SOURCES *.cxx)
 
 add_library(${name} OBJECT ${SOURCES})
-target_link_libraries(${name} PUBLIC ${HDF5_CXX_LIBRARIES} base) 
+# target_link_libraries(${name} PUBLIC ${HDF5_CXX_LIBRARIES} base) 
 # target_link_libraries(${name} PUBLIC base) 
 
 
@@ -35,7 +35,7 @@ swig_add_library(${name}
 # swig_add_library(larcv
 #     TYPE SHARED)
 
-swig_link_libraries(${name} ${PYTHON_LIBRARIES} base ${name})
+swig_link_libraries(${name} ${PYTHON_LIBRARIES} ${HDF5_CXX_LIBRARIES} base ${name})
 # swig_add_library(larcv)
 
 # install( TARGETS ${SWIG_MODULE_${name}_REAL_NAME}

@@ -30,7 +30,7 @@ swig_add_library(${name}
 # swig_add_library(larcv
 #     TYPE SHARED)
 
-swig_link_libraries(${name} ${PYTHON_LIBRARIES} dataformat base ${name})
+swig_link_libraries(${name} ${PYTHON_LIBRARIES} ${HDF5_CXX_LIBRARIES} dataformat base ${name})
 # swig_add_library(larcv)
 
 install( TARGETS ${SWIG_MODULE_${name}_REAL_NAME}
