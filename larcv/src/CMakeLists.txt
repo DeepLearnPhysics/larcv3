@@ -7,9 +7,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
 set(CMAKE_PACKAGE_DIR "larcv")
 
+# if(APPLE)
+set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
+# endif(APPLE)
+
 # set(CMAKE_SHARED_LINKER_FLAGS "-Wl, --export-all-symbols")
 # set(CMAKE_SHARED_LINKER_FLAGS "-Wl, --no-as-needed")
-set (CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
+set (CMAKE_SHARED_LINKER_FLAGS "-Wl")
 
 # add_link_options("-Wl")
 # add_link_options("-all_load")
@@ -34,22 +38,22 @@ include_directories(${PYTHON_INCLUDE_DIRS})
 add_subdirectory(larcv)
 
 
-add_library(larcv MODULE 
-    $<TARGET_OBJECTS:base>
-    $<TARGET_OBJECTS:dataformat>
-    $<TARGET_OBJECTS:processor>
-    $<TARGET_OBJECTS:datagenerator>
-    )
+# add_library(larcv SHARED 
+#     $<TARGET_OBJECTS:base>
+#     $<TARGET_OBJECTS:dataformat>
+#     $<TARGET_OBJECTS:processor>
+#     $<TARGET_OBJECTS:datagenerator>
+#     )
 
 
-target_link_libraries(larcv PUBLIC ${HDF5_CXX_LIBRARIES}) 
+# target_link_libraries(larcv PUBLIC ${HDF5_CXX_LIBRARIES}) 
 
-install(TARGETS larcv
-    LIBRARY DESTINATION ${CMAKE_PACKAGE_DIR}/lib
-    ARCHIVE DESTINATION ${CMAKE_PACKAGE_DIR}/lib
-    RUNTIME DESTINATION ${CMAKE_PACKAGE_DIR}/bin
-    INCLUDES DESTINATION ${CMAKE_PACKAGE_DIR}/include
-    )
+# install(TARGETS larcv
+#     LIBRARY DESTINATION ${CMAKE_PACKAGE_DIR}/lib
+#     ARCHIVE DESTINATION ${CMAKE_PACKAGE_DIR}/lib
+#     RUNTIME DESTINATION ${CMAKE_PACKAGE_DIR}/bin
+#     INCLUDES DESTINATION ${CMAKE_PACKAGE_DIR}/include
+#     )
 
 
 

@@ -5,7 +5,7 @@ file(GLOB SOURCES *.cxx)
 
 
 add_library(${name} OBJECT ${SOURCES})
-target_link_libraries(${name} PUBLIC base dataformat) 
+# target_link_libraries(${name} PUBLIC base dataformat) 
 
 
 # find_package(Python ${PYTHON_VERSION} REQUIRED COMPONENTS Development)
@@ -30,7 +30,7 @@ swig_add_library(${name}
 # swig_add_library(larcv
 #     TYPE SHARED)
 
-swig_link_libraries(${name} ${PYTHON_LIBRARIES} ${name} base dataformat)
+swig_link_libraries(${name} ${PYTHON_LIBRARIES} dataformat base ${name})
 # swig_add_library(larcv)
 
 install( TARGETS ${SWIG_MODULE_${name}_REAL_NAME}

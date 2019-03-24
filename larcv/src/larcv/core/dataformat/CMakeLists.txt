@@ -35,7 +35,7 @@ swig_add_library(${name}
 # swig_add_library(larcv
 #     TYPE SHARED)
 
-swig_link_libraries(${name} ${PYTHON_LIBRARIES} ${name} base)
+swig_link_libraries(${name} ${PYTHON_LIBRARIES} base ${name})
 # swig_add_library(larcv)
 
 # install( TARGETS ${SWIG_MODULE_${name}_REAL_NAME}
