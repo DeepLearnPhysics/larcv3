@@ -21,7 +21,7 @@ before_install:
 
 install:
   - pip install scikit-build
-  - pip install -e .
+  - pip install larcv --extra-index-url https://testpypi.python.org/pypi
   - echo $PYTHONPATH
   - echo $LD_LIBRARY_PATH
   # - python setup.py install
