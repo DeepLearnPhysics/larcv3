@@ -13,7 +13,7 @@ set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
 
 # set(CMAKE_SHARED_LINKER_FLAGS "-Wl, --export-all-symbols")
 # set(CMAKE_SHARED_LINKER_FLAGS "-Wl, --no-as-needed")
-set (CMAKE_SHARED_LINKER_FLAGS "-Wl")
+# set (CMAKE_SHARED_LINKER_FLAGS "-Wl")
 
 # add_link_options("-Wl")
 # add_link_options("-all_load")
