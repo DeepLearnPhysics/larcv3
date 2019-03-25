@@ -48,13 +48,22 @@ namespace larcv {
       , _dist_travel      (-1)
       , _energy_init      (0.)
       , _energy_deposit   (0.)
-      , _process          ("")
+      , _process          ()
       // , _num_voxels       (0)
       , _parent_trackid   (kINVALID_UINT)
       , _parent_pdg       (0)
       , _ancestor_trackid (kINVALID_UINT)
       , _ancestor_pdg     (0)
-    {}
+    {
+    }
+
+// _vtx
+// _end_pt
+// _first_step
+// _last_step
+// _parent_vtx
+// _ancestor_vtx
+
 
     /// Default destructor
     ~Particle(){}
