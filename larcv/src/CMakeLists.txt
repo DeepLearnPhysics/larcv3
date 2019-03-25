@@ -18,8 +18,8 @@ set (CMAKE_SHARED_LINKER_FLAGS "-Wl")
 # add_link_options("-Wl")
 # add_link_options("-all_load")
 
-set(H5_INCLUDE_DIR "/opt/local/include")
-set(H5_LIB_DIR "/opt/local/lib")
+# set(H5_INCLUDE_DIR "/opt/local/include")
+# set(H5_LIB_DIR "/opt/local/lib")
 
 project(larcv)
 
@@ -27,7 +27,7 @@ include_directories(larcv)
 
 # IO needs HDF5:
 find_package(HDF5 REQUIRED COMPONENTS C CXX)
-include_directories(${H5_INCLUDE_DIR})
+include_directories(${HDF5_INCLUDE_DIR})
 
 # Many pacakges need python:
 find_package(PythonLibs REQUIRED)
