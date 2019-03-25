@@ -23,4 +23,8 @@
 import os
 
 # Add the location of the libraries to ld library path:
-os.environ['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH'] + ":{}/lib/".format(os.path.dirname(os.path.abspath(__file__)))
+extra_ld_path = ":{}/lib/".format(os.path.dirname(os.path.abspath(__file__)))
+if 'LD_LIBRARY_PATH' in os.environ:
+    os.environ['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH'] + extra_ld_path
+else:
+    os.environ['LD_LIBRARY_PATH'] = extra_ld_path
