@@ -16,24 +16,32 @@ ImageMeta::ImageMeta(size_t n_dims, const std::vector<size_t>& number_of_voxels,
                      const std::vector<double>& image_sizes,
                      const std::vector<double>& origin,
                      DistanceUnit_t unit) {
-  assert(_number_of_voxels.size() == n_dims);
-  assert(_image_sizes.size() == n_dims);
-  assert(n_dims != 0);
+  if ( n_dims != 0 && 
+       _number_of_voxels.size() == n_dims &&
+       _image_sizes.size() == n_dims
+     ){
 
-  // Set the origin to 0 if not set
-  if (origin.size() == _n_dims){
-    _origin = origin;
+    // Set the origin to 0 if not set
+    if (origin.size() == _n_dims){
+      _origin = origin;
+    }
+    else{
+      _origin.resize(n_dims);
+    }
+
+    _n_dims           = n_dims;
+    _image_sizes      = image_sizes;
+    _number_of_voxels = number_of_voxels;
+    _unit             = unit;
+    _origin           = origin;
+    _valid            = true;
+
   }
   else{
-    _origin.resize(n_dims);
+    LARCV_CRITICAL() << "Invalid parameters passed to imagemeta, can not create valid meta." << std::endl;
+    throw larbys();
   }
 
-  _n_dims           = n_dims;
-  _image_sizes      = image_sizes;
-  _number_of_voxels = number_of_voxels;
-  _unit             = unit;
-  _origin           = origin;
-  _valid            = true;
 }
 
 
