@@ -17,7 +17,4 @@ setup(
         'Source Code': 'https://github.com/coreyjadams/larcv2'
     },
     packages=['larcv'],
-    install_requires =[
-        'scikit-build'
-    ]
 )
