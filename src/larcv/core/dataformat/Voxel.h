@@ -15,11 +15,13 @@
 #define __LARCV_VOXEL_H
 
 #include "DataFormatTypes.h"
+#include "ImageMeta.h"
+
 namespace larcv {
 
   /**
      \class Voxel
-     @brief 3D voxel definition element class consisting of ID and stored value
+     @brief  voxel definition element class consisting of ID and stored value
   */
   class Voxel {
 
@@ -275,6 +277,87 @@ namespace larcv {
   private:
     std::vector<larcv::VoxelSet> _voxel_vv;
   };
+
+  /**
+     \class SparseTensor
+     @brief Container of multiple voxel set array
+  */
+  class SparseTensor : public VoxelSet {
+  public:
+    /// Default ctor
+    SparseTensor() {}
+    SparseTensor(VoxelSet&& vs, ImageMeta meta);
+
+    /// Default dtor
+    virtual ~SparseTensor() {}
+    SparseTensor& operator= (const VoxelSet& rhs)
+    { *((VoxelSet*)this) = rhs; this->meta(this->meta()); return *this;}
+
+    //
+    // Read-access
+    //
+    /// Access ImageMeta of specific projection
+    inline const larcv::ImageMeta& meta() const { return _meta; }
+
+    //
+    // Write-access
+    //
+    /// Create & add/set a single voxel
+    void emplace(const larcv::Voxel & vox, const bool add=true);
+
+    /// Emplace the whole voxel set w/ meta
+    inline void emplace(VoxelSet&& vs, const ImageMeta& meta)
+    {*((VoxelSet*)this) = std::move(vs); this->meta(meta);}
+    
+    /// Set the whole voxel set w/ meta
+    inline void set(const VoxelSet& vs, const ImageMeta& meta)
+    {*((VoxelSet*)this) = vs; this->meta(meta);} 
+    
+    /// Clear everything
+    inline void clear_data() { VoxelSet::clear_data(); _meta = ImageMeta(); }
+
+    /// Meta setter
+    void meta(const larcv::ImageMeta& meta);
+
+  private:
+    larcv::ImageMeta _meta;
+    
+  };
+
+  /**
+     \class SparseCluster
+     @brief Container of multiple (-projected) voxel set array
+  */
+  class SparseCluster : public VoxelSetArray {
+  public:
+    /// Default ctor
+    SparseCluster() {}
+    /// Default dtor
+    virtual ~SparseCluster() {}
+
+    //
+    // Read-access
+    //
+    /// Access ImageMeta of specific projection
+    inline const larcv::ImageMeta& meta() const { return _meta; }
+
+    //
+    // Write-access
+    //
+    /// Clear everything
+    inline void clear_data() { VoxelSetArray::clear_data(); _meta = ImageMeta(); }
+    /// set VoxelSetArray
+    inline void set(VoxelSetArray&& vsa, const ImageMeta& meta)
+    { *((VoxelSetArray*)this) = std::move(vsa); this->meta(meta); }
+    /// emplace VoxelSetArray
+    inline void emplace(VoxelSetArray&& vsa, const ImageMeta& meta)
+    { *((VoxelSetArray*)this) = vsa; this->meta(meta); }
+    /// Meta setter
+    void meta(const larcv::ImageMeta& meta);
+
+  private:
+    larcv::ImageMeta _meta;
+  };  
 
 }
 

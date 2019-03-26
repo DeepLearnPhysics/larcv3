@@ -104,7 +104,7 @@ For seriallizing cluster information, EventCluster will be used.  This object wi
 
 Both EventSparse and EventCluster will have a 1 to 1 correspondance with ImageMeta objects.  ImageMeta will provide a flexible correspondance between voxel index and real coordinates, as well as generic useful functions for getting information about the space the image lives in.
 
-To be concrete, EventSparse will handle the IO for sparse 2D and sparse 3D images.  It will read in a set of VOxels from file and map them to a std::vector<larcv::VoxelSet>, where each element of the array represents a unique projection ID.
+To be concrete, EventSparse will handle the IO for sparse 2D and sparse 3D images.  It will read in a set of Voxels from file and map them to a std::vector<larcv::VoxelSet>, where each element of the array represents a unique projection ID.
 
 EventCluster will handle IO for cluster 2D and cluster3D images.  It will read a flat table of voxels and map them to an std::vector<larcv::VoxelSetArray>.
 

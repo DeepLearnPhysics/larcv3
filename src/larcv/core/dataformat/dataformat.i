@@ -12,6 +12,7 @@
 #include "core/dataformat/DataProductFactory.h"
 #include "core/dataformat/IOManager.h"
 #include "core/dataformat/EventParticle.h"
+#include "core/dataformat/EventSparse.h"
 
 using namespace larcv;
 %}
@@ -28,8 +29,10 @@ using namespace larcv;
 %include "core/dataformat/DataProductFactory.h"
 %include "core/dataformat/IOManager.h"
 %include "core/dataformat/EventParticle.h"
+%include "core/dataformat/EventSparse.h"
 
 // Add templates for the dataproducts that get wrapped vectors:
 %template(VectorOfVoxel) std::vector<larcv::Voxel>;
 %template(VectorOfVoxelSet) std::vector<larcv::VoxelSet>;
+%template(VectorOfSparse) std::vector<larcv::SparseTensor>;
 %template(VectorOfParticle) std::vector<larcv::Particle>;

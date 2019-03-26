@@ -35,6 +35,7 @@ class ImageMeta {
 
   /// Constructor with arguments: ndims, dims, image_sizes, unit.
   ImageMeta(size_t n_dims, 
+            size_t projection_id,
             const std::vector<size_t>& number_of_voxels,
             const std::vector<double>& image_sizes, 
             const std::vector<double>& origin = std::vector<double>(),
@@ -54,6 +55,9 @@ class ImageMeta {
   }
 
 
+
+  inline const size_t projection_id() const{ return _projection_id;}
+  inline const size_t id() const{return _projection_id;}
   /// Operators to access information about the image meta:
 
   inline const std::vector<double> & image_size()       const {return _image_sizes;}
@@ -148,6 +152,7 @@ class ImageMeta {
 
   bool _valid;  ///< Boolean set to true only if voxel parameters are properly set
   size_t _n_dims;
+  size_t _projection_id;
   std::vector<double> _image_sizes;  ///< image size in [_unit] along each dimension
   std::vector<size_t> _number_of_voxels;  ///< Total number of voxels in each dimension
   std::vector<double> _origin; ///The location of index==0

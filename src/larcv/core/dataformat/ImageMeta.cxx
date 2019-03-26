@@ -12,7 +12,8 @@ ImageMeta::ImageMeta() { _valid = false; }
 
 
 /// Constructor with arguments: ndims, dims, voxel_sizes, unit.
-ImageMeta::ImageMeta(size_t n_dims, const std::vector<size_t>& number_of_voxels,
+ImageMeta::ImageMeta(size_t n_dims, size_t projection_id,
+                     const std::vector<size_t>& number_of_voxels,
                      const std::vector<double>& image_sizes,
                      const std::vector<double>& origin,
                      DistanceUnit_t unit) {
@@ -29,6 +30,7 @@ ImageMeta::ImageMeta(size_t n_dims, const std::vector<size_t>& number_of_voxels,
       _origin.resize(n_dims);
     }
 
+    _projection_id    = projection_id;
     _n_dims           = n_dims;
     _image_sizes      = image_sizes;
     _number_of_voxels = number_of_voxels;

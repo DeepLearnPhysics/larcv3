@@ -224,6 +224,45 @@ namespace larcv {
     return _voxel_vv[id];
   }
 
+
+
+ SparseTensor::SparseTensor(VoxelSet&& vs, ImageMeta meta)
+   : VoxelSet(std::move(vs))
+ { this->meta(meta); }
+
+ void SparseTensor::meta(const larcv::ImageMeta& meta)
+ {
+   for (auto const& vox : this->as_vector()) {
+     if (vox.id() < meta.total_voxels()) continue;
+     std::cerr << "VoxelSet contains ID " << vox.id()
+               << " which cannot exists in ImageMeta with size " << meta.total_voxels()
+               << std::endl;
+     throw std::exception();
+   }
+   _meta = meta;
+ }
+
+ void SparseTensor::emplace(const larcv::Voxel & vox, const bool add)
+ {
+   if (vox.id() != kINVALID_VOXELID) VoxelSet::emplace(vox.id(), vox.value(), add);
+ }
+
+ void SparseCluster::meta(const larcv::ImageMeta& meta)
+ {
+   for (auto const& vs : this->as_vector()) {
+     for (auto const& vox : vs.as_vector()) {
+       if (vox.id() < meta.total_voxels()) continue;
+       std::cerr << "VoxelSet contains ID " << vox.id()
+                 << " which cannot exists in ImageMeta with size " << meta.total_voxels()
+                 << std::endl;
+       throw std::exception();
+     }
+   }
+   _meta = meta;
+ }
+
+
+
 };
 
 #endif

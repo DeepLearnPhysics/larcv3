@@ -62,6 +62,7 @@ namespace larcv {
 
   private:
 
+
     std::vector<larcv::Particle> _part_v; ///< a collection of particles (index maintained)
 
   };

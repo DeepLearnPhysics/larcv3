@@ -11,6 +11,9 @@ namespace larcv{
   H5::DataType get_datatype<int>()                {return H5::PredType::NATIVE_INT;}
 
   template<>
+  H5::DataType get_datatype<bool>()               {return H5::PredType::NATIVE_HBOOL;}
+
+  template<>
   H5::DataType get_datatype<float>()              {return H5::PredType::NATIVE_FLOAT;}
 
   template<>
