@@ -8,11 +8,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3")
 
 set(CMAKE_PACKAGE_DIR "larcv")
 
-# # Control rpath handling:
-# set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
-# set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-
 
 project(larcv)
 
