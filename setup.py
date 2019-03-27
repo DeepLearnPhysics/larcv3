@@ -2,10 +2,10 @@ from skbuild import setup  # This line replaces 'from setuptools import setup'
 
 setup(
     name="larcv",
-    version="3.0a0",
-    cmake_source_dir='larcv/src/',
+    version="3.0a01",
+    cmake_source_dir='src/',
     cmake_args=[
-        '-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.9'
+        '-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.9',
     ],
     # extra_link_args=["-stdlib=libc++", "-mmacosx-version-min=10.9"],
     include_package_data=True,
@@ -16,5 +16,5 @@ setup(
     project_urls={
         'Source Code': 'https://github.com/coreyjadams/larcv2'
     },
-    packages=['larcv'],
+    packages=['larcv'],   
 )

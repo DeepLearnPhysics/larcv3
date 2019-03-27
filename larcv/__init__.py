@@ -28,3 +28,8 @@ if 'LD_LIBRARY_PATH' in os.environ:
     os.environ['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH'] + extra_ld_path
 else:
     os.environ['LD_LIBRARY_PATH'] = extra_ld_path
+
+if 'DYLD_LIBRARY_PATH' in os.environ:
+    os.environ['DYLD_LIBRARY_PATH'] = os.environ['DYLD_LIBRARY_PATH'] + extra_ld_path
+else:
+    os.environ['DYLD_LIBRARY_PATH'] = extra_ld_path
