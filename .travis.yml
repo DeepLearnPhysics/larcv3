@@ -12,7 +12,8 @@ python:
   - 2.7
   - 3.6
 
-
+virtualenv:
+  system_site_packages: true
 
 before_install:
   # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
@@ -21,7 +22,7 @@ before_install:
 
 install:
   - pip install scikit-build
-  - pip install larcv --extra-index-url https://testpypi.python.org/pypi
+  - pip install -e .
   - echo $PYTHONPATH
   - echo $LD_LIBRARY_PATH
   # - python setup.py install
