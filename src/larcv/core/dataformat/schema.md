@@ -111,11 +111,41 @@ EventCluster will handle IO for cluster 2D and cluster3D images.  It will read a
 In both cases, the ImageMeta will be stored in the attributes for the datasets.
 
 
+## Storing Voxel information
 
 
+Voxels are, at a fundamental level, a pair of values, and a collection of voxels, voxelsets, voxelsetarrays is a vector of voxels, and meta information about how to slice it up.  Each selection of voxels has a length, an offset from the front of the main vector, and some general index to indicate how it fits into the big picture.  For concreteness, some examples:
+
+* VoxelSets in 2D, aka sparse images, with 3 projections.  Let's say the number of voxels at each projection is N1, N2, N3, for a total of N = N1 + N2 + N3.  The metadata needed to reconstruct the individual voxel sets is:
+  1. Voxel set with *ID 0* starts at offset 0 and has length N1
+  1. Voxel set with *ID 1* starts at offset N1 and has length N2
+  1. Voxel set with *ID 2* starts at offset N3 and has length N3
+
+* VoxelSets in 3D, aka sparse images, with only one projection.  Simpler than above, we need only know that N1 = N, offset is 0, and there is only one ID = 0.
 
 
+* VoxelSetArray in 3D, aka 3D clusters.  This is almost identical to the first case above, but now the Voxel id's all have a projection ID of 0, and inside of that another ID of 0, 1, 2, 3, etc ...
 
+* VoxelSetArray in 2D, with 3 projections, aka 2D clusters.  In this case, we have a complex situation.  We need to take our flat list of voxels and slice it into a 2D indexed dimension.  So, all of the voxelSets in projection 0 are different than the ones in projection 1, but it makes sense to preserve the the same serialization tools for all of this.
+
+A solution: the problem of flattening a multi dimensional index into a flat index is well solved already by ImageMeta.  So, larcv will use a static, constant instance of an image meta that wil map the projectionID and clusterID indexes into a flat index.  At serialization time, particularly at initialization, the ImageMeta handling the ID raveling will be persisted into the file so that the deserialization can reference it.  This preserves backwards compatibility if we ever need to change the meta information.
+
+In this model, *ALL* IO for voxel data products at it's core level will read in a flat array of Voxels, and map to variable length 2D arrays (ragged array) to manage the splitting of different voxels to different images, cluster, projections, etc.  An important, and necessary, constraint is that at the deepest index the voxels are contiguous in file and not interleaved with any other voxel set.  To be explicit, the groups in the the voxel persistence will be 3:
+
+* *voxels* will contain a long table of larcv::Voxels, only storing index and value pairs
+
+* *voxel_map* will contain the mapping of the voxel table within an event.  Each entry will have the raveled projection/clusterID, the starting voxel (offset), and the length of this object
+
+* *event_extents* will contain the extents of the voxel_map for a particular event.  So, this will have only starting offset and number of voxelset IDs.
+
+After reading, the voxels may be diverted into index/value stored in independent arrays within an object
+
+
+#### How is the Image meta handled?
+
+Image meta is static with the projectionIDs.  Therefore, all images with the same projectionID, regardless of clusterID, are using the same image meta.  Image meta is also static for all events in a file.
+
+Since Image meta is property of the entire producer/dataproduct for all events/entries in a file, it is stored as a group attribute.  Additionally, the projection/cluster meta is stored as a group attribute.  When the group is initialized, the projection/cluster meta is serialized for the first time.  When the group is read for the first time, the projection/cluster meta is read from file for deserializing.  When the first voxels are written, the image meta for each projection ID is written to file.
 
 
 
