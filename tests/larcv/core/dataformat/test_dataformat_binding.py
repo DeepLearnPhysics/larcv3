@@ -72,3 +72,15 @@ def test_import_IOManager_h():
 def test_import_EventParticle_h():
     from larcv import dataformat
     ep = dataformat.EventParticle()
+
+
+def test_vector_double():
+    from larcv import dataformat
+    vec = dataformat.VectorOfDouble()
+    vec.push_back(random.uniform(-1e5, 1e5))  
+
+def test_vector_sizet():
+    from larcv import dataformat
+    vec = dataformat.VectorOfSizet()
+    vec.push_back(random.randint(1, 2e4))  
+
