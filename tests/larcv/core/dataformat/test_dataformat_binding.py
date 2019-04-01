@@ -1,5 +1,8 @@
 import unittest
 
+from random import Random
+random = Random()
+
 def test_import_dataformat_top():
     from larcv import dataformat
 
