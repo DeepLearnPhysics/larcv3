@@ -5,7 +5,7 @@ import pytest
 from random import Random
 random = Random()
 
-N_CHECKS = 10
+N_CHECKS = 1
 
 def test_import():
     from larcv import dataformat
@@ -21,6 +21,9 @@ def test_default_constructor(execution_number):
     total_volume = 1.0
     total_voxels = 1
 
+    _id = random.randint(1, 100)
+    im.set_projection_id(_id)
+
     for dim in range(n_dims):
         L = random.uniform(0.001, 1e4)
         N = random.randint(1, 2e4)
@@ -29,6 +32,7 @@ def test_default_constructor(execution_number):
         total_volume *= L
         total_voxels *= N
 
+    assert(im.id() == _id)
     assert(im.n_dims() == n_dims)
     assert(im.total_voxels() == total_voxels)
 
