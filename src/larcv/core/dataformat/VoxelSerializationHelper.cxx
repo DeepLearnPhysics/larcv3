@@ -200,57 +200,57 @@ namespace larcv {
 
     //  Read the total number of projections:
       size_t n_projections;
-      H5::Attribute n_projections_attr = group->openAttribute("n_projection_ids");
+      H5::Attribute n_projections_attr = obj->openAttribute("n_projection_ids");
       n_projections_attr.read(get_datatype<size_t>(),&n_projections);
 
-      size_t i_meta = 0;
-      for (auto & meta : image_meta){
+      // size_t i_meta = 0;
+      // for (auto & meta : image_meta){
 
-        std::string basename = "proj_" + std::to_string(i_meta);
+      //   std::string basename = "proj_" + std::to_string(i_meta);
 
-        //  Everything gets flattened to scalars to write meta
+      //   //  Everything gets flattened to scalars to write meta
 
-        // Dimensionality
-        H5::DataSpace n_dims_space(H5S_SCALAR);
-        H5::Attribute n_dims_attr = obj->createAttribute(basename + "_n_dims",get_datatype<size_t>(),n_dims_space);
-        auto n_dims_val = meta.n_dims();
-        n_dims_attr.write(get_datatype<size_t>(), &(n_dims_val));
+      //   // Dimensionality
+      //   H5::DataSpace n_dims_space(H5S_SCALAR);
+      //   H5::Attribute n_dims_attr = obj->createAttribute(basename + "_n_dims",get_datatype<size_t>(),n_dims_space);
+      //   auto n_dims_val = meta.n_dims();
+      //   n_dims_attr.write(get_datatype<size_t>(), &(n_dims_val));
 
 
-        // Projection ID
-        H5::DataSpace projection_id_space(H5S_SCALAR);
-        H5::Attribute projection_id_attr = obj->createAttribute(basename + "_projection_id",get_datatype<size_t>(),projection_id_space);
-        auto projection_id_val = meta.projection_id();
-        projection_id_attr.write(get_datatype<size_t>(), &(projection_id_val));
+      //   // Projection ID
+      //   H5::DataSpace projection_id_space(H5S_SCALAR);
+      //   H5::Attribute projection_id_attr = obj->createAttribute(basename + "_projection_id",get_datatype<size_t>(),projection_id_space);
+      //   auto projection_id_val = meta.projection_id();
+      //   projection_id_attr.write(get_datatype<size_t>(), &(projection_id_val));
 
-        // Vector characteristics:
-        for (size_t i_dim = 0; i_dim < n_dims_val; i_dim ++){
-          // Image Size:
-          std::string sub_basename = basename + "_" + std::to_string(i_dim);
+      //   // Vector characteristics:
+      //   for (size_t i_dim = 0; i_dim < n_dims_val; i_dim ++){
+      //     // Image Size:
+      //     std::string sub_basename = basename + "_" + std::to_string(i_dim);
           
-          // Image Size
-          H5::DataSpace image_size_space(H5S_SCALAR);
-          H5::Attribute image_size_attr = obj->createAttribute(sub_basename + "_image_size",get_datatype<double>(),image_size_space);
-          auto image_size_val = meta.image_size(i_dim);
-          image_size_attr.write(get_datatype<double>(), &(image_size_val));
+      //     // Image Size
+      //     H5::DataSpace image_size_space(H5S_SCALAR);
+      //     H5::Attribute image_size_attr = obj->createAttribute(sub_basename + "_image_size",get_datatype<double>(),image_size_space);
+      //     auto image_size_val = meta.image_size(i_dim);
+      //     image_size_attr.write(get_datatype<double>(), &(image_size_val));
 
-          // Number of Voxels
-          H5::DataSpace number_of_voxels_space(H5S_SCALAR);
-          H5::Attribute number_of_voxels_attr = obj->createAttribute(sub_basename + "_number_of_voxels",get_datatype<size_t>(),number_of_voxels_space);
-          auto number_of_voxels_val = meta.number_of_voxels(i_dim);
-          number_of_voxels_attr.write(get_datatype<size_t>(), &(number_of_voxels_val));
+      //     // Number of Voxels
+      //     H5::DataSpace number_of_voxels_space(H5S_SCALAR);
+      //     H5::Attribute number_of_voxels_attr = obj->createAttribute(sub_basename + "_number_of_voxels",get_datatype<size_t>(),number_of_voxels_space);
+      //     auto number_of_voxels_val = meta.number_of_voxels(i_dim);
+      //     number_of_voxels_attr.write(get_datatype<size_t>(), &(number_of_voxels_val));
 
-          // Origin
-          H5::DataSpace origin_space(H5S_SCALAR);
-          H5::Attribute origin_attr = obj->createAttribute(sub_basename + "_origin",get_datatype<double>(),origin_space);
-          auto origin_val = meta.origin(i_dim);
-          origin_attr.write(get_datatype<double>(), &(origin_val));
+      //     // Origin
+      //     H5::DataSpace origin_space(H5S_SCALAR);
+      //     H5::Attribute origin_attr = obj->createAttribute(sub_basename + "_origin",get_datatype<double>(),origin_space);
+      //     auto origin_val = meta.origin(i_dim);
+      //     origin_attr.write(get_datatype<double>(), &(origin_val));
 
 
-        }
+      //   }
 
-        i_meta ++;
-      }
+      //   i_meta ++;
+      // }
 
 
 
