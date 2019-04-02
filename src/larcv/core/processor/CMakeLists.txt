@@ -24,14 +24,21 @@ file(GLOB SWIGSOURCES "*.i" )
 set_source_files_properties(${SWIGSOURCES} PROPERTIES CPLUSPLUS ON)
 
 # Add as a module ('.so' extension on mac)
-swig_add_library(${name} 
-    TYPE MODULE
-    LANGUAGE python 
-    SOURCES ${SWIGSOURCES}
-    )
+if (${CMAKE_MINOR_VERSION} GREATER 7)
+  swig_add_library(${name} 
+      TYPE MODULE
+      LANGUAGE python 
+      SOURCES ${SWIGSOURCES}
+      )
+else ()
+  swig_add_module(
+      ${name}
+      python 
+      ${SWIGSOURCES})
+endif()
 
 # Link to python and core shared library
-swig_link_libraries(${name} ${PYTHON_LIBRARIES} ${name} base dataformat)
+swig_link_libraries(${name} ${PYTHON_LIBRARIES} ${name})
 
 # I took this from a github:
 # https://github.com/pemsley/cmake-python-swig-rpath-example/blob/master/src/CMakeLists.txt
@@ -57,8 +64,8 @@ if (APPLE)
 
 else()
 
-   SET_TARGET_PROPERTIES(${SWIG_MODULE_${name}_REAL_NAME} PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-   SET_TARGET_PROPERTIES(${SWIG_MODULE_${name}_REAL_NAME} PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+   SET_TARGET_PROPERTIES(${SWIG_MODULE_${name}_REAL_NAME} PROPERTIES CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+   SET_TARGET_PROPERTIES(${SWIG_MODULE_${name}_REAL_NAME} PROPERTIES CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 endif()
 
