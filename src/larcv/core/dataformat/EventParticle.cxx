@@ -38,7 +38,7 @@ namespace larcv{
   }
 
   void EventParticle::clear(){ 
-    std::cout<< "Clearing" << std::endl; _part_v.clear();
+    _part_v.clear();
   }
 ////////Serialization is hidden from SWIG:
 // #ifndef SWIG

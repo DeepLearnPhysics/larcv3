@@ -62,12 +62,14 @@ class ImageMeta {
 
   inline const std::vector<double> & image_size()       const {return _image_sizes;}
   inline const std::vector<size_t> & number_of_voxels() const {return _number_of_voxels;}
+  inline const std::vector<double> & origin()           const {return _origin;}
 
 
   inline size_t n_dims()  const { return _n_dims; }
 
-  size_t image_size(size_t axis)       const;
+  double image_size(size_t axis)       const;
   size_t number_of_voxels(size_t axis) const;
+  double origin(size_t axis)           const;
 
   size_t total_voxels() const;
   double total_volume() const;

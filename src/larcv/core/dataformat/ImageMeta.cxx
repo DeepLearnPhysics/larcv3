@@ -52,9 +52,7 @@ ImageMeta::ImageMeta(size_t n_dims, size_t projection_id,
 }
 
 
-
-
-size_t ImageMeta::image_size(size_t axis)       const{
+double ImageMeta::image_size(size_t axis)       const{
   if (_valid && axis >= 0 && axis < _n_dims){
     return _image_sizes.at(axis);
   } 
@@ -63,6 +61,17 @@ size_t ImageMeta::image_size(size_t axis)       const{
     throw larbys();
   }
 }
+
+double ImageMeta::origin(size_t axis)       const{
+  if (_valid && axis >= 0 && axis < _n_dims){
+    return _origin.at(axis);
+  } 
+  else{
+    LARCV_CRITICAL() << "Can't return origin of invalid meta." << std::endl;
+    throw larbys();
+  }
+}
+
 size_t ImageMeta::number_of_voxels(size_t axis) const{
   if (_valid && axis >= 0 && axis < _n_dims){
     return _number_of_voxels.at(axis);

@@ -76,6 +76,7 @@ namespace larcv {
 
   void EventSparseTensor::emplace(larcv::SparseTensor&& voxels)
   {
+    LARCV_CRITICAL() << "Id is : " << voxels.meta().id() << std::endl;
     if(_tensor_v.size() <= voxels.meta().id())
       _tensor_v.resize(voxels.meta().id()+1);
     _tensor_v[voxels.meta().id()] = std::move(voxels);
@@ -120,16 +121,29 @@ namespace larcv {
 
     if (! _helper.initialized()){
       _helper.image_meta.clear();
+      LARCV_CRITICAL() << "_tensor_v size: " << _tensor_v.size() << std::endl;
       for (auto & sparse_tensor : _tensor_v)
         _helper.image_meta.push_back(sparse_tensor.meta());
 
       _helper.write_image_meta(group);
   
     }
+    else{
+      // In this case, we make sure that since the helper is initialized, we have 
+      // the same meta going in to the file:
+      for (size_t i = 0; i <  _tensor_v.size(); ++ i){
+        if (_tensor_v.at(i).meta() != _helper.image_meta.at(i)){
+          LARCV_CRITICAL() << "Meta has been changed since this group was first initialized!  ERROR." << std::endl;
+          throw larbys();
+        }
+      }
+
+    }
     
     // We unpack the voxels of the sparse tensor into one long list:
     /// TODO
     std::vector<larcv::Voxel> _voxels;
+
 
     // User the helper to write them to file:
     _helper.write_voxels(group, _voxels);
