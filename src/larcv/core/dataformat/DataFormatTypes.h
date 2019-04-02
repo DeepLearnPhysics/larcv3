@@ -32,6 +32,13 @@ namespace larcv {
     unsigned int n;
   };
 
+  struct IDExtents_t{
+    unsigned int first;
+    unsigned int n;
+    unsigned int id;
+  };
+
+
   /// "ID" for Voxel3D
   typedef unsigned long long VoxelID_t;
   /// Invalid Voxel3DID_t definition

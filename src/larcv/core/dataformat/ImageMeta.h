@@ -70,6 +70,7 @@ class ImageMeta {
   size_t number_of_voxels(size_t axis) const;
 
   size_t total_voxels() const;
+  double total_volume() const;
 
   std::vector<double> voxel_dimensions()  const;
   double voxel_dimensions(size_t axis)    const;
@@ -127,7 +128,12 @@ class ImageMeta {
   /// Map just one position to just one coordinate
   size_t position_to_coordinate(double position, size_t axis) const;
 
+  // This function is useful to interactively build up a meta object
+  void add_dimension(double image_size, size_t number_of_voxels, double origin = 0);
 
+  inline void set_projection_id(size_t projection_id){_projection_id = projection_id;}
+
+  bool is_valid() const;
 
   // inline void update(size_t row_count, size_t col_count) {
   //   _row_count = row_count;

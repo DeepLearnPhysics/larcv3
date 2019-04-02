@@ -519,7 +519,6 @@ bool IOManager::save_entry() {
   LARCV_INFO() << "Saving new entry " << std::endl;
 
   set_id();
-  std::cout << "Saving new entry3" << std::endl;
 
   if (_store_id_bool.empty()) {
     for (auto& p : _product_ptr_v) {
@@ -563,7 +562,6 @@ bool IOManager::save_entry() {
       p->clear();
     }
   }
-  std::cout << "Saving new entry4" << std::endl;
 
   clear_entry();
 

@@ -261,7 +261,9 @@ namespace larcv {
    _meta = meta;
  }
 
-
+ SparseCluster::SparseCluster(VoxelSetArray&& vsa, ImageMeta meta)
+   : VoxelSetArray(std::move(vsa))
+ { this->meta(meta); }
 
 };
 

@@ -332,6 +332,8 @@ namespace larcv {
   public:
     /// Default ctor
     SparseCluster() {}
+    SparseCluster(VoxelSetArray&& vsa, ImageMeta meta);
+    
     /// Default dtor
     virtual ~SparseCluster() {}
 
