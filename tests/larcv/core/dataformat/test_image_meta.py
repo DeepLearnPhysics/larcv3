@@ -80,15 +80,14 @@ def test_unravel(execution_number):
     for dim in range(n_dims):
         L = random.uniform(0.001, 1e4)
         N = random.randint(1, 2e4)
-        O = random.uniform(0.001, 1e4)
-        im.add_dimension(L, N, O)
+        im.add_dimension(L, N)
         total_volume *= L
         total_voxels *= N
         dims.append(N)
 
     # Verify that the same uniform index gets unraveled to the same value as numpy:
     for i in range(50):
-        flat_index = random.randint(0, total_voxels)
+        flat_index = random.randint(0, total_voxels-1)
         np_unraveled = numpy.unravel_index(flat_index, dims)
         im_unraveled = im.coordinates(flat_index)
 
@@ -112,17 +111,25 @@ def test_ravel(execution_number):
     for dim in range(n_dims):
         L = random.uniform(0.001, 1e4)
         N = random.randint(1, 2e4)
-        O = random.uniform(0.001, 1e4)
-        im.add_dimension(L, N, O)
+        im.add_dimension(L, N)
         total_volume *= L
         total_voxels *= N
         dims.append(N)
 
-    # Verify that the same uniform index gets raveled to the same value as numpy:
+    # Verify that the same coordinates get raveled to the same index as numpy:
     for i in range(50):
-        flat_index = random.randint(0, total_voxels)
-        np_raveled = numpy.ravel_index(flat_index, dims)
-        im_raveled = im.coordinates(flat_index)
+        
+        # Create a list of indexes:
+        indexes = []
+        vec_of_indexes = dataformat.VectorOfSizet()
+        for dim in dims:
+            ind = random.randint(0, dim-1)
+            indexes.append(ind)
+            vec_of_indexes.push_back(ind)
+
+        # for 
+        np_raveled = numpy.ravel_multi_index(indexes, dims)
+        im_raveled = im.index(vec_of_indexes)
 
         for d in range(n_dims):
-            assert(np_raveled[d] == im_raveled[d])
+            assert(np_raveled == im_raveled)
