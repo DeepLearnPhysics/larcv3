@@ -228,8 +228,8 @@ void ImageMeta::coordinates( const std::vector<size_t> & index,  std::vector<siz
       for (size_t i = 0; i < _n_dims; i ++ ){
         size_t axis = _n_dims - i - 1;
         size_t stride = _number_of_voxels.at(axis);
-        output_coordinates.at(i_index*_n_dims + axis) = index % stride;
-        index = index / stride;
+        output_coordinates.at(i_index*_n_dims + axis) = index_copy % stride;
+        index_copy = index_copy / stride;
       }
 
     }

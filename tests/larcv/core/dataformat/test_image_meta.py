@@ -5,11 +5,13 @@ import pytest
 from random import Random
 random = Random()
 
+N_CHECKS = 10
+
 def test_import():
     from larcv import dataformat
     im = dataformat.ImageMeta()
 
-@pytest.mark.parametrize('execution_number', range(10))
+@pytest.mark.parametrize('execution_number', range(N_CHECKS))
 def test_default_constructor(execution_number):
     from larcv import dataformat
     im = dataformat.ImageMeta()
@@ -32,7 +34,7 @@ def test_default_constructor(execution_number):
 
 
 
-@pytest.mark.parametrize('execution_number', range(10))
+@pytest.mark.parametrize('execution_number', range(N_CHECKS))
 def test_filled_constructor(execution_number):
 
     from larcv import dataformat
@@ -61,3 +63,66 @@ def test_filled_constructor(execution_number):
 
     assert(im.n_dims() == n_dims)
     assert(im.total_voxels() == total_voxels)
+
+@pytest.mark.parametrize('execution_number', range(N_CHECKS))
+def test_unravel(execution_number):
+
+    from larcv import dataformat
+    im = dataformat.ImageMeta()
+
+    n_dims = random.randint(1,4)
+
+    total_volume = 1.0
+    total_voxels = 1
+
+    dims = []
+
+    for dim in range(n_dims):
+        L = random.uniform(0.001, 1e4)
+        N = random.randint(1, 2e4)
+        O = random.uniform(0.001, 1e4)
+        im.add_dimension(L, N, O)
+        total_volume *= L
+        total_voxels *= N
+        dims.append(N)
+
+    # Verify that the same uniform index gets unraveled to the same value as numpy:
+    for i in range(50):
+        flat_index = random.randint(0, total_voxels)
+        np_unraveled = numpy.unravel_index(flat_index, dims)
+        im_unraveled = im.coordinates(flat_index)
+
+        for d in range(n_dims):
+            assert(np_unraveled[d] == im_unraveled[d])
+
+
+@pytest.mark.parametrize('execution_number', range(N_CHECKS))
+def test_ravel(execution_number):
+
+    from larcv import dataformat
+    im = dataformat.ImageMeta()
+
+    n_dims = random.randint(1,4)
+
+    total_volume = 1.0
+    total_voxels = 1
+
+    dims = []
+
+    for dim in range(n_dims):
+        L = random.uniform(0.001, 1e4)
+        N = random.randint(1, 2e4)
+        O = random.uniform(0.001, 1e4)
+        im.add_dimension(L, N, O)
+        total_volume *= L
+        total_voxels *= N
+        dims.append(N)
+
+    # Verify that the same uniform index gets raveled to the same value as numpy:
+    for i in range(50):
+        flat_index = random.randint(0, total_voxels)
+        np_raveled = numpy.ravel_index(flat_index, dims)
+        im_raveled = im.coordinates(flat_index)
+
+        for d in range(n_dims):
+            assert(np_raveled[d] == im_raveled[d])
