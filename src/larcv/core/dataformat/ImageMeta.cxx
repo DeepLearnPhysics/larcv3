@@ -135,9 +135,10 @@ size_t ImageMeta::index(const std::vector<size_t> & coordinate) const{
 
     size_t index = 0;
     size_t stride = 1;
-    for (size_t axis = _n_dims - 1; axis >= 0; -- axis) {
+    for (size_t j = 0; j < _n_dims; j ++ ){
+      size_t axis = _n_dims - j - 1;
       index += coordinate.at(axis)*stride;
-      stride += _number_of_voxels.at(axis);
+      stride *= _number_of_voxels.at(axis);
       // dims.at(axis) = _image_sizes.at(axis) / _number_of_voxels.at(axis);
     }
     return index;
@@ -168,9 +169,10 @@ void ImageMeta::index( const std::vector<size_t> & coordinates, std::vector<size
     for (size_t i = 0; i < coordinates.size(); i ++){
       // size_t index = 0;
       size_t stride = 1;
-      for (size_t axis = _n_dims - 1; axis >= 0; -- axis) {
+    for (size_t j = 0; j < _n_dims; j ++ ){
+        size_t axis = _n_dims - j - 1;
         output_index.at(i) += coordinates.at(axis)*stride;
-        stride += _number_of_voxels.at(axis);
+        stride *= _number_of_voxels.at(axis);
         // dims.at(axis) = _image_sizes.at(axis) / _number_of_voxels.at(axis);
       }
     }
