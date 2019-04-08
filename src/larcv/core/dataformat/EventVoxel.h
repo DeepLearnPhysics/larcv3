@@ -101,7 +101,7 @@ namespace larcv {
     // Write-access
     //
     /// EventBase::clear() override
-    void clear() {std::cout << "Clear called" << std::endl; _tensor_v.clear();}
+    void clear() {}
     /// Emplace data
     void emplace(larcv::SparseTensor&& voxels);
     /// Set data`

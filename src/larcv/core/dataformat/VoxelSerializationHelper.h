@@ -38,10 +38,10 @@ namespace larcv {
     void read_projection_meta(H5::Group *group);
 
     // Write a set of voxels, packaged in the way proscribed by meta, to the group:
-    void write_voxels(H5::Group * group, const std::vector<larcv::Voxel> & voxels );
+    void write_voxels(H5::Group * group, const std::vector<std::vector<larcv::VoxelSet> > & voxels );
 
     // Read an entry of voxels from a group
-    void read_voxels(H5::Group * group, size_t entry, std::vector<larcv::Voxel> & voxels);
+    void read_voxels(H5::Group * group, size_t entry, std::vector<std::vector<larcv::VoxelSet> > & voxels);
 
     // Initialization is the same for sparse image and cluster set
     void initialize_voxel_group(H5::Group * group);
@@ -53,6 +53,9 @@ namespace larcv {
     void read_image_meta(H5::H5Object *obj);
 
     bool initialized(){return _initialized;}
+
+    void initialize_for_read(H5::Group * obj);
+    void initialize_for_write(H5::Group * obj);
 
     std::vector<larcv::ImageMeta> image_meta;
     ImageMeta projection_meta;

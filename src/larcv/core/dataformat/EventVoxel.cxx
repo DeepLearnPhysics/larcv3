@@ -76,7 +76,6 @@ namespace larcv {
 
   void EventSparseTensor::emplace(larcv::SparseTensor&& voxels)
   {
-    LARCV_CRITICAL() << "Id is : " << voxels.meta().id() << std::endl;
     if(_tensor_v.size() <= voxels.meta().id())
       _tensor_v.resize(voxels.meta().id()+1);
     _tensor_v[voxels.meta().id()] = std::move(voxels);
@@ -109,7 +108,6 @@ namespace larcv {
     // Call the helper initialize function:
     _helper.initialize_voxel_group(group);
 
-    _helper.write_projection_meta(group);
 
   }
 
@@ -121,12 +119,12 @@ namespace larcv {
 
     if (! _helper.initialized()){
       _helper.image_meta.clear();
-      LARCV_CRITICAL() << "_tensor_v size: " << _tensor_v.size() << std::endl;
       for (auto & sparse_tensor : _tensor_v)
         _helper.image_meta.push_back(sparse_tensor.meta());
 
-      _helper.write_image_meta(group);
-  
+      _helper.initialize_for_write(group);
+
+      
     }
     else{
       // In this case, we make sure that since the helper is initialized, we have 
@@ -142,7 +140,15 @@ namespace larcv {
     
     // We unpack the voxels of the sparse tensor into one long list:
     /// TODO
-    std::vector<larcv::Voxel> _voxels;
+    std::vector<std::vector<larcv::VoxelSet> > _voxels;
+
+    _voxels.resize(_tensor_v.size());
+    for (size_t projection_id = 0; projection_id < _tensor_v.size(); projection_id ++){
+      _voxels.at(projection_id).resize(1);
+      for (auto & voxel : _tensor_v.at(projection_id).as_vector()){
+        _voxels.at(projection_id).front().insert(voxel);
+      }
+    }
 
 
     // User the helper to write them to file:
@@ -157,9 +163,25 @@ namespace larcv {
 
     // Make sure to read in meta before writing:
     if (! _helper.initialized()){
+      std::cout << "Init" << std::endl;
+      _helper.read_projection_meta(group);
       _helper.image_meta.clear();
       _helper.read_image_meta(group); 
+      _helper.initialize_for_read(group);
     }
+
+    std::vector<std::vector<larcv::VoxelSet> > _voxels;
+    _helper.read_voxels(group, entry, _voxels);
+
+    std::cout << "Finished reading voxels" << std::endl;
+
+    _tensor_v.resize(_voxels.size());
+
+    // Now the _voxels object is filled, have to populate the sparse tensor:
+    for (size_t projection_id = 0; projection_id < _voxels.size(); projection_id ++){
+      _tensor_v.at(projection_id).emplace(std::move(_voxels.at(projection_id).at(0)), _helper.image_meta.at(projection_id));
+    }
+
 
     return;
 
