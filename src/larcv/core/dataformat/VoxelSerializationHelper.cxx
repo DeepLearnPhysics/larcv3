@@ -404,7 +404,7 @@ namespace larcv {
 
     voxel_extents_dataset.read(&(voxel_extents[0]), larcv::get_datatype<IDExtents_t>(), voxel_extents_memspace, voxel_extents_dataspace);
 
-    std::cout << "voxel_extents.size(): " << voxel_extents.size() << std::endl;
+    // std::cout << "voxel_extents.size(): " << voxel_extents.size() << std::endl;
     
 
     /////////////////////////////////////////////////////////
@@ -442,9 +442,9 @@ namespace larcv {
       hsize_t voxels_offset[1];
       voxels_offset[0] = offset;
 
-      std::cout << "N: " << voxels_slab_dims[0] << "\n"
-                << "offset: " << voxels_offset[0] << "\n"
-                << std::endl;
+      // std::cout << "N: " << voxels_slab_dims[0] << "\n"
+      //           << "offset: " << voxels_offset[0] << "\n"
+      //           << std::endl;
       // Now, select as a hyperslab the last section of data for readomg:
       voxels_dataspace.selectHyperslab(H5S_SELECT_SET, voxels_slab_dims, voxels_offset);
 
@@ -462,19 +462,16 @@ namespace larcv {
 
       voxels_dataset.read(&(temp_voxel_vector[0]), larcv::Voxel::get_datatype(), voxels_memspace, voxels_dataspace);
 
-      std::cout << "temp_voxel_vector.size(): " << temp_voxel_vector.size() << std::endl;
+      // std::cout << "temp_voxel_vector.size(): " << temp_voxel_vector.size() << std::endl;
 
-      std::cout << "voxels.size(): " << voxels.size() << std::endl;
-      std::cout << "cluster id: " << cluster_id << std::endl;
-      std::cout << "voxels.at(" << projection_id  << ").size(): " << voxels.at(projection_id).size() << std::endl;
 
       for (auto & v : temp_voxel_vector){
         voxels.at(projection_id).at(cluster_id).add(v);
       }
 
-      std::cout << "voxels.at(projection_id).at(cluster_id).size(): " << voxels.at(projection_id).at(cluster_id).size() << std::endl;
+      // std::cout << "voxels.at(projection_id).at(cluster_id).size(): " << voxels.at(projection_id).at(cluster_id).size() << std::endl;
     
-
+      offset += voxels_slab_dims[0];
     }
 
 

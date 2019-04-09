@@ -163,7 +163,6 @@ namespace larcv {
 
     // Make sure to read in meta before writing:
     if (! _helper.initialized()){
-      std::cout << "Init" << std::endl;
       _helper.read_projection_meta(group);
       _helper.image_meta.clear();
       _helper.read_image_meta(group); 
@@ -173,7 +172,6 @@ namespace larcv {
     std::vector<std::vector<larcv::VoxelSet> > _voxels;
     _helper.read_voxels(group, entry, _voxels);
 
-    std::cout << "Finished reading voxels" << std::endl;
 
     _tensor_v.resize(_voxels.size());
 
