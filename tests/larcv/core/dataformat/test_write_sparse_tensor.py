@@ -6,26 +6,20 @@ from random import Random
 random = Random()
 
 
-@pytest.fixture()
-def tempfile(tmpdir):
-    return str(tmpdir.dirpath() + "/test_sparse.h5")
 
 @pytest.fixture()
 def rand_num_events():
     return random.randint(5, 100)
 
 
-def write_sparse_tensors(tempfile, voxel_set_list):
+def write_sparse_tensors(tempfile, voxel_set_list, dimension, n_projections):
 
     from larcv import dataformat
 
     io_manager = dataformat.IOManager(dataformat.IOManager.kWRITE)
+    print(type(tempfile))
     io_manager.set_out_file(tempfile)
     io_manager.initialize()
-
-
-    dimension = 2
-    n_projections = 3
 
     # For this test, the meta is pretty irrelevant as long as it is consistent
     meta_list = []
@@ -100,13 +94,7 @@ def read_sparse_tensors(tempfile):
 
     return voxel_set_list
 
-# @pytest.mark.parametrize('random_seed', random.rando(N_CHECKS))
-def test_write_sparse_tensors(tempfile, rand_num_events):
-    from random import Random
-    random = Random()
-
-    rand_num_events = 5
-    n_projections = 3
+def build_sparse_tensor(rand_num_events, n_projections=3):
 
     voxel_set_list = []
      
@@ -123,36 +111,32 @@ def test_write_sparse_tensors(tempfile, rand_num_events):
             for j in range(voxel_set_list[i][projection]['n_voxels']):
                 voxel_set_list[i][-1]['values'].append(random.uniform(-1e3, 1e3) )
 
+    return voxel_set_list
 
 
-    write_sparse_tensors(tempfile, voxel_set_list)
+@pytest.mark.parametrize('dimension', [2, 3])
+@pytest.mark.parametrize('n_projections', [1, 2, 3])
+def test_write_sparse_tensors(tmpdir, rand_num_events, dimension, n_projections):
 
-def test_read_write_sparse_tensors(tempfile, rand_num_events):
-    from random import Random
-    random = Random()
+    voxel_set_list = build_sparse_tensor(rand_num_events, n_projections = n_projections)
+
+    random_file_name = str(tmpdir + "/test_write_sparse_tensors.h5")
+
+    write_sparse_tensors(random_file_name, voxel_set_list, dimension, n_projections)
+
+
+@pytest.mark.parametrize('dimension', [2, 3])
+@pytest.mark.parametrize('n_projections', [1, 2, 3])
+def test_read_write_sparse_tensors(tmpdir, rand_num_events, dimension, n_projections):
+
     import numpy
 
-    n_projections = 3
+    random_file_name = str(tmpdir + "/test_write_read_sparse_tensors.h5")
 
-    voxel_set_list = []
-     
-    for i in range(rand_num_events):
-        voxel_set_list.append([])
-        # Get a piece of data, sparse tensor:
-        for projection in range(n_projections):
-            n_voxels = random.randint(0,50)
-            voxel_set_list[i].append({
-                'values'  : [],
-                'indexes' : random.sample(range(512*512), n_voxels),
-                'n_voxels': n_voxels
-                })
-            for j in range(voxel_set_list[i][projection]['n_voxels']):
-                voxel_set_list[i][-1]['values'].append(random.uniform(-1e3, 1e3) )
+    voxel_set_list = build_sparse_tensor(rand_num_events, n_projections = n_projections)
 
-
-
-    write_sparse_tensors("test_sparse.h5", voxel_set_list)
-    read_voxel_set_list = read_sparse_tensors("test_sparse.h5")
+    write_sparse_tensors(random_file_name, voxel_set_list, dimension, n_projections)
+    read_voxel_set_list = read_sparse_tensors(random_file_name)
 
     # Check the same number of events came back:
     assert(len(read_voxel_set_list) == rand_num_events)
