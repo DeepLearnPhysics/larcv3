@@ -9,6 +9,8 @@
 #include "core/base/PSet.h"
 #include "core/base/Watch.h"
 #include "core/base/ConfigManager.h"
+#include "core/base/larbys.h"
+
 using namespace larcv;
 using namespace std;
 %}
@@ -23,3 +25,5 @@ using namespace std;
 %include "core/base/PSet.h"
 %include "core/base/Watch.h"
 %include "core/base/ConfigManager.h"
+%include "core/base/larbys.h"
+
