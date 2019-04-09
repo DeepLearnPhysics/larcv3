@@ -159,7 +159,6 @@ namespace larcv {
   }
 
   void EventSparseTensor::deserialize(H5::Group * group, size_t entry){
-    // TODO
 
     // Make sure to read in meta before writing:
     if (! _helper.initialized()){
@@ -195,13 +194,81 @@ namespace larcv {
   }
 
   void EventSparseClusters::serialize  (H5::Group * group){
-    // TODO
+    // Step one, we write the meta if it hasn't already been written.
+    // The helper handles this, if we set the meta:
+
+    if (! _helper.initialized()){
+      _helper.image_meta.clear();
+      for (auto & sparse_cluster : _cluster_v)
+        _helper.image_meta.push_back(sparse_cluster.meta());
+
+      _helper.initialize_for_write(group);
+
+      
+    }
+    else{
+      // In this case, we make sure that since the helper is initialized, we have 
+      // the same meta going in to the file:
+      for (size_t i = 0; i <  _cluster_v.size(); ++ i){
+        if (_cluster_v.at(i).meta() != _helper.image_meta.at(i)){
+          LARCV_CRITICAL() << "Meta has been changed since this group was first initialized!  ERROR." << std::endl;
+          throw larbys();
+        }
+      }
+
+    }
+    
+    // We unpack the voxels of the sparse tensor into one long list:
+    /// TODO
+    std::vector<std::vector<larcv::VoxelSet> > _voxels;
+
+    _voxels.resize(_cluster_v.size());
+    for (size_t projection_id = 0; projection_id < _cluster_v.size(); projection_id ++){
+      _voxels.at(projection_id).resize(_cluster_v.at(projection_id).size());
+      
+      for (size_t cluster_id = 0; cluster_id < _cluster_v.at(projection_id).size(); cluster_id ++){
+        for (auto & voxel : _cluster_v.at(projection_id).voxel_set(cluster_id).as_vector()){
+          _voxels.at(projection_id).at(cluster_id).insert(voxel);
+        }
+      }
+    }
+
+
+    // User the helper to write them to file:
+    _helper.write_voxels(group, _voxels);
+    // Serialization relies on the helper to write everything.
     return;
 
   }
 
   void EventSparseClusters::deserialize(H5::Group * group, size_t entry){
-    // TODO
+
+    // Make sure to read in meta before writing:
+    if (! _helper.initialized()){
+      _helper.read_projection_meta(group);
+      _helper.image_meta.clear();
+      _helper.read_image_meta(group); 
+      _helper.initialize_for_read(group);
+    }
+
+    std::vector<std::vector<larcv::VoxelSet> > _voxels;
+    _helper.read_voxels(group, entry, _voxels);
+
+
+    _cluster_v.resize(_voxels.size());
+
+    // Now the _voxels object is filled, have to populate the sparse tensor:
+    for (size_t projection_id = 0; projection_id < _voxels.size(); projection_id ++){
+      // Set the meta for this projection:
+      _cluster_v.at(projection_id).meta(_helper.image_meta.at(projection_id));
+      for (size_t cluster_id = 0; cluster_id < _cluster_v.at(projection_id).size(); cluster_id ++){
+        auto & _this_cluster = _cluster_v.at(projection_id).writeable_voxel_set(cluster_id);
+        for (auto & vox : _voxels.at(projection_id).at(cluster_id).as_vector()){
+          _this_cluster.insert(vox);
+        }
+      }
+    }
+
 
     return;
 

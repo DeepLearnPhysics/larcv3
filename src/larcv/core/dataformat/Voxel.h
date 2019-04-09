@@ -145,7 +145,7 @@ namespace larcv {
   class VoxelSet {
   public:
     /// Default ctor
-    VoxelSet() {}
+    VoxelSet() {_id=0;}
     /// Default dtor
     virtual ~VoxelSet() {}
 

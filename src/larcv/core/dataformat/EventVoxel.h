@@ -68,6 +68,9 @@ namespace larcv {
     void serialize  (H5::Group * group);
     void deserialize(H5::Group * group, size_t entry);
 
+    static EventSparseClusters * to_sparse_clusters(EventBase * e){
+      return (EventSparseClusters *) e;
+    }
 
   private:
     std::vector<larcv::SparseCluster> _cluster_v;
