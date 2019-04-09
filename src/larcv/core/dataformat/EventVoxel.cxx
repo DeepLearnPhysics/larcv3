@@ -261,14 +261,15 @@ namespace larcv {
     for (size_t projection_id = 0; projection_id < _voxels.size(); projection_id ++){
       // Set the meta for this projection:
       _cluster_v.at(projection_id).meta(_helper.image_meta.at(projection_id));
-      for (size_t cluster_id = 0; cluster_id < _cluster_v.at(projection_id).size(); cluster_id ++){
-        auto & _this_cluster = _cluster_v.at(projection_id).writeable_voxel_set(cluster_id);
-        for (auto & vox : _voxels.at(projection_id).at(cluster_id).as_vector()){
-          _this_cluster.insert(vox);
-        }
-      }
+      _cluster_v.at(projection_id).emplace(std::move(_voxels.at(projection_id)));
+      // for (size_t cluster_id = 0; cluster_id < _voxels.at(projection_id).size(); cluster_id ++){
+      //   // Write the voxels into the appropriate cluster
+      //   auto & _this_cluster = _cluster_v.at(projection_id).emplace();
+      //   for (auto & vox : _voxels.at(projection_id).at(cluster_id).as_vector()){
+      //     _this_cluster.insert(vox);
+      //   }
+      // }
     }
-
 
     return;
 

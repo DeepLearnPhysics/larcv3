@@ -468,7 +468,7 @@ namespace larcv {
       for (auto & v : temp_voxel_vector){
         voxels.at(projection_id).at(cluster_id).add(v);
       }
-
+      voxels.at(projection_id).at(cluster_id).id(cluster_id);
       // std::cout << "voxels.at(projection_id).at(cluster_id).size(): " << voxels.at(projection_id).at(cluster_id).size() << std::endl;
     
       offset += voxels_slab_dims[0];

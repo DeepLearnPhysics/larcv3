@@ -113,7 +113,7 @@ namespace larcv {
     // Cannot be the end
     if ( iter == _voxel_v.end() ) {
       std::cerr << "VoxelSet sorting logic error!" << std::endl;
-      throw std::exception();
+      throw larbys();
     }
 
     // If found, merge
@@ -174,7 +174,7 @@ namespace larcv {
   {
     if(id >= _voxel_vv.size()) {
       std::cerr << "VoxelSetArray has no VoxelSet with InstanceID_t " << id << std::endl;
-      throw std::exception();
+      throw larbys();
     }
     return _voxel_vv[id];
   }
@@ -219,7 +219,7 @@ namespace larcv {
   {
     if(id >= _voxel_vv.size()) {
       std::cerr << "VoxelSetArray has no VoxelSet with InstanceID_t " << id << std::endl;
-      throw std::exception();
+      throw larbys();
     }
     return _voxel_vv[id];
   }
@@ -237,7 +237,7 @@ namespace larcv {
      std::cerr << "VoxelSet contains ID " << vox.id()
                << " which cannot exists in ImageMeta with size " << meta.total_voxels()
                << std::endl;
-     throw std::exception();
+     throw larbys();
    }
    _meta = meta;
  }
@@ -255,7 +255,7 @@ namespace larcv {
        std::cerr << "VoxelSet contains ID " << vox.id()
                  << " which cannot exists in ImageMeta with size " << meta.total_voxels()
                  << std::endl;
-       throw std::exception();
+       throw larbys();
      }
    }
    _meta = meta;
