@@ -9,8 +9,14 @@ def test_import_dataformat_top():
 # Testing import of Point.h objects:
 def test_import_Point_h():
     from larcv import dataformat
-    lib = dataformat.Point2D()
-    lib = dataformat.Point3D()
+    pt = dataformat.Point2D()
+    pt = dataformat.Point3D()
+
+def test_import_BBox_h():
+    from larcv import dataformat
+    bb = dataformat.BBox2D()
+    bb = dataformat.BBox3D()
+
 
 # Testing import of Vertex.h objects:
 def test_import_Vertex_h():
@@ -46,7 +52,8 @@ def test_import_Voxel_h_VoxelSetArray():
 def test_import_ImageMeta_h():
     from larcv import dataformat
 
-    im = dataformat.ImageMeta()
+    im = dataformat.ImageMeta2D()
+    im = dataformat.ImageMeta3D()
 
 def test_import_EventID_h():
     from larcv import dataformat

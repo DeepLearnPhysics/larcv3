@@ -7,16 +7,28 @@ random = Random()
 
 N_CHECKS = 1
 
-def test_import():
+@pytest.mark.parametrize('dimension', [2,3])
+def test_import(dimension):
     from larcv import dataformat
-    im = dataformat.ImageMeta()
+    if dimension == 2:
+        im = dataformat.ImageMeta2D()
+    elif dimension == 3:
+        im = dataformat.ImageMeta3D()
+    else:
+        assert False
 
+@pytest.mark.parametrize('dimension', [2,3])
 @pytest.mark.parametrize('execution_number', range(N_CHECKS))
-def test_default_constructor(execution_number):
+def test_default_constructor(dimension, execution_number):
     from larcv import dataformat
-    im = dataformat.ImageMeta()
+    if dimension == 2:
+        im = dataformat.ImageMeta2D()
+    elif dimension == 3:
+        im = dataformat.ImageMeta3D()
+    else:
+        assert(False)
 
-    n_dims = random.randint(1,4)
+    # n_dims = random.randint(1,4)
 
     total_volume = 1.0
     total_voxels = 1
@@ -24,26 +36,26 @@ def test_default_constructor(execution_number):
     _id = random.randint(1, 100)
     im.set_projection_id(_id)
 
-    for dim in range(n_dims):
+    for dim in range(dimension):
         L = random.uniform(0.001, 1e4)
         N = random.randint(1, 2e4)
         O = random.uniform(0.001, 1e4)
-        im.add_dimension(L, N, O)
+        im.set_dimension(dim, L, N, O)
         total_volume *= L
         total_voxels *= N
 
     assert(im.id() == _id)
-    assert(im.n_dims() == n_dims)
+    assert(im.n_dims() == dimension)
     assert(im.total_voxels() == total_voxels)
 
 
 
+@pytest.mark.parametrize('dimension', [2,3])
 @pytest.mark.parametrize('execution_number', range(N_CHECKS))
-def test_filled_constructor(execution_number):
+def test_filled_constructor(dimension, execution_number):
 
     from larcv import dataformat
 
-    n_dims = random.randint(1,4)
     projection_id = random.randint(0,10)
 
     number_of_voxels = dataformat.VectorOfSizet()
@@ -53,7 +65,7 @@ def test_filled_constructor(execution_number):
     total_volume = 1.0
     total_voxels = 1
 
-    for dim in range(n_dims):
+    for dim in range(dimension):
         L = random.uniform(0.001, 1e4)
         N = random.randint(1, 2e4)
         O = random.uniform(0.001, 1e4)
@@ -63,28 +75,39 @@ def test_filled_constructor(execution_number):
         total_volume *= L
         total_voxels *= N
 
-    im = dataformat.ImageMeta(n_dims, projection_id, number_of_voxels, image_sizes)
 
-    assert(im.n_dims() == n_dims)
+    if dimension == 2:
+        im = dataformat.ImageMeta2D(projection_id, number_of_voxels, image_sizes)
+    elif dimension == 3:
+        im = dataformat.ImageMeta3D(projection_id, number_of_voxels, image_sizes)
+    else:
+        assert(False)
+
+    assert(im.n_dims() == dimension)
     assert(im.total_voxels() == total_voxels)
 
+@pytest.mark.parametrize('dimension', [2,3])
 @pytest.mark.parametrize('execution_number', range(N_CHECKS))
-def test_unravel(execution_number):
+def test_unravel(dimension, execution_number):
 
     from larcv import dataformat
-    im = dataformat.ImageMeta()
+    if dimension == 2:
+        im = dataformat.ImageMeta2D()
+    elif dimension == 3:
+        im = dataformat.ImageMeta3D()
+    else:
+        assert(False)
 
-    n_dims = random.randint(1,4)
 
     total_volume = 1.0
     total_voxels = 1
 
     dims = []
 
-    for dim in range(n_dims):
+    for dim in range(dimension):
         L = random.uniform(0.001, 1e4)
         N = random.randint(1, 2e4)
-        im.add_dimension(L, N)
+        im.set_dimension(dim, L, N)
         total_volume *= L
         total_voxels *= N
         dims.append(N)
@@ -95,27 +118,30 @@ def test_unravel(execution_number):
         np_unraveled = numpy.unravel_index(flat_index, dims)
         im_unraveled = im.coordinates(flat_index)
 
-        for d in range(n_dims):
+        for d in range(dimension):
             assert(np_unraveled[d] == im_unraveled[d])
 
-
+@pytest.mark.parametrize('dimension', [2,3])
 @pytest.mark.parametrize('execution_number', range(N_CHECKS))
-def test_ravel(execution_number):
+def test_ravel(dimension, execution_number):
 
     from larcv import dataformat
-    im = dataformat.ImageMeta()
-
-    n_dims = random.randint(1,4)
+    if dimension == 2:
+        im = dataformat.ImageMeta2D()
+    elif dimension == 3:
+        im = dataformat.ImageMeta3D()
+    else:
+        assert(False)
 
     total_volume = 1.0
     total_voxels = 1
 
     dims = []
 
-    for dim in range(n_dims):
+    for dim in range(dimension):
         L = random.uniform(0.001, 1e4)
         N = random.randint(1, 2e4)
-        im.add_dimension(L, N)
+        im.set_dimension(dim, L, N)
         total_volume *= L
         total_voxels *= N
         dims.append(N)
@@ -135,5 +161,5 @@ def test_ravel(execution_number):
         np_raveled = numpy.ravel_multi_index(indexes, dims)
         im_raveled = im.index(vec_of_indexes)
 
-        for d in range(n_dims):
+        for d in range(dimension):
             assert(np_raveled == im_raveled)
