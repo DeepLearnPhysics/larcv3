@@ -8,39 +8,48 @@
 namespace larcv {
 
 /// Default constructor: Does nothing, valid defaults to false
-ImageMeta::ImageMeta() : 
+template<size_t dimension>
+ImageMeta<dimension>::ImageMeta() : 
  _valid(false)
-, _n_dims(0)
 , _projection_id(0)
 , _unit(kUnitUnknown)
-{ _valid = false; }
+{
+  for(size_t i = 0; i < dimension; i++){
+    _image_sizes[i] = 0;
+    _number_of_voxels[i] = 0;
+    _origin[i] = 0;
+  }
+ }
 
 
 /// Constructor with arguments: ndims, dims, voxel_sizes, unit.
-ImageMeta::ImageMeta(size_t n_dims, size_t projection_id,
+template<size_t dimension>
+ImageMeta<dimension>::ImageMeta(size_t projection_id,
                      const std::vector<size_t>& number_of_voxels,
                      const std::vector<double>& image_sizes,
                      const std::vector<double>& origin,
                      DistanceUnit_t unit) {
-  if ( n_dims != 0 && 
-       number_of_voxels.size() == n_dims &&
-       image_sizes.size() == n_dims
+  if ( dimension != 0 && 
+       number_of_voxels.size() == dimension &&
+       image_sizes.size() == dimension
      ){
 
-    // Set the origin to 0 if not set
-    if (origin.size() == _n_dims){
-      _origin = origin;
-    }
-    else{
-      _origin.resize(n_dims);
+    // Copy the data in:
+    for (size_t i = 0; i < dimension; i ++){
+      _image_sizes[i]      = image_sizes[i];
+      _number_of_voxels[i] = number_of_voxels[i];
     }
 
+    // Set the origin to 0 if not set
+    if (origin.size() == dimension){
+      for (size_t i = 0; i < dimension; i ++){
+        _origin[i] = origin[i];
+      }
+    }
+
+
     _projection_id    = projection_id;
-    _n_dims           = n_dims;
-    _image_sizes      = image_sizes;
-    _number_of_voxels = number_of_voxels;
     _unit             = unit;
-    _origin           = origin;
     _valid            = true;
 
   }
@@ -51,10 +60,10 @@ ImageMeta::ImageMeta(size_t n_dims, size_t projection_id,
 
 }
 
-
-double ImageMeta::image_size(size_t axis)       const{
-  if (_valid && axis >= 0 && axis < _n_dims){
-    return _image_sizes.at(axis);
+template<size_t dimension>
+double ImageMeta<dimension>::image_size(size_t axis)       const{
+  if (_valid && axis >= 0 && axis < dimension){
+    return _image_sizes[axis];
   } 
   else{
     LARCV_CRITICAL() << "Can't return image size of invalid meta." << std::endl;
@@ -62,9 +71,10 @@ double ImageMeta::image_size(size_t axis)       const{
   }
 }
 
-double ImageMeta::origin(size_t axis)       const{
-  if (_valid && axis >= 0 && axis < _n_dims){
-    return _origin.at(axis);
+template<size_t dimension>
+double ImageMeta<dimension>::origin(size_t axis)       const{
+  if (_valid && axis >= 0 && axis < dimension){
+    return _origin[axis];
   } 
   else{
     LARCV_CRITICAL() << "Can't return origin of invalid meta." << std::endl;
@@ -72,9 +82,10 @@ double ImageMeta::origin(size_t axis)       const{
   }
 }
 
-size_t ImageMeta::number_of_voxels(size_t axis) const{
-  if (_valid && axis >= 0 && axis < _n_dims){
-    return _number_of_voxels.at(axis);
+template<size_t dimension>
+size_t ImageMeta<dimension>::number_of_voxels(size_t axis) const{
+  if (_valid && axis >= 0 && axis < dimension){
+    return _number_of_voxels[axis];
   } 
   else{
     LARCV_CRITICAL() << "Can't return number_of_voxels of invalid meta." << std::endl;
@@ -82,7 +93,8 @@ size_t ImageMeta::number_of_voxels(size_t axis) const{
   }
 }
 
-size_t ImageMeta::total_voxels() const{
+template<size_t dimension>
+size_t ImageMeta<dimension>::total_voxels() const{
   if (_valid){
     size_t i = 1;
     for (auto count : _number_of_voxels) i *= count;
@@ -94,7 +106,8 @@ size_t ImageMeta::total_voxels() const{
   }
 }
 
-double ImageMeta::total_volume() const{
+template<size_t dimension>
+double ImageMeta<dimension>::total_volume() const{
   if (_valid){
     double v = 1.0;
     for (auto count : _image_sizes) v *= count;
@@ -106,11 +119,12 @@ double ImageMeta::total_volume() const{
   }
 }
 
-std::vector<double> ImageMeta::voxel_dimensions()  const{
+template<size_t dimension>
+std::vector<double> ImageMeta<dimension>::voxel_dimensions()  const{
   if (_valid){
-    std::vector<double> dims; dims.resize(_n_dims);
-    for (size_t axis = 0; axis < _n_dims; ++ axis) {
-      dims.at(axis) = _image_sizes.at(axis) / _number_of_voxels.at(axis);
+    std::vector<double> dims; dims.resize(dimension);
+    for (size_t axis = 0; axis < dimension; ++ axis) {
+      dims.at(axis) = _image_sizes[axis] / _number_of_voxels[axis];
     }
     return dims;
   }
@@ -119,9 +133,11 @@ std::vector<double> ImageMeta::voxel_dimensions()  const{
     throw larbys();
   }
 }
-double ImageMeta::voxel_dimensions(size_t axis)    const{
-  if (_valid && axis >= 0 && axis < _n_dims){
-    return _image_sizes.at(axis) / _number_of_voxels.at(axis);
+
+template<size_t dimension>
+double ImageMeta<dimension>::voxel_dimensions(size_t axis)    const{
+  if (_valid && axis >= 0 && axis < dimension){
+    return _image_sizes[axis] / _number_of_voxels[axis];
   }
   else{
     LARCV_CRITICAL() << "Can't return voxel dimensions of invalid meta." << std::endl;
@@ -131,23 +147,24 @@ double ImageMeta::voxel_dimensions(size_t axis)    const{
 
 
 /// Provide 1-D array index dimension from general coordinates
-size_t ImageMeta::index(const std::vector<size_t> & coordinate) const{
+template<size_t dimension>
+size_t ImageMeta<dimension>::index(const std::vector<size_t> & coordinate) const{
   // By convention, the conversion from index to coordinate uses the last coordinate as the most frequently
   // changing, and first coordinate as the most commonly changing.
 
   if (_valid ){
 
-    if (coordinate.size() != _n_dims){
+    if (coordinate.size() != dimension){
       LARCV_CRITICAL() << "Incomplete coordinate submitted for conversion to index, abort." << std::endl;
       throw larbys();
     }
 
     size_t index = 0;
     size_t stride = 1;
-    for (size_t j = 0; j < _n_dims; j ++ ){
-      size_t axis = _n_dims - j - 1;
-      index += coordinate.at(axis)*stride;
-      stride *= _number_of_voxels.at(axis);
+    for (size_t j = 0; j < dimension; j ++ ){
+      size_t axis = dimension - j - 1;
+      index += coordinate[axis]*stride;
+      stride *= _number_of_voxels[axis];
       // dims.at(axis) = _image_sizes.at(axis) / _number_of_voxels.at(axis);
     }
     return index;
@@ -161,12 +178,13 @@ size_t ImageMeta::index(const std::vector<size_t> & coordinate) const{
 
 /// Vectorized version for converting all coordinates to index:
 /// Coordinates is flattened here as [x0, y0, z0, x1, y1, z1, x2, y2, z2, x3 ....]
-void ImageMeta::index( const std::vector<size_t> & coordinates, std::vector<size_t> & output_index) const{
+template<size_t dimension>
+void ImageMeta<dimension>::index( const std::vector<size_t> & coordinates, std::vector<size_t> & output_index) const{
 
 
   if (_valid){
 
-    if (coordinates.size() != _n_dims){
+    if (coordinates.size() != dimension){
       LARCV_CRITICAL() << "Incomplete coordinates submitted for conversion to index, abort." << std::endl;
       throw larbys();
     }
@@ -178,11 +196,11 @@ void ImageMeta::index( const std::vector<size_t> & coordinates, std::vector<size
     for (size_t i = 0; i < coordinates.size(); i ++){
       // size_t index = 0;
       size_t stride = 1;
-    for (size_t j = 0; j < _n_dims; j ++ ){
-        size_t axis = _n_dims - j - 1;
-        output_index.at(i) += coordinates.at(axis)*stride;
-        stride *= _number_of_voxels.at(axis);
-        // dims.at(axis) = _image_sizes.at(axis) / _number_of_voxels.at(axis);
+    for (size_t j = 0; j < dimension; j ++ ){
+        size_t axis = dimension - j - 1;
+        output_index.at(i) += coordinates[axis]*stride;
+        stride *= _number_of_voxels[axis];
+        // dims[axis] = _image_sizes[axis] / _number_of_voxels[axis];
       }
     }
 
@@ -198,17 +216,18 @@ void ImageMeta::index( const std::vector<size_t> & coordinates, std::vector<size
 
 
 /// Convert 1D index to overall coordinates
-std::vector<size_t> ImageMeta::coordinates( size_t index) const{
+template<size_t dimension>
+std::vector<size_t> ImageMeta<dimension>::coordinates( size_t index) const{
   if (_valid ){
 
     std::vector<size_t> coordinates;
-    coordinates.resize(_n_dims);
+    coordinates.resize(dimension);
 
     // size_t index = 0;
-    for (size_t i = 0; i < _n_dims; i ++ ){
-      size_t axis = _n_dims - i - 1;
-      size_t stride = _number_of_voxels.at(axis);
-      coordinates.at(axis) = index % stride;
+    for (size_t i = 0; i < dimension; i ++ ){
+      size_t axis = dimension - i - 1;
+      size_t stride = _number_of_voxels[axis];
+      coordinates[axis] = index % stride;
       index = index / stride;
     }
     return coordinates;
@@ -219,27 +238,30 @@ std::vector<size_t> ImageMeta::coordinates( size_t index) const{
   }
 
 }
+
+
   /// Vectorized version for converting all indexes into coordinates
   /// Coordinates is flattened here as [x0, y0, z0, x1, y1, z1, x2, y2, z2, x3 ....]
-void ImageMeta::coordinates( const std::vector<size_t> & index,  std::vector<size_t> & output_coordinates) const{
+template<size_t dimension>
+void ImageMeta<dimension>::coordinates( const std::vector<size_t> & index,  std::vector<size_t> & output_coordinates) const{
 
   if (_valid ){
 
-    if (index.size() != _n_dims){
+    if (index.size() != dimension){
       LARCV_CRITICAL() << "Incomplete index submitted for conversion to coordinates, abort." << std::endl;
       throw larbys();
     }
 
-    output_coordinates.resize(index.size() * _n_dims);
+    output_coordinates.resize(index.size() * dimension);
 
     #pragma omp parallel for
     for (size_t i_index = 0; i_index < index.size(); ++ i_index){
       size_t index_copy = index.at(i_index);
 
-      for (size_t i = 0; i < _n_dims; i ++ ){
-        size_t axis = _n_dims - i - 1;
-        size_t stride = _number_of_voxels.at(axis);
-        output_coordinates.at(i_index*_n_dims + axis) = index_copy % stride;
+      for (size_t i = 0; i < dimension; i ++ ){
+        size_t axis = dimension - i - 1;
+        size_t stride = _number_of_voxels[axis];
+        output_coordinates.at(i_index*dimension + axis) = index_copy % stride;
         index_copy = index_copy / stride;
       }
 
@@ -257,12 +279,13 @@ void ImageMeta::coordinates( const std::vector<size_t> & index,  std::vector<siz
 
 
   /// Convert 1D index to overall coordiante along specified axis
-size_t ImageMeta::coordinate(size_t index, size_t axis) const{
-  if (_valid && axis >= 0 && axis < _n_dims){
+template<size_t dimension>
+size_t ImageMeta<dimension>::coordinate(size_t index, size_t axis) const{
+  if (_valid && axis >= 0 && axis < dimension){
 
     // size_t index = 0;
-    for (size_t loop_axis = _n_dims - 1; loop_axis >= 0; -- loop_axis) {
-      size_t stride = _number_of_voxels.back();
+    for (size_t loop_axis = dimension - 1; loop_axis >= 0; -- loop_axis) {
+      size_t stride = _number_of_voxels[dimension-1];
       size_t coordinate = index % stride;
       index = index / stride;
       if (loop_axis == axis){
@@ -284,7 +307,8 @@ size_t ImageMeta::coordinate(size_t index, size_t axis) const{
 
 
   /// Provide absolute coordinate of the center of a specified pixel index
-std::vector<double> ImageMeta::position(size_t index) const{
+template<size_t dimension>
+std::vector<double> ImageMeta<dimension>::position(size_t index) const{
   if (_valid ){
 
 
@@ -300,20 +324,21 @@ std::vector<double> ImageMeta::position(size_t index) const{
 
 
   /// Provide absolute coordinate of the center of a specified pixel (row,col)
-std::vector<double> ImageMeta::position(const std::vector<size_t> & coordinates) const{
+template<size_t dimension>
+std::vector<double> ImageMeta<dimension>::position(const std::vector<size_t> & coordinates) const{
   if (_valid ){
 
 
     std::vector<double> positions;
-    positions.resize(_n_dims);
+    positions.resize(dimension);
 
     // size_t index = 0;
-    for (size_t axis = _n_dims - 1; axis >= 0; -- axis) {
+    for (size_t axis = dimension - 1; axis >= 0; -- axis) {
       // Calculate the voxel size:
-      double voxel_size = (_image_sizes.at(axis) / _number_of_voxels.at(axis) );
+      double voxel_size = (_image_sizes[axis] / _number_of_voxels[axis] );
       positions.at(axis) = coordinates.at(axis) * voxel_size;
       /// Measure to the center of each voxel
-      positions.at(axis) += 0.5*voxel_size + _origin.at(axis); 
+      positions.at(axis) += 0.5*voxel_size + _origin[axis]; 
     }
     
     return positions;
@@ -325,33 +350,38 @@ std::vector<double> ImageMeta::position(const std::vector<size_t> & coordinates)
 }
 
 /// Same as above, but restricted to a single axis
-double ImageMeta::position(size_t index, size_t axis) const{
+template<size_t dimension>
+double ImageMeta<dimension>::position(size_t index, size_t axis) const{
   std::vector<size_t> coords = coordinates(index);    
   return position(coords).at(axis);
 }
 
 /// Same as above, but restricted to a single axis
-double ImageMeta::position(const std::vector<size_t> & coordinates, size_t axis) const{
+template<size_t dimension>
+double ImageMeta<dimension>::position(const std::vector<size_t> & coordinates, size_t axis) const{
   return position(coordinates).at(axis);
 }
 
 
 /// Provide the minimum and maximum real space values of the image.
-std::vector<double> ImageMeta::min() const{
+template<size_t dimension>
+std::vector<double> ImageMeta<dimension>::min() const{
   if (_valid){
-    return _origin;
+    std::vector<double> min(_origin, _origin + dimension);
+    return min;
   }
   else{
     LARCV_CRITICAL() << "Can't return min of invalid meta." << std::endl;
     throw larbys();
   }
 }
-std::vector<double> ImageMeta::max() const{
+template<size_t dimension>
+std::vector<double> ImageMeta<dimension>::max() const{
   if (_valid){
     std::vector<double> max;
-    max.resize(_n_dims);
-    for (size_t axis = 0; axis < _n_dims; ++ axis){
-      max.at(axis) = _origin.at(axis) + _image_sizes.at(axis);
+    max.resize(dimension);
+    for (size_t axis = 0; axis < dimension; ++ axis){
+      max.at(axis) = _origin[axis] + _image_sizes[axis];
     } 
     return max;
   }
@@ -361,33 +391,38 @@ std::vector<double> ImageMeta::max() const{
   }
 }
 
-double ImageMeta::min(size_t axis) const{
+template<size_t dimension>
+double ImageMeta<dimension>::min(size_t axis) const{
   return min().at(axis);
 }
-double ImageMeta::max(size_t axis) const{
+
+template<size_t dimension>
+double ImageMeta<dimension>::max(size_t axis) const{
   return max().at(axis);
 }
 
 
 //Provide a conversion from a real position to an index or coordinate
-size_t ImageMeta::position_to_index(const std::vector<double> & position ) const{
+template<size_t dimension>
+size_t ImageMeta<dimension>::position_to_index(const std::vector<double> & position ) const{
   std::vector<size_t> coords = position_to_coordinate(position);
   return index(coords);
 }
 
-std::vector<size_t> ImageMeta::position_to_coordinate(const std::vector<double> & position) const{
-  if (_valid && position.size() == _n_dims){
+template<size_t dimension>
+std::vector<size_t> ImageMeta<dimension>::position_to_coordinate(const std::vector<double> & position) const{
+  if (_valid && position.size() == dimension){
 
 
 
     std::vector<size_t> coordinates;
-    coordinates.resize(_n_dims);
+    coordinates.resize(dimension);
 
     std::vector<double> dims = voxel_dimensions();
     
-    for (size_t axis = 0; axis < _n_dims; axis ++){
-      double relative_position = position.at(axis) - _origin.at(axis);
-      if (relative_position < 0.0 || relative_position >= _image_sizes.at(axis)){
+    for (size_t axis = 0; axis < dimension; axis ++){
+      double relative_position = position.at(axis) - _origin[axis];
+      if (relative_position < 0.0 || relative_position >= _image_sizes[axis]){
         coordinates.at(axis) = kINVALID_INDEX;
       }
       coordinates.at(axis) = (size_t) relative_position / dims.at(axis);
@@ -402,12 +437,13 @@ std::vector<size_t> ImageMeta::position_to_coordinate(const std::vector<double> 
 
 
 /// Map just one position to just one coordinate
-size_t ImageMeta::position_to_coordinate(double position, size_t axis) const{
-  if (_valid && axis >= 0 && axis < _n_dims){
+template<size_t dimension>
+size_t ImageMeta<dimension>::position_to_coordinate(double position, size_t axis) const{
+  if (_valid && axis >= 0 && axis < dimension){
 
 
-    double relative_position = position - _origin.at(axis);
-    if (relative_position < 0.0 || relative_position >= _image_sizes.at(axis)){
+    double relative_position = position - _origin[axis];
+    if (relative_position < 0.0 || relative_position >= _image_sizes[axis]){
       return kINVALID_INDEX;
     }
     else{ 
@@ -423,32 +459,36 @@ size_t ImageMeta::position_to_coordinate(double position, size_t axis) const{
 }
 
 
-void ImageMeta::add_dimension(double image_size, size_t number_of_voxels, double origin){
-  // Update all of the values:
-  _image_sizes.push_back(image_size);
-  _number_of_voxels.push_back(number_of_voxels);
-  _origin.push_back(origin);
-
-  _n_dims ++;
-
-  _valid = is_valid();
-
-}
-
-bool ImageMeta::is_valid() const {
-
- 
-  if ( _n_dims != 0 && 
-       _number_of_voxels.size() == _n_dims &&
-       _image_sizes.size() == _n_dims &&
-       _origin.size() == _n_dims
-     )
-  {
-    return true;
-  } 
-  else{
-    return false;
+template<size_t dimension>
+void ImageMeta<dimension>::set_dimension(size_t axis, double image_size, size_t number_of_voxels, double origin){
+  if (axis < dimension){
+    _image_sizes[axis] = image_size;
+    _number_of_voxels[axis] = number_of_voxels;
+    if (origin != 0){
+      _origin[axis] = origin;      
+    } 
   }
+  // Update all of the values:
+
+  // Check validity here, which only insists on the total number of voxels
+  // to be non zero:
+
+  size_t n_voxels = 1;
+  #pragma omp unroll
+  for (size_t i = 0; i < dimension; i++){
+    n_voxels *= _number_of_voxels[i];
+  }
+
+  if(n_voxels > 0) _valid = true;
+  else _valid = false;
+
+}
+
+template<size_t dimension>
+bool ImageMeta<dimension>::is_valid() const {
+
+    return _valid;
+
 }
 
 
@@ -459,7 +499,8 @@ bool ImageMeta::is_valid() const {
 
 
 
-
+template class ImageMeta<2>;
+template class ImageMeta<3>;
 
 
 

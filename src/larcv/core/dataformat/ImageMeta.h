@@ -28,29 +28,30 @@
 
 namespace larcv {
 
+template<size_t dimension>
 class ImageMeta {
  public:
   /// Default constructor: Does nothing, valid defaults to false
   ImageMeta();
 
   /// Constructor with arguments: ndims, dims, image_sizes, unit.
-  ImageMeta(size_t n_dims, 
-            size_t projection_id,
+  ImageMeta(size_t projection_id,
             const std::vector<size_t>& number_of_voxels,
             const std::vector<double>& image_sizes, 
             const std::vector<double>& origin = std::vector<double>(),
             DistanceUnit_t unit = kUnitUnknown);
 
-  // Comparison operators:
-  inline bool operator==(const ImageMeta& rhs) const {
-    return (
-      _n_dims           == rhs._n_dims && 
-      _image_sizes      == rhs._image_sizes &&
-      _number_of_voxels == rhs._number_of_voxels &&
-      _unit             == rhs._unit);
-  }
-
-  inline bool operator!=(const ImageMeta& rhs) const {
+  // // Comparison operators:
+  // inline bool operator==(const ImageMeta& rhs) const {
+  //   return (
+  //     _n_dims           == rhs._n_dims && 
+  //     _image_sizes      == rhs._image_sizes &&
+  //     _number_of_voxels == rhs._number_of_voxels &&
+  //     _unit             == rhs._unit);
+  // }
+  template<size_t other_dim>
+  inline bool operator!=(const ImageMeta<other_dim> & rhs) const {
+    if (dimension != other_dim) return false;
     return !((*this) == rhs);
   }
 
@@ -60,12 +61,12 @@ class ImageMeta {
   inline const size_t id() const{return _projection_id;}
   /// Operators to access information about the image meta:
 
-  inline const std::vector<double> & image_size()       const {return _image_sizes;}
-  inline const std::vector<size_t> & number_of_voxels() const {return _number_of_voxels;}
-  inline const std::vector<double> & origin()           const {return _origin;}
+  inline const double * image_size()       const {return _image_sizes;}
+  inline const size_t * number_of_voxels() const {return _number_of_voxels;}
+  inline const double * origin()           const {return _origin;}
 
 
-  inline size_t n_dims()  const { return _n_dims; }
+  inline size_t n_dims()  const { return dimension; }
 
   double image_size(size_t axis)       const;
   size_t number_of_voxels(size_t axis) const;
@@ -131,7 +132,7 @@ class ImageMeta {
   size_t position_to_coordinate(double position, size_t axis) const;
 
   // This function is useful to interactively build up a meta object
-  void add_dimension(double image_size, size_t number_of_voxels, double origin = 0);
+  void set_dimension(size_t axis, double image_size, size_t number_of_voxels, double origin = 0);
 
   inline void set_projection_id(size_t projection_id){_projection_id = projection_id;}
 
@@ -154,19 +155,40 @@ class ImageMeta {
   // /// Dump info in text
   // std::string dump() const;
 
+
+#ifndef SWIG
+  public: 
+    static H5::CompType get_datatype() {
+      H5::CompType datatype(sizeof(ImageMeta));
+
+      datatype.insertMember("valid",            offsetof(ImageMeta, _valid),            larcv::get_datatype<bool>());
+      datatype.insertMember("projection_id",    offsetof(ImageMeta, _projection_id),    larcv::get_datatype<size_t>());
+      datatype.insertMember("image_sizes",      offsetof(ImageMeta, _image_sizes),      larcv::get_datatype<double>());
+      datatype.insertMember("number_of_voxels", offsetof(ImageMeta, _number_of_voxels), larcv::get_datatype<size_t>());
+      datatype.insertMember("origin",           offsetof(ImageMeta, _origin),           larcv::get_datatype<double>());
+
+      return datatype;
+    }
+#endif
+
+
  protected:
   // ImageIndex_t   _image_id;  ///< Associated image ID (of the same producer
   // name)
 
   bool _valid;  ///< Boolean set to true only if voxel parameters are properly set
-  size_t _n_dims;
+  // size_t _n_dims;
   size_t _projection_id;
-  std::vector<double> _image_sizes;  ///< image size in [_unit] along each dimension
-  std::vector<size_t> _number_of_voxels;  ///< Total number of voxels in each dimension
-  std::vector<double> _origin; ///The location of index==0
+  double _image_sizes[dimension];  ///< image size in [_unit] along each dimension
+  size_t _number_of_voxels[dimension];  ///< Total number of voxels in each dimension
+  double _origin[dimension]; ///The location of index==0
 
   DistanceUnit_t _unit;  ///< length unit
 };
+
+typedef ImageMeta<2> ImageMeta2D;
+typedef ImageMeta<3> ImageMeta3D;
+
 
 }  // namespace larcv
 
