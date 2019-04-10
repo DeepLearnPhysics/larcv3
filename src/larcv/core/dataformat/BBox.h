@@ -27,6 +27,9 @@ namespace larcv {
   template<size_t dimension>
   class BBox{
   public:
+
+    BBox() {}
+
     BBox(Point<dimension> min, Point<dimension> max, ProjectionID_t id = kINVALID_PROJECTIONID);    
     
     template<size_t other_dim>

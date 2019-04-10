@@ -1,9 +1,9 @@
 /**
- * \file Image.h
+ * \file Image2D.h
  *
  * \ingroup core_DataFormat
  * 
- * \brief Class def header for an image data holder larcv::Image
+ * \brief Class def header for an image2D data holder larcv::Image2D
  *
  * @author tmw, kazu, cadams
  */
@@ -23,31 +23,31 @@ namespace larcv {
 
   /**
     \TODO Need to  work on implementations for overlay, resize, crop
-    \class Image
-    Meant to be a storage class for an image into a ROOT file. Ultimately data is 1D array.
+    \class Image2D
+    Meant to be a storage class for an image2D into a ROOT file. Ultimately data is 1D array.
   */
-  class Image {
+  class Image2D {
     
   public:
     /// ctor by dimensions
-    Image(const std::vector<size_t> & dims);
+    Image2D(const std::vector<size_t> & dims);
     /// ctor from ImageMeta
-    Image(const ImageMeta&);
+    Image2D(const ImageMeta2D&);
     /// ctor from ImageMeta and 1D array data
-    Image(const ImageMeta&, const std::vector<float>&);
+    Image2D(const ImageMeta2D&, const std::vector<float>&);
     /// copy ctor
-    Image(const Image&);
+    Image2D(const Image2D&);
     
 
     /// dtor
-    virtual ~Image(){}
+    virtual ~Image2D(){}
 
     /// Reset contents w/ new larcv::ImageMeta
-    void reset(const ImageMeta&);
+    void reset(const ImageMeta2D&);
     /// Various modes used to combine pixels
     enum CompressionModes_t { kSum, kAverage, kMaxPool, kOverWrite};
 
-    /// Return image index ID number (should be unique within larcv::EventImage2D)
+    /// Return image2D index ID number (should be unique within larcv::EventImage2D)
     ImageIndex_t index() const { return _id; }
     /// Index setter
     void index(ImageIndex_t n) { _id = n; }
@@ -58,7 +58,7 @@ namespace larcv {
     /// Specific pixel value getter
     float pixel(size_t index) const;
     /// larcv::ImageMeta const reference getter
-    const ImageMeta& meta() const { return _meta; }
+    const ImageMeta2D& meta() const { return _meta; }
 
     /// Mem-copy: insert num_pixel many data from src 1D array @ data index starting from (row,col)
     void copy(const std::vector<size_t> & coords, const float* src, size_t num_pixel);
@@ -72,8 +72,8 @@ namespace larcv {
     void reverse_copy(const std::vector<size_t> & coords, const std::vector<float>& src, size_t nskip=0, size_t num_pixel=0);
     /// Same as copy, but perform in reverse direction of rows (useful when src is not in the same order)
     void reverse_copy(const std::vector<size_t> & coords, const std::vector<short>& src, size_t nskip=0, size_t num_pixel=0);
-    // /// Crop specified region via crop_meta to generate a new larcv::Image
-    // Image crop(const ImageMeta& crop_meta) const;
+    // /// Crop specified region via crop_meta to generate a new larcv::Image2D
+    // Image2D crop(const ImageMeta& crop_meta) const;
     /// 1D const reference array getter
     const std::vector<float>& as_vector() const 
     { return _img; }
@@ -92,38 +92,38 @@ namespace larcv {
     /// Clear data contents
     void clear_data();
 
-    // /// Overlay with another Image: overlapped pixel region is merged
-    // void overlay(const Image&, CompressionModes_t mode=kSum);
+    // /// Overlay with another Image2D: overlapped pixel region is merged
+    // void overlay(const Image2D&, CompressionModes_t mode=kSum);
     /// Move data contents out
     std::vector<float>&& move();
     /// Move data contents in
     void move(std::vector<float>&&);
 
-    inline Image& operator+=(const float val)
+    inline Image2D& operator+=(const float val)
     { for(auto& v : _img) v+= val; return (*this);}
-    inline Image operator+(const float val) const
-    { Image res = (*this); res+=val; return res; }
-    inline Image& operator-=(const float val)
+    inline Image2D operator+(const float val) const
+    { Image2D res = (*this); res+=val; return res; }
+    inline Image2D& operator-=(const float val)
     { for(auto& v : _img) v-= val; return (*this);}
-    inline Image operator-(const float val) const
-    { Image res = (*this); res-=val; return res; }
-    inline Image& operator*=(const float val)
+    inline Image2D operator-(const float val) const
+    { Image2D res = (*this); res-=val; return res; }
+    inline Image2D& operator*=(const float val)
     { for(auto& v : _img) v*= val; return (*this);}
-    inline Image operator*(const float val) const
-    { Image res = (*this); res*=val; return res; }
-    inline Image& operator/=(const float val)
+    inline Image2D operator*(const float val) const
+    { Image2D res = (*this); res*=val; return res; }
+    inline Image2D& operator/=(const float val)
     { for(auto& v : _img) v/= val; return (*this);}
-    inline Image operator/(const float val) const
-    { Image res = (*this); res/=val; return res; }
+    inline Image2D operator/(const float val) const
+    { Image2D res = (*this); res/=val; return res; }
 
-    Image& operator +=(const std::vector<float>& rhs);
-    Image& operator -=(const std::vector<float>& rhs);
-    Image& operator +=(const larcv::Image& rhs);
+    Image2D& operator +=(const std::vector<float>& rhs);
+    Image2D& operator -=(const std::vector<float>& rhs);
+    Image2D& operator +=(const larcv::Image2D& rhs);
 
 
 
     /// Element-wise pixel value multiplication
-    void eltwise( const Image& rhs );
+    void eltwise( const Image2D& rhs );
     /// Element-wise multiplication w/ 1D array data
     void eltwise(const std::vector<float>& arr,bool allow_longer=false);
     
@@ -133,12 +133,12 @@ namespace larcv {
 
     /*
     /// attribute move ctor
-    Image(ImageMeta&&, std::vector<float>&&);
+    Image2D(ImageMeta&&, std::vector<float>&&);
 
     /// Move origin position
     void reset_origin(double x, double y) {_meta.reset_origin(x,y);}
     
-    /// Compress image data and returns compressed data 1D array
+    /// Compress image2D data and returns compressed data 1D array
     std::vector<float> copy_compress(size_t row_count, size_t col_count, CompressionModes_t mode=kSum) const;
 
     /// Paint a row of pixels with a specified value
@@ -150,19 +150,19 @@ namespace larcv {
     
     // Matrix Multiplication
     /// Matrix multiplicaition
-    Image multiRHS( const Image& rhs ) const; 
+    Image2D multiRHS( const Image2D& rhs ) const; 
 
 
     // /// uniry operator for matrix multiplicaition
-    // Image& operator*=( const Image& rhs );
+    // Image2D& operator*=( const Image2D& rhs );
     // /// binary operator for matrix multiplication
-    // Image operator*(const Image& rhs) const;
+    // Image2D operator*(const Image2D& rhs) const;
 
     */
   private:
     std::vector<float> _img;
     ImageIndex_t _id;
-    ImageMeta _meta;
+    ImageMeta2D _meta ;
     void clear();
   };
 

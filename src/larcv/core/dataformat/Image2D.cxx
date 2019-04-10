@@ -3,42 +3,42 @@
 
 
 #include "core/base/larbys.h"
-#include "Image.h"
+#include "Image2D.h"
 #include <iostream>
 #include <string.h>
 #include <stdio.h>
 namespace larcv {
 
-  Image::Image(const std::vector<size_t> & dims)
+  Image2D::Image2D(const std::vector<size_t> & dims)
    : _meta()
   {
-    for(auto & d : dims) _meta.add_dimension(1.0, d);
+    for(size_t i = 0; i < dims.size(); i ++) _meta.set_dimension(i, 1.0, dims[i]);
     _img.resize(_meta.total_voxels());
   }
 
-  Image::Image(const ImageMeta& meta)
+  Image2D::Image2D(const ImageMeta2D& meta)
     : _img(meta.total_voxels(), 0.)
     , _meta(meta)
   {}
 
-  Image::Image(const ImageMeta& meta, const std::vector<float>& img)
+  Image2D::Image2D(const ImageMeta2D& meta, const std::vector<float>& img)
     : _img(img)
     , _meta(meta)
   { if (img.size() != meta.total_voxels()) throw larbys("Inconsistent dimensions!"); }
 
-  Image::Image(const Image& rhs)
+  Image2D::Image2D(const Image2D& rhs)
     : _img(rhs._img)
     , _meta(rhs._meta)
   {}
 
-  void Image::reset(const ImageMeta& meta)
+  void Image2D::reset(const ImageMeta2D& meta)
   {
     _meta = meta;
     if (_img.size() != _meta.total_voxels()) _img.resize(_meta.total_voxels());
     paint(0.);
   }
 
-  // void Image::resize(const std::vector<size_t> &  counts, float fillval)
+  // void Image2D::resize(const std::vector<size_t> &  counts, float fillval)
   // {
   //   auto const current_counts = _meta.number_of_voxels();
 
@@ -56,53 +56,53 @@ namespace larcv {
   //   _img = std::move(img);
   // }
 
-  void Image::clear() {
+  void Image2D::clear() {
     _img.clear();
     _img.resize(1, 0);
-    _meta = ImageMeta();
-    //std::cout << "[Image (" << this << ")] Cleared image memory " << std::endl;
+    _meta = ImageMeta2D();
+    //std::cout << "[Image2D (" << this << ")] Cleared image2D memory " << std::endl;
   }
 
-  void Image::clear_data() { for (auto& v : _img) v = 0.; }
+  void Image2D::clear_data() { for (auto& v : _img) v = 0.; }
 
-  void Image::set_pixel( size_t index, float value ) {
+  void Image2D::set_pixel( size_t index, float value ) {
     if ( index >= _img.size() ) throw larbys("Out-of-bound pixel set request!");
     _img[ index ] = value;
   }
 
-  void Image::set_pixel( const std::vector<size_t> & coords, float value ) {
+  void Image2D::set_pixel( const std::vector<size_t> & coords, float value ) {
     size_t idx = _meta.index(coords);
     if ( idx >= _meta.total_voxels() )
       throw larbys("Out-of-bound pixel set request!");
     _img[ idx ] = value;
   }
 
-  void Image::paint(float value)
+  void Image2D::paint(float value)
   { for (auto& v : _img) v = value; }
 
-  void Image::threshold(float thresh, bool lower)
+  void Image2D::threshold(float thresh, bool lower)
   { for (auto& v : _img) if ( (lower && v < thresh) || (!lower && v > thresh ) ) v = thresh; }
 
-  void Image::binarize(float thresh, float lower_overwrite, float upper_overwrite)
+  void Image2D::binarize(float thresh, float lower_overwrite, float upper_overwrite)
   { for (auto& v : _img) v = (v <= thresh ? lower_overwrite : upper_overwrite); }
 
-  float Image::pixel(const std::vector<size_t> & coords) const{
+  float Image2D::pixel(const std::vector<size_t> & coords) const{
     // Get the access index:
     return _img[_meta.index(coords)]; 
   }
-  float Image::pixel(size_t index) const{
+  float Image2D::pixel(size_t index) const{
     return _img.at(index); 
 
   }
 
-  void Image::copy(const std::vector<size_t> & coords, const float* src, size_t num_pixel)
+  void Image2D::copy(const std::vector<size_t> & coords, const float* src, size_t num_pixel)
   {
     const size_t idx = _meta.index(coords);
     if (idx + num_pixel - 1 >= _img.size()) throw larbys("memcpy size exceeds allocated memory!");
     memcpy(&(_img[idx]), src, num_pixel * sizeof(float));
   }
 
-  void Image::copy(const std::vector<size_t> & coords, const std::vector<float>& src, size_t num_pixel)
+  void Image2D::copy(const std::vector<size_t> & coords, const std::vector<float>& src, size_t num_pixel)
   {
     if (!num_pixel)
       this->copy(coords, (float*)(&(src[0])), src.size());
@@ -112,14 +112,14 @@ namespace larcv {
       throw larbys("Not enough pixel in source!");
   }
 
-  void Image::copy(const std::vector<size_t> & coords, const short* src, size_t num_pixel)
+  void Image2D::copy(const std::vector<size_t> & coords, const short* src, size_t num_pixel)
   {
     const size_t idx = _meta.index(coords);
     if (idx + num_pixel - 1 >= _img.size()) throw larbys("memcpy size exceeds allocated memory!");
     for (size_t i = 0; i < num_pixel; ++i) _img[idx + i] = src[idx];
   }
 
-  void Image::copy(const std::vector<size_t> & coords, const std::vector<short>& src, size_t num_pixel)
+  void Image2D::copy(const std::vector<size_t> & coords, const std::vector<short>& src, size_t num_pixel)
   {
     if (!num_pixel)
       this->copy(coords, (short*)(&(src[0])), src.size());
@@ -129,15 +129,15 @@ namespace larcv {
       throw larbys("Not enough pixel in source!");
   }
 
-  void Image::reverse_copy(const std::vector<size_t> & coords, const std::vector<float>& src, size_t nskip, size_t num_pixel)
+  void Image2D::reverse_copy(const std::vector<size_t> & coords, const std::vector<float>& src, size_t nskip, size_t num_pixel)
   {
     size_t idx = 0;
     try {
       idx = _meta.index(coords);
     } catch (const larbys& err) {
       std::cout << "Exception caught @ " << __FUNCTION__ << std::endl
-                << "Image ... fill coords[0]: " << coords[0] << " => " << (coords[0] + num_pixel - 1) << std::endl
-                << "Image ... orig idx: " << nskip << " => " << nskip + num_pixel - 1 << std::endl
+                << "Image2D ... fill coords[0]: " << coords[0] << " => " << (coords[0] + num_pixel - 1) << std::endl
+                << "Image2D ... orig idx: " << nskip << " => " << nskip + num_pixel - 1 << std::endl
                 << "Re-throwing exception..." << std::endl;
       throw err;
     }
@@ -146,15 +146,15 @@ namespace larcv {
     for (size_t i = 0; i < num_pixel; ++i) { _img[idx + i] = src[nskip + num_pixel - i - 1]; }
   }
 
-  void Image::reverse_copy(const std::vector<size_t> & coords, const std::vector<short>& src, size_t nskip, size_t num_pixel)
+  void Image2D::reverse_copy(const std::vector<size_t> & coords, const std::vector<short>& src, size_t nskip, size_t num_pixel)
   {
     size_t idx = 0;
     try {
       idx = _meta.index(coords);
     } catch (const larbys& err) {
       std::cout << "Exception caught @ " << __FUNCTION__ << std::endl
-                << "Image ... fill coords[0]: " << coords[0] << " => " << (coords[0] + num_pixel - 1) << std::endl
-                << "Image ... orig idx: " << nskip << " => " << nskip + num_pixel - 1 << std::endl
+                << "Image2D ... fill coords[0]: " << coords[0] << " => " << (coords[0] + num_pixel - 1) << std::endl
+                << "Image2D ... orig idx: " << nskip << " => " << nskip + num_pixel - 1 << std::endl
                 << "Re-throwing exception..." << std::endl;
       throw err;
     }
@@ -165,12 +165,12 @@ namespace larcv {
 
   
 
-//  Image Image::crop(const ImageMeta& crop_meta) const
+//  Image2D Image2D::crop(const ImageMeta& crop_meta) const
 //  {
-//    // Croppin region must be within the image
+//    // Croppin region must be within the image2D
 //    if ( crop_meta.min_x() < _meta.min_x() || crop_meta.min_y() < _meta.min_y() ||
 //         crop_meta.max_x() > _meta.max_x() || crop_meta.max_y() > _meta.max_y() )
-//      throw larbys("Cropping region contains region outside the image!");
+//      throw larbys("Cropping region contains region outside the image2D!");
 //
 //    size_t min_col = _meta.col(crop_meta.min_x() + _meta.pixel_width()  / 2. );
 //    size_t max_col = _meta.col(crop_meta.max_x() - _meta.pixel_width()  / 2. );
@@ -204,11 +204,11 @@ namespace larcv {
 //
 //    //std::cout<<"Cropped:" << std::endl << res_meta.dump()<<std::endl;
 //
-//    return Image(std::move(res_meta), std::move(img));
+//    return Image2D(std::move(res_meta), std::move(img));
 //  }
 
 
-  // void Image::overlay(const Image& rhs, CompressionModes_t mode )
+  // void Image2D::overlay(const Image2D& rhs, CompressionModes_t mode )
   // {
   //   auto const& rhs_meta = rhs.meta();
 
@@ -278,20 +278,20 @@ namespace larcv {
   //   }
   // }
 
-  std::vector<float>&& Image::move()
+  std::vector<float>&& Image2D::move()
   { return std::move(_img); }
 
-  void Image::move(std::vector<float>&& data)
+  void Image2D::move(std::vector<float>&& data)
   { _img = std::move(data); }
 
-  Image& Image::operator+=(const std::vector<float>& rhs)
+  Image2D& Image2D::operator+=(const std::vector<float>& rhs)
   {
     if (rhs.size() != _img.size()) throw larbys("Cannot call += uniry operator w/ incompatible size!");
     for (size_t i = 0; i < _img.size(); ++i) _img[i] += rhs[i];
     return (*this);
   }
 
-  Image& Image::operator+=(const larcv::Image& rhs)
+  Image2D& Image2D::operator+=(const larcv::Image2D& rhs)
   {
     if (rhs.size() != _img.size()) throw larbys("Cannot call += uniry operator w/ incompatible size!");
     for(size_t index = 0; index < meta().total_voxels(); index ++ ){
@@ -300,7 +300,7 @@ namespace larcv {
     return (*this);
   }
 
-  Image& Image::operator-=(const std::vector<float>& rhs)
+  Image2D& Image2D::operator-=(const std::vector<float>& rhs)
   {
     if (rhs.size() != _img.size()) throw larbys("Cannot call += uniry operator w/ incompatible size!");
     for (size_t i = 0; i < _img.size(); ++i) _img[i] -= rhs[i];
@@ -309,11 +309,11 @@ namespace larcv {
 
 
 
-  void Image::eltwise(const std::vector<float>& arr, bool allow_longer) {
+  void Image2D::eltwise(const std::vector<float>& arr, bool allow_longer) {
     // check multiplication is valid
     if ( !( (allow_longer && _img.size() <= arr.size()) || arr.size() == _img.size() ) ) {
       char oops[500];
-      sprintf( oops, "Image element-wise multiplication not valid. LHS size = %zu, while argument size = %zu",
+      sprintf( oops, "Image2D element-wise multiplication not valid. LHS size = %zu, while argument size = %zu",
                _img.size(), arr.size());
       throw larbys(oops);
     }
@@ -322,12 +322,12 @@ namespace larcv {
       _img[i] *= arr[i];
   }
 
-  void Image::eltwise( const Image& rhs ) {
+  void Image2D::eltwise( const Image2D& rhs ) {
     // check multiplication is valid
     auto const& meta = rhs.meta();
     if (meta.total_voxels() != _meta.total_voxels() ) {
       char oops[500];
-      sprintf( oops, "Image element-wise multiplication not valid. LHS n_voxels (%zu) != RHS n_voxels (%zu)",
+      sprintf( oops, "Image2D element-wise multiplication not valid. LHS n_voxels (%zu) != RHS n_voxels (%zu)",
                _meta.total_voxels(), meta.total_voxels());
       throw larbys(oops);
     }
@@ -350,20 +350,20 @@ namespace larcv {
 *
 
 
-  void Image::compress(size_t rows, size_t cols, CompressionModes_t mode)
+  void Image2D::compress(size_t rows, size_t cols, CompressionModes_t mode)
   {
     _img = copy_compress(rows, cols, mode);
     _meta.update(rows, cols);
   }
 
 
-void Image::paint_row(int row, float value)
+void Image2D::paint_row(int row, float value)
 {
   for ( size_t col = 0; col < _meta.cols(); col++ )
     set_pixel( row, col, value );
 }
 
-void Image::paint_col(int col, float value)
+void Image2D::paint_col(int col, float value)
 {
   for ( size_t row = 0; row < _meta.rows(); row++ )
     set_pixel( row, col, value );
@@ -371,13 +371,13 @@ void Image::paint_col(int col, float value)
 
 
 
-Image::Image(ImageMeta&& meta, std::vector<float>&& img)
+Image2D::Image2D(ImageMeta&& meta, std::vector<float>&& img)
   : _img(std::move(img))
   , _meta(std::move(meta))
 { if (_img.size() != _meta.rows() * _meta.cols()) throw larbys("Inconsistent dimensions!"); }
 
 
-std::vector<float> Image::copy_compress(size_t rows, size_t cols, CompressionModes_t mode) const
+std::vector<float> Image2D::copy_compress(size_t rows, size_t cols, CompressionModes_t mode) const
   {
     if (mode == kOverWrite)
       throw larbys("kOverWrite is invalid for copy_compress!");
@@ -420,15 +420,15 @@ std::vector<float> Image::copy_compress(size_t rows, size_t cols, CompressionMod
   }
 
 
-  Image Image::crop(const BBox2D& bbox, const DistanceUnit_t unit) const
+  Image2D Image2D::crop(const BBox2D& bbox, const DistanceUnit_t unit) const
   {
     if (unit != _meta.unit())
-      throw larbys("Cannot crop Image with BBox with different length unit!");
+      throw larbys("Cannot crop Image2D with BBox with different length unit!");
 
-    // Croppin region must be within the image
+    // Croppin region must be within the image2D
     if ( bbox.min_x() < _meta.min_x() || bbox.min_y() < _meta.min_y() ||
          bbox.max_x() > _meta.max_x() || bbox.max_y() > _meta.max_y() )
-      throw larbys("Cropping region contains region outside the image!");
+      throw larbys("Cropping region contains region outside the image2D!");
 
     size_t min_col = _meta.col(bbox.min_x() + _meta.pixel_width()  / 2. );
     size_t max_col = _meta.col(bbox.max_x() - _meta.pixel_width()  / 2. );
@@ -461,20 +461,20 @@ std::vector<float> Image::copy_compress(size_t rows, size_t cols, CompressionMod
 
     //std::cout<<"Cropped:" << std::endl << res_meta.dump()<<std::endl;
 
-    return Image(std::move(res_meta), std::move(img));
+    return Image2D(std::move(res_meta), std::move(img));
   }
 
 
-  Image Image::multiRHS( const Image& rhs ) const {
+  Image2D Image2D::multiRHS( const Image2D& rhs ) const {
     // check multiplication is valid
     if ( meta().cols() != rhs.meta().rows() ) {
       char oops[500];
-      sprintf( oops, "Image Matrix multiplication not valid. LHS cols (%zu) != RHS rows (%zu).", meta().cols(), rhs.meta().rows() );
+      sprintf( oops, "Image2D Matrix multiplication not valid. LHS cols (%zu) != RHS rows (%zu).", meta().cols(), rhs.meta().rows() );
       throw larbys(oops);
     }
 
     // LHS copies internal data
-    Image out( *this );
+    Image2D out( *this );
     out.resize( (*this).meta().rows(), rhs.meta().cols() );
     for (int r = 0; r < (int)(out.meta().rows()); r++) {
       for (int c = 0; c < (int)(out.meta().cols()); c++) {
@@ -490,11 +490,11 @@ std::vector<float> Image::copy_compress(size_t rows, size_t cols, CompressionMod
   }
 
 
-  Image Image::operator*(const Image& rhs) const {
+  Image2D Image2D::operator*(const Image2D& rhs) const {
     return (*this).multiRHS( rhs );
   }
 
-  Image& Image::operator*=( const Image& rhs ) {
+  Image2D& Image2D::operator*=( const Image2D& rhs ) {
     (*this) = multiRHS( rhs );
     return (*this);
   }
