@@ -35,23 +35,27 @@ namespace larcv {
   }
 
   const larcv::Point2D Vertex::as_point2d(larcv::PointType_t point_type) const
-  {
+  { 
+    double data[2];
     switch(point_type) {
       case kPointXY:
-        return Point2D(_x, _y);
+        data[0] = _x; data[1] = _y;
       case kPointYZ:
-        return Point2D(_y, _z);
+        data[0] = _y; data[1] = _z;
       case kPointZX:
-        return Point2D(_z, _x);
+        data[0] = _z; data[1] = _x;
       case kPoint3D:
         LARCV_CRITICAL() << "Wrong point type (Point3D) in Vertex::as_point2d" << std::endl;
         throw larbys();
     }
+    return Point2D(data);
   }
 
   const larcv::Point3D Vertex::as_point3d() const
   {
-    return Point3D(_x, _y, _z);
+    Point3D ret;
+    ret.x[0] = _x; ret.x[1] = _y; ret.x[2] = _z;
+    return ret;
   }
 
   void Vertex::as_point(larcv::PointType_t point_type, double * x, double * y, double * z)
