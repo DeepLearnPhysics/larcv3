@@ -282,11 +282,12 @@ namespace larcv {
      \class SparseTensor
      @brief Container of multiple voxel set array
   */
+  template<size_t dimension>
   class SparseTensor : public VoxelSet {
   public:
     /// Default ctor
     SparseTensor() {}
-    SparseTensor(VoxelSet&& vs, ImageMeta meta);
+    SparseTensor(VoxelSet&& vs, ImageMeta<dimension> meta);
 
     /// Default dtor
     virtual ~SparseTensor() {}
@@ -297,7 +298,7 @@ namespace larcv {
     // Read-access
     //
     /// Access ImageMeta of specific projection
-    inline const larcv::ImageMeta& meta() const { return _meta; }
+    inline const larcv::ImageMeta<dimension>& meta() const { return _meta; }
 
     //
     // Write-access
@@ -306,21 +307,21 @@ namespace larcv {
     void emplace(const larcv::Voxel & vox, const bool add=true);
 
     /// Emplace the whole voxel set w/ meta
-    inline void emplace(VoxelSet&& vs, const ImageMeta& meta)
+    inline void emplace(VoxelSet&& vs, const ImageMeta<dimension>& meta)
     {*((VoxelSet*)this) = std::move(vs); this->meta(meta);}
     
     /// Set the whole voxel set w/ meta
-    inline void set(const VoxelSet& vs, const ImageMeta& meta)
+    inline void set(const VoxelSet& vs, const ImageMeta<dimension>& meta)
     {*((VoxelSet*)this) = vs; this->meta(meta);} 
     
     /// Clear everything
-    inline void clear_data() { VoxelSet::clear_data(); _meta = ImageMeta(); }
+    inline void clear_data() { VoxelSet::clear_data(); _meta = ImageMeta<dimension>(); }
 
     /// Meta setter
-    void meta(const larcv::ImageMeta& meta);
+    void meta(const larcv::ImageMeta<dimension>& meta);
 
   private:
-    larcv::ImageMeta _meta;
+    larcv::ImageMeta<dimension> _meta;
     
   };
 
@@ -328,11 +329,12 @@ namespace larcv {
      \class SparseCluster
      @brief Container of multiple (-projected) voxel set array
   */
+  template<size_t dimension>
   class SparseCluster : public VoxelSetArray {
   public:
     /// Default ctor
     SparseCluster() {}
-    SparseCluster(VoxelSetArray&& vsa, ImageMeta meta);
+    SparseCluster(VoxelSetArray&& vsa, ImageMeta<dimension> meta);
     
     /// Default dtor
     virtual ~SparseCluster() {}
@@ -341,25 +343,32 @@ namespace larcv {
     // Read-access
     //
     /// Access ImageMeta of specific projection
-    inline const larcv::ImageMeta& meta() const { return _meta; }
+    inline const larcv::ImageMeta<dimension>& meta() const { return _meta; }
 
     //
     // Write-access
     //
     /// Clear everything
-    inline void clear_data() { VoxelSetArray::clear_data(); _meta = ImageMeta(); }
+    inline void clear_data() { VoxelSetArray::clear_data(); _meta = ImageMeta<dimension>(); }
     /// set VoxelSetArray
-    inline void set(VoxelSetArray&& vsa, const ImageMeta& meta)
+    inline void set(VoxelSetArray&& vsa, const ImageMeta<dimension>& meta)
     { *((VoxelSetArray*)this) = std::move(vsa); this->meta(meta); }
     /// emplace VoxelSetArray
     // inline void emplace(const VoxelSetArray& vsa, const ImageMeta& meta)
     // { *((VoxelSetArray*)this) = vsa; this->meta(meta); }
     /// Meta setter
-    void meta(const larcv::ImageMeta& meta);
+    void meta(const larcv::ImageMeta<dimension>& meta);
 
   private:
-    larcv::ImageMeta _meta;
+    larcv::ImageMeta<dimension> _meta;
   };  
+
+
+// Define typedefs to specify sparse objects:
+typedef SparseTensor<2>  SparseTensor2D;
+typedef SparseTensor<3>  SparseTensor3D;
+typedef SparseCluster<2> SparseCluster2D;
+typedef SparseCluster<3> SparseCluster3D;
 
 }
 

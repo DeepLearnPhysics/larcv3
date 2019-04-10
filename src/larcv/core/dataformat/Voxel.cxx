@@ -226,45 +226,59 @@ namespace larcv {
 
 
 
- SparseTensor::SparseTensor(VoxelSet&& vs, ImageMeta meta)
-   : VoxelSet(std::move(vs))
- { this->meta(meta); }
+template<size_t dimension>
+SparseTensor<dimension>::SparseTensor(VoxelSet&& vs, ImageMeta<dimension> meta)
+: VoxelSet(std::move(vs))
+{ this->meta(meta); }
 
- void SparseTensor::meta(const larcv::ImageMeta& meta)
- {
-   for (auto const& vox : this->as_vector()) {
-     if (vox.id() < meta.total_voxels()) continue;
-     std::cerr << "VoxelSet contains ID " << vox.id()
-               << " which cannot exists in ImageMeta with size " << meta.total_voxels()
-               << std::endl;
-     throw larbys();
-   }
-   _meta = meta;
+template<size_t dimension>
+void SparseTensor<dimension>::meta(const larcv::ImageMeta<dimension>& meta)
+{
+for (auto const& vox : this->as_vector()) {
+ if (vox.id() < meta.total_voxels()) continue;
+ std::cerr << "VoxelSet contains ID " << vox.id()
+           << " which cannot exists in ImageMeta with size " << meta.total_voxels()
+           << std::endl;
+ throw larbys();
+}
+_meta = meta;
+}
+
+template<size_t dimension>
+void SparseTensor<dimension>::emplace(const larcv::Voxel & vox, const bool add)
+{
+if (vox.id() != kINVALID_VOXELID) VoxelSet::emplace(vox.id(), vox.value(), add);
+}
+
+template<size_t dimension>
+void SparseCluster<dimension>::meta(const larcv::ImageMeta<dimension>& meta)
+{
+for (auto const& vs : this->as_vector()) {
+ for (auto const& vox : vs.as_vector()) {
+   if (vox.id() < meta.total_voxels()) continue;
+   std::cerr << "VoxelSet contains ID " << vox.id()
+             << " which cannot exists in ImageMeta with size " << meta.total_voxels()
+             << std::endl;
+   throw larbys();
  }
+}
+_meta = meta;
+}
 
- void SparseTensor::emplace(const larcv::Voxel & vox, const bool add)
- {
-   if (vox.id() != kINVALID_VOXELID) VoxelSet::emplace(vox.id(), vox.value(), add);
- }
+template<size_t dimension>
+SparseCluster<dimension>::SparseCluster(VoxelSetArray&& vsa, ImageMeta<dimension> meta)
+: VoxelSetArray(std::move(vsa))
+{ this->meta(meta); }
 
- void SparseCluster::meta(const larcv::ImageMeta& meta)
- {
-   for (auto const& vs : this->as_vector()) {
-     for (auto const& vox : vs.as_vector()) {
-       if (vox.id() < meta.total_voxels()) continue;
-       std::cerr << "VoxelSet contains ID " << vox.id()
-                 << " which cannot exists in ImageMeta with size " << meta.total_voxels()
-                 << std::endl;
-       throw larbys();
-     }
-   }
-   _meta = meta;
- }
 
- SparseCluster::SparseCluster(VoxelSetArray&& vsa, ImageMeta meta)
-   : VoxelSetArray(std::move(vsa))
- { this->meta(meta); }
+// Instantiate the objects:
+template class SparseTensor<2> ;
+template class SparseTensor<3> ;
+template class SparseCluster<2>;
+template class SparseCluster<3>;
 
-};
+}
+
+
 
 #endif
