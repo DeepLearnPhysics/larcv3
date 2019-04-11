@@ -50,8 +50,8 @@ namespace larcv {
     /// Configuration PSet file construction so you don't have to call setter functions
     IOManager(std::string config_file, std::string name = "IOManager");
 
-    /// Default destructor
-    ~IOManager() {}
+    /// Destructor
+    ~IOManager();
     /// IO mode accessor
     IOMode_t io_mode() const { return _io_mode;}
     void reset();

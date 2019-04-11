@@ -62,6 +62,8 @@ IOManager::IOManager(std::string config_file, std::string name)
   configure(cfg);
 }
 
+IOManager::~IOManager(){}
+
 void IOManager::add_in_file(const std::string filename,
                             const std::string dirname) {
   _in_file_v.push_back(filename);
@@ -695,7 +697,16 @@ EventBase* IOManager::get_data(const size_t id) {
     // std::cout << "_current_offset: " << _current_offset << std::endl;
 
     H5::Group group = _in_open_file.openGroup(group_name);
-    _product_ptr_v[id]->deserialize(&group, _in_index - _current_offset);
+    try {
+      _product_ptr_v[id]->deserialize(&group, _in_index - _current_offset);
+    }
+    catch (...){
+      // When there is an error in deserialization, close the open input file gracefully:
+      if(_io_mode != kWRITE){
+        LARCV_CRITICAL() << "Exception caught in deserialization, closing input file gracefully" << std::endl;
+        _in_open_file.close();
+      }
+    }
   }
   __ioman_mtx.unlock();
   return _product_ptr_v[id];
