@@ -27,8 +27,13 @@ namespace larcv {
     Meant to be a storage class for an image2D into a ROOT file. Ultimately data is 1D array.
   */
   class Image2D {
+    friend class EventImage2D;
     
   public:
+
+    /// Default Constructor:
+    Image2D() {}
+
     /// ctor by dimensions
     Image2D(const std::vector<size_t> & dims);
     /// ctor from ImageMeta

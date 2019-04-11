@@ -152,8 +152,8 @@ class ImageMeta {
   // /// Construct a union bounding box
   // ImageMeta inclusive(const ImageMeta& meta) const;
 
-  // /// Dump info in text
-  // std::string dump() const;
+  /// Dump info in text
+  std::string dump() const;
 
 
 #ifndef SWIG
@@ -161,11 +161,17 @@ class ImageMeta {
     static H5::CompType get_datatype() {
       H5::CompType datatype(sizeof(ImageMeta));
 
+      hsize_t array_dimensions[1];
+      array_dimensions[0] = dimension;
+
+      H5::ArrayType double_type(larcv::get_datatype<double>(), 1, array_dimensions);
+      H5::ArrayType size_t_type(larcv::get_datatype<size_t>(), 1, array_dimensions);
+
       datatype.insertMember("valid",            offsetof(ImageMeta, _valid),            larcv::get_datatype<bool>());
       datatype.insertMember("projection_id",    offsetof(ImageMeta, _projection_id),    larcv::get_datatype<size_t>());
-      datatype.insertMember("image_sizes",      offsetof(ImageMeta, _image_sizes),      larcv::get_datatype<double>());
-      datatype.insertMember("number_of_voxels", offsetof(ImageMeta, _number_of_voxels), larcv::get_datatype<size_t>());
-      datatype.insertMember("origin",           offsetof(ImageMeta, _origin),           larcv::get_datatype<double>());
+      datatype.insertMember("image_sizes",      offsetof(ImageMeta, _image_sizes),      double_type);
+      datatype.insertMember("number_of_voxels", offsetof(ImageMeta, _number_of_voxels), size_t_type);
+      datatype.insertMember("origin",           offsetof(ImageMeta, _origin),           double_type);
 
       return datatype;
     }
@@ -182,6 +188,10 @@ class ImageMeta {
   double _image_sizes[dimension];  ///< image size in [_unit] along each dimension
   size_t _number_of_voxels[dimension];  ///< Total number of voxels in each dimension
   double _origin[dimension]; ///The location of index==0
+  hvl_t _image_sizes_handle;
+  hvl_t _number_of_voxels_handle;
+  hvl_t _origin_handle;
+
 
   DistanceUnit_t _unit;  ///< length unit
 };

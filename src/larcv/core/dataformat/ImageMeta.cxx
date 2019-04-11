@@ -97,7 +97,7 @@ template<size_t dimension>
 size_t ImageMeta<dimension>::total_voxels() const{
   if (_valid){
     size_t i = 1;
-    for (auto count : _number_of_voxels) i *= count;
+    for (size_t axis = 0; axis < dimension; ++ axis) i *= _number_of_voxels[axis];
     return i;
   }
   else{
@@ -110,7 +110,7 @@ template<size_t dimension>
 double ImageMeta<dimension>::total_volume() const{
   if (_valid){
     double v = 1.0;
-    for (auto count : _image_sizes) v *= count;
+    for (size_t axis = 0; axis < dimension; ++ axis) v *= _number_of_voxels[axis];
     return v;
   }
   else{
@@ -493,8 +493,38 @@ bool ImageMeta<dimension>::is_valid() const {
 
 
 
-
-
+template<size_t dimension>
+std::string ImageMeta<dimension>::dump() const
+{
+  std::stringstream ss;
+  ss << "ProjectionID " << id() <<"\n";
+  ss << "  N Voxels: (";
+  for (size_t i = 0; i < dimension; i ++){
+    ss << _number_of_voxels[i];
+    if (i != dimension - 1)
+      ss << ", ";
+  }
+  ss << ")\n";
+  ss << "  Image Size: (";
+  for (size_t i = 0; i < dimension; i ++){
+    ss << _image_sizes[i];
+    if (i != dimension - 1)
+      ss << ", ";
+  }
+  ss << ")\n";
+  ss << "  Origin: (";
+  for (size_t i = 0; i < dimension; i ++){
+    ss << _origin[i];
+    if (i != dimension - 1)
+      ss << ", ";
+  }
+  ss << ")\n";
+  // "rows,cols) = (" << _row_count << "," <<
+  // _col_count
+  //    << ") ... Distance Unit: " << (int)(this-> unit())
+  //    << " ... Left Bottom => Right Top " << ((BBox2D*)(this))->dump();
+  return ss.str();
+}
 
 
 
@@ -528,15 +558,7 @@ ImageMeta ImageMeta::inclusive(const ImageMeta& meta) const
                    _unit);
 }
 
-std::string ImageMeta::dump() const
-{
-  std::stringstream ss;
-  ss << "ProjectionID " << id() << " (rows,cols) = (" << _row_count << "," <<
-  _col_count
-     << ") ... Distance Unit: " << (int)(this-> unit())
-     << " ... Left Bottom => Right Top " << ((BBox2D*)(this))->dump();
-  return ss.str();
-}
+
 */
 
 }  // namespace larcv

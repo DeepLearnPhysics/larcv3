@@ -56,6 +56,7 @@ using namespace larcv;
 %template(VectorOfVoxelSet) std::vector<larcv::VoxelSet>;
 // %template(VectorOfSparse) std::vector<larcv::SparseTensor>;
 %template(VectorOfParticle) std::vector<larcv::Particle>;
+%template(VectorOfImage2D) std::vector<larcv::Image2D>;
 
 // Define instantiations of LARCV templates:
 %template(Point2D) larcv::Point<2>;

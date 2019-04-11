@@ -3,8 +3,8 @@
 
 #include "EventParticle.h"
 
-#define PARTICLE_EXTENTS_CHUNK_SIZE 1
-#define PARTICLE_DATA_CHUNK_SIZE 5
+#define PARTICLE_EXTENTS_CHUNK_SIZE 100
+#define PARTICLE_DATA_CHUNK_SIZE 500
 
 namespace larcv{
   /// Global larcv::SBClusterFactory to register ClusterAlgoFactory
