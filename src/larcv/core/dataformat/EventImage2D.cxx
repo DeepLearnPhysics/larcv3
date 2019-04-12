@@ -8,6 +8,8 @@
 #define IMAGE_DATA_CHUNK_SIZE 25000000
 #define IMAGE_IDEXTENTS_CHUNK_SIZE 1000
 #define IMAGE_META_CHUNK_SIZE 1000
+#define IMAGE_COMPRESSION_LEVEL 1
+
 namespace larcv {
 
   /// Global larcv::SBClusterFactory to register ClusterAlgoFactory
@@ -165,7 +167,7 @@ namespace larcv {
     H5::DSetCreatPropList image_cparms;
     hsize_t      image_chunk_dims[1] ={IMAGE_DATA_CHUNK_SIZE};
     image_cparms.setChunk( 1, image_chunk_dims );
-    image_cparms.setDeflate(3);
+    image_cparms.setDeflate(IMAGE_COMPRESSION_LEVEL);
     // Create the extents dataset:
     H5::DataSet image_ds = group->createDataSet("images", image_datatype, image_dataspace, image_cparms);
 
