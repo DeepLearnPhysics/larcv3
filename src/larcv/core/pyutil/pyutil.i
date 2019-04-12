@@ -5,7 +5,7 @@
 
 /* Put header files here or function declarations like below */
 #include "core/pyutil/PyUtils.h"
-
+#include "core/dataformat/ImageMeta.h"
 
 %}
 
@@ -16,7 +16,7 @@
 %rename(as_ndarray_uint)   larcv::as_ndarray(const std::vector<unsigned int> & );
 
 %include "core/pyutil/PyUtils.h"
-
+%include "core/dataformat/ImageMeta.h"
 
 
 

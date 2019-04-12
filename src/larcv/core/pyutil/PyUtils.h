@@ -75,7 +75,7 @@ PyObject* as_ndarray(const larcv::Image2D &img);
 // //void copy_array(PyObject *arrayin, const std::vector<float> &cvec);
 // // void copy_array(PyObject *arrayin);//, const std::vector<float>& vec);
 
-larcv::Image2D as_image2d_meta(PyObject *, larcv::ImageMeta2D * meta);
+larcv::Image2D as_image2d_meta(PyObject *, larcv::ImageMeta2D meta);
 
 larcv::Image2D as_image2d(PyObject *);
 

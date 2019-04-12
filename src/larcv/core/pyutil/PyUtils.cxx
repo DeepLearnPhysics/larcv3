@@ -531,7 +531,7 @@ void copy_array(PyObject *arrayin, const std::vector<float> &cvec) {
 //   return PyArray_SimpleNewFromData(2, dim_data, NPY_FLOAT, (char *)&(vec[0]));
 // }
 
-larcv::Image2D as_image2d_meta(PyObject *pyarray, ImageMeta2D * meta) {
+larcv::Image2D as_image2d_meta(PyObject *pyarray, ImageMeta2D meta) {
   SetPyUtil();
   float **carray;
   // Create C arrays from numpy objects:
@@ -552,7 +552,7 @@ larcv::Image2D as_image2d_meta(PyObject *pyarray, ImageMeta2D * meta) {
   }
   PyArray_Free(pyarray, (void *)carray);
 
-  Image2D res(std::move(*meta), std::move(res_data));
+  Image2D res(std::move(meta), std::move(res_data));
   return res;
 }
 
