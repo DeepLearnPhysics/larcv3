@@ -60,6 +60,10 @@ using namespace larcv;
 %template(SparseTensor3D) larcv::SparseTensor<3>;
 %template(EventSparseTensor2D) larcv::EventSparseTensor<2>;
 %template(EventSparseTensor3D) larcv::EventSparseTensor<3>;
+%template(SparseCluster2D) larcv::SparseCluster<2>;
+%template(SparseCluster3D) larcv::SparseCluster<3>;
+%template(EventSparseCluster2D) larcv::EventSparseCluster<2>;
+%template(EventSparseCluster3D) larcv::EventSparseCluster<3>;
 
 
 // Add templates for the dataproducts that get wrapped vectors:
@@ -70,6 +74,8 @@ using namespace larcv;
 %template(VectorOfVoxelSet) std::vector<larcv::VoxelSet>;
 %template(VectorOfSparse2D) std::vector<larcv::SparseTensor2D>;
 %template(VectorOfSparse3D) std::vector<larcv::SparseTensor3D>;
+%template(VectorOfCluster2D) std::vector<larcv::SparseCluster2D>;
+%template(VectorOfCluster3D) std::vector<larcv::SparseCluster3D>;
 %template(VectorOfParticle) std::vector<larcv::Particle>;
 %template(VectorOfImage2D) std::vector<larcv::Image2D>;
 

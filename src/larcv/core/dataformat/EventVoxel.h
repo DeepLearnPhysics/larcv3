@@ -9,9 +9,9 @@
  * @author cadams
  
 
-/** \addtogroup core_DataFormat
+ * \addtogroup core_DataFormat
 
-    @{*/
+*/
 #ifndef __LARCV_EVENTVOXEL_H
 #define __LARCV_EVENTVOXEL_H
 
@@ -24,61 +24,61 @@
 
 namespace larcv {
 
-  // /**
-  //   \class EventSparseClusters2D
-  //   \brief Event-wise class to store a collection of VoxelSet (cluster) per projection id
-  // */
-  // template<size_t dimension>
-  // class EventSparseCluster : public EventBase {
+  /**
+    \class EventSparseCluster2D
+    \brief Event-wise class to store a collection of VoxelSet (cluster) per projection id
+  */
+  template<size_t dimension>
+  class EventSparseCluster : public EventBase {
 
-  // public:
+  public:
 
-  //   /// Default constructor
-  //   EventSparseCluster() {}
+    /// Default constructor
+    EventSparseCluster() {}
 
-  //   /// Default destructor
-  //   virtual ~EventSparseCluster() {}
+    /// Default destructor
+    virtual ~EventSparseCluster() {}
 
-  //   /// EventBase::clear() override
-  //   inline void clear() {_cluster_v.clear();}
+    /// EventBase::clear() override
+    inline void clear() {_cluster_v.clear();}
 
-  //   /// Access to all stores larcv::SparseCluster
-  //   inline const std::vector<larcv::SparseCluster<dimension> >& as_vector() const { return _cluster_v; }
+    /// Access to all stores larcv::SparseCluster
+    inline const std::vector<larcv::SparseCluster<dimension> >& as_vector() const { return _cluster_v; }
 
-  //   /// Access SparseCluster of a specific projection ID
-  //   const larcv::SparseCluster<dimension> & sparse_cluster(const ProjectionID_t id) const;
+    /// Access SparseCluster of a specific projection ID
+    const larcv::SparseCluster<dimension> & sparse_cluster(const ProjectionID_t id) const;
 
-  //   /// Number of valid projection id
-  //   inline size_t size() const { return _cluster_v.size(); }
+    /// Number of valid projection id
+    inline size_t size() const { return _cluster_v.size(); }
 
-  //   //
-  //   // Write-access
-  //   //
-  //   /// Emplace data
-  //   void emplace(larcv::SparseCluster&& clusters);
-  //   /// Set data
-  //   void set(const larcv::SparseCluster& clusters);
-  //   /// Emplace a new element
-  //   void emplace(larcv::VoxelSetArray&& clusters, larcv::ImageMeta<dimension>&& meta);
-  //   // /// Set a new element
-  //   // void set(const larcv::VoxelSetArray& clusters, const larcv::ImageMeta& meta);
+    //
+    // Write-access
+    //
+    /// Emplace data
+    void emplace(larcv::SparseCluster<dimension>&& clusters);
+    /// Set data
+    void set(const larcv::SparseCluster<dimension>& clusters);
+    /// Emplace a new element
+    void emplace(larcv::VoxelSetArray&& clusters, larcv::ImageMeta<dimension>&& meta);
+    // /// Set a new element
+    // void set(const larcv::VoxelSetArray& clusters, const larcv::ImageMeta& meta);
 
 
 
-  //   // IO functions:
-  //   void initialize (H5::Group * group);
-  //   void serialize  (H5::Group * group);
-  //   void deserialize(H5::Group * group, size_t entry);
+    // IO functions:
+    void initialize (H5::Group * group);
+    void serialize  (H5::Group * group);
+    void deserialize(H5::Group * group, size_t entry);
 
-  //   static EventSparseCluster * to_sparse_cluster2d(EventBase * e){
-  //     return (EventSparseCluster *) e;
-  //   }
+    static EventSparseCluster * to_sparse_cluster(EventBase * e){
+      return (EventSparseCluster *) e;
+    }
 
-  // private:
-  //   std::vector<larcv::SparseCluster<dimension> > _cluster_v;
-  //   VoxelSerializationHelper _helper;
+  private:
+    std::vector<larcv::SparseCluster<dimension> > _cluster_v;
+    VoxelSerializationHelper<dimension> _helper;
     
-  // };
+  };
 
   /**
     \class EventSparseTensor
@@ -136,9 +136,11 @@ namespace larcv {
   };
 
 
-typedef EventSparseTensor<2> EventSparseTensor2D;
-typedef EventSparseTensor<3> EventSparseTensor3D;
+typedef EventSparseTensor<2>  EventSparseTensor2D;
+typedef EventSparseTensor<3>  EventSparseTensor3D;
 
+typedef EventSparseCluster<2> EventSparseCluster2D;
+typedef EventSparseCluster<3> EventSparseCluster3D;
 
 }
 
@@ -147,32 +149,39 @@ typedef EventSparseTensor<3> EventSparseTensor3D;
 namespace larcv {
 
   // Template instantiation for IO
-  // template<> inline std::string product_unique_name<larcv::EventSparseClusters>() { return "cluster"; }
-  // template EventSparseClusters& IOManager::get_data<larcv::EventSparseClusters>(const std::string&);
-  // template EventSparseClusters& IOManager::get_data<larcv::EventSparseClusters>(const ProducerID_t);
+  template<> inline std::string product_unique_name<larcv::EventSparseCluster2D>() { return "cluster2d"; }
+  template<> inline std::string product_unique_name<larcv::EventSparseCluster3D>() { return "cluster3d"; }
 
-  /*
-  //    \class larcv::EventSparseClusters
-  //    \brief A concrete factory class for larcv::EventSparseClusters
+  
+  //    \class larcv::EventSparseCluster
+  //    \brief A concrete factory class for larcv::EventSparseCluster
   
 
-  class EventSparseClustersFactory : public DataProductFactoryBase {
+  class EventSparseCluster2DFactory : public DataProductFactoryBase {
   public:
     /// ctor
-    EventSparseClustersFactory()
-    { DataProductFactory::get().add_factory(product_unique_name<larcv::EventSparseClusters>(), this); }
+    EventSparseCluster2DFactory()
+    { DataProductFactory::get().add_factory(product_unique_name<larcv::EventSparseCluster2D>(), this); }
     /// dtor
-    ~EventSparseClustersFactory() {}
+    ~EventSparseCluster2DFactory() {}
     /// create method
-    EventBase* create() { return new EventSparseClusters; }
+    EventBase* create() { return new EventSparseCluster2D; }
   };
-  */
+  
+  class EventSparseCluster3DFactory : public DataProductFactoryBase {
+  public:
+    /// ctor
+    EventSparseCluster3DFactory()
+    { DataProductFactory::get().add_factory(product_unique_name<larcv::EventSparseCluster3D>(), this); }
+    /// dtor
+    ~EventSparseCluster3DFactory() {}
+    /// create method
+    EventBase* create() { return new EventSparseCluster3D; }
+  };
 
   // Template instantiation for IO
   template<> inline std::string product_unique_name<larcv::EventSparseTensor2D>() { return "sparse2d"; }
   template<> inline std::string product_unique_name<larcv::EventSparseTensor3D>() { return "sparse3d"; }
-  // template EventSparseTensor& IOManager::get_data<larcv::EventSparseTensor>(const std::string&);
-  // template EventSparseTensor& IOManager::get_data<larcv::EventSparseTensor>(const ProducerID_t);
 
   /**
      \class larcv::EventSparseTensor

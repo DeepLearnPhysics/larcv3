@@ -6,49 +6,55 @@
 
 namespace larcv {
 
-  /// Global larcv::EventClusterPixel2DFactory to register EventSparseClusters
-  // static EventSparseClustersFactory __global_EventSparseClustersFactory__;
+  /// Global larcv::EventClusterPixel2DFactory to register EventSparseCluster
+  static EventSparseCluster2DFactory __global_EventSparseCluster2DFactory__;
+  static EventSparseCluster3DFactory __global_EventSparseCluster3DFactory__;
 
   /// Global larcv::EventSparseTensorFactory to register EventSparseTensor
   static EventSparseTensor2DFactory __global_EventSparseTensor2DFactory__;
   static EventSparseTensor3DFactory __global_EventSparseTensor3DFactory__;
 
   
-  // // EventSparseClusters
-  // //
-  // const larcv::SparseCluster&
-  // EventSparseClusters::sparse_cluster(const ProjectionID_t id) const
-  // {
-  //   if(id >= _cluster_v.size()) {
-  //     std::cerr << "EventSparseClusters does not hold any SparseCluster for ProjectionID_t " << id << std::endl;
-  //     throw larbys();
-  //   }
-  //   return _cluster_v[id];
-  // }
+  // EventSparseCluster
+  //
+  template<size_t dimension> 
+  const larcv::SparseCluster<dimension>&
+  EventSparseCluster<dimension>::sparse_cluster(const ProjectionID_t id) const
+  {
+    if(id >= _cluster_v.size()) {
+      std::cerr << "EventSparseCluster does not hold any SparseCluster for ProjectionID_t " << id << std::endl;
+      throw larbys();
+    }
+    return _cluster_v[id];
+  }
 
-  // void EventSparseClusters::emplace(larcv::SparseCluster&& clusters)
-  // {
-  //   if(_cluster_v.size() <= clusters.meta().id())
-  //     _cluster_v.resize(clusters.meta().id()+1);
-  //   _cluster_v[clusters.meta().id()] = std::move(clusters);
-  // }
+  template<size_t dimension> 
+  void EventSparseCluster<dimension>::emplace(larcv::SparseCluster<dimension>&& clusters)
+  {
+    if(_cluster_v.size() <= clusters.meta().id())
+      _cluster_v.resize(clusters.meta().id()+1);
+    _cluster_v[clusters.meta().id()] = std::move(clusters);
+  }
 
-  // void EventSparseClusters::set(const larcv::SparseCluster& clusters) 
-  // {
-  //   if(_cluster_v.size() <= clusters.meta().id())
-  //     _cluster_v.resize(clusters.meta().id()+1);
-  //   _cluster_v[clusters.meta().id()] = clusters;
+  template<size_t dimension> 
+  void EventSparseCluster<dimension>::set(const larcv::SparseCluster<dimension>& clusters) 
+  {
+    if(_cluster_v.size() <= clusters.meta().id())
+      _cluster_v.resize(clusters.meta().id()+1);
+    _cluster_v[clusters.meta().id()] = clusters;
     
-  // }
+  }
   
-  // void EventSparseClusters::emplace(larcv::VoxelSetArray&& clusters, larcv::ImageMeta<dimension>&& meta)
-  // {
-  //   larcv::SparseCluster source(std::move(clusters),std::move(meta));
-  //   // source.set();
-  //   emplace(std::move(source));
-  // }
+  template<size_t dimension> 
+  void EventSparseCluster<dimension>::emplace(larcv::VoxelSetArray&& clusters, larcv::ImageMeta<dimension>&& meta)
+  {
+    larcv::SparseCluster<dimension> source(std::move(clusters),std::move(meta));
+    // source.set();
+    emplace(std::move(source));
+  }
 
-  // void EventSparseClusters::set(const larcv::VoxelSetArray& clusters, const larcv::ImageMeta<dimension>& meta)
+  // template<size_t dimension> 
+  // void EventSparseCluster<dimension>::set(const larcv::VoxelSetArray& clusters, const larcv::ImageMeta<dimension>& meta)
   // {
 
   //   if(_cluster_v.size() <= clusters.meta().id())
@@ -193,9 +199,10 @@ namespace larcv {
     return;
 
   }
-/*
+
   // IO functions: 
-  void EventSparseClusters::initialize (H5::Group * group){
+  template<size_t dimension> 
+  void EventSparseCluster<dimension>::initialize (H5::Group * group){
 
     // Call the helper initialize function:
     _helper.initialize_voxel_group(group);
@@ -203,7 +210,8 @@ namespace larcv {
 
   }
 
-  void EventSparseClusters::serialize  (H5::Group * group){
+  template<size_t dimension> 
+  void EventSparseCluster<dimension>::serialize  (H5::Group * group){
     // Step one, we write the meta if it hasn't already been written.
     // The helper handles this, if we set the meta:
 
@@ -251,7 +259,8 @@ namespace larcv {
 
   }
 
-  void EventSparseClusters::deserialize(H5::Group * group, size_t entry){
+  template<size_t dimension> 
+  void EventSparseCluster<dimension>::deserialize(H5::Group * group, size_t entry){
 
     // Make sure to read in meta before writing:
     if (! _helper.initialized()){
@@ -284,11 +293,12 @@ namespace larcv {
     return;
 
   }
-*/
+
 
 template class EventSparseTensor<2>;
 template class EventSparseTensor<3>;
-
+template class EventSparseCluster<2>;
+template class EventSparseCluster<3>;
 }
 
 #endif
