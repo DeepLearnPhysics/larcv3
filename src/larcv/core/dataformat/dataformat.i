@@ -14,12 +14,12 @@
 #include "core/dataformat/Voxel.h"
 
 // IO Interface classes:
+#include "core/dataformat/DataProductFactory.h"
 #include "core/dataformat/EventBase.h"
 #include "core/dataformat/EventParticle.h"
 #include "core/dataformat/EventImage2D.h"
-#include "core/dataformat/DataProductFactory.h"
 #include "core/dataformat/IOManager.h"
-//#include "core/dataformat/EventVoxel.h"
+#include "core/dataformat/EventVoxel.h"
 
 
 using namespace larcv;
@@ -41,22 +41,13 @@ using namespace larcv;
 %include "core/dataformat/Voxel.h"
 
 // IO Interface classes:
+%include "core/dataformat/DataProductFactory.h"
 %include "core/dataformat/EventBase.h"
 %include "core/dataformat/EventParticle.h"
 %include "core/dataformat/EventImage2D.h"
-%include "core/dataformat/DataProductFactory.h"
 %include "core/dataformat/IOManager.h"
-//%include "core/dataformat/EventVoxel.h"
+%include "core/dataformat/EventVoxel.h"
 
-// Add templates for the dataproducts that get wrapped vectors:
-%template(VectorOfDouble) std::vector<double>;
-%template(VectorOfFloat) std::vector<float>;
-%template(VectorOfSizet) std::vector<size_t>;
-%template(VectorOfVoxel) std::vector<larcv::Voxel>;
-%template(VectorOfVoxelSet) std::vector<larcv::VoxelSet>;
-// %template(VectorOfSparse) std::vector<larcv::SparseTensor>;
-%template(VectorOfParticle) std::vector<larcv::Particle>;
-%template(VectorOfImage2D) std::vector<larcv::Image2D>;
 
 // Define instantiations of LARCV templates:
 %template(Point2D) larcv::Point<2>;
@@ -65,7 +56,22 @@ using namespace larcv;
 %template(BBox3D) larcv::BBox<3>;
 %template(ImageMeta2D) larcv::ImageMeta<2>;
 %template(ImageMeta3D) larcv::ImageMeta<3>;
+%template(SparseTensor2D) larcv::SparseTensor<2>;
+%template(SparseTensor3D) larcv::SparseTensor<3>;
+%template(EventSparseTensor2D) larcv::EventSparseTensor<2>;
+%template(EventSparseTensor3D) larcv::EventSparseTensor<3>;
 
+
+// Add templates for the dataproducts that get wrapped vectors:
+%template(VectorOfDouble) std::vector<double>;
+%template(VectorOfFloat) std::vector<float>;
+%template(VectorOfSizet) std::vector<size_t>;
+%template(VectorOfVoxel) std::vector<larcv::Voxel>;
+%template(VectorOfVoxelSet) std::vector<larcv::VoxelSet>;
+%template(VectorOfSparse2D) std::vector<larcv::SparseTensor2D>;
+%template(VectorOfSparse3D) std::vector<larcv::SparseTensor3D>;
+%template(VectorOfParticle) std::vector<larcv::Particle>;
+%template(VectorOfImage2D) std::vector<larcv::Image2D>;
 
 
 

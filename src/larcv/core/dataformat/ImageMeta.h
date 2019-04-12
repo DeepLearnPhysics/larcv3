@@ -41,17 +41,22 @@ class ImageMeta {
             const std::vector<double>& origin = std::vector<double>(),
             DistanceUnit_t unit = kUnitUnknown);
 
-  // // Comparison operators:
-  // inline bool operator==(const ImageMeta& rhs) const {
-  //   return (
-  //     _n_dims           == rhs._n_dims && 
-  //     _image_sizes      == rhs._image_sizes &&
-  //     _number_of_voxels == rhs._number_of_voxels &&
-  //     _unit             == rhs._unit);
-  // }
-  template<size_t other_dim>
-  inline bool operator!=(const ImageMeta<other_dim> & rhs) const {
-    if (dimension != other_dim) return false;
+  // Comparison operators:
+  inline bool operator==(const ImageMeta<dimension> & rhs) const {
+    for (size_t i = 0; i < dimension; i ++){
+      if (_image_sizes[i]       != rhs._image_sizes[i])
+        return false;
+      if (_number_of_voxels[i]  != rhs._number_of_voxels[i])
+        return false;
+      if (_origin[i]              != rhs._origin[i])
+        return false;
+    }
+    return (
+      _projection_id == rhs._projection_id &&
+      _unit          == rhs._unit);
+  }
+
+  inline bool operator!=(const ImageMeta<dimension> & rhs) const {
     return !((*this) == rhs);
   }
 
@@ -188,9 +193,6 @@ class ImageMeta {
   double _image_sizes[dimension];  ///< image size in [_unit] along each dimension
   size_t _number_of_voxels[dimension];  ///< Total number of voxels in each dimension
   double _origin[dimension]; ///The location of index==0
-  hvl_t _image_sizes_handle;
-  hvl_t _number_of_voxels_handle;
-  hvl_t _origin_handle;
 
 
   DistanceUnit_t _unit;  ///< length unit
