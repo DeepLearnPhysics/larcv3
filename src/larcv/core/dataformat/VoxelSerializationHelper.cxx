@@ -3,8 +3,9 @@
 
 #include "VoxelSerializationHelper.h"
 
-#define VOXEL_EXTENTS_CHUNK_SIZE 10
-#define VOXEL_IDEXTENTS_CHUNK_SIZE 10
+#define VOXEL_EXTENTS_CHUNK_SIZE 100
+#define VOXEL_IDEXTENTS_CHUNK_SIZE 100
+#define VOXEL_META_CHUNK_SIZE 1000
 #define VOXEL_DATA_CHUNK_SIZE 1000
 
 // Here are hard coded values for mapping cluster ID to projection/cluster pairs
@@ -14,7 +15,8 @@
 namespace larcv {
 
 
-  VoxelSerializationHelper::VoxelSerializationHelper() :
+  template<size_t dimension>
+  VoxelSerializationHelper<dimension>::VoxelSerializationHelper() :
     _initialized(false)
   {
     // We initialize the image meta to 0, but the default projection meta is hardcoded
@@ -31,31 +33,38 @@ namespace larcv {
     image_sizes.push_back(1.0);
     image_sizes.push_back(1.0);
 
-    projection_meta = ImageMeta(2, // size_t n_dims, 
-                                0, // size_t projection_id,
-                                number_of_voxels, /// const std::vector<size_t>& number_of_voxels,
-                                image_sizes); ///const std::vector<double>& image_sizes, 
+    projection_meta = ImageMeta2D(0, // size_t projection_id,
+                                  number_of_voxels, /// const std::vector<size_t>& number_of_voxels,
+                                  image_sizes); ///const std::vector<double>& image_sizes, 
 
 
   }
 
   // Write the projection meta to the group
-  void VoxelSerializationHelper::write_projection_meta(H5::Group *group){
+  template<size_t dimension>
+  void VoxelSerializationHelper<dimension>::write_projection_meta(H5::Group *group){
 
     // Take the projection meta, which we define above, and write it:
 
     if ( ! _initialized ){
-      //  To rebuild the projection meta, we need only a few attibutes: n_voxels_0, n_voxels_1
 
-      H5::DataSpace dspace0(H5S_SCALAR);
-      H5::Attribute att0 = group->createAttribute("max_projection_ids",get_datatype<size_t>(),dspace0);
-      size_t n_projections = projection_meta.number_of_voxels(0);
-      att0.write(get_datatype<size_t>(), &n_projections);
 
-      H5::DataSpace dspace1(H5S_SCALAR);
-      H5::Attribute att1 = group->createAttribute("max_cluster_ids",get_datatype<size_t>(),dspace1);
-      size_t n_clusters = projection_meta.number_of_voxels(1);
-      att1.write(get_datatype<size_t>(), &n_clusters);
+
+        // Get the data type for extents:
+        H5::DataType image_meta_datatype = larcv::ImageMeta2D::get_datatype();
+
+        // Get the starting size (0) and dimensions (unlimited)
+        hsize_t image_meta_starting_dim[] = {0};
+        hsize_t image_meta_maxsize_dim[]  = {1};
+
+        // Create a dataspace 
+        H5::DataSpace image_meta_dataspace(1, image_meta_starting_dim, image_meta_maxsize_dim);
+
+        // Create the extents dataset:
+        H5::Attribute image_meta_ds = group->createAttribute("projection_meta", 
+          image_meta_datatype, image_meta_dataspace);
+
+        image_meta_ds.write(image_meta_datatype, &projection_meta);
 
     }
 
@@ -64,7 +73,8 @@ namespace larcv {
   }
 
   // Read the projection meta from the group
-  void VoxelSerializationHelper::read_projection_meta(H5::Group *group){
+  template<size_t dimension>
+  void VoxelSerializationHelper<dimension>::read_projection_meta(H5::Group *group){
     // TODO
     
     if ( ! _initialized ){
@@ -72,29 +82,10 @@ namespace larcv {
       // Read in the necessary attributes:
 
 
-
-      std::vector<size_t> number_of_voxels;
-      std::vector<double> image_sizes;
-
-      number_of_voxels.resize(2);
-
-      image_sizes.push_back(1.0);
-      image_sizes.push_back(1.0);
-
-      H5::Attribute att0 = group->openAttribute("max_projection_ids");
-      H5::DataType type0 = att0.getDataType();
-      att0.read(type0,&(number_of_voxels[0]));
-
-      H5::Attribute att1 = group->openAttribute("max_cluster_ids");
-      H5::DataType type1 = att1.getDataType();
-      att1.read(type1,&(number_of_voxels[1]));
-
-
-      projection_meta = ImageMeta(2, // size_t n_dims, 
-                                  0, // size_t projection_id,
-                                  number_of_voxels, /// const std::vector<size_t>& number_of_voxels,
-                                  image_sizes); ///const std::vector<double>& image_sizes, 
-
+        H5::Attribute projection_meta_attr = group->openAttribute("projection_meta");
+        H5::DataType projection_meta_type = projection_meta_attr.getDataType();
+        projection_meta_attr.read(projection_meta_type,&(projection_meta));
+  
       
     }
 
@@ -103,7 +94,8 @@ namespace larcv {
   }
 
   // Write a set of voxels, packaged in the way proscribed by meta, to the group:
-  void VoxelSerializationHelper::write_voxels(H5::Group * group, const std::vector<std::vector<larcv::VoxelSet> > & voxels){
+  template<size_t dimension>
+  void VoxelSerializationHelper<dimension>::write_voxels(H5::Group * group, const std::vector<std::vector<larcv::VoxelSet> > & voxels){
     // TODO
 
     if (! _initialized){
@@ -318,7 +310,8 @@ namespace larcv {
   }
 
   // Read an entry of voxels from a group
-  void VoxelSerializationHelper::read_voxels(H5::Group * group, size_t entry, std::vector<std::vector<larcv::VoxelSet> > & voxels){
+  template<size_t dimension>
+  void VoxelSerializationHelper<dimension>::read_voxels(H5::Group * group, size_t entry, std::vector<std::vector<larcv::VoxelSet> > & voxels){
     // TODO
 
 
@@ -481,11 +474,10 @@ namespace larcv {
 
 
   // Function to write a piece of meta as an attribute
-  void VoxelSerializationHelper::write_image_meta(H5::H5Object * obj){
+  template<size_t dimension>
+  void VoxelSerializationHelper<dimension>::write_image_meta(H5::H5Object * obj){
 
     // Writing a piece of meta is relatively easy.
-    // Instead of writing a complex object, we write it as just a set of scalars.
-
     //  Write the total number of projections:
 
     H5::DataSpace n_projections_space(H5S_SCALAR);
@@ -496,64 +488,39 @@ namespace larcv {
     size_t i_meta = 0;
     for (auto & meta : image_meta){
 
-      std::string basename = "proj_" + std::to_string(i_meta);
+        std::string basename = "proj_" + std::to_string(i_meta);
 
-      //  Everything gets flattened to scalars to write meta
+       // Get the data type for extents:
+        H5::DataType image_meta_datatype = meta.get_datatype();
 
-      // Dimensionality
-      H5::DataSpace n_dims_space(H5S_SCALAR);
-      H5::Attribute n_dims_attr = obj->createAttribute(basename + "_n_dims",get_datatype<size_t>(),n_dims_space);
-      auto n_dims_val = meta.n_dims();
-      n_dims_attr.write(get_datatype<size_t>(), &(n_dims_val));
+        // Get the starting size (0) and dimensions (unlimited)
+        hsize_t image_meta_starting_dim[] = {1};
+        hsize_t image_meta_maxsize_dim[]  = {1};
 
+        // Create a dataspace 
+        H5::DataSpace image_meta_dataspace(1, image_meta_starting_dim, image_meta_maxsize_dim);
 
-      // Projection ID
-      H5::DataSpace projection_id_space(H5S_SCALAR);
-      H5::Attribute projection_id_attr = obj->createAttribute(basename + "_projection_id",get_datatype<size_t>(),projection_id_space);
-      auto projection_id_val = meta.projection_id();
-      projection_id_attr.write(get_datatype<size_t>(), &(projection_id_val));
+        // Create the extents dataset:
+        H5::Attribute image_meta_ds = obj->createAttribute(basename + "_meta", 
+          image_meta_datatype, image_meta_dataspace);
 
-      // Vector characteristics:
-      for (size_t i_dim = 0; i_dim < n_dims_val; i_dim ++){
-        // Image Size:
-        std::string sub_basename = basename + "_" + std::to_string(i_dim);
-        
-        // Image Size
-        H5::DataSpace image_size_space(H5S_SCALAR);
-        H5::Attribute image_size_attr = obj->createAttribute(sub_basename + "_image_size",get_datatype<double>(),image_size_space);
-        auto image_size_val = meta.image_size(i_dim);
-        image_size_attr.write(get_datatype<double>(), &(image_size_val));
+        image_meta_ds.write(image_meta_datatype, &meta);
 
-        // Number of Voxels
-        H5::DataSpace number_of_voxels_space(H5S_SCALAR);
-        H5::Attribute number_of_voxels_attr = obj->createAttribute(sub_basename + "_number_of_voxels",get_datatype<size_t>(),number_of_voxels_space);
-        auto number_of_voxels_val = meta.number_of_voxels(i_dim);
-        number_of_voxels_attr.write(get_datatype<size_t>(), &(number_of_voxels_val));
-
-        // Origin
-        H5::DataSpace origin_space(H5S_SCALAR);
-        H5::Attribute origin_attr = obj->createAttribute(sub_basename + "_origin",get_datatype<double>(),origin_space);
-        auto origin_val = meta.origin(i_dim);
-        origin_attr.write(get_datatype<double>(), &(origin_val));
-
-
-      }
 
       i_meta ++;
     }
 
-
-
-     
-
   }
-  void VoxelSerializationHelper::initialize_for_write(H5::Group * obj){
+
+  template<size_t dimension>
+  void VoxelSerializationHelper<dimension>::initialize_for_write(H5::Group * obj){
     write_projection_meta(obj);
     write_image_meta(obj);
     _initialized = true;
   }
 
-  void VoxelSerializationHelper::initialize_for_read(H5::Group * obj){
+  template<size_t dimension>
+  void VoxelSerializationHelper<dimension>::initialize_for_read(H5::Group * obj){
     read_projection_meta(obj);
     image_meta.clear();
     read_image_meta(obj);
@@ -561,7 +528,8 @@ namespace larcv {
   }
 
   // Function to read all meta from an object
-  void VoxelSerializationHelper::read_image_meta(H5::H5Object *obj){
+  template<size_t dimension>
+  void VoxelSerializationHelper<dimension>::read_image_meta(H5::H5Object *obj){
 
     // Reading a piece of meta is relatively easy.
 
@@ -575,50 +543,56 @@ namespace larcv {
     image_meta.resize(n_projections);
 
 
+
+
     // size_t i_meta = 0;
     for (size_t i_meta = 0; i_meta < n_projections;i_meta ++){
 
-      std::string basename = "proj_" + std::to_string(i_meta);
+        std::string basename = "proj_" + std::to_string(i_meta);
 
-      //  Everything gets flattened to scalars to write meta
+        H5::Attribute image_meta_attr = obj->openAttribute(basename + "_meta");
+        H5::DataType image_meta_type = image_meta_attr.getDataType();
+        image_meta_attr.read(image_meta_type,&(image_meta[i_meta]));
+  
+      // //  Everything gets flattened to scalars to write meta
 
-      // Dimensionality
-      size_t n_dims;
-      H5::Attribute n_dims_attr = obj->openAttribute(basename + "_n_dims");
-      n_dims_attr.read(get_datatype<size_t>(), &(n_dims));
+      // // Dimensionality
+      // size_t n_dims;
+      // H5::Attribute n_dims_attr = obj->openAttribute(basename + "_n_dims");
+      // n_dims_attr.read(get_datatype<size_t>(), &(n_dims));
 
 
-      // Projection ID
-      size_t projection_id;
-      H5::Attribute projection_id_attr = obj->openAttribute(basename + "_projection_id");
-      projection_id_attr.read(get_datatype<size_t>(), &(projection_id));
+      // // Projection ID
+      // size_t projection_id;
+      // H5::Attribute projection_id_attr = obj->openAttribute(basename + "_projection_id");
+      // projection_id_attr.read(get_datatype<size_t>(), &(projection_id));
 
-      image_meta.at(i_meta).set_projection_id(projection_id);
+      // image_meta.at(i_meta).set_projection_id(projection_id);
 
-      // Vector characteristics:
-      for (size_t i_dim = 0; i_dim < n_dims; i_dim ++){
-        // Image Size:
-        std::string sub_basename = basename + "_" + std::to_string(i_dim);
+      // // Vector characteristics:
+      // for (size_t i_dim = 0; i_dim < n_dims; i_dim ++){
+      //   // Image Size:
+      //   std::string sub_basename = basename + "_" + std::to_string(i_dim);
         
-        // Image Size
-        double image_size_val;
-        H5::Attribute image_size_attr = obj->openAttribute(sub_basename + "_image_size");
-        image_size_attr.read(get_datatype<double>(), &(image_size_val));
+      //   // Image Size
+      //   double image_size_val;
+      //   H5::Attribute image_size_attr = obj->openAttribute(sub_basename + "_image_size");
+      //   image_size_attr.read(get_datatype<double>(), &(image_size_val));
 
-        // Number of Voxels
-        size_t number_of_voxels_val;
-        H5::Attribute number_of_voxels_attr = obj->openAttribute(sub_basename + "_number_of_voxels");
-        number_of_voxels_attr.read(get_datatype<size_t>(), &(number_of_voxels_val));
+      //   // Number of Voxels
+      //   size_t number_of_voxels_val;
+      //   H5::Attribute number_of_voxels_attr = obj->openAttribute(sub_basename + "_number_of_voxels");
+      //   number_of_voxels_attr.read(get_datatype<size_t>(), &(number_of_voxels_val));
 
-        // Origin
-        double origin_val;
-        H5::Attribute origin_attr = obj->openAttribute(sub_basename + "_origin");
-        origin_attr.read(get_datatype<double>(), &(origin_val));
+      //   // Origin
+      //   double origin_val;
+      //   H5::Attribute origin_attr = obj->openAttribute(sub_basename + "_origin");
+      //   origin_attr.read(get_datatype<double>(), &(origin_val));
 
-        image_meta.at(i_meta).add_dimension(image_size_val, number_of_voxels_val, origin_val);
+      //   image_meta.at(i_meta).add_dimension(image_size_val, number_of_voxels_val, origin_val);
 
 
-      }
+      // }
 
     }
 
@@ -627,7 +601,8 @@ namespace larcv {
 
 
   // Initialization is the same for sparse image and cluster set
-  void VoxelSerializationHelper::initialize_voxel_group(H5::Group * group){
+  template<size_t dimension>
+  void VoxelSerializationHelper<dimension>::initialize_voxel_group(H5::Group * group){
 
     if (group -> getNumObjs() != 0){
       LARCV_CRITICAL() << "Attempt to initialize non empty particle group " << group->fromClass() << std::endl;
@@ -726,7 +701,9 @@ namespace larcv {
       voxel_datatype, voxel_dataspace, voxel_cparms);
   }
 
-
+// Force instantiation of 2D and 3D serialization helpers:
+template class VoxelSerializationHelper<2>;
+template class VoxelSerializationHelper<3>;
   
 }
 

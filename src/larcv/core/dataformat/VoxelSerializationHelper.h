@@ -24,7 +24,10 @@ namespace larcv {
 
   // Create a suite of functions to manage the shared IO of sparse tensors and clusters
 
+  
   // This class keeps a copy of the meta for an object, so it is managed here.
+  
+  template<size_t dimension>
   class VoxelSerializationHelper {
   
   public:
@@ -57,8 +60,8 @@ namespace larcv {
     void initialize_for_read(H5::Group * obj);
     void initialize_for_write(H5::Group * obj);
 
-    std::vector<larcv::ImageMeta> image_meta;
-    ImageMeta projection_meta;
+    std::vector<larcv::ImageMeta<dimension> > image_meta;
+    ImageMeta2D projection_meta;
 
   private:
     bool _initialized;

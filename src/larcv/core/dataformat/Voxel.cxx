@@ -271,7 +271,7 @@ SparseCluster<dimension>::SparseCluster(VoxelSetArray&& vsa, ImageMeta<dimension
 { this->meta(meta); }
 
 
-// Instantiate the objects:
+// Instantiate the objects for 2D and 3D:
 template class SparseTensor<2> ;
 template class SparseTensor<3> ;
 template class SparseCluster<2>;
