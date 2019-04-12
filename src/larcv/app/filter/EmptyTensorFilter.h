@@ -23,7 +23,7 @@ namespace larcv {
      User defined class EmptyTensorFilter ... these comments are used to generate
      doxygen documentation!
   */
-  class EmptyTensorFilter : public ProcessBase {
+  class EmptyTensorFilter : public larcv::ProcessBase {
 
   public:
     
@@ -33,11 +33,11 @@ namespace larcv {
     /// Default destructor
     ~EmptyTensorFilter(){}
 
-    void configure(const PSet&);
+    void configure(const larcv::PSet&);
 
     void initialize();
 
-    bool process(IOManager& mgr);
+    bool process(larcv::IOManager& mgr);
 
     void finalize();
 

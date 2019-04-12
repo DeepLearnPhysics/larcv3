@@ -14,8 +14,8 @@
 #ifndef __EVENTIDFILTER_H__
 #define __EVENTIDFILTER_H__
 
-#include "larcv/core/Processor/ProcessBase.h"
-#include "larcv/core/Processor/ProcessFactory.h"
+#include "core/processor/ProcessBase.h"
+#include "core/processor/ProcessFactory.h"
 #include <map>
 namespace larcv {
 
@@ -24,7 +24,7 @@ namespace larcv {
      User defined class EventIDFilter ... these comments are used to generate
      doxygen documentation!
   */
-  class EventIDFilter : public ProcessBase {
+  class EventIDFilter : public larcv::ProcessBase {
 
   public:
     
@@ -34,26 +34,25 @@ namespace larcv {
     /// Default destructor
     ~EventIDFilter(){}
 
-    void configure(const PSet&);
+    void configure(const larcv::PSet&);
 
     void initialize();
 
-    bool process(IOManager& mgr);
+    bool process(larcv::IOManager& mgr);
 
     void finalize();
 
   private:
 
-    TTree* _tree;
 
-    std::map<larcv::EventBase,bool> _id_m;
+    std::map<larcv::EventID,bool> _id_m;
     std::string _ref_producer;
     std::string _ref_type;
     bool _remove_duplicate;
     std::string _fname;
-    int _run;
-    int _subrun;
-    int _event;
+    // int _run;
+    // int _subrun;
+    // int _event;
   };
 
   /**

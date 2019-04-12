@@ -14,8 +14,8 @@
 #ifndef __MCSINGLEPARTICLEFILTER_H__
 #define __MCSINGLEPARTICLEFILTER_H__
 
-#include "larcv/core/Processor/ProcessBase.h"
-#include "larcv/core/Processor/ProcessFactory.h"
+#include "core/processor/ProcessBase.h"
+#include "core/processor/ProcessFactory.h"
 namespace larcv {
 
   /**
@@ -33,11 +33,11 @@ namespace larcv {
     /// Default destructor
     ~MCSingleParticleFilter(){}
 
-    void configure(const PSet&);
+    void configure(const larcv::PSet&);
 
     void initialize();
 
-    bool process(IOManager& mgr);
+    bool process(larcv::IOManager& mgr);
 
     void finalize();
 

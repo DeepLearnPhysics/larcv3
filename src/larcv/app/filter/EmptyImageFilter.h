@@ -14,8 +14,8 @@
 #ifndef __EMPTYIMAGEFILTER_H__
 #define __EMPTYIMAGEFILTER_H__
 
-#include "larcv/core/Processor/ProcessBase.h"
-#include "larcv/core/Processor/ProcessFactory.h"
+#include "core/processor/ProcessBase.h"
+#include "core/processor/ProcessFactory.h"
 namespace larcv {
 
   /**
@@ -23,7 +23,7 @@ namespace larcv {
      User defined class EmptyImageFilter ... these comments are used to generate
      doxygen documentation!
   */
-  class EmptyImageFilter : public ProcessBase {
+  class EmptyImageFilter : public larcv::ProcessBase {
 
   public:
     
@@ -33,11 +33,11 @@ namespace larcv {
     /// Default destructor
     ~EmptyImageFilter(){}
 
-    void configure(const PSet&);
+    void configure(const larcv::PSet&);
 
     void initialize();
 
-    bool process(IOManager& mgr);
+    bool process(larcv::IOManager& mgr);
 
     void finalize();
 

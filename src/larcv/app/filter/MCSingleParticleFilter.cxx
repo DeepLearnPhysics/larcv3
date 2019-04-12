@@ -2,7 +2,7 @@
 #define __MCSINGLEPARTICLEFILTER_CXX__
 
 #include "MCSingleParticleFilter.h"
-#include "larcv/core/DataFormat/EventParticle.h"
+#include "core/dataformat/EventParticle.h"
 namespace larcv {
 
   static MCSingleParticleFilterProcessFactory __global_MCSingleParticleFilterProcessFactory__;
@@ -31,20 +31,20 @@ namespace larcv {
       if(part.mcst_index() == kINVALID_USHORT) continue;
 
       if( (part.pdg_code() == 11 || part.pdg_code() == -11 || part.pdg_code() == 22 || part.pdg_code() == 111) && 
-	  part.energy_deposit() < _shower_min_energy) {
-	LARCV_INFO() << "Ignoring Shower (pdg_code=" << part.pdg_code() << ") with energy " << part.energy_deposit() << std::endl;
-	continue;
+           part.energy_deposit() < _shower_min_energy) {
+        LARCV_INFO() << "Ignoring Shower (pdg_code=" << part.pdg_code() << ") with energy " << part.energy_deposit() << std::endl;
+        continue;
       }
 
       if(part.pdg_code() == 2212 && part.energy_deposit() < _proton_min_energy) {
 
-	LARCV_INFO() << "Ignoring Proton with energy " << part.energy_deposit() << std::endl;
-	continue;
+        LARCV_INFO() << "Ignoring Proton with energy " << part.energy_deposit() << std::endl;
+        continue;
 
       }else if(part.shape() == kShapeTrack && part.energy_deposit() < _track_min_energy) {
 
-	LARCV_INFO() << "Ignoring TRACK (pdg_code=" << part.pdg_code() << ") with energy " << part.energy_deposit() << std::endl;
-	continue;
+        LARCV_INFO() << "Ignoring TRACK (pdg_code=" << part.pdg_code() << ") with energy " << part.energy_deposit() << std::endl;
+        continue;
 
       }
 

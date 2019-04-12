@@ -12,7 +12,7 @@ file(GLOB SOURCES *.cxx)
 add_library(${name} SHARED ${SOURCES})
 
 # Link this shared library against the base library
-target_link_libraries(${name} base dataformat processor)
+target_link_libraries(${name} base dataformat processor cpputil)
 
 
 generate_python_bindings(${name})

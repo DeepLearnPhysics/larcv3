@@ -2,7 +2,7 @@
 #define __PARTICLECOUNTFILTER_CXX__
 
 #include "ParticleCountFilter.h"
-#include "larcv/core/DataFormat/EventParticle.h"
+#include "core/dataformat/EventParticle.h"
 
 namespace larcv {
 

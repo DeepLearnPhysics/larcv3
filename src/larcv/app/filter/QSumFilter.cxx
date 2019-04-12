@@ -2,7 +2,7 @@
 #define __QSUMFILTER_CXX__
 
 #include "QSumFilter.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
+#include "core/dataformat/EventImage2D.h"
 namespace larcv {
 
   static QSumFilterProcessFactory __global_QSumFilterProcessFactory__;
@@ -11,7 +11,7 @@ namespace larcv {
     : ProcessBase(name)
   {}
 
-  void QSumFilter::configure(const PSet& cfg)
+  void QSumFilter::configure(const larcv::PSet& cfg)
   {
     _image_producer = cfg.get< std::string          >("ImageProducer");
     _min_qsum_v     = cfg.get< std::vector<double>  >("MinQSum");

@@ -2,14 +2,14 @@
 #define __EventIDFILTER_CXX__
 
 #include "EventIDFilter.h"
-#include "larcv/core/CPPUtil/CSVReader.h"
+#include "core/cpputil/CSVReader.h"
 
 namespace larcv {
 
   static EventIDFilterProcessFactory __global_EventIDFilterProcessFactory__;
 
   EventIDFilter::EventIDFilter(const std::string name)
-    : ProcessBase(name), _tree(nullptr)
+    : ProcessBase(name)
   {}
     
   void EventIDFilter::configure(const PSet& cfg)
@@ -25,7 +25,7 @@ namespace larcv {
     auto const& subrun_v = data.get<int>("subrun");
     auto const& event_v = data.get<int>("event");
     _id_m.clear();
-    EventBase id;
+    EventID id;
     for(size_t i=0; i<run_v.size(); ++i) {
       id.set_id( run_v[i], subrun_v[i], event_v[i] );
       _id_m[id] = false;
@@ -35,25 +35,17 @@ namespace larcv {
 
   void EventIDFilter::initialize()
   {
-    if(has_ana_file()) {
-      _tree = new TTree("EventIDFilter","");
-      _tree->Branch("fname"  , &_fname);
-      _tree->Branch("run"    , &_run    , "run/I");
-      _tree->Branch("subrun" , &_subrun , "subrun/I");
-      _tree->Branch("event"  , &_event  , "event/I");
-    }
   }
 
   bool EventIDFilter::process(IOManager& mgr)
   {
-    auto ptr = mgr.get_data(_ref_type,_ref_producer);
 
-    EventBase ref_id;
-    ref_id.set_id(ptr->run(),ptr->subrun(),ptr->event());
+    EventID ref_id = mgr.event_id();
+    // ref_id.set_id(ptr->run(),ptr->subrun(),ptr->event());
     auto itr = _id_m.find(ref_id);
 
     bool keepit = (itr != _id_m.end());
-    LARCV_INFO() << "Event key: " << ptr->event_key() << " ... keep it? " << keepit << std::endl;
+    LARCV_INFO() << "Event key: " << ref_id.event_key() << " ... keep it? " << keepit << std::endl;
     bool duplicate = false;
     if(keepit) {
       duplicate = (*itr).second;
@@ -62,13 +54,7 @@ namespace larcv {
     }
     if(duplicate && _remove_duplicate) return false;
 
-    if(has_ana_file()) {
-      _fname  = (std::string) mgr.file_list().front();
-      _run    = (int) ptr->run();
-      _subrun = (int) ptr->subrun();
-      _event  = (int) ptr->event();
-      _tree->Fill();
-    }
+
     return keepit;
   }
 
@@ -80,8 +66,6 @@ namespace larcv {
 		      << " SubRun " << id_used.first.subrun() 
 		      << " Event " << id_used.first.event() << std::endl;
     }
-    if(has_ana_file())
-      _tree->Write();
   }
 
 }

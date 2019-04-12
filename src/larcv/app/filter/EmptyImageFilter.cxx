@@ -2,7 +2,7 @@
 #define __EMPTYIMAGEFILTER_CXX__
 
 #include "EmptyImageFilter.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
+#include "core/dataformat/EventImage2D.h"
 namespace larcv {
 
   static EmptyImageFilterProcessFactory __global_EmptyImageFilterProcessFactory__;
