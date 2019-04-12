@@ -15,7 +15,7 @@ def rand_num_events():
 def write_sparse_tensors(tempfile, voxel_set_list, dimension, n_projections):
 
     from larcv import dataformat
-
+    from copy import copy
     io_manager = dataformat.IOManager(dataformat.IOManager.kWRITE)
     print(type(tempfile))
     io_manager.set_out_file(tempfile)
@@ -24,20 +24,27 @@ def write_sparse_tensors(tempfile, voxel_set_list, dimension, n_projections):
     # For this test, the meta is pretty irrelevant as long as it is consistent
     meta_list = []
     for projection in range(n_projections):
-        meta_list.append(dataformat.ImageMeta())
+        if dimension == 2:
+            meta_list.append(dataformat.ImageMeta2D())
+        else:
+            meta_list.append(dataformat.ImageMeta3D())
+
         for dim in range(dimension):
             L = 10.
             N = 512
-            meta_list[-1].add_dimension(L, N)
+            meta_list[-1].set_dimension(dim, L, N)
 
         meta_list[-1].set_projection_id(projection)
 
-        
     for i in range(len(voxel_set_list)):
         io_manager.set_id(1001, 0, i)
         
         # Get a piece of data, sparse tensor:
-        ev_sparse = dataformat.EventSparseTensor.to_sparse_tensor(io_manager.get_data("sparse","test"))
+        if dimension== 2:
+            ev_sparse = dataformat.EventSparseTensor2D.to_sparse_tensor(io_manager.get_data("sparse2d","test"))
+        else:
+            ev_sparse = dataformat.EventSparseTensor3D.to_sparse_tensor(io_manager.get_data("sparse3d","test"))
+
 
         for projection in range(n_projections):
             vs = dataformat.VoxelSet()
@@ -46,8 +53,7 @@ def write_sparse_tensors(tempfile, voxel_set_list, dimension, n_projections):
             for j in range(voxel_set_list[i][projection]['n_voxels']):
                 vs.emplace(indexes[j], values[j], False)
 
-            ev_sparse.set(vs, meta_list[projection])
-
+            ev_sparse.set(vs, copy(meta_list[projection]))
         io_manager.save_entry()
 
 
@@ -61,7 +67,7 @@ def write_sparse_tensors(tempfile, voxel_set_list, dimension, n_projections):
 
     return
  
-def read_sparse_tensors(tempfile):
+def read_sparse_tensors(tempfile, dimension):
 
     from larcv import dataformat
 
@@ -78,7 +84,10 @@ def read_sparse_tensors(tempfile):
         io_manager.read_entry(i)
         
         # Get a piece of data, sparse tensor:
-        ev_sparse = dataformat.EventSparseTensor.to_sparse_tensor(io_manager.get_data("sparse","test"))
+        if dimension== 2:
+            ev_sparse = dataformat.EventSparseTensor2D.to_sparse_tensor(io_manager.get_data("sparse2d","test"))
+        else:
+            ev_sparse = dataformat.EventSparseTensor3D.to_sparse_tensor(io_manager.get_data("sparse3d","test"))
 
         for projection in range(ev_sparse.size()):
             voxel_set_list[i].append({
@@ -136,7 +145,7 @@ def test_read_write_sparse_tensors(tmpdir, rand_num_events, dimension, n_project
     voxel_set_list = build_sparse_tensor(rand_num_events, n_projections = n_projections)
 
     write_sparse_tensors(random_file_name, voxel_set_list, dimension, n_projections)
-    read_voxel_set_list = read_sparse_tensors(random_file_name)
+    read_voxel_set_list = read_sparse_tensors(random_file_name, dimension)
 
     # Check the same number of events came back:
     assert(len(read_voxel_set_list) == rand_num_events)

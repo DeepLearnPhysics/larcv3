@@ -28,26 +28,38 @@ def write_sparse_clusters(file_name, voxel_set_array_list, dimension=2, n_projec
     # For this test, the meta is pretty irrelevant as long as it is consistent
     meta_list = []
     for projection in range(n_projections):
-        meta_list.append(dataformat.ImageMeta())
+        if dimension == 2:
+            meta_list.append(dataformat.ImageMeta2D())
+        else:
+            meta_list.append(dataformat.ImageMeta3D())
+
         for dim in range(dimension):
             L = 10.
             N = 2048
-            meta_list[-1].add_dimension(L, N)
+            meta_list[-1].set_dimension(dim, L, N)
 
         meta_list[-1].set_projection_id(projection)
 
     for i in range(len(voxel_set_array_list)):
         io_manager.set_id(1001, 0, i)
         # Get a piece of data, sparse tensor:
-        ev_cluster = dataformat.EventSparseClusters.to_sparse_clusters(io_manager.get_data("cluster","test"))
+        if dimension== 2:
+            ev_cluster = dataformat.EventSparseCluster2D.to_sparse_cluster(io_manager.get_data("cluster2d","test"))
+        else:
+            ev_cluster = dataformat.EventSparseCluster3D.to_sparse_cluster(io_manager.get_data("cluster3d","test"))
+
         # Holder for the voxels to store:
 
 
         for projection in range(n_projections):
             clusters = voxel_set_array_list[i][projection]
-            vsa = dataformat.SparseCluster()
+            if dimension == 2:
+                vsa = dataformat.SparseCluster2D()
+            else:
+                vsa = dataformat.SparseCluster3D()
             for cluster in range(len(clusters)):
                 vs = dataformat.VoxelSet()
+
                 vs.id(cluster)
                 indexes = clusters[cluster]['indexes']
                 values = clusters[cluster]['values']
@@ -71,7 +83,7 @@ def write_sparse_clusters(file_name, voxel_set_array_list, dimension=2, n_projec
 
     return
  
-def read_sparse_clusters(tempfile):
+def read_sparse_clusters(tempfile, dimension):
 
     from larcv import dataformat
 
@@ -88,8 +100,12 @@ def read_sparse_clusters(tempfile):
 
         io_manager.read_entry(event)
         
-        # Get a piece of data, sparse cluster:
-        ev_cluster = dataformat.EventSparseClusters.to_sparse_clusters(io_manager.get_data("cluster","test"))
+        # Get a piece of data, sparse cluster:\
+        if dimension == 2:
+            ev_cluster = dataformat.EventSparseCluster2D.to_sparse_cluster(io_manager.get_data("cluster2d","test"))
+        else:
+            ev_cluster = dataformat.EventSparseCluster3D.to_sparse_cluster(io_manager.get_data("cluster3d","test"))
+
         for projection in range(ev_cluster.size()):
             # Append a list of clusters for this projection:
             voxel_set_array_list[event].append([])
@@ -160,7 +176,7 @@ def test_read_write_sparse_clusters(tmpdir, rand_num_events, dimension, n_projec
 
 
     write_sparse_clusters(random_file_name, voxel_set_array_list, dimension, n_projections)
-    read_voxel_set_array_list = read_sparse_clusters(random_file_name)
+    read_voxel_set_array_list = read_sparse_clusters(random_file_name, dimension)
 
     # Check the same number of events came back:
     assert(len(read_voxel_set_array_list) == rand_num_events)
