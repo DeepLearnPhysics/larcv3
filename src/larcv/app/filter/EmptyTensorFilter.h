@@ -14,8 +14,8 @@
 #ifndef __EmptyTensorFilter_H__
 #define __EmptyTensorFilter_H__
 
-#include "larcv/core/Processor/ProcessBase.h"
-#include "larcv/core/Processor/ProcessFactory.h"
+#include "core/processor/ProcessBase.h"
+#include "core/processor/ProcessFactory.h"
 namespace larcv {
 
   /**

@@ -2,8 +2,8 @@
 #define __EmptyTensorFilter_CXX__
 
 #include "EmptyTensorFilter.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "core/dataformat/EventVoxel.h"
+// #include "larcv/core/DataFormat/EventVoxel3D.h"
 namespace larcv {
 
   static EmptyTensorFilterProcessFactory __global_EmptyTensorFilterProcessFactory__;
@@ -87,12 +87,14 @@ namespace larcv {
       auto const& event_tensor3d = mgr.get_data<larcv::EventSparseTensor3D>(producer);
       auto const& min_voxel_value = _min_voxel3d_value_v[producer_index];
       auto const& min_voxel_count = _min_voxel3d_count_v[producer_index];
-      size_t ctr = 0;
-      for (auto const& vox : event_tensor3d.as_vector()) {
-        if (vox.value() < min_voxel_value) continue;
-        ctr++;
+      for (auto const& vox_set : event_tensor3d.as_vector()) {
+        size_t ctr = 0;
+        for (auto const& vox : vox_set.as_vector()) {
+          if (vox.value() < min_voxel_value) continue;
+          ctr++;
+        }
+        if (ctr < min_voxel_count) return false;
       }
-      if (ctr < min_voxel_count) return false;
     }
 
     for (size_t producer_index = 0; producer_index < _tensor2d_producer_v.size(); ++producer_index) {
