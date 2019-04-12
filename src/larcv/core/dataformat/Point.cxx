@@ -3,4 +3,8 @@
 
 #include "Point.h"
 
+namespace larcv{
+template class Point<2>;
+template class Point<3>;
+}
 #endif

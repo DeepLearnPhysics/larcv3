@@ -213,8 +213,7 @@ namespace larcv {
 
   // };
 
-template class Point<2>;
-template class Point<3>;
+
 typedef Point<2> Point2D;
 typedef Point<3> Point3D;
 
