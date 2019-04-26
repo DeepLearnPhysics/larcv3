@@ -17,14 +17,14 @@
 #include "core/processor/ProcessBase.h"
 #include "core/processor/ProcessFactory.h"
 #include <map>
-namespace larcv {
+namespace larcv3 {
 
   /**
      \class ProcessBase
      User defined class EventIDFilter ... these comments are used to generate
      doxygen documentation!
   */
-  class EventIDFilter : public larcv::ProcessBase {
+  class EventIDFilter : public larcv3::ProcessBase {
 
   public:
     
@@ -34,18 +34,18 @@ namespace larcv {
     /// Default destructor
     ~EventIDFilter(){}
 
-    void configure(const larcv::PSet&);
+    void configure(const larcv3::PSet&);
 
     void initialize();
 
-    bool process(larcv::IOManager& mgr);
+    bool process(larcv3::IOManager& mgr);
 
     void finalize();
 
   private:
 
 
-    std::map<larcv::EventID,bool> _id_m;
+    std::map<larcv3::EventID,bool> _id_m;
     std::string _ref_producer;
     std::string _ref_type;
     bool _remove_duplicate;
@@ -56,8 +56,8 @@ namespace larcv {
   };
 
   /**
-     \class larcv::EventIDFilterFactory
-     \brief A concrete factory class for larcv::EventIDFilter
+     \class larcv3::EventIDFilterFactory
+     \brief A concrete factory class for larcv3::EventIDFilter
   */
   class EventIDFilterProcessFactory : public ProcessFactoryBase {
   public:

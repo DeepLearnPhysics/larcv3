@@ -16,7 +16,7 @@
 
 #include <iostream>
 
-namespace larcv {
+namespace larcv3 {
   /**
      \class load_pyutil
      User defined class load_pyutil ... these comments are used to generate

@@ -3,7 +3,7 @@
 
 #include "MCSingleParticleFilter.h"
 #include "core/dataformat/EventParticle.h"
-namespace larcv {
+namespace larcv3 {
 
   static MCSingleParticleFilterProcessFactory __global_MCSingleParticleFilterProcessFactory__;
 
@@ -24,7 +24,7 @@ namespace larcv {
 
   bool MCSingleParticleFilter::process(IOManager& mgr)
   {
-    auto const& ev_part = mgr.get_data<larcv::EventParticle>(_part_producer);
+    auto const& ev_part = mgr.get_data<larcv3::EventParticle>(_part_producer);
     size_t part_ctr = 0;
     for(auto const& part : ev_part.as_vector()) {
       

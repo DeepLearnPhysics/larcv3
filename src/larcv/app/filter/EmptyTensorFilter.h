@@ -16,14 +16,14 @@
 
 #include "core/processor/ProcessBase.h"
 #include "core/processor/ProcessFactory.h"
-namespace larcv {
+namespace larcv3 {
 
   /**
      \class ProcessBase
      User defined class EmptyTensorFilter ... these comments are used to generate
      doxygen documentation!
   */
-  class EmptyTensorFilter : public larcv::ProcessBase {
+  class EmptyTensorFilter : public larcv3::ProcessBase {
 
   public:
     
@@ -33,11 +33,11 @@ namespace larcv {
     /// Default destructor
     ~EmptyTensorFilter(){}
 
-    void configure(const larcv::PSet&);
+    void configure(const larcv3::PSet&);
 
     void initialize();
 
-    bool process(larcv::IOManager& mgr);
+    bool process(larcv3::IOManager& mgr);
 
     void finalize();
 
@@ -51,8 +51,8 @@ namespace larcv {
   };
 
   /**
-     \class larcv::EmptyTensorFilterFactory
-     \brief A concrete factory class for larcv::EmptyTensorFilter
+     \class larcv3::EmptyTensorFilterFactory
+     \brief A concrete factory class for larcv3::EmptyTensorFilter
   */
   class EmptyTensorFilterProcessFactory : public ProcessFactoryBase {
   public:

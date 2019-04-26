@@ -3,7 +3,7 @@
  *
  * \ingroup core_DataFormat
  *
- * \brief Class def header for a class larcv::Particle
+ * \brief Class def header for a class larcv3::Particle
  *
  * @author kazuhiro
  */
@@ -22,7 +22,7 @@
 // In hdf5, strings are fixed length so we set the maximum length here:
 #define PARTICLE_PROCESS_STRLEN 64
 
-namespace larcv {
+namespace larcv3 {
 
   /**
      \class Particle
@@ -33,7 +33,7 @@ namespace larcv {
   public:
 
     /// Default constructor
-    Particle(larcv::ShapeType_t shape=larcv::kShapeUnknown)
+    Particle(larcv3::ShapeType_t shape=larcv3::kShapeUnknown)
       : _id         (kINVALID_INDEX)
       , _mcst_index (kINVALID_INDEX)
       , _mct_index  (kINVALID_INDEX)
@@ -82,21 +82,21 @@ namespace larcv {
     inline double       py         () const { return _py;         }
     inline double       pz         () const { return _pz;         }
     inline double       p          () const { return sqrt(pow(_px,2)+pow(_py,2)+pow(_pz,2)); }
-    inline const larcv::Vertex& position() const { return _vtx;   }
+    inline const larcv3::Vertex& position() const { return _vtx;   }
     inline double       x          () const { return _vtx.x();    }
     inline double       y          () const { return _vtx.y();    }
     inline double       z          () const { return _vtx.z();    }
     inline double       t          () const { return _vtx.t();    }
-    inline const larcv::Vertex& end_position () const { return _end_pt;     }
-    inline const larcv::Vertex& first_step   () const { return _first_step; }
-    inline const larcv::Vertex& last_step    () const { return _last_step;  }
+    inline const larcv3::Vertex& end_position () const { return _end_pt;     }
+    inline const larcv3::Vertex& first_step   () const { return _first_step; }
+    inline const larcv3::Vertex& last_step    () const { return _last_step;  }
     inline double       distance_travel () const { return _dist_travel;     }
     inline double       energy_init     () const { return _energy_init;     }
     inline double       energy_deposit  () const { return _energy_deposit;  }
            std::string  creation_process() const;
     
     // const BBox2D& boundingbox_2d(ProjectionID_t id) const;
-    // inline const std::vector<larcv::BBox2D>& boundingbox_2d() const { return _bb2d_v; }
+    // inline const std::vector<larcv3::BBox2D>& boundingbox_2d() const { return _bb2d_v; }
     // inline const BBox3D& boundingbox_3d() const { return _bb3d; }
     
     // inline int num_voxels() const { return _num_voxels; }
@@ -104,7 +104,7 @@ namespace larcv {
     // parent info getter
     inline unsigned int parent_track_id () const { return _parent_trackid; }
     inline int          parent_pdg_code () const { return _parent_pdg;     }
-    inline const larcv::Vertex& parent_position () const { return _parent_vtx;}
+    inline const larcv3::Vertex& parent_position () const { return _parent_vtx;}
     inline double       parent_x        () const { return _parent_vtx.x(); }
     inline double       parent_y        () const { return _parent_vtx.y(); }
     inline double       parent_z        () const { return _parent_vtx.z(); }
@@ -113,7 +113,7 @@ namespace larcv {
     // ancestor info getter
     inline unsigned int ancestor_track_id () const { return _ancestor_trackid; }
     inline int          ancestor_pdg_code () const { return _ancestor_pdg;     }
-    inline const larcv::Vertex& ancestor_position () const { return _ancestor_vtx;}
+    inline const larcv3::Vertex& ancestor_position () const { return _ancestor_vtx;}
     inline double       ancestor_x        () const { return _ancestor_vtx.x(); }
     inline double       ancestor_y        () const { return _ancestor_vtx.y(); }
     inline double       ancestor_z        () const { return _ancestor_vtx.z(); }
@@ -133,19 +133,19 @@ namespace larcv {
     inline void track_id        (unsigned int id )   { _trackid = id;       }
     inline void pdg_code        (int code)           { _pdg = code;         }
     inline void momentum        (double px, double py, double pz) { _px = px; _py = py; _pz = pz; }
-    inline void position        (const larcv::Vertex& vtx) { _vtx = vtx;    }
+    inline void position        (const larcv3::Vertex& vtx) { _vtx = vtx;    }
     inline void position        (double x, double y, double z, double t) { _vtx = Vertex(x,y,z,t); }
-    inline void end_position    (const larcv::Vertex& vtx) { _end_pt = vtx; }
+    inline void end_position    (const larcv3::Vertex& vtx) { _end_pt = vtx; }
     inline void end_position    (double x, double y, double z, double t) { _end_pt = Vertex(x,y,z,t); }
-    inline void first_step      (const larcv::Vertex& vtx) { _first_step = vtx; }
+    inline void first_step      (const larcv3::Vertex& vtx) { _first_step = vtx; }
     inline void first_step      (double x, double y, double z, double t) { _first_step = Vertex(x,y,z,t); }
-    inline void last_step       (const larcv::Vertex& vtx) { _last_step = vtx; }
+    inline void last_step       (const larcv3::Vertex& vtx) { _last_step = vtx; }
     inline void last_step       (double x, double y, double z, double t) { _last_step = Vertex(x,y,z,t); }
     inline void distance_travel ( double dist ) { _dist_travel = dist; }
     inline void energy_init     (double e)           { _energy_init = e;    }
     inline void energy_deposit  (double e)           { _energy_deposit = e; }
            void creation_process (const std::string& proc);
-    // inline void boundingbox_2d(const std::vector<larcv::BBox2D>& bb_v) { _bb2d_v = bb_v; }
+    // inline void boundingbox_2d(const std::vector<larcv3::BBox2D>& bb_v) { _bb2d_v = bb_v; }
     // inline void boundingbox_2d(const BBox2D& bb, ProjectionID_t id) { _bb2d_v.resize(id+1); _bb2d_v[id] = bb; }
     // inline void boundingbox_3d(const BBox3D& bb) { _bb3d = bb; }
     // inline void num_voxels(int count) { _num_voxels = count; }
@@ -153,12 +153,12 @@ namespace larcv {
     // parent info setter
     inline void parent_track_id (unsigned int id )   { _parent_trackid = id;}
     inline void parent_pdg_code (int code)           { _parent_pdg = code;  }
-    inline void parent_position (const larcv::Vertex& vtx) { _parent_vtx = vtx; }
+    inline void parent_position (const larcv3::Vertex& vtx) { _parent_vtx = vtx; }
     inline void parent_position (double x, double y, double z, double t) { _parent_vtx = Vertex(x,y,z,t); }
     // ancestor info setter
     inline void ancestor_track_id (unsigned int id )   { _ancestor_trackid = id;}
     inline void ancestor_pdg_code (int code)           { _ancestor_pdg = code;  }
-    inline void ancestor_position (const larcv::Vertex& vtx) { _ancestor_vtx = vtx; }
+    inline void ancestor_position (const larcv3::Vertex& vtx) { _ancestor_vtx = vtx; }
     inline void ancestor_position (double x, double y, double z, double t) { _ancestor_vtx = Vertex(x,y,z,t); }
 
     std::string dump() const;
@@ -171,30 +171,30 @@ namespace larcv {
       // Get the compound types:
       H5::StrType string_type(0, PARTICLE_PROCESS_STRLEN);
 
-      datatype.insertMember("id",               offsetof(Particle, _id),               larcv::get_datatype<InstanceID_t>());
-      datatype.insertMember("mcst_index",       offsetof(Particle, _mcst_index),       larcv::get_datatype<MCSTIndex_t>());
-      datatype.insertMember("mct_index",        offsetof(Particle, _mct_index),        larcv::get_datatype<MCTIndex_t>());
-      datatype.insertMember("shape",            offsetof(Particle, _shape),            larcv::get_datatype<ShapeType_t>());
-      datatype.insertMember("current_type",     offsetof(Particle, _current_type),     larcv::get_datatype<short>());
-      datatype.insertMember("interaction_type", offsetof(Particle, _interaction_type), larcv::get_datatype<short>());
-      datatype.insertMember("trackid",          offsetof(Particle, _trackid),          larcv::get_datatype<unsigned int>());
-      datatype.insertMember("pdg",              offsetof(Particle, _pdg),              larcv::get_datatype<int>());
-      datatype.insertMember("px",               offsetof(Particle, _px),               larcv::get_datatype<double>());
-      datatype.insertMember("py",               offsetof(Particle, _py),               larcv::get_datatype<double>());
-      datatype.insertMember("pz",               offsetof(Particle, _pz),               larcv::get_datatype<double>());
+      datatype.insertMember("id",               offsetof(Particle, _id),               larcv3::get_datatype<InstanceID_t>());
+      datatype.insertMember("mcst_index",       offsetof(Particle, _mcst_index),       larcv3::get_datatype<MCSTIndex_t>());
+      datatype.insertMember("mct_index",        offsetof(Particle, _mct_index),        larcv3::get_datatype<MCTIndex_t>());
+      datatype.insertMember("shape",            offsetof(Particle, _shape),            larcv3::get_datatype<ShapeType_t>());
+      datatype.insertMember("current_type",     offsetof(Particle, _current_type),     larcv3::get_datatype<short>());
+      datatype.insertMember("interaction_type", offsetof(Particle, _interaction_type), larcv3::get_datatype<short>());
+      datatype.insertMember("trackid",          offsetof(Particle, _trackid),          larcv3::get_datatype<unsigned int>());
+      datatype.insertMember("pdg",              offsetof(Particle, _pdg),              larcv3::get_datatype<int>());
+      datatype.insertMember("px",               offsetof(Particle, _px),               larcv3::get_datatype<double>());
+      datatype.insertMember("py",               offsetof(Particle, _py),               larcv3::get_datatype<double>());
+      datatype.insertMember("pz",               offsetof(Particle, _pz),               larcv3::get_datatype<double>());
       datatype.insertMember("vtx",              offsetof(Particle, _vtx),              Vertex::get_datatype());
       datatype.insertMember("end_pt",           offsetof(Particle, _end_pt),           Vertex::get_datatype());
       datatype.insertMember("first_step",       offsetof(Particle, _first_step),       Vertex::get_datatype());
       datatype.insertMember("last_step",        offsetof(Particle, _last_step),        Vertex::get_datatype());
-      datatype.insertMember("dist_travel",      offsetof(Particle, _dist_travel),      larcv::get_datatype<double>());
-      datatype.insertMember("energy_init",      offsetof(Particle, _energy_init),      larcv::get_datatype<double>());
-      datatype.insertMember("energy_deposit",   offsetof(Particle, _energy_deposit),   larcv::get_datatype<double>());
+      datatype.insertMember("dist_travel",      offsetof(Particle, _dist_travel),      larcv3::get_datatype<double>());
+      datatype.insertMember("energy_init",      offsetof(Particle, _energy_init),      larcv3::get_datatype<double>());
+      datatype.insertMember("energy_deposit",   offsetof(Particle, _energy_deposit),   larcv3::get_datatype<double>());
       datatype.insertMember("process",          offsetof(Particle, _process),          string_type);
-      datatype.insertMember("parent_trackid",   offsetof(Particle, _parent_trackid),   larcv::get_datatype<unsigned int>());
-      datatype.insertMember("parent_pdg",       offsetof(Particle, _parent_pdg),       larcv::get_datatype<int>());
+      datatype.insertMember("parent_trackid",   offsetof(Particle, _parent_trackid),   larcv3::get_datatype<unsigned int>());
+      datatype.insertMember("parent_pdg",       offsetof(Particle, _parent_pdg),       larcv3::get_datatype<int>());
       datatype.insertMember("parent_vtx",       offsetof(Particle, _parent_vtx),       Vertex::get_datatype());
-      datatype.insertMember("ancestor_trackid", offsetof(Particle, _ancestor_trackid), larcv::get_datatype<unsigned int>());
-      datatype.insertMember("ancestor_pdg",     offsetof(Particle, _ancestor_pdg),     larcv::get_datatype<int>());
+      datatype.insertMember("ancestor_trackid", offsetof(Particle, _ancestor_trackid), larcv3::get_datatype<unsigned int>());
+      datatype.insertMember("ancestor_pdg",     offsetof(Particle, _ancestor_pdg),     larcv3::get_datatype<int>());
       datatype.insertMember("ancestor_vtx",     offsetof(Particle, _ancestor_vtx),     Vertex::get_datatype());
 
       return datatype;
@@ -223,8 +223,8 @@ namespace larcv {
     double       _energy_init; ///< initial energy of the particle
     double       _energy_deposit; ///< deposited energy of the particle in the detector
     char         _process[PARTICLE_PROCESS_STRLEN];     ///< string identifier of the particle's creation process from Geant4
-    // std::vector<larcv::BBox2D> _bb2d_v; ///< bounding box of particle's trajectory in 2D projections. index = ProjectionID_t
-    // larcv::BBox3D _bb3d; ///< bounding box of particle's trajectory in 3D
+    // std::vector<larcv3::BBox2D> _bb2d_v; ///< bounding box of particle's trajectory in 2D projections. index = ProjectionID_t
+    // larcv3::BBox3D _bb3d; ///< bounding box of particle's trajectory in 3D
     // int _num_voxels; ///< Number of voxels in the particle's 3D cluster.
 
     unsigned int _parent_trackid; ///< Geant4 track id of the parent particle

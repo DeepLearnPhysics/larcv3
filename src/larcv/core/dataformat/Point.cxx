@@ -3,7 +3,7 @@
 
 #include "Point.h"
 
-namespace larcv{
+namespace larcv3{
 template class Point<2>;
 template class Point<3>;
 }

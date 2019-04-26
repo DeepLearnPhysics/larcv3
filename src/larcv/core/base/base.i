@@ -11,7 +11,7 @@
 #include "core/base/ConfigManager.h"
 #include "core/base/larbys.h"
 
-using namespace larcv;
+using namespace larcv3;
 using namespace std;
 %}
 %include <std_string.i>

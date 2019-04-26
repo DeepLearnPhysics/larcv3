@@ -7,7 +7,7 @@
 #include <array>
 #include <iostream>
 
-namespace larcv {
+namespace larcv3 {
 
   // Data holder
   class CSVData {
@@ -23,7 +23,7 @@ namespace larcv {
     CSVData(const std::string fname, const std::string format)
     { read_file(fname,format); }
     /// alternative ctor
-    CSVData(const std::string& fname, const std::vector<larcv::CSVData::ValueType_t>& format)
+    CSVData(const std::string& fname, const std::vector<larcv3::CSVData::ValueType_t>& format)
     { read_file(fname,format); }
 
     /// Clear
@@ -31,7 +31,7 @@ namespace larcv {
     /// Read in CSV file
     void read_file(const std::string, const std::string);
     /// Read in CSV file
-    void read_file(const std::string, const std::vector<larcv::CSVData::ValueType_t>&);
+    void read_file(const std::string, const std::vector<larcv3::CSVData::ValueType_t>&);
 
     /// A value-type-wise container getter
     template <class T>
@@ -59,7 +59,7 @@ namespace larcv {
 
   private:
     void read_line(const std::string& line_data,
-		   const std::vector<larcv::CSVData::ValueType_t>& value_types,
+		   const std::vector<larcv3::CSVData::ValueType_t>& value_types,
 		   std::vector<void*>& column_ptrs);
 		  
     std::map< std::string, std::vector<std::string> > _data_str;

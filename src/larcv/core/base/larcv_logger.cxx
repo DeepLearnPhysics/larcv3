@@ -4,7 +4,7 @@
 #include "larcv_logger.h"
 #include <mutex>
 std::mutex __logger_mtx;
-namespace larcv {
+namespace larcv3 {
 
   logger *logger::_shared_logger = nullptr;
   

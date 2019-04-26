@@ -6,7 +6,7 @@
 #include "core/base/larbys.h"
 #include "core/base/larcv_logger.h"
 
-namespace larcv {
+namespace larcv3 {
 
   // Interaction ID default constructor
   // Vertex::Vertex()
@@ -34,7 +34,7 @@ namespace larcv {
     // approx();
   }
 
-  const larcv::Point2D Vertex::as_point2d(larcv::PointType_t point_type) const
+  const larcv3::Point2D Vertex::as_point2d(larcv3::PointType_t point_type) const
   { 
     double data[2];
     switch(point_type) {
@@ -51,14 +51,14 @@ namespace larcv {
     return Point2D(data);
   }
 
-  const larcv::Point3D Vertex::as_point3d() const
+  const larcv3::Point3D Vertex::as_point3d() const
   {
     Point3D ret;
     ret.x[0] = _x; ret.x[1] = _y; ret.x[2] = _z;
     return ret;
   }
 
-  void Vertex::as_point(larcv::PointType_t point_type, double * x, double * y, double * z)
+  void Vertex::as_point(larcv3::PointType_t point_type, double * x, double * y, double * z)
   {
     switch(point_type) {
       case kPointXY:

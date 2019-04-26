@@ -17,7 +17,7 @@
 #include <iostream>
 #include "DataFormatTypes.h"
 
-namespace larcv {
+namespace larcv3 {
 // class IOManager;
 class DataProductFactory;
 /**
@@ -102,7 +102,7 @@ class EventID {
   size_t _subrun;  ///< LArSoft sub-run number
   size_t _event;   ///< LArSoft event number
 };
-}  // namespace larcv
+}  // namespace larcv3
 
 #endif
 /** @} */  // end of doxygen group

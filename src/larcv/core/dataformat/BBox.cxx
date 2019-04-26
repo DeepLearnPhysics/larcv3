@@ -7,7 +7,7 @@
 #include <sstream>
 #include "core/base/larbys.h"
 
-namespace larcv {
+namespace larcv3 {
 
   template<size_t dimension>
   BBox<dimension>::BBox(Point<dimension> min, Point<dimension> max, ProjectionID_t id )

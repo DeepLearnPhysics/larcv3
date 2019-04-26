@@ -1,14 +1,14 @@
 /**
  * \file larcv_logger.h
  *
- * \ingroup LArCV
+ * \ingroup LArCV3
  * 
  * \brief logger utility class definition header file.
  *
  * @author Kazu - Nevis 2015
  */
 
-/** \addtogroup LArCV
+/** \addtogroup LArCV3
 
     @{*/
 
@@ -23,7 +23,7 @@
 #include <vector>
 #include <exception>
 
-namespace larcv {
+namespace larcv3 {
 
   /**
     \class RandomGaus

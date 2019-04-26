@@ -3,7 +3,7 @@
  *
  * \ingroup core_Base
  * 
- * \brief Class def header for exception classes for larcv framework
+ * \brief Class def header for exception classes for larcv3 framework
  *
  * @author kazuhiro tmw
  */
@@ -17,7 +17,7 @@
 #include <iostream>
 #include <exception>
 
-namespace larcv {
+namespace larcv3 {
 
   /**
      \class larbys

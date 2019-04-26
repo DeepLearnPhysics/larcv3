@@ -6,7 +6,7 @@
  *
  * \ingroup core_Base
  * 
- * \brief Class def header for a class larcv::Watch
+ * \brief Class def header for a class larcv3::Watch
  *
  * @author kazuhiro
  */
@@ -18,10 +18,10 @@
 #include <sys/time.h>
 #include <time.h>
 
-namespace larcv {
+namespace larcv3 {
 
   /**
-     \class larcv::Watch
+     \class larcv3::Watch
      @brief a _very_ simple stopwatch class for simple time measurement
    */
   class Watch {

@@ -3,7 +3,7 @@
  *
  * \ingroup core_DataFormat
  *
- * \brief Class def header for a class larcv::ImageMeta
+ * \brief Class def header for a class larcv3::ImageMeta
  *
  * @author kazuhiro
  * @author cadams
@@ -26,7 +26,7 @@
 #include "DataFormatTypes.h"
 #include "core/base/larbys.h"
 
-namespace larcv {
+namespace larcv3 {
 
 template<size_t dimension>
 class ImageMeta {
@@ -169,11 +169,11 @@ class ImageMeta {
       hsize_t array_dimensions[1];
       array_dimensions[0] = dimension;
 
-      H5::ArrayType double_type(larcv::get_datatype<double>(), 1, array_dimensions);
-      H5::ArrayType size_t_type(larcv::get_datatype<size_t>(), 1, array_dimensions);
+      H5::ArrayType double_type(larcv3::get_datatype<double>(), 1, array_dimensions);
+      H5::ArrayType size_t_type(larcv3::get_datatype<size_t>(), 1, array_dimensions);
 
-      datatype.insertMember("valid",            offsetof(ImageMeta, _valid),            larcv::get_datatype<bool>());
-      datatype.insertMember("projection_id",    offsetof(ImageMeta, _projection_id),    larcv::get_datatype<size_t>());
+      datatype.insertMember("valid",            offsetof(ImageMeta, _valid),            larcv3::get_datatype<bool>());
+      datatype.insertMember("projection_id",    offsetof(ImageMeta, _projection_id),    larcv3::get_datatype<size_t>());
       datatype.insertMember("image_sizes",      offsetof(ImageMeta, _image_sizes),      double_type);
       datatype.insertMember("number_of_voxels", offsetof(ImageMeta, _number_of_voxels), size_t_type);
       datatype.insertMember("origin",           offsetof(ImageMeta, _origin),           double_type);
@@ -202,7 +202,7 @@ typedef ImageMeta<2> ImageMeta2D;
 typedef ImageMeta<3> ImageMeta3D;
 
 
-}  // namespace larcv
+}  // namespace larcv3
 
 #endif
 /** @} */  // end of doxygen group

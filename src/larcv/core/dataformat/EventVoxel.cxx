@@ -1,16 +1,16 @@
-#ifndef __LARCV_EVENTVOXEL_CXX
-#define __LARCV_EVENTVOXEL_CXX
+#ifndef __LARCV3_EVENTVOXEL_CXX
+#define __LARCV3_EVENTVOXEL_CXX
 
 #include "EventVoxel.h"
 
 
-namespace larcv {
+namespace larcv3 {
 
-  /// Global larcv::EventClusterPixel2DFactory to register EventSparseCluster
+  /// Global larcv3::EventClusterPixel2DFactory to register EventSparseCluster
   static EventSparseCluster2DFactory __global_EventSparseCluster2DFactory__;
   static EventSparseCluster3DFactory __global_EventSparseCluster3DFactory__;
 
-  /// Global larcv::EventSparseTensorFactory to register EventSparseTensor
+  /// Global larcv3::EventSparseTensorFactory to register EventSparseTensor
   static EventSparseTensor2DFactory __global_EventSparseTensor2DFactory__;
   static EventSparseTensor3DFactory __global_EventSparseTensor3DFactory__;
 
@@ -18,7 +18,7 @@ namespace larcv {
   // EventSparseCluster
   //
   template<size_t dimension> 
-  const larcv::SparseCluster<dimension>&
+  const larcv3::SparseCluster<dimension>&
   EventSparseCluster<dimension>::sparse_cluster(const ProjectionID_t id) const
   {
     if(id >= _cluster_v.size()) {
@@ -29,7 +29,7 @@ namespace larcv {
   }
 
   template<size_t dimension> 
-  void EventSparseCluster<dimension>::emplace(larcv::SparseCluster<dimension>&& clusters)
+  void EventSparseCluster<dimension>::emplace(larcv3::SparseCluster<dimension>&& clusters)
   {
     if(_cluster_v.size() <= clusters.meta().id())
       _cluster_v.resize(clusters.meta().id()+1);
@@ -37,7 +37,7 @@ namespace larcv {
   }
 
   template<size_t dimension> 
-  void EventSparseCluster<dimension>::set(const larcv::SparseCluster<dimension>& clusters) 
+  void EventSparseCluster<dimension>::set(const larcv3::SparseCluster<dimension>& clusters) 
   {
     if(_cluster_v.size() <= clusters.meta().id())
       _cluster_v.resize(clusters.meta().id()+1);
@@ -46,15 +46,15 @@ namespace larcv {
   }
   
   template<size_t dimension> 
-  void EventSparseCluster<dimension>::emplace(larcv::VoxelSetArray&& clusters, larcv::ImageMeta<dimension>&& meta)
+  void EventSparseCluster<dimension>::emplace(larcv3::VoxelSetArray&& clusters, larcv3::ImageMeta<dimension>&& meta)
   {
-    larcv::SparseCluster<dimension> source(std::move(clusters),std::move(meta));
+    larcv3::SparseCluster<dimension> source(std::move(clusters),std::move(meta));
     // source.set();
     emplace(std::move(source));
   }
 
   // template<size_t dimension> 
-  // void EventSparseCluster<dimension>::set(const larcv::VoxelSetArray& clusters, const larcv::ImageMeta<dimension>& meta)
+  // void EventSparseCluster<dimension>::set(const larcv3::VoxelSetArray& clusters, const larcv3::ImageMeta<dimension>& meta)
   // {
 
   //   if(_cluster_v.size() <= clusters.meta().id())
@@ -62,7 +62,7 @@ namespace larcv {
   //   _cluster_v[clusters.meta().id()] = clusters;
     
 
-  //   larcv::SparseCluster source;
+  //   larcv3::SparseCluster source;
   //   source.emplace(std::move(clusters), meta);
   //   // source.meta(meta);
   //   emplace(std::move(source));
@@ -72,7 +72,7 @@ namespace larcv {
   // EventSparseTensor
   //
   template<size_t dimension> 
-  const larcv::SparseTensor<dimension>&
+  const larcv3::SparseTensor<dimension>&
   EventSparseTensor<dimension>::sparse_tensor(const ProjectionID_t id) const
   {
     if(id >= _tensor_v.size()) {
@@ -83,7 +83,7 @@ namespace larcv {
   }
 
   template<size_t dimension> 
-  void EventSparseTensor<dimension>::emplace(larcv::SparseTensor<dimension>&& voxels)
+  void EventSparseTensor<dimension>::emplace(larcv3::SparseTensor<dimension>&& voxels)
   {
     if(_tensor_v.size() <= voxels.meta().id())
       _tensor_v.resize(voxels.meta().id()+1);
@@ -92,7 +92,7 @@ namespace larcv {
   }
 
   template<size_t dimension> 
-  void EventSparseTensor<dimension>::set(const larcv::SparseTensor<dimension>& voxels) 
+  void EventSparseTensor<dimension>::set(const larcv3::SparseTensor<dimension>& voxels) 
   {
     if(_tensor_v.size() <= voxels.meta().id())
       _tensor_v.resize(voxels.meta().id()+1);
@@ -100,16 +100,16 @@ namespace larcv {
   }
   
   template<size_t dimension> 
-  void EventSparseTensor<dimension>::emplace(larcv::VoxelSet&& voxels, larcv::ImageMeta<dimension>&& meta)
+  void EventSparseTensor<dimension>::emplace(larcv3::VoxelSet&& voxels, larcv3::ImageMeta<dimension>&& meta)
   {
-    larcv::SparseTensor<dimension> source(std::move(voxels),std::move(meta));
+    larcv3::SparseTensor<dimension> source(std::move(voxels),std::move(meta));
     emplace(std::move(source));
   }
 
   template<size_t dimension> 
-  void EventSparseTensor<dimension>::set(const larcv::VoxelSet& voxels, const larcv::ImageMeta<dimension>& meta)
+  void EventSparseTensor<dimension>::set(const larcv3::VoxelSet& voxels, const larcv3::ImageMeta<dimension>& meta)
   {
-    larcv::SparseTensor<dimension> source;
+    larcv3::SparseTensor<dimension> source;
     source.set(voxels, meta);
     // source.meta(meta);
     emplace(std::move(source));
@@ -155,7 +155,7 @@ namespace larcv {
     
     // We unpack the voxels of the sparse tensor into one long list:
     /// TODO
-    std::vector<std::vector<larcv::VoxelSet> > _voxels;
+    std::vector<std::vector<larcv3::VoxelSet> > _voxels;
 
     _voxels.resize(_tensor_v.size());
     for (size_t projection_id = 0; projection_id < _tensor_v.size(); projection_id ++){
@@ -184,7 +184,7 @@ namespace larcv {
       _helper.initialize_for_read(group);
     }
 
-    std::vector<std::vector<larcv::VoxelSet> > _voxels;
+    std::vector<std::vector<larcv3::VoxelSet> > _voxels;
     _helper.read_voxels(group, entry, _voxels);
 
 
@@ -238,7 +238,7 @@ namespace larcv {
     
     // We unpack the voxels of the sparse tensor into one long list:
     /// TODO
-    std::vector<std::vector<larcv::VoxelSet> > _voxels;
+    std::vector<std::vector<larcv3::VoxelSet> > _voxels;
 
     _voxels.resize(_cluster_v.size());
     for (size_t projection_id = 0; projection_id < _cluster_v.size(); projection_id ++){
@@ -270,7 +270,7 @@ namespace larcv {
       _helper.initialize_for_read(group);
     }
 
-    std::vector<std::vector<larcv::VoxelSet> > _voxels;
+    std::vector<std::vector<larcv3::VoxelSet> > _voxels;
     _helper.read_voxels(group, entry, _voxels);
 
 

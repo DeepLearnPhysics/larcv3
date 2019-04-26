@@ -2,7 +2,7 @@
 #define EVENTIMAGE2D_CXX
 
 #include "EventImage2D.h"
-// #include "larcv/core/Base/larbys.h"
+// #include "larcv3/core/Base/larbys.h"
 
 #define IMAGE_EXTENTS_CHUNK_SIZE 1
 #define IMAGE_DATA_CHUNK_SIZE 25000000
@@ -10,9 +10,9 @@
 #define IMAGE_META_CHUNK_SIZE 1000
 #define IMAGE_COMPRESSION_LEVEL 1
 
-namespace larcv {
+namespace larcv3 {
 
-  /// Global larcv::SBClusterFactory to register ClusterAlgoFactory
+  /// Global larcv3::SBClusterFactory to register ClusterAlgoFactory
   static EventImage2DFactory __global_EventImage2DFactory__;
 
   void EventImage2D::clear()
@@ -38,7 +38,7 @@ namespace larcv {
     _image_v.back().index((ImageIndex_t)(_image_v.size()-1));
   }
 
-  void EventImage2D::emplace(std::vector<larcv::Image2D>&& image_v)
+  void EventImage2D::emplace(std::vector<larcv3::Image2D>&& image_v)
   {
     _image_v = std::move(image_v);
     for(size_t i=0; i<_image_v.size(); ++i) _image_v[i].index((ImageIndex_t)i);
@@ -71,7 +71,7 @@ namespace larcv {
 
 
     // Get the data type for extents:
-    H5::DataType extents_datatype = larcv::get_datatype<Extents_t>();
+    H5::DataType extents_datatype = larcv3::get_datatype<Extents_t>();
 
     // Get the starting size (0) and dimensions (unlimited)
     hsize_t extents_starting_dim[] = {0};
@@ -96,7 +96,7 @@ namespace larcv {
     /////////////////////////////////////////////////////////
 
     // Get the data type for extents:
-    H5::DataType image_extents_datatype = larcv::get_datatype<IDExtents_t>();
+    H5::DataType image_extents_datatype = larcv3::get_datatype<IDExtents_t>();
 
     // Get the starting size (0) and dimensions (unlimited)
     hsize_t image_extents_starting_dim[] = {0};
@@ -122,7 +122,7 @@ namespace larcv {
     /////////////////////////////////////////////////////////
 
     // Get the data type for extents:
-    H5::DataType image_meta_datatype = larcv::ImageMeta2D::get_datatype();
+    H5::DataType image_meta_datatype = larcv3::ImageMeta2D::get_datatype();
 
     // Get the starting size (0) and dimensions (unlimited)
     hsize_t image_meta_starting_dim[] = {0};
@@ -151,7 +151,7 @@ namespace larcv {
     // The image ID is store in the image_extents table, and the meta in the image_meta table
 
     // Get the data type for extents:
-    H5::DataType image_datatype = larcv::get_datatype<float>();
+    H5::DataType image_datatype = larcv3::get_datatype<float>();
 
 
     // Get the starting size (0) and dimensions (unlimited)
@@ -286,7 +286,7 @@ namespace larcv {
 
 
     // Write the new data
-    extents_dataset.write(&(next_extents), larcv::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
+    extents_dataset.write(&(next_extents), larcv3::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
 
 
 
@@ -321,7 +321,7 @@ namespace larcv {
 
 
     // Write the new data
-    image_extents_dataset.write(&(image_extents[0]), larcv::get_datatype<IDExtents_t>(), 
+    image_extents_dataset.write(&(image_extents[0]), larcv3::get_datatype<IDExtents_t>(), 
       image_extents_memspace, image_extents_dataspace);
 
 
@@ -356,7 +356,7 @@ namespace larcv {
 
 
     // Write the new data
-    image_meta_dataset.write(&(image_meta[0]), larcv::ImageMeta2D::get_datatype(), 
+    image_meta_dataset.write(&(image_meta[0]), larcv3::ImageMeta2D::get_datatype(), 
       image_meta_memspace, image_meta_dataspace);
 
 
@@ -410,7 +410,7 @@ namespace larcv {
 
 
         // Write the new data
-        images_dataset.write(&(_image_v.at(image_id).as_vector()[0]), larcv::get_datatype<float>(), images_memspace, images_dataspace);
+        images_dataset.write(&(_image_v.at(image_id).as_vector()[0]), larcv3::get_datatype<float>(), images_memspace, images_dataspace);
 
         starting_index += new_images_slab_dims[0];
     }
@@ -464,7 +464,7 @@ namespace larcv {
 
     Extents_t input_extents;
     // Write the new data
-    extents_dataset.read(&(input_extents), larcv::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
+    extents_dataset.read(&(input_extents), larcv3::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
 
     /////////////////////////////////////////////////////////
     // Step 2: Get the image_extents information
@@ -502,7 +502,7 @@ namespace larcv {
     // Reserve space for reading in image_extents:
     image_extents.resize(input_extents.n);
 
-    image_extents_dataset.read(&(image_extents[0]), larcv::get_datatype<IDExtents_t>(), 
+    image_extents_dataset.read(&(image_extents[0]), larcv3::get_datatype<IDExtents_t>(), 
       image_extents_memspace, image_extents_dataspace);
 
 
@@ -536,7 +536,7 @@ namespace larcv {
     // Reserve space for reading in image_meta:
     image_meta.resize(input_extents.n);
 
-    image_meta_dataset.read(&(image_meta[0]), larcv::ImageMeta2D::get_datatype(), 
+    image_meta_dataset.read(&(image_meta[0]), larcv3::ImageMeta2D::get_datatype(), 
       image_meta_memspace, image_meta_dataspace);
 
       
@@ -585,7 +585,7 @@ namespace larcv {
       H5::DataSpace images_memspace(1, images_slab_dims);
 
 
-      images_dataset.read(&(_image_v[image_index]._img[0]), larcv::get_datatype<float>(), images_memspace, images_dataspace);
+      images_dataset.read(&(_image_v[image_index]._img[0]), larcv3::get_datatype<float>(), images_memspace, images_dataspace);
 
 
 

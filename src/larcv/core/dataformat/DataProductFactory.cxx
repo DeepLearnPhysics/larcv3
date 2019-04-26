@@ -3,11 +3,11 @@
 
 #include "DataProductFactory.h"
 
-larcv::DataProductFactory* larcv::DataProductFactory::_me = nullptr;
+larcv3::DataProductFactory* larcv3::DataProductFactory::_me = nullptr;
 
-namespace larcv {
+namespace larcv3 {
   
-  void DataProductFactory::add_factory(std::string type, larcv::DataProductFactoryBase* factory)
+  void DataProductFactory::add_factory(std::string type, larcv3::DataProductFactoryBase* factory)
   {
     if(type.empty()) {
       LARCV_CRITICAL() << "Attempted to register a data product type with empty name!" << std::endl

@@ -3,7 +3,7 @@
 
 #include "PSet.h"
 #include <sstream>
-namespace larcv {
+namespace larcv3 {
 
   PSet::PSet(const std::string name,
 	     const std::string data)
@@ -366,7 +366,7 @@ namespace larcv {
   }
 
   template<>
-  PSet PSet::get<larcv::PSet>(const std::string& key) const
+  PSet PSet::get<larcv3::PSet>(const std::string& key) const
   { return this->get_pset(key); }
 
 }

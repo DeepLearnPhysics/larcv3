@@ -21,7 +21,7 @@
 #include "EventBase.h"
 #include "DataFormatTypes.h"
 #include <sstream>
-namespace larcv {
+namespace larcv3 {
 
   class EventBase;
   /**
@@ -40,10 +40,10 @@ namespace larcv {
 
   /**
      \class ClusterAlgoFactory
-     \brief Factory class for instantiating event product instance by larcv::IOManager
+     \brief Factory class for instantiating event product instance by larcv3::IOManager
      This factory class can instantiate a specified product instance w/ provided producer name. \n
      The actual factory core (to which each product class must register creation factory instance) is \n
-     a static std::map. Use static method to get a static instance (larcv::DataProductFactory::get) \n
+     a static std::map. Use static method to get a static instance (larcv3::DataProductFactory::get) \n
      to access a factory.
   */
   class DataProductFactory : public larcv_base  {
@@ -59,7 +59,7 @@ namespace larcv {
     { if(!_me) _me = new DataProductFactory; return *_me; }
     
     /// Factory registration method (should be called by global factory instance in algorithm header)
-    void add_factory(std::string type, larcv::DataProductFactoryBase* factory);
+    void add_factory(std::string type, larcv3::DataProductFactoryBase* factory);
 
     /// Factory creation method (should åbe called by clients, possibly you!)
     inline EventBase* create(const std::string& type, const std::string& producer) {
@@ -80,7 +80,7 @@ namespace larcv {
 
   private:
     /// Factory container
-    std::map<std::string,larcv::DataProductFactoryBase*> _factory_map;
+    std::map<std::string,larcv3::DataProductFactoryBase*> _factory_map;
     /// Unique product type ID
     std::vector<std::string> _id_to_type;
     /// Static self

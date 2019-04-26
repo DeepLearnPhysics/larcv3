@@ -16,7 +16,7 @@
 
 #include "core/processor/ProcessBase.h"
 #include "core/processor/ProcessFactory.h"
-namespace larcv {
+namespace larcv3 {
 
   /**
      \class ProcessBase
@@ -33,11 +33,11 @@ namespace larcv {
     /// Default destructor
     ~QSumFilter(){}
 
-    void configure(const larcv::PSet&);
+    void configure(const larcv3::PSet&);
 
     void initialize();
 
-    bool process(larcv::IOManager& mgr);
+    bool process(larcv3::IOManager& mgr);
 
     void finalize();
 
@@ -51,8 +51,8 @@ namespace larcv {
   };
 
   /**
-     \class larcv::QSumFilterFactory
-     \brief A concrete factory class for larcv::QSumFilter
+     \class larcv3::QSumFilterFactory
+     \brief A concrete factory class for larcv3::QSumFilter
   */
   class QSumFilterProcessFactory : public ProcessFactoryBase {
   public:

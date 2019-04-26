@@ -3,7 +3,7 @@
  *
  * \ingroup core_DataFormat
  * 
- * \brief Class def header for an image2D data holder larcv::Image2D
+ * \brief Class def header for an image2D data holder larcv3::Image2D
  *
  * @author tmw, kazu, cadams
  */
@@ -12,14 +12,14 @@
 
     @{*/
 
-#ifndef __LARCV_IMAGE_H__
-#define __LARCV_IMAGE_H__
+#ifndef __LARCV3_IMAGE_H__
+#define __LARCV3_IMAGE_H__
 
 #include <vector>
 #include <cstdlib>
 #include "ImageMeta.h"
 
-namespace larcv {
+namespace larcv3 {
 
   /**
     \TODO Need to  work on implementations for overlay, resize, crop
@@ -47,12 +47,12 @@ namespace larcv {
     /// dtor
     virtual ~Image2D(){}
 
-    /// Reset contents w/ new larcv::ImageMeta
+    /// Reset contents w/ new larcv3::ImageMeta
     void reset(const ImageMeta2D&);
     /// Various modes used to combine pixels
     enum CompressionModes_t { kSum, kAverage, kMaxPool, kOverWrite};
 
-    /// Return image2D index ID number (should be unique within larcv::EventImage2D)
+    /// Return image2D index ID number (should be unique within larcv3::EventImage2D)
     ImageIndex_t index() const { return _id; }
     /// Index setter
     void index(ImageIndex_t n) { _id = n; }
@@ -62,7 +62,7 @@ namespace larcv {
     float pixel(const std::vector<size_t> & coords) const;
     /// Specific pixel value getter
     float pixel(size_t index) const;
-    /// larcv::ImageMeta const reference getter
+    /// larcv3::ImageMeta const reference getter
     const ImageMeta2D& meta() const { return _meta; }
 
     /// Mem-copy: insert num_pixel many data from src 1D array @ data index starting from (row,col)
@@ -77,7 +77,7 @@ namespace larcv {
     void reverse_copy(const std::vector<size_t> & coords, const std::vector<float>& src, size_t nskip=0, size_t num_pixel=0);
     /// Same as copy, but perform in reverse direction of rows (useful when src is not in the same order)
     void reverse_copy(const std::vector<size_t> & coords, const std::vector<short>& src, size_t nskip=0, size_t num_pixel=0);
-    // /// Crop specified region via crop_meta to generate a new larcv::Image2D
+    // /// Crop specified region via crop_meta to generate a new larcv3::Image2D
     // Image2D crop(const ImageMeta& crop_meta) const;
     /// 1D const reference array getter
     const std::vector<float>& as_vector() const 
@@ -123,7 +123,7 @@ namespace larcv {
 
     Image2D& operator +=(const std::vector<float>& rhs);
     Image2D& operator -=(const std::vector<float>& rhs);
-    Image2D& operator +=(const larcv::Image2D& rhs);
+    Image2D& operator +=(const larcv3::Image2D& rhs);
 
 
 
@@ -132,7 +132,7 @@ namespace larcv {
     /// Element-wise multiplication w/ 1D array data
     void eltwise(const std::vector<float>& arr,bool allow_longer=false);
     
-    // The following functions were deprecated for larcv3.
+    // The following functions were deprecated for larcv33.
     // Implementations are here in the source code until a later cleanup, in case they
     // need to be un deprecated:
 

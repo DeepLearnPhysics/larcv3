@@ -3,7 +3,7 @@
  *
  * \ingroup core_DataFormat
  *
- * \brief Class def header for a class larcv::IOManager
+ * \brief Class def header for a class larcv3::IOManager
  *
  * @author drinkingkazu
  * @author coreyjadams
@@ -28,14 +28,14 @@
 #include "EventID.h"
 
 //#include "ProductMap.h"
-namespace larcv {
+namespace larcv3 {
 
 
   /**
     \class IOManager
-    \brief LArCV file IO hanlder class: it can read/write LArCV file.
+    \brief LArCV3 file IO hanlder class: it can read/write LArCV3 file.
   */
-  class IOManager : public larcv::larcv_base {
+  class IOManager : public larcv3::larcv_base {
 
   public:
     /// Three IO modes: read, write, or read-and-write
@@ -180,7 +180,7 @@ namespace larcv {
     // List of total entries in input files?
     std::vector<size_t>             _in_entries_v;
     // List of producer/product pairs in the input files
-    std::map<larcv::ProducerName_t, larcv::ProducerID_t> _in_key_list;
+    std::map<larcv3::ProducerName_t, larcv3::ProducerID_t> _in_key_list;
 
     // Event id information:
     EventID   _event_id;
@@ -188,9 +188,9 @@ namespace larcv {
     EventID   _last_event_id;
 
     // Keeping track of products and producers:
-    std::map<larcv::ProducerName_t, larcv::ProducerID_t> _key_list;
+    std::map<larcv3::ProducerName_t, larcv3::ProducerID_t> _key_list;
     size_t                          _product_ctr;
-    std::vector<larcv::EventBase*>  _product_ptr_v;
+    std::vector<larcv3::EventBase*>  _product_ptr_v;
     std::vector<std::string>        _product_type_v;
     std::vector<std::string>        _producer_name_v;
 

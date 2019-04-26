@@ -6,31 +6,31 @@
 #define PARTICLE_EXTENTS_CHUNK_SIZE 100
 #define PARTICLE_DATA_CHUNK_SIZE 500
 
-namespace larcv{
-  /// Global larcv::SBClusterFactory to register ClusterAlgoFactory
+namespace larcv3{
+  /// Global larcv3::SBClusterFactory to register ClusterAlgoFactory
   static EventParticleFactory __global_EventParticleFactory__;
 
 
-  void EventParticle::set(const std::vector<larcv::Particle>& part_v)
+  void EventParticle::set(const std::vector<larcv3::Particle>& part_v)
   {
     _part_v = part_v;
     for(size_t i=0; i<_part_v.size(); ++i)
       _part_v[i].id(i);
   }
 
-  void EventParticle::append(const larcv::Particle& part)
+  void EventParticle::append(const larcv3::Particle& part)
   {
     _part_v.push_back(part);
     _part_v.back().id(_part_v.size()-1);
   }
 
-  void EventParticle::emplace_back(larcv::Particle&& part)
+  void EventParticle::emplace_back(larcv3::Particle&& part)
   {
     _part_v.emplace_back(std::move(part));
     _part_v.back().id(_part_v.size()-1);
   }
 
-  void EventParticle::emplace(std::vector<larcv::Particle>&& part_v)
+  void EventParticle::emplace(std::vector<larcv3::Particle>&& part_v)
   {
     _part_v = std::move(part_v);
     for(size_t i=0; i<_part_v.size(); ++i)
@@ -113,7 +113,7 @@ namespace larcv{
 
 
     // Write the new data
-    particles_dataset.write(&(_part_v[0]), larcv::Particle::get_datatype(), particles_memspace, particles_dataspace);
+    particles_dataset.write(&(_part_v[0]), larcv3::Particle::get_datatype(), particles_memspace, particles_dataspace);
 
 
 
@@ -157,7 +157,7 @@ namespace larcv{
 
 
     // Write the new data
-    extents_dataset.write(&(next_extents), larcv::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
+    extents_dataset.write(&(next_extents), larcv3::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
 
 
     /////////////////////////////////////////////////////////
@@ -190,7 +190,7 @@ namespace larcv{
 
 
     // Get the data type for extents:
-    H5::DataType extents_datatype = larcv::get_datatype<Extents_t>();
+    H5::DataType extents_datatype = larcv3::get_datatype<Extents_t>();
 
 
     // Get the starting size (0) and dimensions (unlimited)
@@ -219,7 +219,7 @@ namespace larcv{
 
 
     // Get the data type for extents:
-    H5::DataType particle_datatype = larcv::Particle::get_datatype();
+    H5::DataType particle_datatype = larcv3::Particle::get_datatype();
 
 
     // Get the starting size (0) and dimensions (unlimited)
@@ -292,7 +292,7 @@ namespace larcv{
 
     Extents_t input_extents;
     // Write the new data
-    extents_dataset.read(&(input_extents), larcv::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
+    extents_dataset.read(&(input_extents), larcv3::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
 
     // std::cout << " Extents start: " << input_extents.first << ", end: "
     //           << input_extents.first + input_extents.n << std::endl;
@@ -327,7 +327,7 @@ namespace larcv{
     // Reserve space for reading in particles:
     _part_v.resize(input_extents.n);
 
-    particles_dataset.read(&(_part_v[0]), larcv::Particle::get_datatype(), particles_memspace, particles_dataspace);
+    particles_dataset.read(&(_part_v[0]), larcv3::Particle::get_datatype(), particles_memspace, particles_dataspace);
 
     
 
@@ -336,6 +336,6 @@ namespace larcv{
 
 // #endif // swig
 
-} // larcv
+} // larcv3
 
 #endif

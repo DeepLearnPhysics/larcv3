@@ -4,7 +4,7 @@
 #include "LArCVBaseUtilFunc.h"
 #include <sstream>
 #include <fstream>
-namespace larcv {
+namespace larcv3 {
 
   std::string ConfigFile2String(std::string fname)
   {

@@ -1,11 +1,11 @@
-#ifndef __LARCAFFE_IMAGEMETA_CXX__
-#define __LARCAFFE_IMAGEMETA_CXX__
+#ifndef __LARCV3_IMAGEMETA_CXX__
+#define __LARCV3_IMAGEMETA_CXX__
 
 #include "ImageMeta.h"
 #include "core/base/larbys.h"
 #include "core/base/larcv_logger.h"
 #include <sstream>
-namespace larcv {
+namespace larcv3 {
 
 /// Default constructor: Does nothing, valid defaults to false
 template<size_t dimension>
@@ -561,6 +561,6 @@ ImageMeta ImageMeta::inclusive(const ImageMeta& meta) const
 
 */
 
-}  // namespace larcv
+}  // namespace larcv3
 
 #endif

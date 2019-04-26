@@ -3,7 +3,7 @@
  *
  * \ingroup core_Base
  * 
- * \brief Class definition file of larcv::larcv_base
+ * \brief Class definition file of larcv3::larcv_base
  *
  * @author Kazu - Nevis 2015
  */
@@ -18,7 +18,7 @@
 #include <vector>
 #include "larcv_logger.h"
 
-namespace larcv {
+namespace larcv3 {
     
   /**
     \class larcv_base
@@ -31,7 +31,7 @@ namespace larcv {
     /// Default constructor
     larcv_base(const std::string logger_name="larcv_base")
       : _logger(nullptr)
-    { _logger = &(::larcv::logger::get(logger_name)); }
+    { _logger = &(::larcv3::logger::get(logger_name)); }
     
     /// Default copy constructor
     larcv_base(const larcv_base &original) : _logger(original._logger) {}
@@ -40,11 +40,11 @@ namespace larcv {
     virtual ~larcv_base(){};
     
     /// Logger getter
-    inline const larcv::logger& logger() const
+    inline const larcv3::logger& logger() const
     { return *_logger; }
     
     /// Verbosity level
-    void set_verbosity(::larcv::msg::Level_t level)
+    void set_verbosity(::larcv3::msg::Level_t level)
     { _logger->set(level); }
 
     /// Name getter, defined in a logger instance attribute
@@ -53,7 +53,7 @@ namespace larcv {
     
   private:
     
-    larcv::logger *_logger;   ///< logger
+    larcv3::logger *_logger;   ///< logger
     
   };
 }

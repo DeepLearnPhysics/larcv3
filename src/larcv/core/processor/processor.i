@@ -6,7 +6,7 @@
 #include "core/processor/ProcessDriver.h"
 #include "core/processor/ProcessFactory.h"
 
-using namespace larcv;
+using namespace larcv3;
 %}
 
 %include "core/processor/ProcessorTypes.h"

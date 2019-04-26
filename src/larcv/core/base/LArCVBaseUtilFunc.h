@@ -17,13 +17,13 @@
 
 #include "PSet.h"
 
-namespace larcv {
+namespace larcv3 {
 
-  /// Given a configuration string, format to create larcv::PSet
+  /// Given a configuration string, format to create larcv3::PSet
   //std::string FormatPSetString(std::string fname);
-  /// Given a configuration file (full path), read & parse contents to create larcv::PSet
+  /// Given a configuration file (full path), read & parse contents to create larcv3::PSet
   std::string ConfigFile2String(std::string fname);
-  /// Given a configuration file (full path), create and return larcv::PSet
+  /// Given a configuration file (full path), create and return larcv3::PSet
   PSet CreatePSetFromFile(std::string fname,std::string cfg_name="cfg");
 
 }

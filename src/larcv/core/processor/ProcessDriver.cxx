@@ -6,7 +6,7 @@
 #include <sstream>
 #include "ProcessFactory.h"
 #include "core/base/LArCVBaseUtilFunc.h"
-namespace larcv {
+namespace larcv3 {
 
 ProcessDriver::ProcessDriver(std::string name)
     : larcv_base(name),
@@ -69,7 +69,7 @@ std::vector<std::string> ProcessDriver::process_names() const {
   return res;
 }
 
-const std::map<std::string, larcv::ProcessID_t>& ProcessDriver::process_map()
+const std::map<std::string, larcv3::ProcessID_t>& ProcessDriver::process_map()
     const {
   LARCV_DEBUG() << "Called" << std::endl;
   return _proc_m;
@@ -108,7 +108,7 @@ void ProcessDriver::configure(const std::string config_file) {
                      << main_cfg.dump() << std::endl;
     throw larbys();
   }
-  auto const cfg = main_cfg.get<larcv::PSet>(name());
+  auto const cfg = main_cfg.get<larcv3::PSet>(name());
   configure(cfg);
 }
 
@@ -119,9 +119,9 @@ void ProcessDriver::configure(const PSet& cfg) {
   LARCV_INFO() << "Retrieving IO config" << std::endl;
   PSet io_config("Empty");
   if (cfg.contains_pset("IOManager"))
-    io_config = cfg.get<larcv::PSet>("IOManager");
+    io_config = cfg.get<larcv3::PSet>("IOManager");
   else if (cfg.contains_pset(std::string(name() + "IOManager")))
-    io_config = cfg.get<larcv::PSet>(name() + "IOManager");
+    io_config = cfg.get<larcv3::PSet>(name() + "IOManager");
   else {
     LARCV_CRITICAL() << "IOManager config not found!" << std::endl
                      << cfg.dump() << std::endl;
@@ -135,7 +135,7 @@ void ProcessDriver::configure(const PSet& cfg) {
                      << cfg.dump() << std::endl;
     throw larbys();
   }
-  auto const proc_config = cfg.get<larcv::PSet>("ProcessList");
+  auto const proc_config = cfg.get<larcv3::PSet>("ProcessList");
 
   // Prepare IO manager
   LARCV_INFO() << "Configuring IO" << std::endl;
@@ -144,7 +144,7 @@ void ProcessDriver::configure(const PSet& cfg) {
   LARCV_INFO() << "Retrieving self (ProcessDriver) config" << std::endl;
   set_verbosity(
       (msg::Level_t)(cfg.get<unsigned short>("Verbosity", logger().level())));
-  larcv::logger::get_shared().set(logger().level());
+  larcv3::logger::get_shared().set(logger().level());
   _enable_filter = cfg.get<bool>("EnableFilter", false);
   auto random_access_bool = cfg.get<bool>("RandomAccess");
   if (!random_access_bool)
@@ -481,6 +481,6 @@ size_t ProcessDriver::get_tree_index(size_t entry) const {
   return 0;
 }
 
-}  // namespace larcv
+}  // namespace larcv3
 
 #endif

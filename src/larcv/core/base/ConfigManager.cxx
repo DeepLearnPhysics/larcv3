@@ -3,7 +3,7 @@
 
 #include "ConfigManager.h"
 #include "LArCVBaseUtilFunc.h"
-namespace larcv {
+namespace larcv3 {
 
   ConfigManager* ConfigManager::_me = nullptr;
 

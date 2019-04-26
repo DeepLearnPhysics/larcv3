@@ -16,7 +16,7 @@
 
 #include <iostream>
 #include <cmath>
-namespace larcv {
+namespace larcv3 {
 
     template<size_t dimension>
     class Point {

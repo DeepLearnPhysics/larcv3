@@ -12,7 +12,7 @@
 #define VOXEL_MAX_PROJECTION_IDS  512
 #define VOXEL_MAX_CLUSTER_IDS     2048
 
-namespace larcv {
+namespace larcv3 {
 
 
   template<size_t dimension>
@@ -51,7 +51,7 @@ namespace larcv {
 
 
         // Get the data type for extents:
-        H5::DataType image_meta_datatype = larcv::ImageMeta2D::get_datatype();
+        H5::DataType image_meta_datatype = larcv3::ImageMeta2D::get_datatype();
 
         // Get the starting size (0) and dimensions (unlimited)
         hsize_t image_meta_starting_dim[] = {0};
@@ -95,7 +95,7 @@ namespace larcv {
 
   // Write a set of voxels, packaged in the way proscribed by meta, to the group:
   template<size_t dimension>
-  void VoxelSerializationHelper<dimension>::write_voxels(H5::Group * group, const std::vector<std::vector<larcv::VoxelSet> > & voxels){
+  void VoxelSerializationHelper<dimension>::write_voxels(H5::Group * group, const std::vector<std::vector<larcv3::VoxelSet> > & voxels){
     // TODO
 
     if (! _initialized){
@@ -210,7 +210,7 @@ namespace larcv {
 
 
     // Write the new data
-    extents_dataset.write(&(next_extents), larcv::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
+    extents_dataset.write(&(next_extents), larcv3::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
 
 
 
@@ -245,7 +245,7 @@ namespace larcv {
 
 
     // Write the new data
-    voxel_extents_dataset.write(&(voxel_extents[0]), larcv::get_datatype<IDExtents_t>(), voxel_extents_memspace, voxel_extents_dataspace);
+    voxel_extents_dataset.write(&(voxel_extents[0]), larcv3::get_datatype<IDExtents_t>(), voxel_extents_memspace, voxel_extents_dataspace);
 
 
 
@@ -298,7 +298,7 @@ namespace larcv {
 
 
         // Write the new data
-        voxels_dataset.write(&(voxels.at(projection_id).at(cluster_id).as_vector()[0]), larcv::Voxel::get_datatype(), voxels_memspace, voxels_dataspace);
+        voxels_dataset.write(&(voxels.at(projection_id).at(cluster_id).as_vector()[0]), larcv3::Voxel::get_datatype(), voxels_memspace, voxels_dataspace);
 
         starting_index += new_voxels_slab_dims[0];
       }
@@ -311,7 +311,7 @@ namespace larcv {
 
   // Read an entry of voxels from a group
   template<size_t dimension>
-  void VoxelSerializationHelper<dimension>::read_voxels(H5::Group * group, size_t entry, std::vector<std::vector<larcv::VoxelSet> > & voxels){
+  void VoxelSerializationHelper<dimension>::read_voxels(H5::Group * group, size_t entry, std::vector<std::vector<larcv3::VoxelSet> > & voxels){
     // TODO
 
 
@@ -357,7 +357,7 @@ namespace larcv {
 
     Extents_t input_extents;
     // Write the new data
-    extents_dataset.read(&(input_extents), larcv::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
+    extents_dataset.read(&(input_extents), larcv3::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
 
     /////////////////////////////////////////////////////////
     // Step 2: Get the voxel_extents information
@@ -395,7 +395,7 @@ namespace larcv {
     // Reserve space for reading in voxel_extents:
     voxel_extents.resize(input_extents.n);
 
-    voxel_extents_dataset.read(&(voxel_extents[0]), larcv::get_datatype<IDExtents_t>(), voxel_extents_memspace, voxel_extents_dataspace);
+    voxel_extents_dataset.read(&(voxel_extents[0]), larcv3::get_datatype<IDExtents_t>(), voxel_extents_memspace, voxel_extents_dataspace);
 
     // std::cout << "voxel_extents.size(): " << voxel_extents.size() << std::endl;
     
@@ -448,12 +448,12 @@ namespace larcv {
       // This implementation is not ideal.
       // It copies from disk, then is copying into a vector
 
-      std::vector<larcv::Voxel> temp_voxel_vector;
+      std::vector<larcv3::Voxel> temp_voxel_vector;
       temp_voxel_vector.resize(voxels_slab_dims[0]);
 
       // Reserve space for reading in voxels:
 
-      voxels_dataset.read(&(temp_voxel_vector[0]), larcv::Voxel::get_datatype(), voxels_memspace, voxels_dataspace);
+      voxels_dataset.read(&(temp_voxel_vector[0]), larcv3::Voxel::get_datatype(), voxels_memspace, voxels_dataspace);
 
       // std::cout << "temp_voxel_vector.size(): " << temp_voxel_vector.size() << std::endl;
 
@@ -624,7 +624,7 @@ namespace larcv {
 
 
     // Get the data type for extents:
-    H5::DataType extents_datatype = larcv::get_datatype<Extents_t>();
+    H5::DataType extents_datatype = larcv3::get_datatype<Extents_t>();
 
 
     // Get the starting size (0) and dimensions (unlimited)
@@ -651,7 +651,7 @@ namespace larcv {
     /////////////////////////////////////////////////////////
 
     // Get the data type for extents:
-    H5::DataType id_extents_datatype = larcv::get_datatype<IDExtents_t>();
+    H5::DataType id_extents_datatype = larcv3::get_datatype<IDExtents_t>();
 
 
     // Get the starting size (0) and dimensions (unlimited)
@@ -679,7 +679,7 @@ namespace larcv {
     /////////////////////////////////////////////////////////
 
     // Get the data type for extents:
-    H5::DataType voxel_datatype = larcv::Voxel::get_datatype();
+    H5::DataType voxel_datatype = larcv3::Voxel::get_datatype();
 
 
     // Get the starting size (0) and dimensions (unlimited)

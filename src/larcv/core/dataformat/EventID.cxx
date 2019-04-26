@@ -4,7 +4,7 @@
 #include "EventID.h"
 #include <sstream>
 #include <iomanip>
-namespace larcv {
+namespace larcv3 {
 
   void EventID::clear()
   { _run = _subrun = _event = kINVALID_SIZE; }

@@ -7,7 +7,7 @@
 #include "core/base/larcv_logger.h"
 #include "core/base/larbys.h"
 
-namespace larcv {
+namespace larcv3 {
 
   // const BBox2D& Particle::boundingbox_2d(ProjectionID_t id) const
   // {

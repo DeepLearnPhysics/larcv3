@@ -8,7 +8,7 @@
 #include "numpy/arrayobject.h"
 #include <cassert>
 
-namespace larcv {
+namespace larcv3 {
 
 void SetPyUtil() {
   static bool once = false;
@@ -99,7 +99,7 @@ PyObject *as_ndarray(const SparseTensor2D& data, bool clear_mem) {
 //   PyArray_Descr *descr = PyArray_DescrFromType(dtype);
 //   npy_intp dims[2];
 //   if (PyArray_AsCArray(&pyarray, (void **)&carray, dims, 2, descr) < 0) {
-//     logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+//     logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
 // 			       "ERROR: cannot convert pyarray to 2D C-array");
 //     throw larbys();
 //   }
@@ -110,12 +110,12 @@ PyObject *as_ndarray(const SparseTensor2D& data, bool clear_mem) {
 //     auto select_pyptr = (PyArrayObject *)(select);
 //     // Check dimension size is 1:
 //     if (PyArray_NDIM(select_pyptr) != 1){
-//       logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+//       logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
 // 				 "ERROR: select array must be 1D!");
 //       throw larbys();
 //     }
 //     if((int)npts < PyArray_SIZE(select_pyptr)) {
-//       logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+//       logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
 // 				 "ERROR: select array size exceeds max data length!");
 //       throw larbys();
 //     }
@@ -126,7 +126,7 @@ PyObject *as_ndarray(const SparseTensor2D& data, bool clear_mem) {
 //   }
 
 //   if(npts > data.size() || (dims[1] != 1 && dims[1] != 3 && dims[1] != 4)) {
-//     logger::get("PyUtil").send(larcv::msg::kCRITICAL,__FUNCTION__,__LINE__,
+//     logger::get("PyUtil").send(larcv3::msg::kCRITICAL,__FUNCTION__,__LINE__,
 // 			       "ERROR: dimension mismatch");
 //     throw larbys();
 //   }
@@ -166,7 +166,7 @@ PyObject *as_ndarray(const SparseTensor2D& data, bool clear_mem) {
 //   PyArray_Descr *descr = PyArray_DescrFromType(dtype);
 //   npy_intp dims[2];
 //   if (PyArray_AsCArray(&pyarray, (void **)&carray, dims, 2, descr) < 0) {
-//     logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+//     logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
 // 			       "ERROR: cannot convert pyarray to 2D C-array");
 //     throw larbys();
 //   }
@@ -177,12 +177,12 @@ PyObject *as_ndarray(const SparseTensor2D& data, bool clear_mem) {
 //     auto select_pyptr = (PyArrayObject *)(select);
 //     // Check dimension size is 1:
 //     if (PyArray_NDIM(select_pyptr) != 1){
-//       logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+//       logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
 // 				 "ERROR: select array must be 1D!");
 //       throw larbys();
 //     }
 //     if((int)npts < PyArray_SIZE(select_pyptr)) {
-//       logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+//       logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
 // 				 "ERROR: select array size exceeds max data length!");
 //       throw larbys();
 //     }
@@ -193,7 +193,7 @@ PyObject *as_ndarray(const SparseTensor2D& data, bool clear_mem) {
 //   }
 
 //   if(npts > data.size() || dims[1] != 3 ) {
-//     logger::get("PyUtil").send(larcv::msg::kCRITICAL,__FUNCTION__,__LINE__,
+//     logger::get("PyUtil").send(larcv3::msg::kCRITICAL,__FUNCTION__,__LINE__,
 // 			       "ERROR: dimension mismatch");
 //     throw larbys();
 //   }
@@ -224,7 +224,7 @@ PyObject *as_ndarray(const SparseTensor2D& data, bool clear_mem) {
 //   PyArray_Descr *descr = PyArray_DescrFromType(dtype);
 //   npy_intp dims[2];
 //   if (PyArray_AsCArray(&pyarray, (void **)&carray, dims, 2, descr) < 0) {
-//     logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+//     logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
 // 			       "ERROR: cannot convert pyarray to 2D C-array");
 //     throw larbys();
 //   }
@@ -235,12 +235,12 @@ PyObject *as_ndarray(const SparseTensor2D& data, bool clear_mem) {
 //     auto select_pyptr = (PyArrayObject *)(select);
 //     // Check dimension size is 1:
 //     if (PyArray_NDIM(select_pyptr) != 1){
-//       logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+//       logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
 // 				 "ERROR: select array must be 1D!");
 //       throw larbys();
 //     }
 //     if((int)npts < PyArray_SIZE(select_pyptr)) {
-//       logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+//       logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
 // 				 "ERROR: select array size exceeds max data length!");
 //       throw larbys();
 //     }
@@ -251,7 +251,7 @@ PyObject *as_ndarray(const SparseTensor2D& data, bool clear_mem) {
 //   }
 
 //   if(npts > data.size() || (dims[1] != 1 && dims[1] != 2 && dims[1] != 3)) {
-//     logger::get("PyUtil").send(larcv::msg::kCRITICAL,__FUNCTION__,__LINE__,
+//     logger::get("PyUtil").send(larcv3::msg::kCRITICAL,__FUNCTION__,__LINE__,
 // 			       "ERROR: dimension mismatch");
 //     throw larbys();
 //   }
@@ -290,7 +290,7 @@ PyObject *as_ndarray(const SparseTensor2D& data, bool clear_mem) {
 //   PyArray_Descr *descr = PyArray_DescrFromType(dtype);
 //   npy_intp dims[2];
 //   if (PyArray_AsCArray(&pyarray, (void **)&carray, dims, 2, descr) < 0) {
-//     logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+//     logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
 // 			       "ERROR: cannot convert pyarray to 2D C-array");
 //     throw larbys();
 //   }
@@ -301,12 +301,12 @@ PyObject *as_ndarray(const SparseTensor2D& data, bool clear_mem) {
 //     auto select_pyptr = (PyArrayObject *)(select);
 //     // Check dimension size is 1:
 //     if (PyArray_NDIM(select_pyptr) != 1){
-//       logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+//       logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
 // 				 "ERROR: select array must be 1D!");
 //       throw larbys();
 //     }
 //     if((int)npts < PyArray_SIZE(select_pyptr)) {
-//       logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+//       logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
 // 				 "ERROR: select array size exceeds max data length!");
 //       throw larbys();
 //     }
@@ -317,7 +317,7 @@ PyObject *as_ndarray(const SparseTensor2D& data, bool clear_mem) {
 //   }
 
 //   if(npts > data.size() || dims[1] != 2 ) {
-//     logger::get("PyUtil").send(larcv::msg::kCRITICAL,__FUNCTION__,__LINE__,
+//     logger::get("PyUtil").send(larcv3::msg::kCRITICAL,__FUNCTION__,__LINE__,
 // 			       "ERROR: dimension mismatch");
 //     throw larbys();
 //   }
@@ -531,7 +531,7 @@ void copy_array(PyObject *arrayin, const std::vector<float> &cvec) {
 //   return PyArray_SimpleNewFromData(2, dim_data, NPY_FLOAT, (char *)&(vec[0]));
 // }
 
-larcv::Image2D as_image2d_meta(PyObject *pyarray, ImageMeta2D meta) {
+larcv3::Image2D as_image2d_meta(PyObject *pyarray, ImageMeta2D meta) {
   SetPyUtil();
   float **carray;
   // Create C arrays from numpy objects:
@@ -539,7 +539,7 @@ larcv::Image2D as_image2d_meta(PyObject *pyarray, ImageMeta2D meta) {
   PyArray_Descr *descr = PyArray_DescrFromType(dtype);
   npy_intp dims[2];
   if (PyArray_AsCArray(&pyarray, (void **)&carray, dims, 2, descr) < 0) {
-    logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+    logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
                                "ERROR: cannot convert to 2D C-array");
     throw larbys();
   }
@@ -556,7 +556,7 @@ larcv::Image2D as_image2d_meta(PyObject *pyarray, ImageMeta2D meta) {
   return res;
 }
 
-larcv::Image2D as_image2d(PyObject *pyarray) {
+larcv3::Image2D as_image2d(PyObject *pyarray) {
   SetPyUtil();
   float **carray;
   // Create C arrays from numpy objects:
@@ -564,9 +564,9 @@ larcv::Image2D as_image2d(PyObject *pyarray) {
   PyArray_Descr *descr = PyArray_DescrFromType(dtype);
   npy_intp dims[2];
   if (PyArray_AsCArray(&pyarray, (void **)&carray, dims, 2, descr) < 0) {
-    logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__, std::to_string(dims[0]) + "\n");
-    logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__, std::to_string(dims[1]) + "\n");
-    logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+    logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__, std::to_string(dims[0]) + "\n");
+    logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__, std::to_string(dims[1]) + "\n");
+    logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
                                "ERROR: cannot convert to 2D C-array\n");
     throw larbys();
   }
@@ -586,14 +586,14 @@ larcv::Image2D as_image2d(PyObject *pyarray) {
   // ImageMeta2D meta(0., 0., (double)(dims[0]), (double)(dims[1]),
   //                (size_t)(dims[0]),
   //                (size_t)(dims[1]),
-  //                larcv::kINVALID_PROJECTIONID);
+  //                larcv3::kINVALID_PROJECTIONID);
 
   Image2D res(std::move(meta), std::move(res_data));
   return res;
 }
 
 
-// larcv::VoxelSet as_tensor2d(PyObject * values_in, PyObject * indexes_in) {
+// larcv3::VoxelSet as_tensor2d(PyObject * values_in, PyObject * indexes_in) {
 //   SetPyUtil();
 
 //   // Cast to pyarrayobject
@@ -611,7 +611,7 @@ larcv::Image2D as_image2d(PyObject *pyarray) {
 
 
 //   if (PyArray_NDIM(values) != 1 || PyArray_NDIM(indexes) != 1){
-//     LARCV_CRITICAL() << "Must feed flattened values and indexes to larcv.as_tensor2d!" << std::endl;
+//     LARCV_CRITICAL() << "Must feed flattened values and indexes to larcv3.as_tensor2d!" << std::endl;
 //     throw larbys();
 //   }
 
@@ -635,7 +635,7 @@ larcv::Image2D as_image2d(PyObject *pyarray) {
 
 //   npy_intp dims_values[1];
 //   if (PyArray_AsCArray(&values_in, (void *)&carray_values, dims_values, 1, descr_values) < 0) {
-//     logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+//     logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
 //                                "ERROR: cannot convert values to 1D C-array\n");
 //     throw larbys();
 //   }
@@ -645,7 +645,7 @@ larcv::Image2D as_image2d(PyObject *pyarray) {
 
 //   npy_intp dims_indexes[1];
 //   if (PyArray_AsCArray(&indexes_in, (void *)&carray_indexes, dims_indexes, 1, descr_indexes) < 0) {
-//     logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+//     logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
 //                                "ERROR: cannot convert indexes to 1D C-array\n");
 //     throw larbys();
 //   }

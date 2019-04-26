@@ -5,7 +5,7 @@
 
 #ifndef SWIG
 
-namespace larcv{
+namespace larcv3{
 
   template<>
   H5::DataType get_datatype<int>()                {return H5::PredType::NATIVE_INT;}

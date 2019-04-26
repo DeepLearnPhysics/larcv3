@@ -4,7 +4,7 @@
 #include "RandomGaus.h"
 #include "core/base/larbys.h"
 
-namespace larcv {
+namespace larcv3 {
 
   RandomGaus::RandomGaus(double mean, double sigma, size_t pool_size)
     : _pool(pool_size)
@@ -20,7 +20,7 @@ namespace larcv {
   
   void RandomGaus::start_filling() {
     if(_th.joinable()) return;
-    std::thread t(&larcv::RandomGaus::_fill_,this);
+    std::thread t(&larcv3::RandomGaus::_fill_,this);
     _th = std::move(t);
   }
 

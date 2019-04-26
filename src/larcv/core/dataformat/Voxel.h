@@ -3,7 +3,7 @@
  *
  * \ingroup core_DataFormat
  *
- * \brief Class def header for a class larcv::Voxel
+ * \brief Class def header for a class larcv3::Voxel
  *
  * @author kazuhiro
  */
@@ -17,7 +17,7 @@
 #include "DataFormatTypes.h"
 #include "ImageMeta.h"
 
-namespace larcv {
+namespace larcv3 {
 
   /**
      \class Voxel
@@ -135,7 +135,7 @@ namespace larcv {
   };
 
 
-  // static const larcv::Voxel kINVALID_VOXEL(kINVALID_VOXELID,0.);
+  // static const larcv3::Voxel kINVALID_VOXEL(kINVALID_VOXELID,0.);
 
 
   /**
@@ -155,7 +155,7 @@ namespace larcv {
     /// InstanceID_t getter
     inline InstanceID_t id() const { return _id; }
     /// Access as a raw vector
-    inline const std::vector<larcv::Voxel>& as_vector() const { return _voxel_v; }
+    inline const std::vector<larcv3::Voxel>& as_vector() const { return _voxel_v; }
     /// Returns a const reference to a voxel with specified id. if not present, invalid voxel is returned.
     const Voxel& find(VoxelID_t id) const;
     /// Sum of contained voxel values
@@ -211,7 +211,7 @@ namespace larcv {
     /// Instance ID
     InstanceID_t _id;
     /// Ordered sparse vector of voxels
-    std::vector<larcv::Voxel> _voxel_v;
+    std::vector<larcv3::Voxel> _voxel_v;
   };
 
   /**
@@ -231,9 +231,9 @@ namespace larcv {
     /// Get # of VoxelSet
     inline size_t size() const { return _voxel_vv.size(); }
     /// Access specific VoxelSet
-    const larcv::VoxelSet& voxel_set(InstanceID_t id) const;
+    const larcv3::VoxelSet& voxel_set(InstanceID_t id) const;
     /// Access all VoxelSet as a vector
-    inline const std::vector<larcv::VoxelSet>& as_vector() const
+    inline const std::vector<larcv3::VoxelSet>& as_vector() const
     { return _voxel_vv; }
     float sum() const;
     /// Mean of contained voxel values
@@ -261,21 +261,21 @@ namespace larcv {
     inline void resize(const size_t num)
     { _voxel_vv.resize(num); for(size_t i=0; i<num; ++i) _voxel_vv[i].id(i); }
     /// Access non-const reference of a specific VoxelSet 
-    larcv::VoxelSet& writeable_voxel_set(const InstanceID_t id);
+    larcv3::VoxelSet& writeable_voxel_set(const InstanceID_t id);
     /// Move an arrray of VoxelSet. Each element's InstanceID_t gets updated
-    void emplace(std::vector<larcv::VoxelSet>&& voxel_vv);
+    void emplace(std::vector<larcv3::VoxelSet>&& voxel_vv);
     /// Set an array of VoxelSet. Each element's InstanceID_t gets updated
-    // void insert(const std::vector<larcv::VoxelSet>& voxel_vv);
+    // void insert(const std::vector<larcv3::VoxelSet>& voxel_vv);
     /// Move a VoxelSet into a collection. The InstanceID_t is respected.
-    void emplace(larcv::VoxelSet&& voxel_v);
+    void emplace(larcv3::VoxelSet&& voxel_v);
     /// Set a VoxelSet into a collection. The InstanceID_t is respected.
-    void insert(const larcv::VoxelSet& voxel_v);
+    void insert(const larcv3::VoxelSet& voxel_v);
     /// Mover
-    void move(larcv::VoxelSetArray&& orig)
+    void move(larcv3::VoxelSetArray&& orig)
     { _voxel_vv = std::move(orig._voxel_vv); }
 
   private:
-    std::vector<larcv::VoxelSet> _voxel_vv;
+    std::vector<larcv3::VoxelSet> _voxel_vv;
   };
 
   /**
@@ -298,13 +298,13 @@ namespace larcv {
     // Read-access
     //
     /// Access ImageMeta of specific projection
-    inline const larcv::ImageMeta<dimension>& meta() const { return _meta; }
+    inline const larcv3::ImageMeta<dimension>& meta() const { return _meta; }
 
     //
     // Write-access
     //
     /// Create & add/set a single voxel
-    void emplace(const larcv::Voxel & vox, const bool add=true);
+    void emplace(const larcv3::Voxel & vox, const bool add=true);
 
     /// Emplace the whole voxel set w/ meta
     inline void emplace(VoxelSet&& vs, const ImageMeta<dimension>& meta)
@@ -318,10 +318,10 @@ namespace larcv {
     inline void clear_data() { VoxelSet::clear_data(); _meta = ImageMeta<dimension>(); }
 
     /// Meta setter
-    void meta(const larcv::ImageMeta<dimension>& meta);
+    void meta(const larcv3::ImageMeta<dimension>& meta);
 
   private:
-    larcv::ImageMeta<dimension> _meta;
+    larcv3::ImageMeta<dimension> _meta;
     
   };
 
@@ -343,7 +343,7 @@ namespace larcv {
     // Read-access
     //
     /// Access ImageMeta of specific projection
-    inline const larcv::ImageMeta<dimension>& meta() const { return _meta; }
+    inline const larcv3::ImageMeta<dimension>& meta() const { return _meta; }
 
     //
     // Write-access
@@ -357,10 +357,10 @@ namespace larcv {
     // inline void emplace(const VoxelSetArray& vsa, const ImageMeta& meta)
     // { *((VoxelSetArray*)this) = vsa; this->meta(meta); }
     /// Meta setter
-    void meta(const larcv::ImageMeta<dimension>& meta);
+    void meta(const larcv3::ImageMeta<dimension>& meta);
 
   private:
-    larcv::ImageMeta<dimension> _meta;
+    larcv3::ImageMeta<dimension> _meta;
   };  
 
 

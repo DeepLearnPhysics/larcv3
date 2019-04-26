@@ -3,7 +3,7 @@
 
 #include "load_pyutil.h"
 
-namespace larcv{
+namespace larcv3{
 
   load_pyutil::load_pyutil(){}
 

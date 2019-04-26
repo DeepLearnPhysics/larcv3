@@ -3,7 +3,7 @@
  *
  * \ingroup core_Base
  * 
- * \brief Class def header for a class larcv::ConfigManager
+ * \brief Class def header for a class larcv3::ConfigManager
  *
  * @author drinkingkazu
  */
@@ -20,12 +20,12 @@
 #include "PSet.h"
 #include <set>
 
-namespace larcv {
+namespace larcv3 {
   /**
      \class ConfigManager
      \brief Utility class to register a set of configurations
      Provides also a shared instance through which registered configurations can be shared beyond a single owner.\n
-     Using larcv::PSet, the uniqueness of configuration parameters is guaranteed (no worry to "overwrite")\n
+     Using larcv3::PSet, the uniqueness of configuration parameters is guaranteed (no worry to "overwrite")\n
   */
   class ConfigManager : public larcv_base {
     

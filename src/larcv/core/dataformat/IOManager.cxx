@@ -11,7 +11,7 @@
 
 #include <mutex>
 std::mutex __ioman_mtx;
-namespace larcv {
+namespace larcv3 {
 
 IOManager::IOManager(IOMode_t mode, std::string name)
     : larcv_base(name),
@@ -57,7 +57,7 @@ IOManager::IOManager(std::string config_file, std::string name)
                      << main_cfg.dump() << std::endl;
     throw larbys();
   }
-  auto const cfg = main_cfg.get<larcv::PSet>(name);
+  auto const cfg = main_cfg.get<larcv3::PSet>(name);
   reset();
   configure(cfg);
 }
@@ -166,7 +166,7 @@ bool IOManager::initialize() {
     cparms.setChunk(1, chunk_dims);
 
     _out_event_id_ds = _out_file.createDataSet(
-        "Events/event_id", larcv::EventID::get_datatype(), dataspace, cparms);
+        "Events/event_id", larcv3::EventID::get_datatype(), dataspace, cparms);
   }
 
   if (_io_mode != kWRITE) {
@@ -310,7 +310,7 @@ void IOManager::prepare_input() {
       H5::Group events = fin->openGroup("/Events");
     } catch (...) {
       LARCV_CRITICAL() << "File " << fname
-                       << " does not appear to be a larcv file, exiting."
+                       << " does not appear to be a larcv3 file, exiting."
                        << std::endl;
       throw larbys();
     }
@@ -343,7 +343,7 @@ void IOManager::prepare_input() {
       char c[2] = "_";
       if (obj_name.find_first_of(c) > obj_name.size() ||
           obj_name.find_first_of(c) == obj_name.find_last_of(c)) {
-        std::cout << "Skipping " << obj_name << " ... (not LArCV Group)"
+        std::cout << "Skipping " << obj_name << " ... (not LArCV3 Group)"
                      << std::endl;
         continue;
       }
@@ -357,7 +357,7 @@ void IOManager::prepare_input() {
           obj_name.find_last_of(c) - obj_name.find_first_of(c) - 1));
 
       if (suffix != "group") {
-        LARCV_CRITICAL() << "Skipping " << obj_name << " ... (not LArCV Group)"
+        LARCV_CRITICAL() << "Skipping " << obj_name << " ... (not LArCV3 Group)"
                          << std::endl;
         throw larbys();
         // continue;
@@ -815,5 +815,5 @@ void IOManager::reset() {
   _store_id_bool.clear();
 }
 
-}  // namespace larcv
+}  // namespace larcv3
 #endif

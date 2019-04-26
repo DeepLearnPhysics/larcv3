@@ -15,10 +15,10 @@ typedef _object PyObject;
 
 #include "core/dataformat/Image2D.h"
 #include "core/dataformat/Voxel.h"
-// #include "larcv/core/dataformat/Voxel2D.h"
-// #include "larcv/core/dataformat/Voxel3DMeta.h"
-// #include "larcv/core/dataformat/EventVoxel3D.h"
-namespace larcv {
+// #include "larcv3/core/dataformat/Voxel2D.h"
+// #include "larcv3/core/dataformat/Voxel3DMeta.h"
+// #include "larcv3/core/dataformat/EventVoxel3D.h"
+namespace larcv3 {
 /// Utility function: call one-time-only numpy module initialization (you don't
 /// have to call)
 void SetPyUtil();
@@ -33,21 +33,21 @@ PyObject* as_ndarray(const std::vector< long long          > &data);
 PyObject* as_ndarray(const std::vector< unsigned long long > &data);
 PyObject* as_ndarray(const std::vector< float              > &data);
 PyObject* as_ndarray(const std::vector< double             > &data);
-/// larcv::Image2D to numpy array converter
-PyObject* as_ndarray(const larcv::Image2D &img);
-// /// larcv::Image2D to numpy array converter
+/// larcv3::Image2D to numpy array converter
+PyObject* as_ndarray(const larcv3::Image2D &img);
+// /// larcv3::Image2D to numpy array converter
 // PyObject* as_caffe_ndarray(const Image2D &img);
-// /// larcv::VoxelSet to numpy (dense array) array converter
+// /// larcv3::VoxelSet to numpy (dense array) array converter
 // PyObject* as_ndarray(const SparseTensor3D &data, bool clear_mem=false);
-// /// larcv::VoxelSet to numpy (dense array) array converter
+// /// larcv3::VoxelSet to numpy (dense array) array converter
 // PyObject* as_ndarray(const SparseTensor2D &data, bool clear_mem=false);
-// /// larcv::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/3/4) converter
+// /// larcv3::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/3/4) converter
 // void fill_3d_pcloud(const SparseTensor3D &data, PyObject* pyarray, PyObject* select=nullptr);
-// /// larcv::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/3/4) converter
+// /// larcv3::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/3/4) converter
 // void fill_3d_voxels(const SparseTensor3D &data, PyObject* pyarray, PyObject* select=nullptr);
-//  /// larcv::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/2/3) converter
+//  /// larcv3::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/2/3) converter
 // void fill_2d_pcloud(const SparseTensor2D &data, PyObject* pyarray, PyObject* select=nullptr);
-// /// larcv::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/2/3) converter
+// /// larcv3::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/2/3) converter
 // void fill_2d_voxels(const SparseTensor2D &data, PyObject* pyarray, PyObject* select=nullptr);
 // /// copy array
 // template <class T>
@@ -75,9 +75,9 @@ PyObject* as_ndarray(const larcv::Image2D &img);
 // //void copy_array(PyObject *arrayin, const std::vector<float> &cvec);
 // // void copy_array(PyObject *arrayin);//, const std::vector<float>& vec);
 
-larcv::Image2D as_image2d_meta(PyObject *, larcv::ImageMeta2D meta);
+larcv3::Image2D as_image2d_meta(PyObject *, larcv3::ImageMeta2D meta);
 
-larcv::Image2D as_image2d(PyObject *);
+larcv3::Image2D as_image2d(PyObject *);
 
 // VoxelSet as_tensor2d(PyObject * values, PyObject * indexes);
 

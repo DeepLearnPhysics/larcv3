@@ -16,14 +16,14 @@
 
 #include "core/processor/ProcessBase.h"
 #include "core/processor/ProcessFactory.h"
-namespace larcv {
+namespace larcv3 {
 
   /**
      \class ProcessBase
      User defined class EmptyImageFilter ... these comments are used to generate
      doxygen documentation!
   */
-  class EmptyImageFilter : public larcv::ProcessBase {
+  class EmptyImageFilter : public larcv3::ProcessBase {
 
   public:
     
@@ -33,11 +33,11 @@ namespace larcv {
     /// Default destructor
     ~EmptyImageFilter(){}
 
-    void configure(const larcv::PSet&);
+    void configure(const larcv3::PSet&);
 
     void initialize();
 
-    bool process(larcv::IOManager& mgr);
+    bool process(larcv3::IOManager& mgr);
 
     void finalize();
 
@@ -47,8 +47,8 @@ namespace larcv {
   };
 
   /**
-     \class larcv::EmptyImageFilterFactory
-     \brief A concrete factory class for larcv::EmptyImageFilter
+     \class larcv3::EmptyImageFilterFactory
+     \brief A concrete factory class for larcv3::EmptyImageFilter
   */
   class EmptyImageFilterProcessFactory : public ProcessFactoryBase {
   public:

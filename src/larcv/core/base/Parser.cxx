@@ -3,7 +3,7 @@
 
 #include "LArCVBaseUtilFunc.h"
 #include "larbys.h"
-namespace larcv {
+namespace larcv3 {
   namespace parser{
     
     template<> std::string FromString( const std::string& value)

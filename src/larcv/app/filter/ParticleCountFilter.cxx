@@ -4,7 +4,7 @@
 #include "ParticleCountFilter.h"
 #include "core/dataformat/EventParticle.h"
 
-namespace larcv {
+namespace larcv3 {
 
   static ParticleCountFilterProcessFactory __global_ParticleCountFilterProcessFactory__;
 
@@ -24,7 +24,7 @@ namespace larcv {
 
   bool ParticleCountFilter::process(IOManager& mgr)
   {
-    auto const& part_v = mgr.get_data<larcv::EventParticle>(_part_producer).as_vector();
+    auto const& part_v = mgr.get_data<larcv3::EventParticle>(_part_producer).as_vector();
     if(part_v.size() >= _part_count_v.size()) {
       _part_count_v.resize(part_v.size()+1,0);
     }

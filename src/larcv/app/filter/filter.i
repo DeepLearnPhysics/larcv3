@@ -8,7 +8,7 @@
 #include "app/filter/ParticleCountFilter.h"
 #include "app/filter/QSumFilter.h"
 
-using namespace larcv;
+using namespace larcv3;
 %}
 
 %include "app/filter/EmptyImageFilter.h"

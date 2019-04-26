@@ -1,5 +1,5 @@
-#ifndef __LARCV_VOXEL_CXX__
-#define __LARCV_VOXEL_CXX__
+#ifndef __LARCV3_VOXEL_CXX__
+#define __LARCV3_VOXEL_CXX__
 
 
 #include "core/base/larbys.h"
@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string.h>
 #include <stdio.h>
-namespace larcv {
+namespace larcv3 {
 
   Image2D::Image2D(const std::vector<size_t> & dims)
    : _meta()
@@ -291,7 +291,7 @@ namespace larcv {
     return (*this);
   }
 
-  Image2D& Image2D::operator+=(const larcv::Image2D& rhs)
+  Image2D& Image2D::operator+=(const larcv3::Image2D& rhs)
   {
     if (rhs.size() != _img.size()) throw larbys("Cannot call += uniry operator w/ incompatible size!");
     for(size_t index = 0; index < meta().total_voxels(); index ++ ){

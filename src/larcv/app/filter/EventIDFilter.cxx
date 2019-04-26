@@ -4,7 +4,7 @@
 #include "EventIDFilter.h"
 #include "core/cpputil/CSVReader.h"
 
-namespace larcv {
+namespace larcv3 {
 
   static EventIDFilterProcessFactory __global_EventIDFilterProcessFactory__;
 
@@ -20,7 +20,7 @@ namespace larcv {
     
     auto file_path=cfg.get<std::string>("CSVFilePath");
     auto format=cfg.get<std::string>("Format","II");
-    auto data = larcv::read_csv(file_path,format);
+    auto data = larcv3::read_csv(file_path,format);
     auto const& run_v = data.get<int>("run");
     auto const& subrun_v = data.get<int>("subrun");
     auto const& event_v = data.get<int>("event");

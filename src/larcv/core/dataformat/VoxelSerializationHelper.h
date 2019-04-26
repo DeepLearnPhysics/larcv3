@@ -3,7 +3,7 @@
  *
  * \ingroup core_DataFormat
  *
- * \brief Class def header for a class larcv::EventSparseTensor and larcv::EventClusterPixel2D
+ * \brief Class def header for a class larcv3::EventSparseTensor and larcv3::EventClusterPixel2D
  *
  * @author cadams
  */
@@ -20,7 +20,7 @@
 #include "ImageMeta.h"
 
 
-namespace larcv {
+namespace larcv3 {
 
   // Create a suite of functions to manage the shared IO of sparse tensors and clusters
 
@@ -41,10 +41,10 @@ namespace larcv {
     void read_projection_meta(H5::Group *group);
 
     // Write a set of voxels, packaged in the way proscribed by meta, to the group:
-    void write_voxels(H5::Group * group, const std::vector<std::vector<larcv::VoxelSet> > & voxels );
+    void write_voxels(H5::Group * group, const std::vector<std::vector<larcv3::VoxelSet> > & voxels );
 
     // Read an entry of voxels from a group
-    void read_voxels(H5::Group * group, size_t entry, std::vector<std::vector<larcv::VoxelSet> > & voxels);
+    void read_voxels(H5::Group * group, size_t entry, std::vector<std::vector<larcv3::VoxelSet> > & voxels);
 
     // Initialization is the same for sparse image and cluster set
     void initialize_voxel_group(H5::Group * group);
@@ -60,7 +60,7 @@ namespace larcv {
     void initialize_for_read(H5::Group * obj);
     void initialize_for_write(H5::Group * obj);
 
-    std::vector<larcv::ImageMeta<dimension> > image_meta;
+    std::vector<larcv3::ImageMeta<dimension> > image_meta;
     ImageMeta2D projection_meta;
 
   private:

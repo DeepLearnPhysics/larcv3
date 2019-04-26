@@ -3,7 +3,7 @@
  *
  * \ingroup core_Processor
  * 
- * \brief Class def header for a class larcv::ProcessDriver
+ * \brief Class def header for a class larcv3::ProcessDriver
  *
  * @author drinkingkazu
  */
@@ -18,13 +18,13 @@
 #include "core/dataformat/IOManager.h"
 #include "ProcessBase.h"
 
-namespace larcv {
+namespace larcv3 {
   /**
      \class ProcessDriver
-     @brief Analysis event-loop driver that executes larcv::ProcessBase inherit "process modules".
-     It uses larcv::IOManager behind the scene to run the event loop.\n
+     @brief Analysis event-loop driver that executes larcv3::ProcessBase inherit "process modules".
+     It uses larcv3::IOManager behind the scene to run the event loop.\n
      Responsible for propagating a structured configuration parameter sets to configure each process module.\n
-     The configuration of larcv::ProcessDriver itself can contain larcv::IOManager configuration.
+     The configuration of larcv3::ProcessDriver itself can contain larcv3::IOManager configuration.
   */
   class ProcessDriver : public larcv_base {
     
@@ -38,9 +38,9 @@ namespace larcv {
     //
     // Configuration setter/modifiers
     //
-    /// Decodes given configuration text file to create larcv::PSet, then calls the other configure function.
+    /// Decodes given configuration text file to create larcv3::PSet, then calls the other configure function.
     void configure(const std::string config_file);
-    /// Configure itself (mainly larcv::IOManager) and also attached process modules.
+    /// Configure itself (mainly larcv3::IOManager) and also attached process modules.
     void configure(const PSet& cfg);
     /// When needs to override the list of input files from what's specified in the configuration
     void override_input_file(const std::vector<std::string>& flist);
@@ -56,7 +56,7 @@ namespace larcv {
     //
     /// Resets the states & all variables. Attached process modules would be removed.
     void reset();
-    /// Must be called after configure. This initializes larcv::IOManager (open files) and initialize attached process modules.
+    /// Must be called after configure. This initializes larcv3::IOManager (open files) and initialize attached process modules.
     void initialize();
     /// Processes the "next entry" automatically (you don't have to control the counter to specify which entry)
     bool process_entry();
@@ -81,9 +81,9 @@ namespace larcv {
     //
     // Information access methods
     //
-    /// Returns larcv::EventBase object that contains an "ID" (run/event integers)
+    /// Returns larcv3::EventBase object that contains an "ID" (run/event integers)
     inline const EventID& event_id() const 
-    { return ( _io.io_mode() == larcv::IOManager::kREAD ? _io.event_id() : _io.last_event_id()); }
+    { return ( _io.io_mode() == larcv3::IOManager::kREAD ? _io.event_id() : _io.last_event_id()); }
     /// Returns a unique ID (integer) assigned for a process module (provide the module's name in argument)
     ProcessID_t process_id(std::string name) const;
     /// Returns the set of process modules' name
@@ -92,7 +92,7 @@ namespace larcv {
     const std::map<std::string,size_t>& process_map() const;
     /// Returns an attached process module's pointer given a unique ID in the argument
     const ProcessBase* process_ptr(ProcessID_t id) const;
-    /// Returns read-only larcv::IOManager instance
+    /// Returns read-only larcv3::IOManager instance
     const IOManager& io() const { return _io; }
     /// When run in random-access IO mode, returns original event entry number for a randomized index number 
     size_t get_tree_index( size_t entry ) const;
@@ -110,8 +110,8 @@ namespace larcv {
     int _random_access;
     std::vector<size_t> _access_entry_v;
     IOManager _io;
-    std::map<std::string,larcv::ProcessID_t> _proc_m;
-    std::vector<larcv::ProcessBase*> _proc_v;
+    std::map<std::string,larcv3::ProcessID_t> _proc_m;
+    std::vector<larcv3::ProcessBase*> _proc_v;
     bool _processing;
     bool _has_event_creator;
 #endif

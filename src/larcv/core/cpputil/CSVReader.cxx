@@ -2,14 +2,14 @@
 #define __LARCV_CSVREADER_CXX__
 #include "CSVReader.h"
 
-namespace larcv {
+namespace larcv3 {
 
   void CSVData::clear()
   { _data_str.clear(); _data_bool.clear(); _data_int.clear(); _data_float.clear(); _data_double.clear(); }
   
   void CSVData::read_file(const std::string fname, const std::string format)
   {
-    std::vector<larcv::CSVData::ValueType_t> value_types;
+    std::vector<larcv3::CSVData::ValueType_t> value_types;
     for(size_t idx=0; idx<format.length(); ++idx) {
       auto v = format.substr(idx,1);
       CSVData::ValueType_t vt(CSVData::ValueType_t::kSTRING);
@@ -27,7 +27,7 @@ namespace larcv {
     read_file(fname,value_types);
   }
 
-  void CSVData::read_file(const std::string fname, const std::vector<larcv::CSVData::ValueType_t>& value_types)
+  void CSVData::read_file(const std::string fname, const std::vector<larcv3::CSVData::ValueType_t>& value_types)
   {
     clear();
     std::ifstream fstrm(fname.c_str());
@@ -99,7 +99,7 @@ namespace larcv {
   }
     
   void CSVData::read_line(const std::string& line_data,
-			  const std::vector<larcv::CSVData::ValueType_t>& value_types,
+			  const std::vector<larcv3::CSVData::ValueType_t>& value_types,
 			  std::vector<void*>& column_ptrs)
   {
 

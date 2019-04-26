@@ -20,7 +20,7 @@
 
 class EventParticle;
 
-namespace larcv {
+namespace larcv3 {
   /**
     \class EventParticle
     User-defined data product class (please comment!)
@@ -38,12 +38,12 @@ namespace larcv {
 
     
 
-    void set(const std::vector<larcv::Particle>& part_v);
-    void append(const larcv::Particle& part);
-    void emplace_back(larcv::Particle&& part);
-    void emplace(std::vector<larcv::Particle>&& part_v);
+    void set(const std::vector<larcv3::Particle>& part_v);
+    void append(const larcv3::Particle& part);
+    void emplace_back(larcv3::Particle&& part);
+    void emplace(std::vector<larcv3::Particle>&& part_v);
 
-    inline const std::vector<larcv::Particle>& as_vector() const
+    inline const std::vector<larcv3::Particle>& as_vector() const
     { return _part_v; }
 
     inline size_t size() const {return _part_v.size();}
@@ -63,32 +63,32 @@ namespace larcv {
   private:
 
 
-    std::vector<larcv::Particle> _part_v; ///< a collection of particles (index maintained)
+    std::vector<larcv3::Particle> _part_v; ///< a collection of particles (index maintained)
 
   };
 }
 
 
 #include "IOManager.h"
-namespace larcv {
+namespace larcv3 {
 
   // Template instantiation for IO
   template<> 
-  inline std::string product_unique_name<larcv::EventParticle>() { return "particle"; }
+  inline std::string product_unique_name<larcv3::EventParticle>() { return "particle"; }
   // template<> 
   // inline EventParticle& IOManager::get_data(const std::string&);
   // template<> 
   // inline EventParticle& IOManager::get_data(const ProducerID_t);
 
   /**
-     \class larcv::EventParticle
-     \brief A concrete factory class for larcv::EventParticle
+     \class larcv3::EventParticle
+     \brief A concrete factory class for larcv3::EventParticle
   */
   class EventParticleFactory : public DataProductFactoryBase {
   public:
     /// ctor
     EventParticleFactory()
-    { DataProductFactory::get().add_factory(product_unique_name<larcv::EventParticle>(),this); }
+    { DataProductFactory::get().add_factory(product_unique_name<larcv3::EventParticle>(),this); }
     /// dtor
     ~EventParticleFactory() {}
     /// create method

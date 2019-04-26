@@ -4,7 +4,7 @@
 #include "Voxel.h"
 #include <iostream>
 
-namespace larcv {
+namespace larcv3 {
 
   Voxel::Voxel(VoxelID_t id, float value)
   { _id = id; _value = value; }
@@ -29,7 +29,7 @@ namespace larcv {
 
   void VoxelSet::threshold(float min, float max)
   {
-    std::vector<larcv::Voxel> vox_v;
+    std::vector<larcv3::Voxel> vox_v;
     vox_v.reserve(_voxel_v.size());
     for(auto const& vox : _voxel_v) {
       if(vox.value() < min || vox.value() > max) continue;
@@ -40,7 +40,7 @@ namespace larcv {
   
   void VoxelSet::threshold_min(float min)
   {
-    std::vector<larcv::Voxel> vox_v;
+    std::vector<larcv3::Voxel> vox_v;
     vox_v.reserve(_voxel_v.size());
     for(auto const& vox : _voxel_v) {
       if(vox.value() < min) continue;
@@ -51,7 +51,7 @@ namespace larcv {
   
   void VoxelSet::threshold_max(float max)
   {
-    std::vector<larcv::Voxel> vox_v;
+    std::vector<larcv3::Voxel> vox_v;
     vox_v.reserve(_voxel_v.size());
     for(auto const& vox : _voxel_v) {
       if(vox.value() > max) continue;
@@ -77,7 +77,7 @@ namespace larcv {
     if(_voxel_v.empty() ||
        id < _voxel_v.front().id() ||
        id > _voxel_v.back().id())
-      return larcv::kINVALID_VOXEL::getInstance();
+      return larcv3::kINVALID_VOXEL::getInstance();
 
     Voxel vox(id,0.);
     // Else do log(N) search
@@ -85,7 +85,7 @@ namespace larcv {
     if( (*iter).id() == id ) return (*iter);
     else {
       //std::cout << "Returning invalid voxel since lower_bound had an id " << (*iter).id() << std::endl;
-      return larcv::kINVALID_VOXEL::getInstance();
+      return larcv3::kINVALID_VOXEL::getInstance();
     }
   }
 
@@ -170,7 +170,7 @@ namespace larcv {
     return val;
   }
 
-  const larcv::VoxelSet& VoxelSetArray::voxel_set(InstanceID_t id) const
+  const larcv3::VoxelSet& VoxelSetArray::voxel_set(InstanceID_t id) const
   {
     if(id >= _voxel_vv.size()) {
       std::cerr << "VoxelSetArray has no VoxelSet with InstanceID_t " << id << std::endl;
@@ -179,21 +179,21 @@ namespace larcv {
     return _voxel_vv[id];
   }
 
-  void VoxelSetArray::emplace(std::vector<larcv::VoxelSet>&& voxel_vv)
+  void VoxelSetArray::emplace(std::vector<larcv3::VoxelSet>&& voxel_vv)
   {
     _voxel_vv = std::move(voxel_vv);
     for(size_t id=0; id<_voxel_vv.size(); ++id)
       _voxel_vv[id].id(id);
   }
 
-  // inline void VoxelSetArray::insert(const std::vector<larcv::VoxelSet>& voxel_vv)
+  // inline void VoxelSetArray::insert(const std::vector<larcv3::VoxelSet>& voxel_vv)
   // {
   //   _voxel_vv = voxel_vv;
   //   for(size_t id=0; id<_voxel_vv.size(); ++id)
   //     _voxel_vv[id].id(id);
   // }
 
-  void VoxelSetArray::emplace(larcv::VoxelSet&& voxel_v)
+  void VoxelSetArray::emplace(larcv3::VoxelSet&& voxel_v)
   {
     if(voxel_v.id() >= _voxel_vv.size()) {
       size_t orig_size = _voxel_vv.size();
@@ -204,7 +204,7 @@ namespace larcv {
     _voxel_vv[voxel_v.id()] = std::move(voxel_v);
   }
 
-  void VoxelSetArray::insert(const larcv::VoxelSet& voxel_v)
+  void VoxelSetArray::insert(const larcv3::VoxelSet& voxel_v)
   {
     if(voxel_v.id() >= _voxel_vv.size()) {
       size_t orig_size = _voxel_vv.size();
@@ -215,7 +215,7 @@ namespace larcv {
     _voxel_vv.at(voxel_v.id()) = voxel_v;
   }
 
-  larcv::VoxelSet& VoxelSetArray::writeable_voxel_set(const InstanceID_t id)
+  larcv3::VoxelSet& VoxelSetArray::writeable_voxel_set(const InstanceID_t id)
   {
     if(id >= _voxel_vv.size()) {
       std::cerr << "VoxelSetArray has no VoxelSet with InstanceID_t " << id << std::endl;
@@ -232,7 +232,7 @@ SparseTensor<dimension>::SparseTensor(VoxelSet&& vs, ImageMeta<dimension> meta)
 { this->meta(meta); }
 
 template<size_t dimension>
-void SparseTensor<dimension>::meta(const larcv::ImageMeta<dimension>& meta)
+void SparseTensor<dimension>::meta(const larcv3::ImageMeta<dimension>& meta)
 {
 for (auto const& vox : this->as_vector()) {
  if (vox.id() < meta.total_voxels()) continue;
@@ -245,13 +245,13 @@ _meta = meta;
 }
 
 template<size_t dimension>
-void SparseTensor<dimension>::emplace(const larcv::Voxel & vox, const bool add)
+void SparseTensor<dimension>::emplace(const larcv3::Voxel & vox, const bool add)
 {
 if (vox.id() != kINVALID_VOXELID) VoxelSet::emplace(vox.id(), vox.value(), add);
 }
 
 template<size_t dimension>
-void SparseCluster<dimension>::meta(const larcv::ImageMeta<dimension>& meta)
+void SparseCluster<dimension>::meta(const larcv3::ImageMeta<dimension>& meta)
 {
 for (auto const& vs : this->as_vector()) {
  for (auto const& vox : vs.as_vector()) {

@@ -3,7 +3,7 @@
  *
  * \ingroup core_Base
  * 
- * \brief basic typedefs and enums (larcv::Point2D, larcv::msg, etc.)
+ * \brief basic typedefs and enums (larcv3::Point2D, larcv3::msg, etc.)
  *
  * @author Kazu - Nevis 2015
  */
@@ -27,10 +27,10 @@
 #include <climits>
 
 /**
-   \namespace larcv
-   C++ namespace for developping LArTPC software interface to computer vision software (LArCV)
+   \namespace larcv3
+   C++ namespace for developping LArTPC software interface to computer vision software (LArCV3)
 */
-namespace larcv {
+namespace larcv3 {
 
   /// Used as an invalid value identifier for long long
   const long long          kINVALID_LONGLONG  = std::numeric_limits< long long          >::max();
@@ -51,7 +51,7 @@ namespace larcv {
   /// Used as an invalid value idnetifier for double-point precision
   const double             kINVALID_DOUBLE    = std::numeric_limits< double             >::max();
 
-  /// Namespace for larcv message related types
+  /// Namespace for larcv3 message related types
   namespace msg {
 
     /// Message level

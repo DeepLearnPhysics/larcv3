@@ -3,6 +3,6 @@
 
 #include "ProcessFactory.h"
 
-larcv::ProcessFactory* larcv::ProcessFactory::_me = nullptr;
+larcv3::ProcessFactory* larcv3::ProcessFactory::_me = nullptr;
 
 #endif

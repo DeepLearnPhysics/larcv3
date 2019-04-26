@@ -3,7 +3,7 @@
  *
  * \ingroup core_Processor
  * 
- * \brief Class def header for a class larcv::ProcessBase
+ * \brief Class def header for a class larcv3::ProcessBase
  *
  * @author drinkingkazu
  */
@@ -18,18 +18,18 @@
 #include "core/dataformat/IOManager.h"
 #include "ProcessorTypes.h"
 
-namespace larcv {
+namespace larcv3 {
 
   class ProcessDriver;
   class ProcessFactory;
   /**
      \class ProcessBase
-     @brief A base class for "process module" to be run by larcv::ProcessDriver
-     @detail Inherited class must implment 4 pure virtual functions that are called by larcv::ProcessDriver instance.\n
-     ProcessBase::configure(const larcv::PSet) is called first with the argument passing the configuration parameters.\n
+     @brief A base class for "process module" to be run by larcv3::ProcessDriver
+     @detail Inherited class must implment 4 pure virtual functions that are called by larcv3::ProcessDriver instance.\n
+     ProcessBase::configure(const larcv3::PSet) is called first with the argument passing the configuration parameters.\n
      ProcessBase::initialize() is called after configure. This is where you may want to initialize variables.\n
-     ProcessBase::process(larcv::IOManager&) is called for every event. The argument provides an access to event data.\n
-     ProcessBase::finalize() is called after larcv::ProcessDriver finished looping over all events.\n
+     ProcessBase::process(larcv3::IOManager&) is called for every event. The argument provides an access to event data.\n
+     ProcessBase::finalize() is called after larcv3::ProcessDriver finished looping over all events.\n
   */
   class ProcessBase : public larcv_base {
     friend class ProcessDriver;
@@ -44,7 +44,7 @@ namespace larcv {
     virtual ~ProcessBase(){}
 
     //
-    // Four pure virtual functions that larcv::ProcessDriver calls and need implementation.
+    // Four pure virtual functions that larcv3::ProcessDriver calls and need implementation.
     //
     /// Called first with the argument passing the configuration parameters.
     virtual void configure(const PSet&) = 0;
@@ -60,7 +60,7 @@ namespace larcv {
     //
     /// Only for experts: allows a loose grouping for a set of ProcessBase inherit classes via true/false return to a "question".
     virtual bool _is_(const std::string question) const;
-    /// Only for experts: larcv::ProcessDriver to see if this module can create a new event or not
+    /// Only for experts: larcv3::ProcessDriver to see if this module can create a new event or not
     bool event_creator() const
     { return _event_creator; }
 
@@ -72,12 +72,12 @@ namespace larcv {
 
     bool _event_creator;    ///< special flag to mark this algorithm an event creator
 #ifndef __CINT__
-    larcv::Watch _watch;    ///< algorithm profile stopwatch
+    larcv3::Watch _watch;    ///< algorithm profile stopwatch
 #endif
     double _proc_time;      ///< algorithm execution time record (cumulative)
     size_t _proc_count;     ///< algorithm execution counter (cumulative)
     
-    larcv::ProcessID_t _id; ///< unique algorithm identifier
+    larcv3::ProcessID_t _id; ///< unique algorithm identifier
     bool _profile;          ///< measure process time if profile flag is on
     std::string _typename;  ///< process type from factory
   };

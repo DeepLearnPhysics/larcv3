@@ -20,7 +20,7 @@
 
 // There is no need to generate an explicit wrapper for EventBase, since it's virtual
 
-namespace larcv {
+namespace larcv3 {
   // class IOManager;
   class DataProductFactory;
   /**

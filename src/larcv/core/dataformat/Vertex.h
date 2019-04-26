@@ -4,7 +4,7 @@
 #include "DataFormatTypes.h"
 #include "Point.h"
 
-namespace larcv {
+namespace larcv3 {
 
   class Vertex {
   public:
@@ -19,9 +19,9 @@ namespace larcv {
     void reset(double x, double y, double z, double t);
 
     /// Convert to point
-    const larcv::Point2D as_point2d(larcv::PointType_t point_type) const;
-    const larcv::Point3D as_point3d() const;
-    void as_point(larcv::PointType_t point_type, double * x, double * y, double * z);
+    const larcv3::Point2D as_point2d(larcv3::PointType_t point_type) const;
+    const larcv3::Point3D as_point3d() const;
+    void as_point(larcv3::PointType_t point_type, double * x, double * y, double * z);
 
     inline double x() const { return _x; }
     inline double y() const { return _y; }
@@ -69,10 +69,10 @@ namespace larcv {
   public: 
     static H5::CompType get_datatype() {
       H5::CompType datatype(sizeof(Vertex));
-      datatype.insertMember("x", offsetof(Vertex, _x), larcv::get_datatype<double>());
-      datatype.insertMember("y", offsetof(Vertex, _y), larcv::get_datatype<double>());
-      datatype.insertMember("z", offsetof(Vertex, _z), larcv::get_datatype<double>());
-      datatype.insertMember("t", offsetof(Vertex, _t), larcv::get_datatype<double>());
+      datatype.insertMember("x", offsetof(Vertex, _x), larcv3::get_datatype<double>());
+      datatype.insertMember("y", offsetof(Vertex, _y), larcv3::get_datatype<double>());
+      datatype.insertMember("z", offsetof(Vertex, _z), larcv3::get_datatype<double>());
+      datatype.insertMember("t", offsetof(Vertex, _t), larcv3::get_datatype<double>());
       return datatype;
     }
 #endif

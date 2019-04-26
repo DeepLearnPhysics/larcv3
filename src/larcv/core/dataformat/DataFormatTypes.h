@@ -1,12 +1,12 @@
-#ifndef __LARCV_DATAFORMATTYPES_H__
-#define __LARCV_DATAFORMATTYPES_H__
+#ifndef __LARCV3_DATAFORMATTYPES_H__
+#define __LARCV3_DATAFORMATTYPES_H__
 
 #include "core/base/LArCVTypes.h"
 #include "H5Cpp.h"
 #include <vector>
 #include <set>
 
-namespace larcv {
+namespace larcv3 {
 
   /// Invalid rep for vector index
   static const unsigned short kINVALID_INDEX = kINVALID_USHORT;
@@ -83,11 +83,11 @@ namespace larcv {
   /// "ID" of MCParticles in terms of its G4 track ID (unless mixing multiple MC samples)
   typedef size_t MCTrackID_t;
   /// A collection of MCTrackID_t for multiple MCParticles
-  typedef std::set<larcv::MCTrackID_t> MCTrackIDSet_t;
+  typedef std::set<larcv3::MCTrackID_t> MCTrackIDSet_t;
 
-  /// ProducerID_t to identify a unique data product within a process (for larcv::IOManager)
+  /// ProducerID_t to identify a unique data product within a process (for larcv3::IOManager)
   typedef size_t ProducerID_t;
-  /// ProductName_t to identify a unique data product within a process (for larcv::IOManager)
+  /// ProductName_t to identify a unique data product within a process (for larcv3::IOManager)
   typedef std::pair<std::string,std::string> ProducerName_t;
   /// Invalid ProducerID_t
   static const ProducerID_t kINVALID_PRODUCER=kINVALID_SIZE;
@@ -104,7 +104,7 @@ namespace larcv {
   };
 
   // In this section, we define and specialize a number of cases for mapping
-  // datatypes used in larcv to datatypes needed for hdf5 serialization.
+  // datatypes used in larcv3 to datatypes needed for hdf5 serialization.
 
 #ifndef SWIG
 

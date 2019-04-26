@@ -3,7 +3,7 @@
  *
  * \ingroup core_Base
  * 
- * \brief larcv::logger utility class definition header file.
+ * \brief larcv3::logger utility class definition header file.
  *
  * @author Kazu - Nevis 2015
  */
@@ -17,15 +17,14 @@
 #include <cstdio>
 #include <iostream>
 #include <map>
-//#include "LArCV/LArCVTypes.h"
 #include "LArCVTypes.h"
 
-namespace larcv {
+namespace larcv3 {
 
   /**
      \class logger
      \brief Utility class used to show formatted message on the screen.
-     A logger class for larcv. Simply shows a formatted colored message on a screen. \n
+     A logger class for larcv3. Simply shows a formatted colored message on a screen. \n
      A static getter method is provided to create a sharable logger instance (see larcv_base for useage). \n
   */
   class logger{
@@ -53,10 +52,10 @@ namespace larcv {
     std::string _name;
     
     /// Set of loggers
-    static std::map<std::string,larcv::logger> *_logger_m;
+    static std::map<std::string,larcv3::logger> *_logger_m;
 
     /// Shared logger
-    static larcv::logger* _shared_logger;
+    static larcv3::logger* _shared_logger;
 
     /// Default logger level
     static msg::Level_t _level_default;
@@ -83,7 +82,7 @@ namespace larcv {
     /// Getter of a message instance 
     static logger& get(const std::string name)
     {
-      if(!_logger_m) _logger_m = new std::map<std::string,larcv::logger>();
+      if(!_logger_m) _logger_m = new std::map<std::string,larcv3::logger>();
       auto iter = _logger_m->find(name);
       if(iter == _logger_m->end()) {
         iter = _logger_m->emplace(name,logger(name)).first;
@@ -134,24 +133,24 @@ namespace larcv {
 // Compiler macro for saving us from text typing
 //
 /// Compiler macro for DEBUG message
-#define LARCV_DEBUG()    if( logger().debug   () ) logger().send(::larcv::msg::kDEBUG,    __FUNCTION__, __LINE__, __FILE__)
+#define LARCV_DEBUG()    if( logger().debug   () ) logger().send(::larcv3::msg::kDEBUG,    __FUNCTION__, __LINE__, __FILE__)
 /// Compiler macro for INFO message
-#define LARCV_INFO()     if( logger().info    () ) logger().send(::larcv::msg::kINFO,     __FUNCTION__, __LINE__          )
+#define LARCV_INFO()     if( logger().info    () ) logger().send(::larcv3::msg::kINFO,     __FUNCTION__, __LINE__          )
 /// Compiler macro for NORMAL message
-#define LARCV_NORMAL()   if( logger().normal  () ) logger().send(::larcv::msg::kNORMAL,   __FUNCTION__                    )
+#define LARCV_NORMAL()   if( logger().normal  () ) logger().send(::larcv3::msg::kNORMAL,   __FUNCTION__                    )
 /// Compiler macro for WARNING message
-#define LARCV_WARNING()  if( logger().warning () ) logger().send(::larcv::msg::kWARNING,  __FUNCTION__                    )
+#define LARCV_WARNING()  if( logger().warning () ) logger().send(::larcv3::msg::kWARNING,  __FUNCTION__                    )
 /// Compiler macro for ERROR message
-#define LARCV_ERROR()    if( logger().error   () ) logger().send(::larcv::msg::kERROR,    __FUNCTION__, __LINE__          )
+#define LARCV_ERROR()    if( logger().error   () ) logger().send(::larcv3::msg::kERROR,    __FUNCTION__, __LINE__          )
 /// Compiler macro for CRITICAL message
-#define LARCV_CRITICAL()                           logger().send(::larcv::msg::kCRITICAL, __FUNCTION__, __LINE__, __FILE__)
+#define LARCV_CRITICAL()                           logger().send(::larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__, __FILE__)
 
-#define LARCV_SDEBUG()    if(larcv::logger::get_shared().debug())    larcv::logger::get_shared().send(::larcv::msg::kDEBUG,    __FUNCTION__,__LINE__,__FILE__)
-#define LARCV_SINFO()     if(larcv::logger::get_shared().info())     larcv::logger::get_shared().send(::larcv::msg::kINFO,     __FUNCTION__,__LINE__         )
-#define LARCV_SNORMAL()   if(larcv::logger::get_shared().normal())   larcv::logger::get_shared().send(::larcv::msg::kNORMAL,   __FUNCTION__                  )
-#define LARCV_SWARNING()  if(larcv::logger::get_shared().warning())  larcv::logger::get_shared().send(::larcv::msg::kWARNING,  __FUNCTION__                  )
-#define LARCV_SERROR()    if(larcv::logger::get_shared().error())    larcv::logger::get_shared().send(::larcv::msg::kERROR,    __FUNCTION__,__LINE__         )
-#define LARCV_SCRITICAL() larcv::logger::get_shared().send(::larcv::msg::kCRITICAL, __FUNCTION__,__LINE__,__FILE__)
+#define LARCV_SDEBUG()    if(larcv3::logger::get_shared().debug())    larcv3::logger::get_shared().send(::larcv3::msg::kDEBUG,    __FUNCTION__,__LINE__,__FILE__)
+#define LARCV_SINFO()     if(larcv3::logger::get_shared().info())     larcv3::logger::get_shared().send(::larcv3::msg::kINFO,     __FUNCTION__,__LINE__         )
+#define LARCV_SNORMAL()   if(larcv3::logger::get_shared().normal())   larcv3::logger::get_shared().send(::larcv3::msg::kNORMAL,   __FUNCTION__                  )
+#define LARCV_SWARNING()  if(larcv3::logger::get_shared().warning())  larcv3::logger::get_shared().send(::larcv3::msg::kWARNING,  __FUNCTION__                  )
+#define LARCV_SERROR()    if(larcv3::logger::get_shared().error())    larcv3::logger::get_shared().send(::larcv3::msg::kERROR,    __FUNCTION__,__LINE__         )
+#define LARCV_SCRITICAL() larcv3::logger::get_shared().send(::larcv3::msg::kCRITICAL, __FUNCTION__,__LINE__,__FILE__)
   
 /** @} */ // end of doxygen group logger
 #endif

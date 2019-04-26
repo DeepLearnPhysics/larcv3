@@ -22,7 +22,7 @@
 #include "core/dataformat/EventVoxel.h"
 
 
-using namespace larcv;
+using namespace larcv3;
 %}
 
 
@@ -49,35 +49,35 @@ using namespace larcv;
 %include "core/dataformat/EventVoxel.h"
 
 
-// Define instantiations of LARCV templates:
-%template(Point2D) larcv::Point<2>;
-%template(Point3D) larcv::Point<3>;
-%template(BBox2D) larcv::BBox<2>;
-%template(BBox3D) larcv::BBox<3>;
-%template(ImageMeta2D) larcv::ImageMeta<2>;
-%template(ImageMeta3D) larcv::ImageMeta<3>;
-%template(SparseTensor2D) larcv::SparseTensor<2>;
-%template(SparseTensor3D) larcv::SparseTensor<3>;
-%template(EventSparseTensor2D) larcv::EventSparseTensor<2>;
-%template(EventSparseTensor3D) larcv::EventSparseTensor<3>;
-%template(SparseCluster2D) larcv::SparseCluster<2>;
-%template(SparseCluster3D) larcv::SparseCluster<3>;
-%template(EventSparseCluster2D) larcv::EventSparseCluster<2>;
-%template(EventSparseCluster3D) larcv::EventSparseCluster<3>;
+// Define instantiations of LARCV3 templates:
+%template(Point2D) larcv3::Point<2>;
+%template(Point3D) larcv3::Point<3>;
+%template(BBox2D) larcv3::BBox<2>;
+%template(BBox3D) larcv3::BBox<3>;
+%template(ImageMeta2D) larcv3::ImageMeta<2>;
+%template(ImageMeta3D) larcv3::ImageMeta<3>;
+%template(SparseTensor2D) larcv3::SparseTensor<2>;
+%template(SparseTensor3D) larcv3::SparseTensor<3>;
+%template(EventSparseTensor2D) larcv3::EventSparseTensor<2>;
+%template(EventSparseTensor3D) larcv3::EventSparseTensor<3>;
+%template(SparseCluster2D) larcv3::SparseCluster<2>;
+%template(SparseCluster3D) larcv3::SparseCluster<3>;
+%template(EventSparseCluster2D) larcv3::EventSparseCluster<2>;
+%template(EventSparseCluster3D) larcv3::EventSparseCluster<3>;
 
 
 // Add templates for the dataproducts that get wrapped vectors:
 %template(VectorOfDouble) std::vector<double>;
 %template(VectorOfFloat) std::vector<float>;
 %template(VectorOfSizet) std::vector<size_t>;
-%template(VectorOfVoxel) std::vector<larcv::Voxel>;
-%template(VectorOfVoxelSet) std::vector<larcv::VoxelSet>;
-%template(VectorOfSparse2D) std::vector<larcv::SparseTensor2D>;
-%template(VectorOfSparse3D) std::vector<larcv::SparseTensor3D>;
-%template(VectorOfCluster2D) std::vector<larcv::SparseCluster2D>;
-%template(VectorOfCluster3D) std::vector<larcv::SparseCluster3D>;
-%template(VectorOfParticle) std::vector<larcv::Particle>;
-%template(VectorOfImage2D) std::vector<larcv::Image2D>;
+%template(VectorOfVoxel) std::vector<larcv3::Voxel>;
+%template(VectorOfVoxelSet) std::vector<larcv3::VoxelSet>;
+%template(VectorOfSparse2D) std::vector<larcv3::SparseTensor2D>;
+%template(VectorOfSparse3D) std::vector<larcv3::SparseTensor3D>;
+%template(VectorOfCluster2D) std::vector<larcv3::SparseCluster2D>;
+%template(VectorOfCluster3D) std::vector<larcv3::SparseCluster3D>;
+%template(VectorOfParticle) std::vector<larcv3::Particle>;
+%template(VectorOfImage2D) std::vector<larcv3::Image2D>;
 
 
 

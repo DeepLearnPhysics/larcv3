@@ -3,7 +3,7 @@
  *
  * \ingroup core_DataFormat
  *
- * \brief Class def header for a class larcv::BBox2D and larcv::BBox3D
+ * \brief Class def header for a class larcv3::BBox2D and larcv3::BBox3D
  *
  * @author kazuhiro, cadams
  */
@@ -17,7 +17,7 @@
 #include <iostream>
 #include "Point.h"
 #include "DataFormatTypes.h"
-namespace larcv {
+namespace larcv3 {
 
   /**
      \class BBox

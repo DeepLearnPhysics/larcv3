@@ -3,7 +3,7 @@
 
 #include "ProcessBase.h"
 
-namespace larcv {
+namespace larcv3 {
 
   ProcessBase::ProcessBase(const std::string name)
     : larcv_base  ( name )

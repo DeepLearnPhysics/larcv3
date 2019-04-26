@@ -3,7 +3,7 @@
  *
  * \ingroup core_Base
  * 
- * \brief Class def header for a class larcv::PSet
+ * \brief Class def header for a class larcv3::PSet
  *
  * @author kazuhiro
  */
@@ -19,10 +19,10 @@
 #include <map>
 #include "larbys.h"
 #include "Parser.h"
-namespace larcv {
+namespace larcv3 {
   /**
      \class PSet
-     \brief A nested configuration parameter set holder for larcv framework.
+     \brief A nested configuration parameter set holder for larcv3 framework.
   */
   class PSet {
     
@@ -103,7 +103,7 @@ namespace larcv {
       if( iter == _data_value.end() ) {
         std::string msg;
         msg = "Key does not exist: \"" + key + "\"";
-	std::cout<<dump()<<std::endl;
+        std::cout<<dump()<<std::endl;
         throw larbys(msg);
       }
       return parser::FromString<T>((*iter).second);
@@ -152,16 +152,16 @@ namespace larcv {
     void trim_space(std::string& txt);
     void no_space(std::string& txt);
 
-    /// The name of this larcv::PSet
+    /// The name of this larcv3::PSet
     std::string _name;
     /// Key-Value pairs
     std::map<std::string,std::string> _data_value;
     /// Key-PSet pairs
-    std::map<std::string,::larcv::PSet> _data_pset;
+    std::map<std::string,::larcv3::PSet> _data_pset;
 
   };
 
-  template<> PSet PSet::get<larcv::PSet>(const std::string& key) const;
+  template<> PSet PSet::get<larcv3::PSet>(const std::string& key) const;
   
 }
 
