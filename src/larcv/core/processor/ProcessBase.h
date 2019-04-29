@@ -59,7 +59,7 @@ namespace larcv3 {
     // Following functions are 
     //
     /// Only for experts: allows a loose grouping for a set of ProcessBase inherit classes via true/false return to a "question".
-    virtual bool _is_(const std::string question) const;
+    virtual bool is(const std::string question) const;
     /// Only for experts: larcv3::ProcessDriver to see if this module can create a new event or not
     bool event_creator() const
     { return _event_creator; }

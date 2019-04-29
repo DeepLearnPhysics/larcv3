@@ -13,7 +13,7 @@ namespace larcv3 {
     , _profile    ( false )
   {}
 
-  bool ProcessBase::_is_(const std::string question) const
+  bool ProcessBase::is(const std::string question) const
   { return false; }
 
   void ProcessBase::_configure_(const PSet& cfg)
