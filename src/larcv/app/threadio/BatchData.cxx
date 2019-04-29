@@ -2,11 +2,11 @@
 #define BATCHDATA_CXX
 
 #include "BatchData.h"
-#include "larcv/core/Base/larcv_logger.h"
-#include "larcv/core/Base/larbys.h"
+#include "core/base/larcv_logger.h"
+#include "core/base/larbys.h"
 #include <sstream>
 
-namespace larcv {
+namespace larcv3 {
 
   template<class T>
   const std::vector<T>& BatchData<T>::data() const
@@ -123,10 +123,10 @@ namespace larcv {
 
 }
 
-template class larcv::BatchData<char>;
-template class larcv::BatchData<short>;
-template class larcv::BatchData<int>;
-template class larcv::BatchData<float>;
-template class larcv::BatchData<double>;
-template class larcv::BatchData<std::string>;
+template class larcv3::BatchData<char>;
+template class larcv3::BatchData<short>;
+template class larcv3::BatchData<int>;
+template class larcv3::BatchData<float>;
+template class larcv3::BatchData<double>;
+template class larcv3::BatchData<std::string>;
 #endif

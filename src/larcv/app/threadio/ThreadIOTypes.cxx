@@ -3,7 +3,7 @@
 
 #include "ThreadIOTypes.h"
 
-namespace larcv{
+namespace larcv3{
 
   std::string BatchDataTypeName(BatchDataType_t type) {
     switch(type) {

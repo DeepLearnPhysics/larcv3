@@ -17,9 +17,10 @@
 #include <iostream>
 #include <map>
 #include "BatchDataStorage.h"
-#include "larcv/core/Base/larcv_logger.h"
-#include "larcv/core/Base/larbys.h"
-namespace larcv {
+#include "core/base/larcv_logger.h"
+#include "core/base/larbys.h"
+
+namespace larcv3 {
   class ThreadProcessor;
   /**
      \class BatchDataStorageFactory

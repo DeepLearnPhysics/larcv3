@@ -2,11 +2,10 @@
 #define __BATCHFILLERTENSOR2D_CXX__
 
 #include "BatchFillerTensor2D.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
 
 #include <random>
 
-namespace larcv {
+namespace larcv3 {
 
 static BatchFillerTensor2DProcessFactory
     __global_BatchFillerTensor2DProcessFactory__;
@@ -66,7 +65,7 @@ void BatchFillerTensor2D::assert_dimension(
 bool BatchFillerTensor2D::process(IOManager& mgr) {
   LARCV_DEBUG() << "start" << std::endl;
   auto const& voxel_data =
-      mgr.get_data<larcv::EventSparseTensor2D>(_tensor2d_producer);
+      mgr.get_data<larcv3::EventSparseTensor2D>(_tensor2d_producer);
   if (!_allow_empty && voxel_data.as_vector().empty()) {
     LARCV_CRITICAL()
         << "Could not locate non-empty voxel data w/ producer name "

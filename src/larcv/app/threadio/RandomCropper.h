@@ -15,11 +15,11 @@
 #define RANDOMCROPPER_H
 
 #include <iostream>
-#include "larcv/core/Base/larcv_base.h"
-#include "larcv/core/Base/PSet.h"
-#include "larcv/core/DataFormat/Image2D.h"
+#include "core/base/larcv_base.h"
+#include "core/base/PSet.h"
+#include "core/dataformat/Image2D.h"
 
-namespace larcv {
+namespace larcv3 {
   /**
      \class RandomCropper
      User defined class RandomCropper ... these comments are used to generate
@@ -43,7 +43,7 @@ namespace larcv {
 
     size_t cols() const { return _crop_cols; }
 
-    const std::vector<float> crop(const larcv::Image2D& image);
+    const std::vector<float> crop(const larcv3::Image2D& image);
     
   private:
 

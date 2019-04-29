@@ -5,7 +5,7 @@
  *
  * \brief Class def header for a class BatchFillerTensor2D
  *
- * @author kazuhiro
+ * @author cadams
  */
 
 /** \addtogroup ThreadIO
@@ -14,11 +14,12 @@
 #ifndef __BATCHFILLERTENSOR2D_H__
 #define __BATCHFILLERTENSOR2D_H__
 
-#include "larcv/core/Processor/ProcessFactory.h"
+#include "core/processor/ProcessFactory.h"
 #include "BatchFillerTemplate.h"
 #include "RandomCropper.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
-namespace larcv {
+#include "core/dataformat/EventVoxel.h"
+
+namespace larcv3 {
 
   /**
      \class ProcessBase
@@ -67,8 +68,8 @@ namespace larcv {
   };
 
   /**
-     \class larcv::BatchFillerTensor2DFactory
-     \brief A concrete factory class for larcv::BatchFillerTensor2D
+     \class larcv3::BatchFillerTensor2DFactory
+     \brief A concrete factory class for larcv3::BatchFillerTensor2D
   */
   class BatchFillerTensor2DProcessFactory : public ProcessFactoryBase {
   public:

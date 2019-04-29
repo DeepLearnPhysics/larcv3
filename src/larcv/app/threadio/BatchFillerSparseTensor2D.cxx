@@ -2,11 +2,10 @@
 #define __BATCHFILLERSPARSETENSOR2D_CXX__
 
 #include "BatchFillerSparseTensor2D.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
 
 #include <random>
 
-namespace larcv {
+namespace larcv3 {
 
 static BatchFillerSparseTensor2DProcessFactory
     __global_BatchFillerSparseTensor2DProcessFactory__;
@@ -102,7 +101,7 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
 
   LARCV_DEBUG() << "start" << std::endl;
   auto const& voxel_data =
-      mgr.get_data<larcv::EventSparseTensor2D>(_tensor2d_producer);
+      mgr.get_data<larcv3::EventSparseTensor2D>(_tensor2d_producer);
   if (!_allow_empty && voxel_data.as_vector().empty()) {
     LARCV_CRITICAL()
         << "Could not locate non-empty voxel data w/ producer name "
@@ -144,11 +143,11 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
   for (auto& v : _entry_data) v = _unfilled_voxel_value;
 
   // Get the random x/y/z flipping
-  bool flip_x = false;
-  bool flip_y = false;
+  bool flip_cols = false;
+  bool flip_rows = false;
   if (_augment){
-    flip_x = bool(rand() % 2);
-    flip_y = bool(rand() % 2);
+    flip_cols = bool(rand() % 2);
+    flip_rows = bool(rand() % 2);
   }
 
 
@@ -170,18 +169,18 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
     if (!found) continue;
     size_t i = 0;
     for (auto const& voxel : voxel_set.as_vector()) {
-      int row = meta.index_to_row(voxel.id());
-      int col = meta.index_to_col(voxel.id());
+      int row = meta.coordinate(voxel.id(),0);
+      int col = meta.coordinate(voxel.id(),1);
 
-      if (flip_x) col = meta.cols() - (col + 1);
-      if (flip_y) row = meta.rows() - (row + 1);
+      if (flip_cols) col = meta.cols() - (col + 1);
+      if (flip_rows) row = meta.rows() - (row + 1);
 
 
       size_t index = count*(_max_voxels*point_dim) + i*point_dim;
-      _entry_data.at(count*(_max_voxels*point_dim) + i*point_dim) = row;
-      _entry_data.at(count*(_max_voxels*point_dim) + i*point_dim + 1) = col;
+      _entry_data.at(index) = row;
+      _entry_data.at(index + 1) = col;
       if (_include_values){
-        _entry_data.at(count*(_max_voxels*point_dim) + i*point_dim + 2) = voxel.value();
+        _entry_data.at(index + 2) = voxel.value();
       }
       i++;
 

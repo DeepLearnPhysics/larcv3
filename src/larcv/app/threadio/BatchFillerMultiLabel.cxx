@@ -3,10 +3,10 @@
 
 #include "BatchFillerMultiLabel.h"
 #include <random>
-#include "larcv/core/DataFormat/EventImage2D.h"
-#include "larcv/core/DataFormat/EventParticle.h"
+#include "core/dataformat/EventImage2D.h"
+#include "core/dataformat/EventParticle.h"
 
-namespace larcv {
+namespace larcv3 {
 
 static BatchFillerMultiLabelProcessFactory
     __global_BatchFillerMultiLabelProcessFactory__;
@@ -57,7 +57,7 @@ void BatchFillerMultiLabel::_batch_end_() {
 void BatchFillerMultiLabel::finalize() {}
 
 bool BatchFillerMultiLabel::process(IOManager& mgr) {
-  auto const& event_part = mgr.get_data<larcv::EventParticle>(_part_producer);
+  auto const& event_part = mgr.get_data<larcv3::EventParticle>(_part_producer);
 
   if (batch_data().dim().empty()) {
     std::vector<int> dim(2);

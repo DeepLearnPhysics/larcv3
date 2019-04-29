@@ -18,7 +18,7 @@
 #include <vector>
 #include "ThreadIOTypes.h"
 
-namespace larcv {
+namespace larcv3 {
   /**
      \class BatchData
      User defined class BatchData ... these comments are used to generate

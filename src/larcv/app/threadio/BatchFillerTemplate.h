@@ -16,7 +16,8 @@
 
 #include "BatchHolder.h"
 #include "BatchData.h"
-namespace larcv {
+
+namespace larcv3 {
   class ThreadProcessor;
   /**
      \class ProcessBase

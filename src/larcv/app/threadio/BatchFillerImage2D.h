@@ -14,11 +14,11 @@
 #ifndef __BATCHFILLERIMAGE2D_H__
 #define __BATCHFILLERIMAGE2D_H__
 
-#include "larcv/core/Processor/ProcessFactory.h"
+#include "core/processor/ProcessFactory.h"
 #include "BatchFillerTemplate.h"
 #include "RandomCropper.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
-namespace larcv {
+#include "core/dataformat/EventImage2D.h"
+namespace larcv3 {
 
   /**
      \class ProcessBase
@@ -74,8 +74,8 @@ namespace larcv {
   };
 
   /**
-     \class larcv::BatchFillerImage2DFactory
-     \brief A concrete factory class for larcv::BatchFillerImage2D
+     \class larcv3::BatchFillerImage2DFactory
+     \brief A concrete factory class for larcv3::BatchFillerImage2D
   */
   class BatchFillerImage2DProcessFactory : public ProcessFactoryBase {
   public:

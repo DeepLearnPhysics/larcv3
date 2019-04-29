@@ -14,10 +14,10 @@
 #ifndef __BATCHFILLERPIDLABEL_H__
 #define __BATCHFILLERPIDLABEL_H__
 
-#include "larcv/core/Processor/ProcessFactory.h"
+#include "core/processor/ProcessFactory.h"
 #include "BatchFillerTemplate.h"
 
-namespace larcv {
+namespace larcv3 {
 
   /**
      \class ProcessBase
@@ -54,8 +54,8 @@ namespace larcv {
   };
 
   /**
-     \class larcv::BatchFillerPIDLabelFactory
-     \brief A concrete factory class for larcv::BatchFillerPIDLabel
+     \class larcv3::BatchFillerPIDLabelFactory
+     \brief A concrete factory class for larcv3::BatchFillerPIDLabel
   */
   class BatchFillerPIDLabelProcessFactory : public ProcessFactoryBase {
   public:

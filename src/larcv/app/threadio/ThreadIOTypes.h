@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace larcv {
+namespace larcv3 {
 
   enum ThreadFillerState_t {
     kThreadStateIdle,

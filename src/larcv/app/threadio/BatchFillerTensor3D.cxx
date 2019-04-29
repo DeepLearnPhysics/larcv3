@@ -2,11 +2,11 @@
 #define __BatchFillerTensor3D_CXX__
 
 #include "BatchFillerTensor3D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "core/dataformat/EventVoxel.h"
 
 #include <random>
 
-namespace larcv {
+namespace larcv3 {
 
 static BatchFillerTensor3DProcessFactory
     __global_BatchFillerTensor3DProcessFactory__;
@@ -48,21 +48,21 @@ void BatchFillerTensor3D::_batch_end_() {
 void BatchFillerTensor3D::finalize() { _entry_data.clear(); }
 
 void BatchFillerTensor3D::assert_dimension(
-    const EventSparseTensor3D& voxel_data) const {
+    const SparseTensor3D& voxel_data) const {
   auto const& voxel_meta = voxel_data.meta();
-  if (_nx != voxel_meta.num_voxel_x()) {
+  if (_nx != voxel_meta.number_of_voxels(0)) {
     LARCV_CRITICAL() << "# of X-voxels (" << _nx << ") changed ... now "
-                     << voxel_meta.num_voxel_x() << std::endl;
+                     << voxel_meta.number_of_voxels(0) << std::endl;
     throw larbys();
   }
-  if (_ny != voxel_meta.num_voxel_y()) {
+  if (_ny != voxel_meta.number_of_voxels(1)) {
     LARCV_CRITICAL() << "# of Y-voxels (" << _ny << ") changed ... now "
-                     << voxel_meta.num_voxel_y() << std::endl;
+                     << voxel_meta.number_of_voxels(1) << std::endl;
     throw larbys();
   }
-  if (_nz != voxel_meta.num_voxel_z()) {
+  if (_nz != voxel_meta.number_of_voxels(2)) {
     LARCV_CRITICAL() << "# of Z-voxels (" << _nz << ") changed ... now "
-                     << voxel_meta.num_voxel_z() << std::endl;
+                     << voxel_meta.number_of_voxels(2) << std::endl;
     throw larbys();
   }
   return;
@@ -70,8 +70,12 @@ void BatchFillerTensor3D::assert_dimension(
 
 bool BatchFillerTensor3D::process(IOManager& mgr) {
   LARCV_DEBUG() << "start" << std::endl;
+
+  // By construction, forcing only the FIRST 3D voxel set:
   auto const& voxel_data =
-      mgr.get_data<larcv::EventSparseTensor3D>(_tensor3d_producer);
+      mgr.get_data<larcv3::EventSparseTensor3D>(_tensor3d_producer).as_vector().front();
+
+
   if (!_allow_empty && voxel_data.as_vector().empty()) {
     LARCV_CRITICAL()
         << "Could not locate non-empty voxel data w/ producer name "
@@ -85,9 +89,9 @@ bool BatchFillerTensor3D::process(IOManager& mgr) {
     std::vector<int> dim;
     dim.resize(5);
     dim[0] = batch_size();
-    dim[1] = _nz = voxel_meta.num_voxel_z();
-    dim[2] = _ny = voxel_meta.num_voxel_y();
-    dim[3] = _nx = voxel_meta.num_voxel_x();
+    dim[1] = _nz = voxel_meta.number_of_voxels(2);
+    dim[2] = _ny = voxel_meta.number_of_voxels(1);
+    dim[3] = _nx = voxel_meta.number_of_voxels(0);
     dim[4] = _num_channel;
     this->set_dim(dim);
   } else

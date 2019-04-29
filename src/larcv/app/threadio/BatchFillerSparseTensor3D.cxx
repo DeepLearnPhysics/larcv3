@@ -2,12 +2,12 @@
 #define __BATCHFILLERSPARSETENSOR3D_CXX__
 
 #include "BatchFillerSparseTensor3D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "core/dataformat/EventVoxel.h"
 
 #include <stdlib.h>
 #include <time.h>
 
-namespace larcv {
+namespace larcv3 {
 
 static BatchFillerSparseTensor3DProcessFactory
     __global_BatchFillerSparseTensor3DProcessFactory__;
@@ -58,21 +58,21 @@ void BatchFillerSparseTensor3D::_batch_end_() {
 
 void BatchFillerSparseTensor3D::finalize() { _entry_data.clear(); }
 
-void BatchFillerSparseTensor3D::assert_dimension(
-    const EventSparseTensor3D& voxel_data) const {
-  // auto const& voxel_meta = voxel_data.as_vector().front().meta();
-  // if (_rows != voxel_meta.rows()) {
-  //   LARCV_CRITICAL() << "# of Y-voxels (" << _rows << ") changed ... now "
-  //                    << voxel_meta.rows() << std::endl;
-  //   throw larbys();
-  // }
-  // if (_cols != voxel_meta.cols()) {
-  //   LARCV_CRITICAL() << "# of X-voxels (" << _cols << ") changed ... now "
-  //                    << voxel_meta.cols() << std::endl;
-  //   throw larbys();
-  // }
-  return;
-}
+// void BatchFillerSparseTensor3D::assert_dimension(
+//     const EventSparseTensor3D& voxel_data) const {
+//   // auto const& voxel_meta = voxel_data.as_vector().front().meta();
+//   // if (_rows != voxel_meta.rows()) {
+//   //   LARCV_CRITICAL() << "# of Y-voxels (" << _rows << ") changed ... now "
+//   //                    << voxel_meta.rows() << std::endl;
+//   //   throw larbys();
+//   // }
+//   // if (_cols != voxel_meta.cols()) {
+//   //   LARCV_CRITICAL() << "# of X-voxels (" << _cols << ") changed ... now "
+//   //                    << voxel_meta.cols() << std::endl;
+//   //   throw larbys();
+//   // }
+//   return;
+// }
 
 bool BatchFillerSparseTensor3D::process(IOManager& mgr) {
   
@@ -104,8 +104,9 @@ bool BatchFillerSparseTensor3D::process(IOManager& mgr) {
 
 
   LARCV_DEBUG() << "start" << std::endl;
+  // By design, this takes ONLY the first 3D voxel set.
   auto const& voxel_data =
-      mgr.get_data<larcv::EventSparseTensor3D>(_tensor3d_producer);
+      mgr.get_data<larcv3::EventSparseTensor3D>(_tensor3d_producer).as_vector().front();
   if (!_allow_empty && voxel_data.as_vector().empty()) {
     LARCV_CRITICAL()
         << "Could not locate non-empty voxel data w/ producer name "
@@ -119,15 +120,16 @@ bool BatchFillerSparseTensor3D::process(IOManager& mgr) {
   }
   // one time operation: get image dimension
   if (batch_data().dim().empty()) {
-    auto const& voxel_meta = voxel_data.meta();
+    // auto const& voxel_meta = voxel_data.meta();
     std::vector<int> dim;
     dim.resize(3);
     dim.at(0) = batch_size();
     dim.at(1) = _max_voxels;
     dim.at(2) = point_dim;
     this->set_dim(dim);
-  } else
-    this->assert_dimension(voxel_data);
+  } 
+  // else
+  //   this->assert_dimension(voxel_data);
 
 
   if (_entry_data.size() != batch_data().entry_data_size())
@@ -141,7 +143,6 @@ bool BatchFillerSparseTensor3D::process(IOManager& mgr) {
   auto & meta = voxel_data.meta();
 
   // Check that this projection ID is in the lists of channels:
-  bool found = false;
   size_t i = 0;
   
   // Get the random x/y/z flipping
@@ -157,13 +158,14 @@ bool BatchFillerSparseTensor3D::process(IOManager& mgr) {
 
 
   for (auto const& voxel : voxel_data.as_vector()) {
-    int i_x = meta.id_to_x_index(voxel.id());
-    int i_y = meta.id_to_y_index(voxel.id());
-    int i_z = meta.id_to_z_index(voxel.id());
+    auto coords = meta.coordinates(voxel.id());
+    int i_x = coords.at(0);
+    int i_y = coords.at(1);
+    int i_z = coords.at(2);
     
-    if (flip_x) i_x = meta.num_voxel_x() - (i_x + 1);
-    if (flip_y) i_y = meta.num_voxel_y() - (i_y + 1);
-    if (flip_z) i_z = meta.num_voxel_z() - (i_z + 1);
+    if (flip_x) i_x = meta.number_of_voxels(0) - (i_x + 1);
+    if (flip_y) i_y = meta.number_of_voxels(1) - (i_y + 1);
+    if (flip_z) i_z = meta.number_of_voxels(2) - (i_z + 1);
 
     _entry_data.at(point_dim*i + 0) = i_x;
     _entry_data.at(point_dim*i + 1) = i_y;

@@ -5,7 +5,7 @@
  *
  * \brief Class def header for a class BatchFillerSparseTensor3D
  *
- * @author kazuhiro
+ * @author cadams
  */
 
 /** \addtogroup ThreadIO
@@ -14,11 +14,12 @@
 #ifndef __BATCHFILLERSPARSETENSOR3D_H__
 #define __BATCHFILLERSPARSETENSOR3D_H__
 
-#include "larcv/core/Processor/ProcessFactory.h"
+#include "core/processor/ProcessFactory.h"
 #include "BatchFillerTemplate.h"
 #include "RandomCropper.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
-namespace larcv {
+#include "core/dataformat/EventVoxel.h"
+
+namespace larcv3 {
 
   /**
      \class ProcessBase
@@ -51,7 +52,7 @@ namespace larcv {
   private:
 
     size_t set_data_size(const EventSparseTensor3D& image_data);
-    void assert_dimension(const EventSparseTensor3D& image_data) const;
+    // void assert_dimension(const EventSparseTensor3D& image_data) const;
 
     std::string _tensor3d_producer;
     size_t _max_voxels;
@@ -64,8 +65,8 @@ namespace larcv {
   };
 
   /**
-     \class larcv::BatchFillerSparseTensor3DFactory
-     \brief A concrete factory class for larcv::BatchFillerSparseTensor3D
+     \class larcv3::BatchFillerSparseTensor3DFactory
+     \brief A concrete factory class for larcv3::BatchFillerSparseTensor3D
   */
   class BatchFillerSparseTensor3DProcessFactory : public ProcessFactoryBase {
   public:

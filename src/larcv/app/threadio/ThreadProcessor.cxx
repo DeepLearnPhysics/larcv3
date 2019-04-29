@@ -2,7 +2,7 @@
 #define THREADPROCESSOR_CXX
 
 #include "ThreadProcessor.h"
-#include "larcv/core/Base/LArCVBaseUtilFunc.h"
+#include "core/base/LArCVBaseUtilFunc.h"
 #include <sstream>
 #include <unistd.h>
 #include "BatchFillerTemplate.h"
@@ -14,7 +14,7 @@
 
 std::mutex __thproc_random_mt;
 
-namespace larcv {
+namespace larcv3 {
   ThreadProcessor::ThreadProcessor(std::string name)
     : larcv_base(name)
     , _run_manager_thread(false)
@@ -176,7 +176,7 @@ namespace larcv {
     return _batch_entries_v[storage_id];
   }
 
-  const std::vector<larcv::EventBase>& ThreadProcessor::processed_events(size_t storage_id) const
+  const std::vector<larcv3::EventID>& ThreadProcessor::processed_events(size_t storage_id) const
   {
     if (storage_id >= _num_batch_storage) {
       LARCV_CRITICAL() << "Requested state of an invalid storage id: " << storage_id << std::endl;
@@ -292,7 +292,7 @@ namespace larcv {
                        << std::endl;
       throw larbys();
     }
-    auto const cfg = main_cfg.get<larcv::PSet>(name());
+    auto const cfg = main_cfg.get<larcv3::PSet>(name());
     configure(cfg);
   }
 
@@ -465,14 +465,14 @@ namespace larcv {
           LARCV_NORMAL() << "IOManager configuration will be ignored..." << std::endl;
         }
         else if (pset_key == "ProcessList") {
-          auto const& orig_thread_plist = orig_cfg.get<larcv::PSet>(pset_key);
+          auto const& orig_thread_plist = orig_cfg.get<larcv3::PSet>(pset_key);
           PSet thread_plist("ProcessList");
           for (auto const& plist_value_key : orig_thread_plist.value_keys())
             thread_plist.add_value(plist_value_key, orig_thread_plist.get<std::string>(plist_value_key));
           for (auto const& plist_pset_key : orig_thread_plist.pset_keys()) {
             std::stringstream ss_tmp3;
             ss_tmp3 << plist_pset_key << "_t" << thread_id;
-            PSet thread_pcfg(orig_thread_plist.get<larcv::PSet>(plist_pset_key));
+            PSet thread_pcfg(orig_thread_plist.get<larcv3::PSet>(plist_pset_key));
             thread_pcfg.rename(ss_tmp3.str());
             thread_plist.add_pset(thread_pcfg);
           }

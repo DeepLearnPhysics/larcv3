@@ -4,7 +4,7 @@
 #include "BatchFillerTemplate.h"
 #include <sstream>
 
-namespace larcv {
+namespace larcv3 {
 
   template<> BatchDataType_t BatchFillerTemplate< char   >::data_type() const     { return BatchDataType_t::kBatchDataChar;   }
   template<> BatchDataType_t BatchFillerTemplate< short  >::data_type() const     { return BatchDataType_t::kBatchDataShort;  }

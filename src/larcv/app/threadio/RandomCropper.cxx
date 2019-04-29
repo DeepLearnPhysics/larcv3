@@ -4,7 +4,7 @@
 #include <random>
 #include "RandomCropper.h"
 
-namespace larcv {
+namespace larcv3 {
 
   RandomCropper::RandomCropper(const std::string name)
     : larcv_base(name)
@@ -54,7 +54,7 @@ namespace larcv {
 
   }
 
-  const std::vector<float> RandomCropper::crop(const larcv::Image2D& image)
+  const std::vector<float> RandomCropper::crop(const larcv3::Image2D& image)
   {
     // Check input image size
     if(image.meta().rows() != _target_rows ||

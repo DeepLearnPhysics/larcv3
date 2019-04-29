@@ -2,11 +2,11 @@
 #define __BatchFillerPIDLabel_CXX__
 
 #include "BatchFillerPIDLabel.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
-#include "larcv/core/DataFormat/EventParticle.h"
+#include "core/dataformat/EventImage2D.h"
+#include "core/dataformat/EventParticle.h"
 #include <random>
 
-namespace larcv {
+namespace larcv3 {
 
   static BatchFillerPIDLabelProcessFactory __global_BatchFillerPIDLabelProcessFactory__;
 
@@ -64,7 +64,7 @@ namespace larcv {
 
   bool BatchFillerPIDLabel::process(IOManager & mgr)
   {
-    auto const& event_part = mgr.get_data<larcv::EventParticle>(_part_producer);
+    auto const& event_part = mgr.get_data<larcv3::EventParticle>(_part_producer);
 
     if (batch_data().dim().empty()) {
       std::vector<int> dim(2);

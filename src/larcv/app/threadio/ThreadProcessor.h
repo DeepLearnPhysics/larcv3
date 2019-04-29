@@ -14,12 +14,12 @@
 #ifndef THREADPROCESSOR_H
 #define THREADPROCESSOR_H
 
-#include "larcv/core/Processor/ProcessDriver.h"
+#include "core/processor/ProcessDriver.h"
 #include "ThreadIOTypes.h"
 #include <thread>
 #include <random>
 
-namespace larcv {
+namespace larcv3 {
   /**
      \class ThreadProcessor
      User defined class ThreadProcessor ... these comments are used to generate
@@ -55,7 +55,7 @@ namespace larcv {
 
     void release_data();
 
-    inline const std::vector<larcv::BatchDataState_t>& storage_status_array() const
+    inline const std::vector<larcv3::BatchDataState_t>& storage_status_array() const
     { return _batch_state_v; }
 
     inline size_t num_threads() const { return _num_threads; }
@@ -76,7 +76,7 @@ namespace larcv {
 
     size_t process_counter() const;
 
-    inline const std::vector<larcv::ThreadFillerState_t>& thread_status() const
+    inline const std::vector<larcv3::ThreadFillerState_t>& thread_status() const
     { return _thread_state_v; }
 
     size_t get_n_entries() const;
@@ -88,7 +88,7 @@ namespace larcv {
     
     const std::vector<size_t>& processed_entries(size_t storage_id=0) const;
 
-    const std::vector<larcv::EventBase>& processed_events(size_t storage_id) const;
+    const std::vector<larcv3::EventID>& processed_events(size_t storage_id) const;
 
     const ProcessDriver* pd(size_t thread_id=0);
 
@@ -99,7 +99,7 @@ namespace larcv {
     inline const std::vector<size_t>& batch_fillers() const
     { return _batch_filler_id_v; }
 
-    inline const std::vector<larcv::BatchDataType_t>& batch_types() const
+    inline const std::vector<larcv3::BatchDataType_t>& batch_types() const
     { return _batch_data_type_v; }
 
     inline size_t num_batch_storage() const
@@ -134,14 +134,14 @@ namespace larcv {
     size_t _batch_global_counter;
 
     std::vector<size_t> _batch_filler_id_v;
-    std::vector<larcv::BatchDataType_t> _batch_data_type_v;
+    std::vector<larcv3::BatchDataType_t> _batch_data_type_v;
 
     // main thread
     std::thread _manager_thread;
     std::mt19937 _random_generator;
     TPRandomAccessMode_t _random_access_mode;
     // thread-wise variables
-    std::vector<larcv::ProcessDriver*> _driver_v;
+    std::vector<larcv3::ProcessDriver*> _driver_v;
     std::vector<std::thread> _thread_v;
     std::vector<size_t> _current_storage_id;
     std::vector<size_t> _thread_exec_ctr_v;
@@ -151,9 +151,9 @@ namespace larcv {
     // process-wise variables
     std::vector<std::string> _process_name_v;
     // storage-wise variables
-    std::vector<larcv::BatchDataState_t> _batch_state_v;
+    std::vector<larcv3::BatchDataState_t> _batch_state_v;
     std::vector<std::vector<size_t> > _batch_entries_v;
-    std::vector<std::vector<larcv::EventBase> > _batch_events_v;
+    std::vector<std::vector<larcv3::EventID> > _batch_events_v;
     std::vector<size_t> _batch_global_id;
   };
 

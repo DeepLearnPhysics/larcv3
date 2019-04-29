@@ -3,7 +3,7 @@
 
 #include "BatchDataStorageFactory.h"
 
-namespace larcv {
+namespace larcv3 {
 
   template <class T>
   const BatchDataStorageFactory<T>& BatchDataStorageFactory<T>::get() {
@@ -40,18 +40,18 @@ namespace larcv {
     return (*_me);
   }
 }
-template<> larcv::BatchDataStorageFactory<char>*   larcv::BatchDataStorageFactory<char>::_me   = nullptr;
-template<> larcv::BatchDataStorageFactory<short>*  larcv::BatchDataStorageFactory<short>::_me  = nullptr;
-template<> larcv::BatchDataStorageFactory<int>*    larcv::BatchDataStorageFactory<int>::_me    = nullptr;
-template<> larcv::BatchDataStorageFactory<float>*  larcv::BatchDataStorageFactory<float>::_me  = nullptr;
-template<> larcv::BatchDataStorageFactory<double>* larcv::BatchDataStorageFactory<double>::_me = nullptr;
-template<> larcv::BatchDataStorageFactory<std::string>* larcv::BatchDataStorageFactory<std::string>::_me = nullptr;
+template<> larcv3::BatchDataStorageFactory<char>*   larcv3::BatchDataStorageFactory<char>::_me   = nullptr;
+template<> larcv3::BatchDataStorageFactory<short>*  larcv3::BatchDataStorageFactory<short>::_me  = nullptr;
+template<> larcv3::BatchDataStorageFactory<int>*    larcv3::BatchDataStorageFactory<int>::_me    = nullptr;
+template<> larcv3::BatchDataStorageFactory<float>*  larcv3::BatchDataStorageFactory<float>::_me  = nullptr;
+template<> larcv3::BatchDataStorageFactory<double>* larcv3::BatchDataStorageFactory<double>::_me = nullptr;
+template<> larcv3::BatchDataStorageFactory<std::string>* larcv3::BatchDataStorageFactory<std::string>::_me = nullptr;
 
-template class larcv::BatchDataStorageFactory<char>;
-template class larcv::BatchDataStorageFactory<short>;
-template class larcv::BatchDataStorageFactory<int>;
-template class larcv::BatchDataStorageFactory<float>;
-template class larcv::BatchDataStorageFactory<double>;
-template class larcv::BatchDataStorageFactory<std::string>;
+template class larcv3::BatchDataStorageFactory<char>;
+template class larcv3::BatchDataStorageFactory<short>;
+template class larcv3::BatchDataStorageFactory<int>;
+template class larcv3::BatchDataStorageFactory<float>;
+template class larcv3::BatchDataStorageFactory<double>;
+template class larcv3::BatchDataStorageFactory<std::string>;
 
 #endif

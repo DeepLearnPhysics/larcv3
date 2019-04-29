@@ -14,11 +14,11 @@
 #ifndef __BATCHFILLERTensor3D_H__
 #define __BATCHFILLERTensor3D_H__
 
-#include "larcv/core/Processor/ProcessFactory.h"
+#include "core/processor/ProcessFactory.h"
 #include "BatchFillerTemplate.h"
 #include "RandomCropper.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
-namespace larcv {
+#include "core/dataformat/EventVoxel.h"
+namespace larcv3 {
 
   /**
      \class ProcessBase
@@ -50,8 +50,8 @@ namespace larcv {
 
   private:
 
-    size_t set_data_size(const EventSparseTensor3D& image_data);
-    void assert_dimension(const EventSparseTensor3D& image_data) const;
+    // size_t set_data_size(const SparseTensor3D& image_data);
+    void assert_dimension(const SparseTensor3D& image_data) const;
 
     std::string _tensor3d_producer;
     size_t _nx;
@@ -64,8 +64,8 @@ namespace larcv {
   };
 
   /**
-     \class larcv::BatchFillerTensor3DFactory
-     \brief A concrete factory class for larcv::BatchFillerTensor3D
+     \class larcv3::BatchFillerTensor3DFactory
+     \brief A concrete factory class for larcv3::BatchFillerTensor3D
   */
   class BatchFillerTensor3DProcessFactory : public ProcessFactoryBase {
   public:

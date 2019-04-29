@@ -17,7 +17,7 @@
 #include <iostream>
 #include "BatchData.h"
 
-namespace larcv {
+namespace larcv3 {
   /**
      \class BatchDataStorage
      User defined class BatchDataStorage ... these comments are used to generate
@@ -57,7 +57,7 @@ namespace larcv {
     void reset_batch();
 
   private:
-    std::vector<larcv::BatchData<T> > _data_v;
+    std::vector<larcv3::BatchData<T> > _data_v;
   };
   
 }

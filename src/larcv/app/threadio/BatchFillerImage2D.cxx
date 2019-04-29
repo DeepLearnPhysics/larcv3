@@ -5,7 +5,7 @@
 
 #include <random>
 
-namespace larcv {
+namespace larcv3 {
 
   static BatchFillerImage2DProcessFactory __global_BatchFillerImage2DProcessFactory__;
 

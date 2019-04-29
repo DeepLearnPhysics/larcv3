@@ -2,10 +2,10 @@
 #define BATCHDATASTORAGE_CXX
 
 #include "BatchDataStorage.h"
-#include "larcv/core/Base/larcv_logger.h"
-#include "larcv/core/Base/larbys.h"
+#include "core/base/larcv_logger.h"
+#include "core/base/larbys.h"
 
-namespace larcv {
+namespace larcv3 {
 
   template <class T>
   BatchDataStorage<T>::BatchDataStorage(size_t num_batch)
@@ -98,11 +98,11 @@ namespace larcv {
 
 }
 
-template class larcv::BatchDataStorage<char>;
-template class larcv::BatchDataStorage<short>;
-template class larcv::BatchDataStorage<int>;
-template class larcv::BatchDataStorage<float>;
-template class larcv::BatchDataStorage<double>;
-template class larcv::BatchDataStorage<std::string>;
+template class larcv3::BatchDataStorage<char>;
+template class larcv3::BatchDataStorage<short>;
+template class larcv3::BatchDataStorage<int>;
+template class larcv3::BatchDataStorage<float>;
+template class larcv3::BatchDataStorage<double>;
+template class larcv3::BatchDataStorage<std::string>;
 
 #endif
