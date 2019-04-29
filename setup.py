@@ -1,4 +1,8 @@
 from skbuild import setup  # This line replaces 'from setuptools import setup'
+import argparse
+
+
+
 
 setup(
     name="larcv",
@@ -6,6 +10,7 @@ setup(
     cmake_source_dir='src/',
     cmake_args=[
         '-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.9',
+        '-DCMAKE_NO_SWIG=False'
     ],
     # extra_link_args=["-stdlib=libc++", "-mmacosx-version-min=10.9"],
     include_package_data=True,
