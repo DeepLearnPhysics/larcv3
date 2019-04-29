@@ -143,6 +143,11 @@ class ImageMeta {
 
   bool is_valid() const;
 
+
+  // These functions are mostly for historical compatibility and consistence:
+  inline size_t cols() const {return _number_of_voxels[0];}
+  inline size_t rows() const {return _number_of_voxels[1];}
+
   // inline void update(size_t row_count, size_t col_count) {
   //   _row_count = row_count;
   //   _col_count = col_count;
