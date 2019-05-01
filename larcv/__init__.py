@@ -20,16 +20,21 @@
 #     larcv.load_cvutil
 # #larcv.LoadImageMod
 
-import os
+# import os
 
-# Add the location of the libraries to ld library path:
-extra_ld_path = ":{}/lib/".format(os.path.dirname(os.path.abspath(__file__)))
-if 'LD_LIBRARY_PATH' in os.environ:
-    os.environ['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH'] + extra_ld_path
-else:
-    os.environ['LD_LIBRARY_PATH'] = extra_ld_path
+# # Add the location of the libraries to ld library path:
+# extra_ld_path = ":{}/lib/".format(os.path.dirname(os.path.abspath(__file__)))
+# if 'LD_LIBRARY_PATH' in os.environ:
+#     os.environ['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH'] + extra_ld_path
+# else:
+#     os.environ['LD_LIBRARY_PATH'] = extra_ld_path
 
-if 'DYLD_LIBRARY_PATH' in os.environ:
-    os.environ['DYLD_LIBRARY_PATH'] = os.environ['DYLD_LIBRARY_PATH'] + extra_ld_path
-else:
-    os.environ['DYLD_LIBRARY_PATH'] = extra_ld_path
+# if 'DYLD_LIBRARY_PATH' in os.environ:
+#     os.environ['DYLD_LIBRARY_PATH'] = os.environ['DYLD_LIBRARY_PATH'] + extra_ld_path
+# else:
+#     os.environ['DYLD_LIBRARY_PATH'] = extra_ld_path
+
+from . import base
+from . import dataformat
+from . import processor
+from . import pyutil

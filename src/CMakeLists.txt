@@ -17,7 +17,7 @@ include_directories(larcv)
 find_package(HDF5 REQUIRED COMPONENTS C CXX)
 include_directories(${HDF5_INCLUDE_DIR})
 
-# Many pacakges need python:
+# Many packages need python:
 find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 
