@@ -11,12 +11,12 @@
 /** \addtogroup core_DataFormat
 
     @{*/
-#ifndef __LARCV_BBOX_H__
-#define __LARCV_BBOX_H__
+#ifndef __LARCV3DATAFORMAT_BBOX_H__
+#define __LARCV3DATAFORMAT_BBOX_H__
 
 #include <iostream>
-#include "Point.h"
-#include "DataFormatTypes.h"
+#include "larcv3/core/dataformat/Point.h"
+#include "larcv3/core/dataformat/DataFormatTypes.h"
 namespace larcv3 {
 
   /**

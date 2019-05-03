@@ -12,13 +12,13 @@
 /** \addtogroup DataFormat
 
     @{*/
-#ifndef EVENTIMAGE_H
-#define EVENTIMAGE_H
+#ifndef __LARCV3DATAFORMAT_EVENTIMAGE_H
+#define __LARCV3DATAFORMAT_EVENTIMAGE_H
 
 #include <iostream>
-#include "EventBase.h"
-#include "Image2D.h"
-#include "DataProductFactory.h"
+#include "larcv3/core/dataformat/EventBase.h"
+#include "larcv3/core/dataformat/Image2D.h"
+#include "larcv3/core/dataformat/DataProductFactory.h"
 
 namespace larcv3 {
   

@@ -1,10 +1,10 @@
-#ifndef __LARCV_VERTEX_CXX__
-#define __LARCV_VERTEX_CXX__
+#ifndef __LARCV3DATAFORMAT_VERTEX_CXX__
+#define __LARCV3DATAFORMAT_VERTEX_CXX__
 
 #include <sstream>
-#include "Vertex.h"
-#include "core/base/larbys.h"
-#include "core/base/larcv_logger.h"
+#include "larcv3/core/dataformat/Vertex.h"
+#include "larcv3/core/base/larbys.h"
+#include "larcv3/core/base/larcv_logger.h"
 
 namespace larcv3 {
 

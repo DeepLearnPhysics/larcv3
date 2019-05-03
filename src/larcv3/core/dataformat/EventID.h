@@ -11,11 +11,11 @@
 /** \addtogroup DataFormat
 
     @{*/
-#ifndef __LARCV_EVENTID_H
-#define __LARCV_EVENTID_H
+#ifndef __LARCV3DATAFORMAT_EVENTID_H
+#define __LARCV3DATAFORMAT_EVENTID_H
 
 #include <iostream>
-#include "DataFormatTypes.h"
+#include "larcv3/core/dataformat/DataFormatTypes.h"
 
 namespace larcv3 {
 // class IOManager;

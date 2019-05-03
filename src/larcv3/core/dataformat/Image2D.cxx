@@ -1,9 +1,9 @@
-#ifndef __LARCV3_VOXEL_CXX__
-#define __LARCV3_VOXEL_CXX__
+#ifndef __LARCV3DATAFORMAT_VOXEL_CXX__
+#define __LARCV3DATAFORMAT_VOXEL_CXX__
 
 
-#include "core/base/larbys.h"
-#include "Image2D.h"
+#include "larcv3/core/base/larbys.h"
+#include "larcv3/core/dataformat/Image2D.h"
 #include <iostream>
 #include <string.h>
 #include <stdio.h>

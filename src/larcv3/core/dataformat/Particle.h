@@ -11,13 +11,13 @@
 /** \addtogroup core_DataFormat
 
     @{*/
-#ifndef __LARCV_PARTICLE_H__
-#define __LARCV_PARTICLE_H__
+#ifndef __LARCV3DATAFORMAT_PARTICLE_H__
+#define __LARCV3DATAFORMAT_PARTICLE_H__
 
 #include <iostream>
-#include "Vertex.h"
+#include "larcv3/core/dataformat/Vertex.h"
 // #include "BBox.h"
-#include "DataFormatTypes.h"
+#include "larcv3/core/dataformat/DataFormatTypes.h"
 
 // In hdf5, strings are fixed length so we set the maximum length here:
 #define PARTICLE_PROCESS_STRLEN 64

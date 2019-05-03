@@ -12,12 +12,12 @@
 
     @{*/
 
-#ifndef __LARCV3_IMAGE_H__
-#define __LARCV3_IMAGE_H__
+#ifndef __LARCV3DATAFORMAT_IMAGE_H__
+#define __LARCV3DATAFORMAT_IMAGE_H__
 
 #include <vector>
 #include <cstdlib>
-#include "ImageMeta.h"
+#include "larcv3/core/dataformat/ImageMeta.h"
 
 namespace larcv3 {
 

@@ -1,7 +1,7 @@
-#ifndef __LARCV3_EVENTVOXEL_CXX
-#define __LARCV3_EVENTVOXEL_CXX
+#ifndef __LARCV3DATAFORMAT_EVENTVOXEL_CXX
+#define __LARCV3DATAFORMAT_EVENTVOXEL_CXX
 
-#include "EventVoxel.h"
+#include "larcv3/core/dataformat/EventVoxel.h"
 
 
 namespace larcv3 {

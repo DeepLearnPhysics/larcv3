@@ -11,12 +11,12 @@
 /** \addtogroup DataFormat
 
     @{*/
-#ifndef __LARCV_EVENTBASE_H
-#define __LARCV_EVENTBASE_H
+#ifndef __LARCV3DATAFORMAT_EVENTBASE_H
+#define __LARCV3DATAFORMAT_EVENTBASE_H
 
 #include <iostream>
-#include "core/base/larcv_base.h"
-#include "DataFormatTypes.h"
+#include "larcv3/core/base/larcv_base.h"
+#include "larcv3/core/dataformat/DataFormatTypes.h"
 
 // There is no need to generate an explicit wrapper for EventBase, since it's virtual
 

@@ -1,11 +1,11 @@
-#ifndef __LARCV_IOMANAGER_CXX__
-#define __LARCV_IOMANAGER_CXX__
+#ifndef __LARCV3DATAFORMAT_IOMANAGER_CXX__
+#define __LARCV3DATAFORMAT_IOMANAGER_CXX__
 
-#include "IOManager.h"
+#include "larcv3/core/dataformat/IOManager.h"
 #include <algorithm>
-#include "DataProductFactory.h"
+#include "larcv3/core/dataformat/DataProductFactory.h"
 #include "assert.h"
-#include "core/base/LArCVBaseUtilFunc.h"
+#include "larcv3/core/base/LArCVBaseUtilFunc.h"
 
 #define EVENT_ID_CHUNK_SIZE 10
 

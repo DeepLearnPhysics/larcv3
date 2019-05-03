@@ -3,23 +3,23 @@
 /* Put header files here or function declarations like below */
 
 // Basic Types:
-#include "core/dataformat/DataFormatTypes.h"
-#include "core/dataformat/EventID.h"
-#include "core/dataformat/Point.h"
-#include "core/dataformat/BBox.h"
-#include "core/dataformat/Vertex.h"
-#include "core/dataformat/Particle.h"
-#include "core/dataformat/ImageMeta.h"
-#include "core/dataformat/Image2D.h"
-#include "core/dataformat/Voxel.h"
+#include "larcv3/core/dataformat/DataFormatTypes.h"
+#include "larcv3/core/dataformat/EventID.h"
+#include "larcv3/core/dataformat/Point.h"
+#include "larcv3/core/dataformat/BBox.h"
+#include "larcv3/core/dataformat/Vertex.h"
+#include "larcv3/core/dataformat/Particle.h"
+#include "larcv3/core/dataformat/ImageMeta.h"
+#include "larcv3/core/dataformat/Image2D.h"
+#include "larcv3/core/dataformat/Voxel.h"
 
 // IO Interface classes:
-#include "core/dataformat/DataProductFactory.h"
-#include "core/dataformat/EventBase.h"
-#include "core/dataformat/EventParticle.h"
-#include "core/dataformat/EventImage2D.h"
-#include "core/dataformat/IOManager.h"
-#include "core/dataformat/EventVoxel.h"
+#include "larcv3/core/dataformat/DataProductFactory.h"
+#include "larcv3/core/dataformat/EventBase.h"
+#include "larcv3/core/dataformat/EventParticle.h"
+#include "larcv3/core/dataformat/EventImage2D.h"
+#include "larcv3/core/dataformat/IOManager.h"
+#include "larcv3/core/dataformat/EventVoxel.h"
 
 
 using namespace larcv3;
@@ -30,23 +30,23 @@ using namespace larcv3;
 %include "std_vector.i"
 
 // Basic Types:
-%include "core/dataformat/DataFormatTypes.h"
-%include "core/dataformat/EventID.h"
-%include "core/dataformat/Point.h"
-%include "core/dataformat/BBox.h"
-%include "core/dataformat/Vertex.h"
-%include "core/dataformat/Particle.h"
-%include "core/dataformat/ImageMeta.h"
-%include "core/dataformat/Image2D.h"
-%include "core/dataformat/Voxel.h"
+%include "larcv3/core/dataformat/DataFormatTypes.h"
+%include "larcv3/core/dataformat/EventID.h"
+%include "larcv3/core/dataformat/Point.h"
+%include "larcv3/core/dataformat/BBox.h"
+%include "larcv3/core/dataformat/Vertex.h"
+%include "larcv3/core/dataformat/Particle.h"
+%include "larcv3/core/dataformat/ImageMeta.h"
+%include "larcv3/core/dataformat/Image2D.h"
+%include "larcv3/core/dataformat/Voxel.h"
 
 // IO Interface classes:
-%include "core/dataformat/DataProductFactory.h"
-%include "core/dataformat/EventBase.h"
-%include "core/dataformat/EventParticle.h"
-%include "core/dataformat/EventImage2D.h"
-%include "core/dataformat/IOManager.h"
-%include "core/dataformat/EventVoxel.h"
+%include "larcv3/core/dataformat/DataProductFactory.h"
+%include "larcv3/core/dataformat/EventBase.h"
+%include "larcv3/core/dataformat/EventParticle.h"
+%include "larcv3/core/dataformat/EventImage2D.h"
+%include "larcv3/core/dataformat/IOManager.h"
+%include "larcv3/core/dataformat/EventVoxel.h"
 
 
 // Define instantiations of LARCV3 templates:

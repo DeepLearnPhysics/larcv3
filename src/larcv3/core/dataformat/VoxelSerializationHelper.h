@@ -11,13 +11,13 @@
 /** \addtogroup core_DataFormat
 
     @{*/
-#ifndef __LARCV_EVENTVOXEL_SERIALIZATION_HELPER_H
-#define __LARCV_EVENTVOXEL_SERIALIZATION_HELPER_H
+#ifndef __LARCV3DATAFORMAT_VOXEL_SERIALIZATION_HELPER_H
+#define __LARCV3DATAFORMAT_VOXEL_SERIALIZATION_HELPER_H
 
 #include <iostream>
-#include "DataProductFactory.h"
-#include "Voxel.h"
-#include "ImageMeta.h"
+#include "larcv3/core/dataformat/DataProductFactory.h"
+#include "larcv3/core/dataformat/Voxel.h"
+#include "larcv3/core/dataformat/ImageMeta.h"
 
 
 namespace larcv3 {

@@ -11,15 +11,15 @@
 /** \addtogroup DataFormat
 
     @{*/
-#ifndef __LARCV_DATAPRODUCTFACTORY_H__
-#define __LARCV_DATAPRODUCTFACTORY_H__
+#ifndef __LARCV3DATAFORMAT_DATAPRODUCTFACTORY_H__
+#define __LARCV3DATAFORMAT_DATAPRODUCTFACTORY_H__
 
 #include <iostream>
 #include <map>
-#include "core/base/larcv_base.h"
-#include "core/base/larbys.h"
-#include "EventBase.h"
-#include "DataFormatTypes.h"
+#include "larcv3/core/base/larcv_base.h"
+#include "larcv3/core/base/larbys.h"
+#include "larcv3/core/dataformat/EventBase.h"
+#include "larcv3/core/dataformat/DataFormatTypes.h"
 #include <sstream>
 namespace larcv3 {
 

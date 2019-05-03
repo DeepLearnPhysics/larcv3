@@ -1,7 +1,7 @@
-#ifndef __LARCV_DATAPRODUCTFACTORY_CXX__
-#define __LARCV_DATAPRODUCTFACTORY_CXX__
+#ifndef __LARCV3DATAFORMAT_DATAPRODUCTFACTORY_CXX__
+#define __LARCV3DATAFORMAT_DATAPRODUCTFACTORY_CXX__
 
-#include "DataProductFactory.h"
+#include "larcv3/core/dataformat/DataProductFactory.h"
 
 larcv3::DataProductFactory* larcv3::DataProductFactory::_me = nullptr;
 

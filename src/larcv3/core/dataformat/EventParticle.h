@@ -11,12 +11,12 @@
 /** \addtogroup DataFormat
 
     @{*/
-#ifndef __LARCV_EVENTPARTICLE_H
-#define __LARCV_EVENTPARTICLE_H
+#ifndef __LARCV3DATAFORMAT_EVENTPARTICLE_H
+#define __LARCV3DATAFORMAT_EVENTPARTICLE_H
 
-#include "EventBase.h"
-#include "Particle.h"
-#include "DataProductFactory.h"
+#include "larcv3/core/dataformat/EventBase.h"
+#include "larcv3/core/dataformat/Particle.h"
+#include "larcv3/core/dataformat/DataProductFactory.h"
 
 class EventParticle;
 

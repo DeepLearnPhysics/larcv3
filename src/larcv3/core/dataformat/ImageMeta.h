@@ -19,12 +19,12 @@
 /** \addtogroup core_DataFormat
 
     @{*/
-#ifndef __LARCV_IMAGEMETA_H__
-#define __LARCV_IMAGEMETA_H__
+#ifndef __LARCV3DATAFORMAT_IMAGEMETA_H__
+#define __LARCV3DATAFORMAT_IMAGEMETA_H__
 
 #include <iostream>
-#include "DataFormatTypes.h"
-#include "core/base/larbys.h"
+#include "larcv3/core/dataformat/DataFormatTypes.h"
+#include "larcv3/core/base/larbys.h"
 
 namespace larcv3 {
 

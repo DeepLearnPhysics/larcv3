@@ -1,7 +1,7 @@
-#ifndef __LARCV_DATAFORMATTYPES_CXX
-#define __LARCV_DATAFORMATTYPES_CXX
+#ifndef __LARCV3DATAFORMAT_DATAFORMATTYPES_CXX
+#define __LARCV3DATAFORMAT_DATAFORMATTYPES_CXX
 
-#include "DataFormatTypes.h"
+#include "larcv3/core/dataformat/DataFormatTypes.h"
 
 #ifndef SWIG
 

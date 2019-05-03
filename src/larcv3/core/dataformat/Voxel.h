@@ -11,11 +11,11 @@
 /** \addtogroup core_DataFormat
 
     @{*/
-#ifndef __LARCV_VOXEL_H
-#define __LARCV_VOXEL_H
+#ifndef __LARCV3DATAFORMAT_VOXEL_H
+#define __LARCV3DATAFORMAT_VOXEL_H
 
-#include "DataFormatTypes.h"
-#include "ImageMeta.h"
+#include "larcv3/core/dataformat/DataFormatTypes.h"
+#include "larcv3/core/dataformat/ImageMeta.h"
 
 namespace larcv3 {
 

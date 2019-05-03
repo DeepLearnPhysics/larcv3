@@ -1,8 +1,8 @@
-#ifndef __LARCV_VERTEX_H__
-#define __LARCV_VERTEX_H__
+#ifndef __LARCV3DATAFORMAT_VERTEX_H__
+#define __LARCV3DATAFORMAT_VERTEX_H__
 
-#include "DataFormatTypes.h"
-#include "Point.h"
+#include "larcv3/core/dataformat/DataFormatTypes.h"
+#include "larcv3/core/dataformat/Point.h"
 
 namespace larcv3 {
 

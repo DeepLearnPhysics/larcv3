@@ -12,15 +12,15 @@
  * \addtogroup core_DataFormat
 
 */
-#ifndef __LARCV3_EVENTVOXEL_H
-#define __LARCV3_EVENTVOXEL_H
+#ifndef __LARCV3DATAFORMAT_EVENTVOXEL_H
+#define __LARCV3DATAFORMAT_EVENTVOXEL_H
 
 #include <iostream>
-#include "EventBase.h"
-#include "DataProductFactory.h"
-#include "Voxel.h"
-#include "ImageMeta.h"
-#include "VoxelSerializationHelper.h"
+#include "larcv3/core/dataformat/EventBase.h"
+#include "larcv3/core/dataformat/DataProductFactory.h"
+#include "larcv3/core/dataformat/Voxel.h"
+#include "larcv3/core/dataformat/ImageMeta.h"
+#include "larcv3/core/dataformat/VoxelSerializationHelper.h"
 
 namespace larcv3 {
 

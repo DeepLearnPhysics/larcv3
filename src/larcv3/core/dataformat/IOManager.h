@@ -12,8 +12,8 @@
 /** \addtogroup core_DataFormat
 
     @{*/
-#ifndef __LARCV_IOMANAGER_H
-#define __LARCV_IOMANAGER_H
+#ifndef __LARCV3DATAFORMAT_IOMANAGER_H
+#define __LARCV3DATAFORMAT_IOMANAGER_H
 
 #include <iostream>
 #include <map>
@@ -21,11 +21,11 @@
 
 #include "H5Cpp.h"
 
-#include "core/base/larcv_base.h"
-#include "core/base/larbys.h"
-#include "core/base/PSet.h"
-#include "EventBase.h"
-#include "EventID.h"
+#include "larcv3/core/base/larcv_base.h"
+#include "larcv3/core/base/larbys.h"
+#include "larcv3/core/base/PSet.h"
+#include "larcv3/core/dataformat/EventBase.h"
+#include "larcv3/core/dataformat/EventID.h"
 
 //#include "ProductMap.h"
 namespace larcv3 {

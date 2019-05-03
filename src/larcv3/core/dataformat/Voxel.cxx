@@ -1,7 +1,7 @@
-#ifndef __LARCV_VOXEL_CXX__
-#define __LARCV_VOXEL_CXX__
+#ifndef __LARCV3DATAFORMAT_VOXEL_CXX__
+#define __LARCV3DATAFORMAT_VOXEL_CXX__
 
-#include "Voxel.h"
+#include "larcv3/core/dataformat/Voxel.h"
 #include <iostream>
 
 namespace larcv3 {

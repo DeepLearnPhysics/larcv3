@@ -1,11 +1,11 @@
-#ifndef __LARCV_PARTICLE_CXX__
-#define __LARCV_PARTICLE_CXX__
+#ifndef __LARCV3DATAFORMAT_PARTICLE_CXX__
+#define __LARCV3DATAFORMAT_PARTICLE_CXX__
 
-#include "Particle.h"
+#include "larcv3/core/dataformat/Particle.h"
 #include <set>
 #include <sstream>
-#include "core/base/larcv_logger.h"
-#include "core/base/larbys.h"
+#include "larcv3/core/base/larcv_logger.h"
+#include "larcv3/core/base/larbys.h"
 
 namespace larcv3 {
 

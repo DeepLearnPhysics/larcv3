@@ -1,7 +1,7 @@
-#ifndef EVENTIMAGE2D_CXX
-#define EVENTIMAGE2D_CXX
+#ifndef __LARCV3DATAFORMAT_EVENTIMAGE2D_CXX
+#define __LARCV3DATAFORMAT_EVENTIMAGE2D_CXX
 
-#include "EventImage2D.h"
+#include "larcv3/core/dataformat/EventImage2D.h"
 // #include "larcv3/core/Base/larbys.h"
 
 #define IMAGE_EXTENTS_CHUNK_SIZE 1
