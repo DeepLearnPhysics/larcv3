@@ -15,7 +15,7 @@
 #ifndef __LARCV3BASE_UTILFUNC_H__
 #define __LARCV3BASE_UTILFUNC_H__
 
-#include "PSet.h"
+#include "larcv3/core/base/PSet.h"
 
 namespace larcv3 {
 

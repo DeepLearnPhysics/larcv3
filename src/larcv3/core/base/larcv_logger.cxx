@@ -1,7 +1,7 @@
 #ifndef __LARCV3BASE_LOGGER_CXX__
 #define __LARCV3BASE_LOGGER_CXX__
 
-#include "larcv_logger.h"
+#include "larcv3/core/base/larcv_logger.h"
 #include <mutex>
 std::mutex __logger_mtx;
 namespace larcv3 {

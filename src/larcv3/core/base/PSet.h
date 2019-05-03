@@ -17,8 +17,8 @@
 #include <iostream>
 #include <string>
 #include <map>
-#include "larbys.h"
-#include "Parser.h"
+#include "larcv3/core/base/larbys.h"
+#include "larcv3/core/base/Parser.h"
 namespace larcv3 {
   /**
      \class PSet

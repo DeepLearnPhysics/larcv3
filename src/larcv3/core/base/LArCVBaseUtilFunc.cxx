@@ -1,7 +1,7 @@
 #ifndef __LARCV3BASE_UTILFUNC_CXX__
 #define __LARCV3BASE_UTILFUNC_CXX__
 
-#include "LArCVBaseUtilFunc.h"
+#include "larcv3/core/base/LArCVBaseUtilFunc.h"
 #include <sstream>
 #include <fstream>
 namespace larcv3 {

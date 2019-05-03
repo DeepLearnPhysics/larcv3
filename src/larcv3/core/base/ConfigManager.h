@@ -15,9 +15,9 @@
 #define __LARCV3BASE_CONFIGMANAGER_H__
 
 #include <iostream>
-#include "larcv_base.h"
-#include "larbys.h"
-#include "PSet.h"
+#include "larcv3/core/base/larcv_base.h"
+#include "larcv3/core/base/larbys.h"
+#include "larcv3/core/base/PSet.h"
 #include <set>
 
 namespace larcv3 {

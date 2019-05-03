@@ -59,5 +59,4 @@ namespace larcv3 {
   };
 }
 #endif
-#endif
 /** @} */ // end of doxygen group 

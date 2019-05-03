@@ -17,7 +17,7 @@
 #include <cstdio>
 #include <iostream>
 #include <map>
-#include "LArCVTypes.h"
+#include "larcv3/core/base/LArCVTypes.h"
 
 namespace larcv3 {
 
