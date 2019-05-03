@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef __LARCVUTIL_RANDOM_GAUS_H__
-#define __LARCVUTIL_RANDOM_GAUS_H__
+#ifndef __LARCV3CPPUTIL_RANDOM_GAUS_H__
+#define __LARCV3CPPUTIL_RANDOM_GAUS_H__
 
 #ifndef __CINT__
 #include <random>

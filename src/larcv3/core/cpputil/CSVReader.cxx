@@ -1,5 +1,5 @@
-#ifndef __LARCV_CSVREADER_CXX__
-#define __LARCV_CSVREADER_CXX__
+#ifndef __LARCV3CPPUTIL_CSVREADER_CXX__
+#define __LARCV3CPPUTIL_CSVREADER_CXX__
 #include "CSVReader.h"
 
 namespace larcv3 {

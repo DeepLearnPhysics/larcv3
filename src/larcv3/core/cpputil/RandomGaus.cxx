@@ -1,5 +1,5 @@
-#ifndef __LARCVUTIL_RANDOM_GAUS_CXX__
-#define __LARCVUTIL_RANDOM_GAUS_CXX__
+#ifndef __LARCV3CPPUTIL_RANDOM_GAUS_CXX__
+#define __LARCV3CPPUTIL_RANDOM_GAUS_CXX__
 
 #include "RandomGaus.h"
 #include "core/base/larbys.h"
