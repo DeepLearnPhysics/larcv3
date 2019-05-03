@@ -11,8 +11,8 @@
 /** \addtogroup PyUtil
 
     @{*/
-#ifndef LOAD_PYUTIL_H
-#define LOAD_PYUTIL_H
+#ifndef __LARCV3PYUTIL_LOAD_PYUTIL_H
+#define __LARCV3PYUTIL_LOAD_PYUTIL_H
 
 #include <iostream>
 

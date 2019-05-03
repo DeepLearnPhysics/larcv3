@@ -1,8 +1,8 @@
-#ifndef __LARCV_PYUTILS_CXX__
-#define __LARCV_PYUTILS_CXX__
+#ifndef __LARCV3PYUTIL_PYUTILS_CXX__
+#define __LARCV3PYUTIL_PYUTILS_CXX__
 
-#include "PyUtils.h"
-#include "core/base/larcv_logger.h"
+#include "larcv3/core/pyutil/PyUtils.h"
+#include "larcv3/core/base/larcv_logger.h"
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 //#include <numpy/ndarrayobject.h>
 #include "numpy/arrayobject.h"

@@ -1,5 +1,5 @@
-#ifndef __LARCV_PYUTILS_H__
-#define __LARCV_PYUTILS_H__
+#ifndef __LARCV3PYUTIL_PYUTILS_H__
+#define __LARCV3PYUTIL_PYUTILS_H__
 
 struct _object;
 typedef _object PyObject;
@@ -13,8 +13,8 @@ typedef _object PyObject;
 //#endif
 //#endif
 
-#include "core/dataformat/Image2D.h"
-#include "core/dataformat/Voxel.h"
+#include "larcv3/core/dataformat/Image2D.h"
+#include "larcv3/core/dataformat/Voxel.h"
 // #include "larcv3/core/dataformat/Voxel2D.h"
 // #include "larcv3/core/dataformat/Voxel3DMeta.h"
 // #include "larcv3/core/dataformat/EventVoxel3D.h"

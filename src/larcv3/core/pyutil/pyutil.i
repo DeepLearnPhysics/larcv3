@@ -4,8 +4,8 @@
 %{
 
 /* Put header files here or function declarations like below */
-#include "core/pyutil/PyUtils.h"
-#include "core/dataformat/ImageMeta.h"
+#include "larcv3/core/pyutil/PyUtils.h"
+#include "larcv3/core/dataformat/ImageMeta.h"
 
 %}
 
@@ -15,8 +15,8 @@
 %rename(as_ndarray_int)    larcv3::as_ndarray(const std::vector<int> & );
 %rename(as_ndarray_uint)   larcv3::as_ndarray(const std::vector<unsigned int> & );
 
-%include "core/pyutil/PyUtils.h"
-%include "core/dataformat/ImageMeta.h"
+%include "larcv3/core/pyutil/PyUtils.h"
+%include "larcv3/core/dataformat/ImageMeta.h"
 
 
 
