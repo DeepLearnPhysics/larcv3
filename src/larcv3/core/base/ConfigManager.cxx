@@ -1,5 +1,5 @@
-#ifndef __LARCVBASE_CONFIGMANAGER_CXX__
-#define __LARCVBASE_CONFIGMANAGER_CXX__
+#ifndef __LARCV3BASE_CONFIGMANAGER_CXX__
+#define __LARCV3BASE_CONFIGMANAGER_CXX__
 
 #include "ConfigManager.h"
 #include "LArCVBaseUtilFunc.h"

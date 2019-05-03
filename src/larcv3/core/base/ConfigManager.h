@@ -11,8 +11,8 @@
 /** \addtogroup core_Base
 
     @{*/
-#ifndef __LARCVBASE_CONFIGMANAGER_H__
-#define __LARCVBASE_CONFIGMANAGER_H__
+#ifndef __LARCV3BASE_CONFIGMANAGER_H__
+#define __LARCV3BASE_CONFIGMANAGER_H__
 
 #include <iostream>
 #include "larcv_base.h"

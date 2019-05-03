@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef __LARCVBASE_UTILFUNC_H__
-#define __LARCVBASE_UTILFUNC_H__
+#ifndef __LARCV3BASE_UTILFUNC_H__
+#define __LARCV3BASE_UTILFUNC_H__
 
 #include "PSet.h"
 

@@ -1,5 +1,5 @@
-#ifndef __LARCVBASE_PARSER_CXX__
-#define __LARCVBASE_PARSER_CXX__
+#ifndef __LARCV3BASE_PARSER_CXX__
+#define __LARCV3BASE_PARSER_CXX__
 
 #include "LArCVBaseUtilFunc.h"
 #include "larbys.h"

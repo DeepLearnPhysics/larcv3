@@ -11,8 +11,8 @@
 /** \addtogroup core_Base
 
     @{*/
-#ifndef __CVFHICL_PSET_H__
-#define __CVFHICL_PSET_H__
+#ifndef __LARCV3BASE_PSET_H__
+#define __LARCV3BASE_PSET_H__
 
 #include <iostream>
 #include <string>

@@ -1,5 +1,5 @@
-#ifndef __LARCVBASE_UTILFUNC_CXX__
-#define __LARCVBASE_UTILFUNC_CXX__
+#ifndef __LARCV3BASE_UTILFUNC_CXX__
+#define __LARCV3BASE_UTILFUNC_CXX__
 
 #include "LArCVBaseUtilFunc.h"
 #include <sstream>

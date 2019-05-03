@@ -11,8 +11,8 @@
 /** \addtogroup core_Base
 
     @{*/
-#ifndef __LARCVBASE_PARSER_H__
-#define __LARCVBASE_PARSER_H__
+#ifndef __LARCV3BASE_PARSER_H__
+#define __LARCV3BASE_PARSER_H__
 
 #include <string>
 #include <vector>

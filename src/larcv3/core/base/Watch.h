@@ -1,6 +1,5 @@
-#ifndef __LARCV_BASE_WATCH_H__
-#define __LARCV_BASE_WATCH_H__
-#ifndef __CINT__
+#ifndef __LARCV3_BASE_WATCH_H__
+#define __LARCV3_BASE_WATCH_H__
 /**
  * \file Watch.h
  *

@@ -1,5 +1,5 @@
-#ifndef __LARCVLOGGER_CXX__
-#define __LARCVLOGGER_CXX__
+#ifndef __LARCV3BASE_LOGGER_CXX__
+#define __LARCV3BASE_LOGGER_CXX__
 
 #include "larcv_logger.h"
 #include <mutex>

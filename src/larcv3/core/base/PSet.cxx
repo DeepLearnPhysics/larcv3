@@ -1,5 +1,5 @@
-#ifndef CVFHICL_CXX
-#define CVFHICL_CXX
+#ifndef __LARCV3BASE_PSET_CXX
+#define __LARCV3BASE_PSET_CXX
 
 #include "PSet.h"
 #include <sstream>

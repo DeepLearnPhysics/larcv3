@@ -11,8 +11,8 @@
 /** \addtogroup core_Base
 
     @{*/
-#ifndef __LARCV_LARBYS_H__
-#define __LARCV_LARBYS_H__
+#ifndef __LARCV3BASE_LARBYS_H__
+#define __LARCV3BASE_LARBYS_H__
 
 #include <iostream>
 #include <exception>

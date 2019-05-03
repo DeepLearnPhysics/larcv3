@@ -11,8 +11,8 @@
 /** \addtogroup core_Base
 
     @{*/
-#ifndef __LARCVLOGGER_H__
-#define __LARCVLOGGER_H__
+#ifndef __LARCV3BASE_LOGGER_H__
+#define __LARCV3BASE_LOGGER_H__
 
 #include <cstdio>
 #include <iostream>

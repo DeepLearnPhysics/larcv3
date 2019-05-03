@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef __LARCV_BASE_H__
-#define __LARCV_BASE_H__
+#ifndef __LARCV3BASE_LARCV_BASE_H__
+#define __LARCV3BASE_LARCV_BASE_H__
 
 #include <vector>
 #include "larcv_logger.h"

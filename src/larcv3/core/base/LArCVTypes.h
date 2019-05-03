@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef __LARCVTYPES_H__
-#define __LARCVTYPES_H__
+#ifndef __LARCV3BASE_TYPES_H__
+#define __LARCV3BASE_TYPES_H__
 
 #include <string>
 #include <utility>
