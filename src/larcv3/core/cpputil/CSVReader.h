@@ -1,7 +1,7 @@
 #ifndef __LARCV3CPPUTIL_CSVREADER_H__
 #define __LARCV3CPPUTIL_CSVREADER_H__
-#include "core/base/larcv_logger.h"
-#include "core/base/larbys.h"
+#include "larcv3/core/base/larcv_logger.h"
+#include "larcv3/core/base/larbys.h"
 #include <fstream>
 #include <map>
 #include <array>
