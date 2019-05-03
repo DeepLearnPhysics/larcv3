@@ -11,13 +11,13 @@
 /** \addtogroup core_Processor
 
     @{*/
-#ifndef PROCESSFACTORY_H
-#define PROCESSFACTORY_H
+#ifndef __LARCV3PROCESSOR_PROCESSFACTORY_H
+#define __LARCV3PROCESSOR_PROCESSFACTORY_H
 
 #include <iostream>
 #include <map>
-#include "core/base/larcv_base.h"
-#include "ProcessBase.h"
+#include "larcv3/core/base/larcv_base.h"
+#include "larcv3/core/processor/ProcessBase.h"
 
 #include <mutex>
 

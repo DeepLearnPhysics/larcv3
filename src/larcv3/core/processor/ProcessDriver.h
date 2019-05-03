@@ -11,12 +11,12 @@
 /** \addtogroup core_Processor
 
     @{*/
-#ifndef PROCESSDRIVER_H
-#define PROCESSDRIVER_H
+#ifndef __LARCV3PROCESSOR_PROCESSDRIVER_H
+#define __LARCV3PROCESSOR_PROCESSDRIVER_H
 
 #include <vector>
-#include "core/dataformat/IOManager.h"
-#include "ProcessBase.h"
+#include "larcv3/core/dataformat/IOManager.h"
+#include "larcv3/core/processor/ProcessBase.h"
 
 namespace larcv3 {
   /**

@@ -11,12 +11,12 @@
 /** \addtogroup core_Processor
 
     @{*/
-#ifndef PROCESSBASE_H
-#define PROCESSBASE_H
+#ifndef __LARCV3PROCESSOR_PROCESSBASE_H
+#define __LARCV3PROCESSOR_PROCESSBASE_H
 
-#include "core/base/Watch.h"
-#include "core/dataformat/IOManager.h"
-#include "ProcessorTypes.h"
+#include "larcv3/core/base/Watch.h"
+#include "larcv3/core/dataformat/IOManager.h"
+#include "larcv3/core/processor/ProcessorTypes.h"
 
 namespace larcv3 {
 

@@ -1,7 +1,7 @@
-#ifndef __PROCESSFACTORY_CXX__
-#define __PROCESSFACTORY_CXX__
+#ifndef __LARCV3PROCESSOR_PROCESSFACTORY_CXX__
+#define __LARCV3PROCESSOR_PROCESSFACTORY_CXX__
 
-#include "ProcessFactory.h"
+#include "larcv3/core/processor/ProcessFactory.h"
 
 larcv3::ProcessFactory* larcv3::ProcessFactory::_me = nullptr;
 
