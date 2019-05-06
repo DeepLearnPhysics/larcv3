@@ -11,11 +11,11 @@
 /** \addtogroup Package_Name
 
     @{*/
-#ifndef __EVENTIDFILTER_H__
-#define __EVENTIDFILTER_H__
+#ifndef __LARCV3FILTER_EVENTIDFILTER_H__
+#define __LARCV3FILTER_EVENTIDFILTER_H__
 
-#include "core/processor/ProcessBase.h"
-#include "core/processor/ProcessFactory.h"
+#include "larcv3/core/processor/ProcessBase.h"
+#include "larcv3/core/processor/ProcessFactory.h"
 #include <map>
 namespace larcv3 {
 

@@ -1,8 +1,8 @@
-#ifndef __EMPTYIMAGEFILTER_CXX__
-#define __EMPTYIMAGEFILTER_CXX__
+#ifndef __LARCV3FILTER_EMPTYIMAGEFILTER_CXX__
+#define __LARCV3FILTER_EMPTYIMAGEFILTER_CXX__
 
 #include "EmptyImageFilter.h"
-#include "core/dataformat/EventImage2D.h"
+#include "larcv3/core/dataformat/EventImage2D.h"
 namespace larcv3 {
 
   static EmptyImageFilterProcessFactory __global_EmptyImageFilterProcessFactory__;

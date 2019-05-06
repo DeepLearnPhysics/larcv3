@@ -1,8 +1,8 @@
-#ifndef __PARTICLECOUNTFILTER_CXX__
-#define __PARTICLECOUNTFILTER_CXX__
+#ifndef __LARCV3FILTER_PARTICLECOUNTFILTER_CXX__
+#define __LARCV3FILTER_PARTICLECOUNTFILTER_CXX__
 
 #include "ParticleCountFilter.h"
-#include "core/dataformat/EventParticle.h"
+#include "larcv3/core/dataformat/EventParticle.h"
 
 namespace larcv3 {
 

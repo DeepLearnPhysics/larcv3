@@ -1,8 +1,8 @@
-#ifndef __EventIDFILTER_CXX__
-#define __EventIDFILTER_CXX__
+#ifndef __LARCV3FILTER_EVENTIDFILTER_CXX__
+#define __LARCV3FILTER_EVENTIDFILTER_CXX__
 
 #include "EventIDFilter.h"
-#include "core/cpputil/CSVReader.h"
+#include "larcv3/core/cpputil/CSVReader.h"
 
 namespace larcv3 {
 

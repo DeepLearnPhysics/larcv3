@@ -11,11 +11,11 @@
 /** \addtogroup Package_Name
 
     @{*/
-#ifndef __QSUMFILTER_H__
-#define __QSUMFILTER_H__
+#ifndef __LARCV3FILTER_QSUMFILTER_H__
+#define __LARCV3FILTER_QSUMFILTER_H__
 
-#include "core/processor/ProcessBase.h"
-#include "core/processor/ProcessFactory.h"
+#include "larcv3/core/processor/ProcessBase.h"
+#include "larcv3/core/processor/ProcessFactory.h"
 namespace larcv3 {
 
   /**

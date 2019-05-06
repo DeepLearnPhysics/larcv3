@@ -1,8 +1,8 @@
-#ifndef __QSUMFILTER_CXX__
-#define __QSUMFILTER_CXX__
+#ifndef __LARCV3FILTER_QSUMFILTER_CXX__
+#define __LARCV3FILTER_QSUMFILTER_CXX__
 
 #include "QSumFilter.h"
-#include "core/dataformat/EventImage2D.h"
+#include "larcv3/core/dataformat/EventImage2D.h"
 namespace larcv3 {
 
   static QSumFilterProcessFactory __global_QSumFilterProcessFactory__;
