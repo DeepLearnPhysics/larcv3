@@ -7,6 +7,7 @@ project(${name})
 
 # Get all the source files:
 file(GLOB SOURCES *.cxx)
+file(GLOB HEADERS *.h)
 
 # Add a shared library
 add_library(${name} SHARED ${SOURCES})
@@ -25,3 +26,6 @@ install(TARGETS ${name}
     RUNTIME DESTINATION ${CMAKE_PACKAGE_DIR}/bin
     INCLUDES DESTINATION ${CMAKE_PACKAGE_DIR}/include
     )
+
+install (FILES ${HEADERS}
+    DESTINATION ${CMAKE_PACKAGE_DIR}/include/app/${name})

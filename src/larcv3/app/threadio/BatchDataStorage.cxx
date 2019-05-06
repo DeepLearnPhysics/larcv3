@@ -1,9 +1,9 @@
-#ifndef BATCHDATASTORAGE_CXX
-#define BATCHDATASTORAGE_CXX
+#ifndef __LARCV3THREADIO_BATCHDATASTORAGE_CXX
+#define __LARCV3THREADIO_BATCHDATASTORAGE_CXX
 
 #include "BatchDataStorage.h"
-#include "core/base/larcv_logger.h"
-#include "core/base/larbys.h"
+#include "larcv3/core/base/larcv_logger.h"
+#include "larcv3/core/base/larbys.h"
 
 namespace larcv3 {
 

@@ -1,8 +1,7 @@
-#ifndef __BatchFillerTensor3D_CXX__
-#define __BatchFillerTensor3D_CXX__
+#ifndef __LARCV3THREADIO_BATCHFILLERTENSOR3D_CXX__
+#define __LARCV3THREADIO_BATCHFILLERTENSOR3D_CXX__
 
 #include "BatchFillerTensor3D.h"
-#include "core/dataformat/EventVoxel.h"
 
 #include <random>
 

@@ -11,13 +11,13 @@
 /** \addtogroup ThreadIO
 
     @{*/
-#ifndef __BATCHFILLERIMAGE2D_H__
-#define __BATCHFILLERIMAGE2D_H__
+#ifndef __LARCV3THREADIO_BATCHFILLERIMAGE2D_H__
+#define __LARCV3THREADIO_BATCHFILLERIMAGE2D_H__
 
-#include "core/processor/ProcessFactory.h"
+#include "larcv3/core/processor/ProcessFactory.h"
 #include "BatchFillerTemplate.h"
 #include "RandomCropper.h"
-#include "core/dataformat/EventImage2D.h"
+#include "larcv3/core/dataformat/EventImage2D.h"
 namespace larcv3 {
 
   /**

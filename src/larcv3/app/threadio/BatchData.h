@@ -11,8 +11,8 @@
 /** \addtogroup ThreadIO
 
     @{*/
-#ifndef BATCHDATA_H
-#define BATCHDATA_H
+#ifndef __LARCV3THREADIO_BATCHDATA_H
+#define __LARCV3THREADIO_BATCHDATA_H
 
 #include <iostream>
 #include <vector>

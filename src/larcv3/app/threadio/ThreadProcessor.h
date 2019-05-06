@@ -11,10 +11,10 @@
 /** \addtogroup ThreadIO
 
     @{*/
-#ifndef THREADPROCESSOR_H
-#define THREADPROCESSOR_H
+#ifndef __LARCV3THREADIO_THREADPROCESSOR_H
+#define __LARCV3THREADIO_THREADPROCESSOR_H
 
-#include "core/processor/ProcessDriver.h"
+#include "larcv3/core/processor/ProcessDriver.h"
 #include "ThreadIOTypes.h"
 #include <thread>
 #include <random>

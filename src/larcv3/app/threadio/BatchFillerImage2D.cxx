@@ -1,5 +1,5 @@
-#ifndef __BatchFillerImage2D_CXX__
-#define __BatchFillerImage2D_CXX__
+#ifndef __LARCV3THREADIO_BATCHFILLERIMAGE2D_CXX__
+#define __LARCV3THREADIO_BATCHFILLERIMAGE2D_CXX__
 
 #include "BatchFillerImage2D.h"
 

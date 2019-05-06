@@ -11,8 +11,8 @@
 /** \addtogroup ThreadIO
 
     @{*/
-#ifndef BATCHDATASTORAGE_H
-#define BATCHDATASTORAGE_H
+#ifndef __LARCV3THREADIO_BATCHDATASTORAGE_H
+#define __LARCV3THREADIO_BATCHDATASTORAGE_H
 
 #include <iostream>
 #include "BatchData.h"

@@ -11,13 +11,13 @@
 /** \addtogroup ThreadIO
 
     @{*/
-#ifndef __BATCHFILLERSPARSETENSOR2D_H__
-#define __BATCHFILLERSPARSETENSOR2D_H__
+#ifndef __LARCV3THREADIO_BATCHFILLERSPARSETENSOR2D_H__
+#define __LARCV3THREADIO_BATCHFILLERSPARSETENSOR2D_H__
 
-#include "core/processor/ProcessFactory.h"
+#include "larcv3/core/processor/ProcessFactory.h"
 #include "BatchFillerTemplate.h"
 #include "RandomCropper.h"
-#include "core/dataformat/EventVoxel.h"
+#include "larcv3/core/dataformat/EventVoxel.h"
 
 namespace larcv3 {
 

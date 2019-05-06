@@ -1,5 +1,5 @@
-#ifndef RANDOMCROPPER_CXX
-#define RANDOMCROPPER_CXX
+#ifndef __LARCV3THREADIO_RANDOMCROPPER_CXX
+#define __LARCV3THREADIO_RANDOMCROPPER_CXX
 
 #include <random>
 #include "RandomCropper.h"

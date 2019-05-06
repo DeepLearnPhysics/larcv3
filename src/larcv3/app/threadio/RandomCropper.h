@@ -11,13 +11,13 @@
 /** \addtogroup APICaffe
 
     @{*/
-#ifndef RANDOMCROPPER_H
-#define RANDOMCROPPER_H
+#ifndef __LARCV3THREADIO_RANDOMCROPPER_H
+#define __LARCV3THREADIO_RANDOMCROPPER_H
 
 #include <iostream>
-#include "core/base/larcv_base.h"
-#include "core/base/PSet.h"
-#include "core/dataformat/Image2D.h"
+#include "larcv3/core/base/larcv_base.h"
+#include "larcv3/core/base/PSet.h"
+#include "larcv3/core/dataformat/Image2D.h"
 
 namespace larcv3 {
   /**

@@ -1,10 +1,10 @@
-#ifndef __BatchFillerMultiLabel_CXX__
-#define __BatchFillerMultiLabel_CXX__
+#ifndef __LARCV3THREADIO_BATCHFILLERMULTILABEL_CXX__
+#define __LARCV3THREADIO_BATCHFILLERMULTILABEL_CXX__
 
 #include "BatchFillerMultiLabel.h"
 #include <random>
-#include "core/dataformat/EventImage2D.h"
-#include "core/dataformat/EventParticle.h"
+#include "larcv3/core/dataformat/EventImage2D.h"
+#include "larcv3/core/dataformat/EventParticle.h"
 
 namespace larcv3 {
 

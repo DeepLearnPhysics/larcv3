@@ -11,10 +11,10 @@
 /** \addtogroup ThreadIO
 
     @{*/
-#ifndef __BATCHFILLERPIDLABEL_H__
-#define __BATCHFILLERPIDLABEL_H__
+#ifndef __LARCV3THREADIO_BATCHFILLERPIDLABEL_H__
+#define __LARCV3THREADIO_BATCHFILLERPIDLABEL_H__
 
-#include "core/processor/ProcessFactory.h"
+#include "larcv3/core/processor/ProcessFactory.h"
 #include "BatchFillerTemplate.h"
 
 namespace larcv3 {

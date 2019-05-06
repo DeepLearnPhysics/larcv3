@@ -11,10 +11,10 @@
 /** \addtogroup ThreadIO
 
     @{*/
-#ifndef __BATCHHOLDER_H__
-#define __BATCHHOLDER_H__
+#ifndef __LARCV3THREADIO_BATCHHOLDER_H__
+#define __LARCV3THREADIO_BATCHHOLDER_H__
 
-#include "core/processor/ProcessBase.h"
+#include "larcv3/core/processor/ProcessBase.h"
 #include "ThreadIOTypes.h"
 namespace larcv3 {
   class ThreadProcessor;

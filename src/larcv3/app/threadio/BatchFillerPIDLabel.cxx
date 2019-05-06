@@ -1,9 +1,9 @@
-#ifndef __BatchFillerPIDLabel_CXX__
-#define __BatchFillerPIDLabel_CXX__
+#ifndef __LARCV3THREADIO_BATCHFILLERPIDLABEL_CXX__
+#define __LARCV3THREADIO_BATCHFILLERPIDLABEL_CXX__
 
 #include "BatchFillerPIDLabel.h"
-#include "core/dataformat/EventImage2D.h"
-#include "core/dataformat/EventParticle.h"
+#include "larcv3/core/dataformat/EventImage2D.h"
+#include "larcv3/core/dataformat/EventParticle.h"
 #include <random>
 
 namespace larcv3 {

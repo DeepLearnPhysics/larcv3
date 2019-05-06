@@ -1,8 +1,8 @@
-#ifndef __BATCHFILLERSPARSETENSOR3D_CXX__
-#define __BATCHFILLERSPARSETENSOR3D_CXX__
+#ifndef __LARCV3THREADIO_BATCHFILLERSPARSETENSOR3D_CXX__
+#define __LARCV3THREADIO_BATCHFILLERSPARSETENSOR3D_CXX__
 
 #include "BatchFillerSparseTensor3D.h"
-#include "core/dataformat/EventVoxel.h"
+#include "larcv3/core/dataformat/EventVoxel.h"
 
 #include <stdlib.h>
 #include <time.h>

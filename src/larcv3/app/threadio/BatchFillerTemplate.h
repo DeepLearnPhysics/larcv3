@@ -11,8 +11,8 @@
 /** \addtogroup ThreadIO
 
     @{*/
-#ifndef __BATCHFILLERTEMPLATE_H__
-#define __BATCHFILLERTEMPLATE_H__
+#ifndef __LARCV3THREADIO_BATCHFILLERTEMPLATE_H__
+#define __LARCV3THREADIO_BATCHFILLERTEMPLATE_H__
 
 #include "BatchHolder.h"
 #include "BatchData.h"

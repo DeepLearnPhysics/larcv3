@@ -1,5 +1,5 @@
-#ifndef __BATCHFILLERTEMPLATE_CXX__
-#define __BATCHFILLERTEMPLATE_CXX__
+#ifndef __LARCV3THREADIO_BATCHFILLERTEMPLATE_CXX__
+#define __LARCV3THREADIO_BATCHFILLERTEMPLATE_CXX__
 
 #include "BatchFillerTemplate.h"
 #include <sstream>

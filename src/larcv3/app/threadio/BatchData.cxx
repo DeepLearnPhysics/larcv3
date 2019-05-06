@@ -1,9 +1,9 @@
-#ifndef BATCHDATA_CXX
-#define BATCHDATA_CXX
+#ifndef __LARCV3THREADIO_BATCHDATA_CXX
+#define __LARCV3THREADIO_BATCHDATA_CXX
 
 #include "BatchData.h"
-#include "core/base/larcv_logger.h"
-#include "core/base/larbys.h"
+#include "larcv3/core/base/larcv_logger.h"
+#include "larcv3/core/base/larbys.h"
 #include <sstream>
 
 namespace larcv3 {
