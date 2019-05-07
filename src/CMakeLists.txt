@@ -6,12 +6,15 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3")
 
+# set(CMAKE_SKIP_RPATH TRUE)
+
 set(CMAKE_PACKAGE_DIR "larcv")
 
+set(PROJECT_SOURCE_DIR "./")
 
-project(larcv)
+project(larcv3)
 
-include_directories(larcv)
+include_directories("./")
 
 # IO needs HDF5:
 find_package(HDF5 REQUIRED COMPONENTS C CXX)
@@ -96,7 +99,7 @@ endmacro(generate_python_bindings)
 
 
 
-add_subdirectory(larcv)
+add_subdirectory(larcv3)
 
 
 # add_library(larcv SHARED 
