@@ -17,7 +17,7 @@
 #include "larcv3/core/processor/ProcessFactory.h"
 #include "BatchFillerTemplate.h"
 #include "RandomCropper.h"
-#include "larcv3/core/dataformat/EventVoxel.h"
+#include "larcv3/core/dataformat/EventSparseTensor.h"
 namespace larcv3 {
 
   /**

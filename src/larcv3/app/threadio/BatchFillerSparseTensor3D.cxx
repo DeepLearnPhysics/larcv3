@@ -2,7 +2,6 @@
 #define __LARCV3THREADIO_BATCHFILLERSPARSETENSOR3D_CXX__
 
 #include "BatchFillerSparseTensor3D.h"
-#include "larcv3/core/dataformat/EventVoxel.h"
 
 #include <stdlib.h>
 #include <time.h>
