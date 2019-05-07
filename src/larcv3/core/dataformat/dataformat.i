@@ -19,7 +19,8 @@
 #include "larcv3/core/dataformat/EventParticle.h"
 #include "larcv3/core/dataformat/EventImage2D.h"
 #include "larcv3/core/dataformat/IOManager.h"
-#include "larcv3/core/dataformat/EventVoxel.h"
+#include "larcv3/core/dataformat/EventSparseTensor.h"
+#include "larcv3/core/dataformat/EventSparseCluster.h"
 
 
 using namespace larcv3;
@@ -46,7 +47,8 @@ using namespace larcv3;
 %include "larcv3/core/dataformat/EventParticle.h"
 %include "larcv3/core/dataformat/EventImage2D.h"
 %include "larcv3/core/dataformat/IOManager.h"
-%include "larcv3/core/dataformat/EventVoxel.h"
+%include "larcv3/core/dataformat/EventSparseTensor.h"
+%include "larcv3/core/dataformat/EventSparseCluster.h"
 
 
 // Define instantiations of LARCV3 templates:
