@@ -2,7 +2,7 @@
 #define __LARCV3FILTER_EMPTYTENSORFILTER_CXX__
 
 #include "EmptyTensorFilter.h"
-#include "larcv3/core/dataformat/EventVoxel.h"
+#include "larcv3/core/dataformat/EventSparseTensor.h"
 // #include "larcv3/core/DataFormat/EventVoxel3D.h"
 namespace larcv3 {
 
