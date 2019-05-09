@@ -5,7 +5,6 @@
 // #include "larcv3/core/Base/larbys.h"
 
 #define IMAGE_EXTENTS_CHUNK_SIZE 1
-#define IMAGE_DATA_CHUNK_SIZE 25000000
 #define IMAGE_IDEXTENTS_CHUNK_SIZE 1000
 #define IMAGE_META_CHUNK_SIZE 1000
 #define IMAGE_COMPRESSION_LEVEL 1
@@ -137,44 +136,64 @@ namespace larcv3 {
     H5::DSetCreatPropList image_meta_cparms;
     hsize_t      image_meta_chunk_dims[1] ={IMAGE_META_CHUNK_SIZE};
     image_meta_cparms.setChunk( 1, image_meta_chunk_dims );
+    image_meta_cparms.setDeflate(IMAGE_COMPRESSION_LEVEL);
 
     // Create the extents dataset:
     H5::DataSet image_meta_ds = group->createDataSet("image_meta", 
       image_meta_datatype, image_meta_dataspace, image_meta_cparms);
 
 
-    /////////////////////////////////////////////////////////
-    // Create the Image dataset
-    /////////////////////////////////////////////////////////
-
-    // An image is stored as a flat vector, so it's type is float.
-    // The image ID is store in the image_extents table, and the meta in the image_meta table
-
-    // Get the data type for extents:
-    H5::DataType image_datatype = larcv3::get_datatype<float>();
-
-
-    // Get the starting size (0) and dimensions (unlimited)
-    hsize_t image_starting_dim[] = {0};
-    hsize_t image_maxsize_dim[]  = {H5S_UNLIMITED};
-
-    // Create a dataspace 
-    H5::DataSpace image_dataspace(1, image_starting_dim, image_maxsize_dim);
-
-    /*
-     * Modify dataset creation properties, i.e. enable chunking.
-     */
-    H5::DSetCreatPropList image_cparms;
-    hsize_t      image_chunk_dims[1] ={IMAGE_DATA_CHUNK_SIZE};
-    image_cparms.setChunk( 1, image_chunk_dims );
-    image_cparms.setDeflate(IMAGE_COMPRESSION_LEVEL);
-    // Create the extents dataset:
-    H5::DataSet image_ds = group->createDataSet("images", image_datatype, image_dataspace, image_cparms);
-
-
+    
     return;
   }
   void EventImage2D::serialize  (H5::Group * group){
+
+
+    // This is something of an optimization trickery.
+    // The dataset for storing images is not created until an image is written.
+    // This enables us to look at the incoming data and set the chunk size
+
+
+    /////////////////////////////////////////////////////////
+    // Create the Image dataset
+    /////////////////////////////////////////////////////////
+    if ( ! group -> nameExists("images")){
+        // std::cout << "Images dataset does not yet exist, creating it." << std::endl;
+        // An image is stored as a flat vector, so it's type is float.
+        // The image ID is store in the image_extents table, and the meta in the image_meta table
+
+        // Get the data type for extents:
+        H5::DataType image_datatype = larcv3::get_datatype<float>();
+
+
+        // Get the starting size (0) and dimensions (unlimited)
+        hsize_t image_starting_dim[] = {0};
+        hsize_t image_maxsize_dim[]  = {H5S_UNLIMITED};
+
+        // Create a dataspace 
+        H5::DataSpace image_dataspace(1, image_starting_dim, image_maxsize_dim);
+
+        // Figure out the chunk size dynamically:
+        size_t chunk_size = 0;
+        for (auto & image : _image_v){
+            chunk_size += image.size();
+        }
+
+        /*
+         * Modify dataset creation properties, i.e. enable chunking.
+         */
+        H5::DSetCreatPropList image_cparms;
+        hsize_t      image_chunk_dims[1] ={chunk_size};
+        image_cparms.setChunk( 1, image_chunk_dims );
+        image_cparms.setDeflate(IMAGE_COMPRESSION_LEVEL);
+        // Create the extents dataset:
+        H5::DataSet image_ds = group->createDataSet("images", image_datatype, image_dataspace, image_cparms);
+
+
+
+    }
+    
+
 
     // Serialization of images proceeds as:
     // 1) Read the current dimensions of all tables (extents, image_extents, image_meta, images)
