@@ -102,22 +102,4 @@ endmacro(generate_python_bindings)
 add_subdirectory(larcv3)
 
 
-# add_library(larcv SHARED 
-#     $<TARGET_OBJECTS:base>
-#     $<TARGET_OBJECTS:dataformat>
-#     $<TARGET_OBJECTS:processor>
-#     $<TARGET_OBJECTS:datagenerator>
-#     )
-
-
-# target_link_libraries(larcv PUBLIC ${HDF5_CXX_LIBRARIES}) 
-
-# install(TARGETS larcv
-#     LIBRARY DESTINATION ${CMAKE_PACKAGE_DIR}/lib
-#     ARCHIVE DESTINATION ${CMAKE_PACKAGE_DIR}/lib
-#     RUNTIME DESTINATION ${CMAKE_PACKAGE_DIR}/bin
-#     INCLUDES DESTINATION ${CMAKE_PACKAGE_DIR}/include
-#     )
-
-
 
