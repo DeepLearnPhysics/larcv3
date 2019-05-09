@@ -2,6 +2,8 @@ import unittest
 import numpy
 import pytest
 
+from larcv import larcv
+
 from random import Random
 random = Random()
 
@@ -9,22 +11,22 @@ N_CHECKS = 1
 
 @pytest.mark.parametrize('dimension', [2,3])
 def test_import(dimension):
-    from larcv import dataformat
+    
     if dimension == 2:
-        im = dataformat.ImageMeta2D()
+        im = larcv.ImageMeta2D()
     elif dimension == 3:
-        im = dataformat.ImageMeta3D()
+        im = larcv.ImageMeta3D()
     else:
         assert False
 
 @pytest.mark.parametrize('dimension', [2,3])
 @pytest.mark.parametrize('execution_number', range(N_CHECKS))
 def test_default_constructor(dimension, execution_number):
-    from larcv import dataformat
+    
     if dimension == 2:
-        im = dataformat.ImageMeta2D()
+        im = larcv.ImageMeta2D()
     elif dimension == 3:
-        im = dataformat.ImageMeta3D()
+        im = larcv.ImageMeta3D()
     else:
         assert(False)
 
@@ -54,13 +56,13 @@ def test_default_constructor(dimension, execution_number):
 @pytest.mark.parametrize('execution_number', range(N_CHECKS))
 def test_filled_constructor(dimension, execution_number):
 
-    from larcv import dataformat
+    
 
     projection_id = random.randint(0,10)
 
-    number_of_voxels = dataformat.VectorOfSizet()
-    image_sizes = dataformat.VectorOfDouble()
-    origin = dataformat.VectorOfDouble()
+    number_of_voxels = larcv.VectorOfSizet()
+    image_sizes = larcv.VectorOfDouble()
+    origin = larcv.VectorOfDouble()
 
     total_volume = 1.0
     total_voxels = 1
@@ -77,9 +79,9 @@ def test_filled_constructor(dimension, execution_number):
 
 
     if dimension == 2:
-        im = dataformat.ImageMeta2D(projection_id, number_of_voxels, image_sizes)
+        im = larcv.ImageMeta2D(projection_id, number_of_voxels, image_sizes)
     elif dimension == 3:
-        im = dataformat.ImageMeta3D(projection_id, number_of_voxels, image_sizes)
+        im = larcv.ImageMeta3D(projection_id, number_of_voxels, image_sizes)
     else:
         assert(False)
 
@@ -90,11 +92,11 @@ def test_filled_constructor(dimension, execution_number):
 @pytest.mark.parametrize('execution_number', range(N_CHECKS))
 def test_unravel(dimension, execution_number):
 
-    from larcv import dataformat
+    
     if dimension == 2:
-        im = dataformat.ImageMeta2D()
+        im = larcv.ImageMeta2D()
     elif dimension == 3:
-        im = dataformat.ImageMeta3D()
+        im = larcv.ImageMeta3D()
     else:
         assert(False)
 
@@ -125,11 +127,11 @@ def test_unravel(dimension, execution_number):
 @pytest.mark.parametrize('execution_number', range(N_CHECKS))
 def test_ravel(dimension, execution_number):
 
-    from larcv import dataformat
+    
     if dimension == 2:
-        im = dataformat.ImageMeta2D()
+        im = larcv.ImageMeta2D()
     elif dimension == 3:
-        im = dataformat.ImageMeta3D()
+        im = larcv.ImageMeta3D()
     else:
         assert(False)
 
@@ -151,7 +153,7 @@ def test_ravel(dimension, execution_number):
         
         # Create a list of indexes:
         indexes = []
-        vec_of_indexes = dataformat.VectorOfSizet()
+        vec_of_indexes = larcv.VectorOfSizet()
         for dim in dims:
             ind = random.randint(0, dim-1)
             indexes.append(ind)

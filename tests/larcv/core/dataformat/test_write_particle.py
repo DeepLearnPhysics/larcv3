@@ -1,6 +1,7 @@
 import pytest
 import unittest
 import random
+from larcv import larcv
 
 @pytest.fixture()
 def tempfile(tmpdir):
@@ -13,9 +14,8 @@ def rand_num_events():
 
 def write_particles(tempfile, rand_num_events):
 
-    from larcv import dataformat
 
-    io_manager = dataformat.IOManager(dataformat.IOManager.kWRITE)
+    io_manager = larcv.IOManager(larcv.IOManager.kWRITE)
     io_manager.set_out_file(tempfile)
     io_manager.initialize()
 
@@ -26,12 +26,12 @@ def write_particles(tempfile, rand_num_events):
         io_manager.set_id(1001, 0, i)
         
         # Get a piece of data, particle:
-        ev_particle = dataformat.EventParticle.to_particle(io_manager.get_data("particle","test"))
+        ev_particle = larcv.EventParticle.to_particle(io_manager.get_data("particle","test"))
 
         print(type(ev_particle))
 
         for j in range(i+1):
-            part = dataformat.Particle()
+            part = larcv.Particle()
             part.energy_deposit(j)
             ev_particle.emplace_back(part)
 
@@ -49,9 +49,8 @@ def write_particles(tempfile, rand_num_events):
  
 def read_particles(tempfile):
 
-    from larcv import dataformat
 
-    io_manager = dataformat.IOManager(dataformat.IOManager.kREAD)
+    io_manager = larcv.IOManager(larcv.IOManager.kREAD)
     io_manager.add_in_file(tempfile)
     io_manager.initialize()
 
@@ -61,7 +60,7 @@ def read_particles(tempfile):
         # print(io_manager.current_entry())
         event_id = io_manager.event_id()
 
-        ev_particles = dataformat.EventParticle.to_particle(io_manager.get_data('particle', 'test'))
+        ev_particles = larcv.EventParticle.to_particle(io_manager.get_data('particle', 'test'))
         read_events += 1
 
     return read_events

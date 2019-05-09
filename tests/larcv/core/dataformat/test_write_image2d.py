@@ -1,6 +1,6 @@
 import pytest
 import unittest
-
+from larcv import larcv
 
 from random import Random
 random = Random()
@@ -14,9 +14,9 @@ def rand_num_events():
 
 def write_image2d(tempfile, event_image_list):
 
-    from larcv import dataformat, pyutil
+    
 
-    io_manager = dataformat.IOManager(dataformat.IOManager.kWRITE)
+    io_manager = larcv.IOManager(larcv.IOManager.kWRITE)
     io_manager.set_out_file(tempfile)
     io_manager.initialize()
 
@@ -27,11 +27,11 @@ def write_image2d(tempfile, event_image_list):
         images = event_image_list[event]
 
         # Get a piece of data, image2d:
-        ev_image2d = dataformat.EventImage2D.to_image2d(io_manager.get_data("image2d","test"))
+        ev_image2d = larcv.EventImage2D.to_image2d(io_manager.get_data("image2d","test"))
 
         for projection in range(len(images)):
 
-            image2d = pyutil.as_image2d(images[projection])
+            image2d = larcv.as_image2d(images[projection])
             image2d.index(projection)
             ev_image2d.append(image2d)
 
@@ -50,10 +50,10 @@ def write_image2d(tempfile, event_image_list):
  
 def read_image2d(tempfile):
 
-    from larcv import dataformat, pyutil
+    
     from copy import copy
 
-    io_manager = dataformat.IOManager(dataformat.IOManager.kREAD)
+    io_manager = larcv.IOManager(larcv.IOManager.kREAD)
     io_manager.add_in_file(tempfile)
     io_manager.initialize()
 
@@ -66,17 +66,17 @@ def read_image2d(tempfile):
         io_manager.read_entry(i)
         
         # Get a piece of data, sparse tensor:
-        ev_image2d = dataformat.EventImage2D.to_image2d(io_manager.get_data("image2d","test"))
+        ev_image2d = larcv.EventImage2D.to_image2d(io_manager.get_data("image2d","test"))
 
         for projection in range(ev_image2d.as_vector().size()):
-            image = pyutil.as_ndarray(ev_image2d.at(projection))
+            image = larcv.as_ndarray(ev_image2d.at(projection))
             event_image_list[i].append(copy(image))
 
 
     return event_image_list
 
 def build_image2d(rand_num_events, n_projections):
-    from larcv import dataformat
+    from larcv import larcv
     import numpy
 
     event_image_list = []

@@ -1,28 +1,25 @@
 import unittest
 
+from larcv import larcv
+
 from random import Random
 random = Random()
 
-def test_import_dataformat_top():
-    from larcv import dataformat
 
 # Testing import of Point.h objects:
 def test_import_Point_h():
-    from larcv import dataformat
-    pt = dataformat.Point2D()
-    pt = dataformat.Point3D()
+    pt = larcv.Point2D()
+    pt = larcv.Point3D()
 
 def test_import_BBox_h():
-    from larcv import dataformat
-    bb = dataformat.BBox2D()
-    bb = dataformat.BBox3D()
+    bb = larcv.BBox2D()
+    bb = larcv.BBox3D()
 
 
 # Testing import of Vertex.h objects:
 def test_import_Vertex_h():
-    from larcv import dataformat
-    vert1 = dataformat.Vertex()
-    vert2 = dataformat.Vertex(1,2,3,4)
+    vert1 = larcv.Vertex()
+    vert2 = larcv.Vertex(1,2,3,4)
     assert(vert1 != vert2)
     assert(vert1 < vert2)
     vert2.reset()
@@ -30,67 +27,55 @@ def test_import_Vertex_h():
 
 # Testing import of Particle.h objects:
 def test_import_Particle_h():
-    from larcv import dataformat
-    part1 = dataformat.Particle()
+    part1 = larcv.Particle()
 
 # Testing import of Voxel.h objects:
 def test_import_Voxel_h_Voxel():
-    from larcv import dataformat
 
-    v = dataformat.Voxel()
+    v = larcv.Voxel()
 
 def test_import_Voxel_h_VoxelSet():
-    from larcv import dataformat
 
-    vs = dataformat.VoxelSet()
+    vs = larcv.VoxelSet()
 
 def test_import_Voxel_h_VoxelSetArray():
-    from larcv import dataformat
 
-    vsa = dataformat.VoxelSetArray()
+    vsa = larcv.VoxelSetArray()
     
 def test_import_ImageMeta_h():
-    from larcv import dataformat
 
-    im = dataformat.ImageMeta2D()
-    im = dataformat.ImageMeta3D()
+    im = larcv.ImageMeta2D()
+    im = larcv.ImageMeta3D()
 
 def test_import_EventID_h():
-    from larcv import dataformat
 
-    im = dataformat.EventID()
+    im = larcv.EventID()
 
 # Event Base is abstract and therefore should NOT import:
 def test_import_EventBase_h():
-    from larcv import dataformat
 
     try:
-        eb = dataformat.EventBase()
+        eb = larcv.EventBase()
         assert(False)
     except:
         assert(True)
 
 def test_import_DataProductFactory_h():
-    from larcv import dataformat
-    # dfb = dataformat.DataProductFactoryBase()
-    df = dataformat.DataProductFactory()
+    # dfb = larcv.DataProductFactoryBase()
+    df = larcv.DataProductFactory()
 
 def test_import_IOManager_h():
-    from larcv import dataformat
-    io = dataformat.IOManager()
+    io = larcv.IOManager()
 
 def test_import_EventParticle_h():
-    from larcv import dataformat
-    ep = dataformat.EventParticle()
+    ep = larcv.EventParticle()
 
 
 def test_vector_double():
-    from larcv import dataformat
-    vec = dataformat.VectorOfDouble()
+    vec = larcv.VectorOfDouble()
     vec.push_back(random.uniform(-1e5, 1e5))  
 
 def test_vector_sizet():
-    from larcv import dataformat
-    vec = dataformat.VectorOfSizet()
+    vec = larcv.VectorOfSizet()
     vec.push_back(random.randint(1, 2e4))  
 

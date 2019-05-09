@@ -1,6 +1,6 @@
 import pytest
 import unittest
-
+from larcv import larcv
 
 from random import Random
 random = Random(1)
@@ -17,10 +17,10 @@ def rand_num_events():
 
 def write_sparse_clusters(file_name, voxel_set_array_list, dimension=2, n_projections=3):
 
-    from larcv import dataformat
+
     import copy
 
-    io_manager = dataformat.IOManager(dataformat.IOManager.kWRITE)
+    io_manager = larcv.IOManager(larcv.IOManager.kWRITE)
     io_manager.set_out_file(file_name)
     io_manager.initialize()
 
@@ -29,9 +29,9 @@ def write_sparse_clusters(file_name, voxel_set_array_list, dimension=2, n_projec
     meta_list = []
     for projection in range(n_projections):
         if dimension == 2:
-            meta_list.append(dataformat.ImageMeta2D())
+            meta_list.append(larcv.ImageMeta2D())
         else:
-            meta_list.append(dataformat.ImageMeta3D())
+            meta_list.append(larcv.ImageMeta3D())
 
         for dim in range(dimension):
             L = 10.
@@ -44,9 +44,9 @@ def write_sparse_clusters(file_name, voxel_set_array_list, dimension=2, n_projec
         io_manager.set_id(1001, 0, i)
         # Get a piece of data, sparse tensor:
         if dimension== 2:
-            ev_cluster = dataformat.EventSparseCluster2D.to_sparse_cluster(io_manager.get_data("cluster2d","test"))
+            ev_cluster = larcv.EventSparseCluster2D.to_sparse_cluster(io_manager.get_data("cluster2d","test"))
         else:
-            ev_cluster = dataformat.EventSparseCluster3D.to_sparse_cluster(io_manager.get_data("cluster3d","test"))
+            ev_cluster = larcv.EventSparseCluster3D.to_sparse_cluster(io_manager.get_data("cluster3d","test"))
 
         # Holder for the voxels to store:
 
@@ -54,11 +54,11 @@ def write_sparse_clusters(file_name, voxel_set_array_list, dimension=2, n_projec
         for projection in range(n_projections):
             clusters = voxel_set_array_list[i][projection]
             if dimension == 2:
-                vsa = dataformat.SparseCluster2D()
+                vsa = larcv.SparseCluster2D()
             else:
-                vsa = dataformat.SparseCluster3D()
+                vsa = larcv.SparseCluster3D()
             for cluster in range(len(clusters)):
-                vs = dataformat.VoxelSet()
+                vs = larcv.VoxelSet()
 
                 vs.id(cluster)
                 indexes = clusters[cluster]['indexes']
@@ -85,9 +85,9 @@ def write_sparse_clusters(file_name, voxel_set_array_list, dimension=2, n_projec
  
 def read_sparse_clusters(tempfile, dimension):
 
-    from larcv import dataformat
 
-    io_manager = dataformat.IOManager(dataformat.IOManager.kREAD)
+
+    io_manager = larcv.IOManager(larcv.IOManager.kREAD)
     io_manager.add_in_file(tempfile)
     io_manager.initialize()
 
@@ -102,9 +102,9 @@ def read_sparse_clusters(tempfile, dimension):
         
         # Get a piece of data, sparse cluster:\
         if dimension == 2:
-            ev_cluster = dataformat.EventSparseCluster2D.to_sparse_cluster(io_manager.get_data("cluster2d","test"))
+            ev_cluster = larcv.EventSparseCluster2D.to_sparse_cluster(io_manager.get_data("cluster2d","test"))
         else:
-            ev_cluster = dataformat.EventSparseCluster3D.to_sparse_cluster(io_manager.get_data("cluster3d","test"))
+            ev_cluster = larcv.EventSparseCluster3D.to_sparse_cluster(io_manager.get_data("cluster3d","test"))
 
         for projection in range(ev_cluster.size()):
             # Append a list of clusters for this projection:
