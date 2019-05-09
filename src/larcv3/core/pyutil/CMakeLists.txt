@@ -57,7 +57,6 @@ add_library(${name} OBJECT ${SOURCES})
 # # Link this shared library against the base library
 # target_link_libraries(${name}  base dataformat)
 
-generate_python_bindings(${name})
 
 
 install (FILES ${HEADERS}

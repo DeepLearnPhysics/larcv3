@@ -8,7 +8,6 @@ file(GLOB HEADERS *.h)
 add_library(${name} OBJECT ${SOURCES})
 
 
-generate_python_bindings(${name})
 
 
 install (FILES ${HEADERS}

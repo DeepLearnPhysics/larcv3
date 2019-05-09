@@ -1,0 +1,8 @@
+
+%include "larcv3/app/threadio/ThreadProcessor.h" 
+%include "larcv3/app/threadio/BatchData.h" 
+%include "larcv3/app/threadio/BatchDataStorage.h"
+%include "larcv3/app/threadio/BatchDataStorageFactory.h"
+
+%include "larcv3/app/threadio/BatchFillerPIDLabel.h"
+

@@ -8,7 +8,6 @@ file(GLOB HEADERS *.h)
 # Add a shared library
 add_library(${name} OBJECT ${SOURCES})
 
-generate_python_bindings(${name})
 
 install (FILES ${HEADERS}
     DESTINATION ${CMAKE_PACKAGE_DIR}/include/larcv3/core/${name})

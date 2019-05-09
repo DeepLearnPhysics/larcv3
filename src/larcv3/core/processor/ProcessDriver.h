@@ -102,7 +102,6 @@ namespace larcv3 {
   private:
 
     bool _process_entry_();
-#ifndef SWIG
     size_t _batch_start_entry;
     size_t _batch_num_entry;
     size_t _current_entry;
@@ -114,7 +113,6 @@ namespace larcv3 {
     std::vector<larcv3::ProcessBase*> _proc_v;
     bool _processing;
     bool _has_event_creator;
-#endif
   };
 }
 

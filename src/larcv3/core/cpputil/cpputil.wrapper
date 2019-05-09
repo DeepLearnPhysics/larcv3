@@ -1,0 +1,5 @@
+%include "larcv3/core/cpputil/CSVReader.h"
+%include "larcv3/core/cpputil/RandomGaus.h"
+
+
+
