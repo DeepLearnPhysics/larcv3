@@ -4,7 +4,8 @@ from larcv import larcv
 from random import Random
 random = Random()
 
-# Testing import of Point.h objects:
-def test_import_BatchDataStorageFactory_h():
+def test_import_BatchDataStorageFloat_h():
 
-    bd = larcv.BatchDataStorageFactory()
+    larcv.BatchDataStorageFactoryFloat()
+    larcv.BatchDataStorageFloat()
+    larcv.BatchDataFloat()
