@@ -32,7 +32,6 @@ def write_image2d(tempfile, event_image_list):
         for projection in range(len(images)):
 
             image2d = larcv.as_image2d(images[projection])
-            image2d.index(projection)
             ev_image2d.append(image2d)
 
         io_manager.save_entry()
@@ -67,9 +66,9 @@ def read_image2d(tempfile):
         
         # Get a piece of data, sparse tensor:
         ev_image2d = larcv.EventImage2D.to_image2d(io_manager.get_data("image2d","test"))
-
+        print("Number of images read: ", ev_image2d.as_vector().size())
         for projection in range(ev_image2d.as_vector().size()):
-            image = larcv.as_ndarray(ev_image2d.at(projection))
+            image = larcv.as_ndarray(ev_image2d.as_vector()[projection])
             event_image_list[i].append(copy(image))
 
 
