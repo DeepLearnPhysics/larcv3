@@ -18,20 +18,20 @@ Software framework for image(2D)/volumetric(3D) data processing with APIs to int
 * scikit-build (for installation)
 * pytest (for continuous integration)
 
+Swig, hdf5 and cmake can all be installed by package managers.  Conda will also work.
+
 ### Setup
 
-0. Dependencies to build with are determined automatically through the following conditions.
-
-  * Numpy: being able to import `numpy`
 
 1. Clone & build
 ```
 git clone https://github.com/DeepLearnPhysics/larcv2.git
-python setup.py build
-python setup.py install
+python setup.py build [-j 12]
+python setup.py install [--user]
 ```
-That's it. When you want to use the built larcv from a different process, you only need to repeat ```source configure.sh``` and no need to re-```make```.
+That's it. When you want to use the built larcv from a different process, as long as you are using the same python it will just work.
 
+If you want it to be even EASIER, and you have the dependencies installed, you can do "pip install -e larcv3 [--user]" from the level above the repo.
 
 ## Wiki
 
