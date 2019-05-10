@@ -149,7 +149,8 @@ namespace larcv3 {
     /////////////////////////////////////////////////////////
     // Create the Image dataset
     /////////////////////////////////////////////////////////
-    if ( ! group -> nameExists("images")){
+    // if ( ! group -> nameExists("images")){
+    if (  group -> getNumObjs() != 4){
         // std::cout << "Images dataset does not yet exist, creating it." << std::endl;
         // An image is stored as a flat vector, so it's type is float.
         // The image ID is store in the image_extents table, and the meta in the image_meta table
