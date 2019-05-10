@@ -16,6 +16,8 @@
 
 #include <iostream>
 #include <cmath>
+#include <cassert>
+
 namespace larcv3 {
 
     template<size_t dimension>
