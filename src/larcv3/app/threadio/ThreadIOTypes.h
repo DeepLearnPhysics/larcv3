@@ -5,14 +5,14 @@
 
 namespace larcv3 {
 
-  enum ThreadFillerState_t {
+  enum ThreadFillerState_t : int{
     kThreadStateIdle,
     kThreadStateStarting,
     kThreadStateRunning,
     kThreadStateUnknown
   };
 
-  enum class BatchDataType_t {
+  enum class BatchDataType_t : int {
     kBatchDataUnknown,
     kBatchDataChar,
     kBatchDataShort,
@@ -24,7 +24,7 @@ namespace larcv3 {
 
   std::string BatchDataTypeName(BatchDataType_t type);
 
-  enum class BatchDataState_t {
+  enum class BatchDataState_t :int  {
     kBatchStateUnknown,
     kBatchStateEmpty,
     kBatchStateFilling,

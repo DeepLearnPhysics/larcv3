@@ -41,6 +41,8 @@
 %template(VectorOfDouble) std::vector<double>;
 %template(VectorOfFloat) std::vector<float>;
 %template(VectorOfSizet) std::vector<size_t>;
+%template(VectorOfInt) std::vector<int>;
+%template(VectorOfEventID) std::vector<larcv3::EventID>;
 %template(VectorOfString) std::vector<std::string>;
 %template(VectorOfVoxel) std::vector<larcv3::Voxel>;
 %template(VectorOfVoxelSet) std::vector<larcv3::VoxelSet>;

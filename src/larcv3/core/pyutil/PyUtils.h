@@ -50,15 +50,15 @@ PyObject* as_ndarray(const larcv3::Image2D &img);
 // /// larcv3::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/2/3) converter
 // void fill_2d_voxels(const SparseTensor2D &data, PyObject* pyarray, PyObject* select=nullptr);
 // /// copy array
-// template <class T>
-// void _copy_array(PyObject *arrayin, const std::vector<T> &cvec);
-// void copy_array(PyObject *arrayin, const std::vector< unsigned short > &cvec);
-// void copy_array(PyObject *arrayin, const std::vector< unsigned int   > &cvec);
-// void copy_array(PyObject *arrayin, const std::vector< short          > &cvec);
-// void copy_array(PyObject *arrayin, const std::vector< int            > &cvec);
-// void copy_array(PyObject *arrayin, const std::vector< long long      > &cvec);
-// void copy_array(PyObject *arrayin, const std::vector< float          > &cvec);
-// void copy_array(PyObject *arrayin, const std::vector< double         > &cvec);
+template <class T>
+void _copy_array(PyObject *arrayin, const std::vector<T> &cvec);
+void copy_array(PyObject *arrayin, const std::vector< unsigned short > &cvec);
+void copy_array(PyObject *arrayin, const std::vector< unsigned int   > &cvec);
+void copy_array(PyObject *arrayin, const std::vector< short          > &cvec);
+void copy_array(PyObject *arrayin, const std::vector< int            > &cvec);
+void copy_array(PyObject *arrayin, const std::vector< long long      > &cvec);
+void copy_array(PyObject *arrayin, const std::vector< float          > &cvec);
+void copy_array(PyObject *arrayin, const std::vector< double         > &cvec);
 
 // // /// Algorithm to extract three 1D arrays (x y and value) from 2D VoxelSet
 // // void as_flat_arrays(const VoxelSet& tensor, const ImageMeta& meta,
