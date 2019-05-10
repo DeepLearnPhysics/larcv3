@@ -50,6 +50,8 @@
 %template(VectorOfCluster3D) std::vector<larcv3::SparseCluster3D>;
 %template(VectorOfParticle) std::vector<larcv3::Particle>;
 %template(VectorOfImage2D) std::vector<larcv3::Image2D>;
+%template(VectorOfImageMeta2D) std::vector<larcv3::ImageMeta2D>;
+%template(VectorOfImageMeta3D) std::vector<larcv3::ImageMeta3D>;
 
 
 

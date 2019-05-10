@@ -32,7 +32,7 @@ namespace larcv3 {
   public:
 
     /// Default Constructor:
-    Image2D() {}
+    Image2D(){}
 
     /// ctor by dimensions
     Image2D(const std::vector<size_t> & dims);
@@ -52,10 +52,6 @@ namespace larcv3 {
     /// Various modes used to combine pixels
     enum CompressionModes_t { kSum, kAverage, kMaxPool, kOverWrite};
 
-    /// Return image2D index ID number (should be unique within larcv3::EventImage2D)
-    ImageIndex_t index() const { return _id; }
-    /// Index setter
-    void index(ImageIndex_t n) { _id = n; }
     /// Size of data, equivalent of # rows x # columns x ...
     size_t size() const { return _img.size(); }
     /// Specific pixel value getter
@@ -166,7 +162,6 @@ namespace larcv3 {
     */
   private:
     std::vector<float> _img;
-    ImageIndex_t _id;
     ImageMeta2D _meta ;
     void clear();
   };

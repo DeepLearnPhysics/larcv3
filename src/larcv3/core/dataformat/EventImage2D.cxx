@@ -19,28 +19,20 @@ namespace larcv3 {
     _image_v.clear();
   }
 
-  const Image2D& EventImage2D::at(ImageIndex_t id) const
-  {
-    if( id >= _image_v.size() ) throw larbys("Invalid request (ImageIndex_t out-o-range)!");
-    return _image_v[id];
-  }
 
   void EventImage2D::append(const Image2D& img)
   {
     _image_v.push_back(img);
-    _image_v.back().index((ImageIndex_t)(_image_v.size()-1));
   }
 
   void EventImage2D::emplace(Image2D&& img)
   {
     _image_v.emplace_back(std::move(img));
-    _image_v.back().index((ImageIndex_t)(_image_v.size()-1));
   }
 
   void EventImage2D::emplace(std::vector<larcv3::Image2D>&& image_v)
   {
     _image_v = std::move(image_v);
-    for(size_t i=0; i<_image_v.size(); ++i) _image_v[i].index((ImageIndex_t)i);
   }
 
 
@@ -251,12 +243,15 @@ namespace larcv3 {
     size_t new_image_size = 0;
     image_extents.resize(extents_offset + n_new_images);
 
+
     for (size_t image_id = 0; image_id < _image_v.size(); image_id ++){
         image_extents[image_id].n     = _image_v.at(image_id).size();
-        image_extents[image_id].id    = _image_v.at(image_id).index();
+        image_extents[image_id].id    = _image_v.at(image_id).meta().id();
         image_extents[image_id].first = last_image_index;
         last_image_index += _image_v.at(image_id).size();
         new_image_size +=  _image_v.at(image_id).size();
+
+
     }
 
 

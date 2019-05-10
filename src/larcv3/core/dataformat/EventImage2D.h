@@ -39,8 +39,6 @@ namespace larcv3 {
     /// Deprecated (use as_vector): const reference getter to an array of larcv3::Image2D 
     const std::vector<larcv3::Image2D>& image2d_array() const { return _image_v; }
 
-    /// larcv3::Image2D const reference getter for a specified index number
-    const Image2D& at(ImageIndex_t id) const;
 
     /// Inserter into larcv3::Image2D array
     void append(const Image2D& img);
