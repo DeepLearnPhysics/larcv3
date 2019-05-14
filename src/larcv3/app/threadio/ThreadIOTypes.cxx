@@ -14,9 +14,9 @@ namespace larcv3{
     case BatchDataType_t::kBatchDataInt:
       return std::string("int");
     case BatchDataType_t::kBatchDataFloat:
-      return std::string("float");
+      return std::string("float32");
     case BatchDataType_t::kBatchDataDouble:
-      return std::string("double");
+      return std::string("float64");
     case BatchDataType_t::kBatchDataString:
       return std::string("string");
     default:

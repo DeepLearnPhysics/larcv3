@@ -15,6 +15,11 @@
 %template(BatchDataStorageFloat) larcv3::BatchDataStorage<float>;
 %template(BatchDataFloat) larcv3::BatchData<float>;
 
+%template(BatchDataStorageFactoryInt) larcv3::BatchDataStorageFactory<int>;
+%template(BatchDataStorageInt) larcv3::BatchDataStorage<int>;
+%template(BatchDataInt) larcv3::BatchData<int>;
+
+
 %include "larcv3/app/threadio/BatchFillerPIDLabel.h"
 
 
