@@ -4,7 +4,9 @@
 # LArCV (Version 3)
 Software framework for image(2D)/volumetric(3D) data processing with APIs to interface deep neural network open-source softwares, written in C++ with extensive Python supports.  Originally developed for analyzing data from [time-projection-chamber (TPC)](https://en.wikipedia.org/wiki/Time_projection_chamber). It is then converted to be a generic tool to handle 2D-projected images and 3D-voxelized data. LArCV is particularly suitable for sparse data processing.
 
-***Note*** This repository is re-created from LArbys/LArCV repository, referred to as larbys version. The larbys version is still under active development for analysis purpose in MicroBooNE experiment. This repository is split for more generic technical R&D work in October 2017.
+***Note for larcv2*** This repository (referring to larcv2) is re-created from LArbys/LArCV repository, referred to as larbys version. The larbys version is still under active development for analysis purpose in MicroBooNE experiment. This repository is split for more generic technical R&D work in October 2017.
+
+***Note for larcv3*** This repository (referring to larcv3) is forked by coreyjadams in early 2019 to remove ROOT dependencies.  It is still under active development but is in "beta" release as the python bindings, build system, dataformat are all working.  The training interface works, and seems to perform reasonably but there have not been benchmark comparisons yet.
 
 ## Installation
 
