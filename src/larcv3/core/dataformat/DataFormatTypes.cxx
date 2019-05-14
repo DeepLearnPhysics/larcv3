@@ -38,6 +38,10 @@ namespace larcv3{
   H5::DataType get_datatype<ShapeType_t>()        {return get_datatype<int>();}
 
   template<>
+  H5::DataType get_datatype<long>()               {return H5::PredType::NATIVE_LONG;}
+
+
+  template<>
   H5::DataType get_datatype<Extents_t>()          {
     H5::CompType datatype(sizeof(Extents_t));
     datatype.insertMember("first", offsetof(struct Extents_t, first), get_datatype<unsigned int>());

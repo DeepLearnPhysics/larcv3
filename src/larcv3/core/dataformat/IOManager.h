@@ -66,7 +66,7 @@ namespace larcv3 {
     bool save_entry();
     void finalize();
     void clear_entry();
-    void set_id(const size_t run, const size_t subrun, const size_t event);
+    void set_id(const long run, const long subrun, const long event);
     size_t current_entry() const { return _in_index; }
 
     size_t get_n_entries_out() const

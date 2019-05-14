@@ -712,8 +712,8 @@ EventBase* IOManager::get_data(const size_t id) {
   return _product_ptr_v[id];
 }
 
-void IOManager::set_id(const size_t run, const size_t subrun,
-                       const size_t event) {
+void IOManager::set_id(const long run, const long subrun,
+                       const long event) {
   if (_io_mode == kREAD) {
     LARCV_CRITICAL() << "Cannot change event id in kREAD mode" << std::endl;
     throw larbys();

@@ -425,7 +425,8 @@ std::vector<size_t> ImageMeta<dimension>::position_to_coordinate(const std::vect
       if (relative_position < 0.0 || relative_position >= _image_sizes[axis]){
         coordinates.at(axis) = kINVALID_INDEX;
       }
-      coordinates.at(axis) = (size_t) relative_position / dims.at(axis);
+      else
+        coordinates.at(axis) = (size_t) relative_position / dims.at(axis);
     }
     return coordinates;
   }

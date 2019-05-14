@@ -32,6 +32,7 @@ namespace larcv3 {
     friend class DataProductFactory;
   public:
     
+
     virtual void clear() = 0;
     virtual void initialize(H5::Group *) = 0;
     virtual void serialize(H5::Group * group) = 0;

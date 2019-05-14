@@ -38,17 +38,17 @@ class EventID {
   /// Set all run/subrun/event to kINVALID_SIZE
   void clear();
   /// Run number getter
-  size_t run() const { return _run; }
+  long run() const { return _run; }
   /// SubRun number getter
-  size_t subrun() const { return _subrun; }
+  long subrun() const { return _subrun; }
   /// Event number getter
-  size_t event() const { return _event; }
+  long event() const { return _event; }
   /// Run number setter
-  inline void run(size_t _run) { this->_run = _run; }
+  inline void run(long _run) { this->_run = _run; }
   /// SubRun number setter
-  inline void subrun(size_t _subrun) { this->_subrun = _subrun; }
+  inline void subrun(long _subrun) { this->_subrun = _subrun; }
   /// Event number setter
-  inline void event(size_t _event) { this->_event = _event; }
+  inline void event(long _event) { this->_event = _event; }
 
   /// Make sure run/subrun/event ID is set
   bool valid() const {
@@ -79,8 +79,8 @@ class EventID {
   std::string event_key() const;
 
   /// Setting the id
-  inline void set_id(const size_t run, const size_t subrun,
-                     const size_t event) {
+  inline void set_id(const long run, const long subrun,
+                     const long event) {
     _run = run;
     _subrun = subrun;
     _event = event;
@@ -90,17 +90,17 @@ class EventID {
   public: 
     static H5::CompType get_datatype() {
       H5::CompType datatype(sizeof(EventID));
-      datatype.insertMember("run",    offsetof(EventID, _run),    H5::PredType::NATIVE_ULLONG);
-      datatype.insertMember("subrun", offsetof(EventID, _subrun), H5::PredType::NATIVE_ULLONG);
-      datatype.insertMember("event",  offsetof(EventID, _event),  H5::PredType::NATIVE_ULLONG);
+      datatype.insertMember("run",    offsetof(EventID, _run),    larcv3::get_datatype<long>());
+      datatype.insertMember("subrun", offsetof(EventID, _subrun), larcv3::get_datatype<long>());
+      datatype.insertMember("event",  offsetof(EventID, _event),  larcv3::get_datatype<long>());
       return datatype;
     }
 #endif
 
  private:
-  size_t _run;     ///< LArSoft run number
-  size_t _subrun;  ///< LArSoft sub-run number
-  size_t _event;   ///< LArSoft event number
+  long _run;     ///< LArSoft run number
+  long _subrun;  ///< LArSoft sub-run number
+  long _event;   ///< LArSoft event number
 };
 }  // namespace larcv3
 
