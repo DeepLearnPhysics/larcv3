@@ -31,6 +31,7 @@ class batch_pydata(object):
    def time_copy(self): return self._time_copy
    def time_reshape(self): return self._time_reshape
 
+
    def set_data(self,storage_id,larcv_batchdata):
       self._storage_id = storage_id
       dim = larcv_batchdata.dim()
@@ -48,25 +49,23 @@ class batch_pydata(object):
                sys.stderr.write('%d-th dimension changed (%d => %d)\n' % (i,self._dim_data[i],dim[i]))
                raise ValueError
 
-
-      mean = 0.0
-      for val in larcv_batchdata.data():
-         mean += val
-      print(mean / (256*256*3))
-
       # copy data into numpy array
       ctime = time.time()
       if self._make_copy:
          if self._npy_data is None:
-            self._npy_data = np.array(larcv_batchdata.data())
-         else:
-            self._npy_data = self._npy_data.reshape(self.batch_data_size())
-            larcv.copy_array(self._npy_data,larcv_batchdata.data())
+            # self._npy_data = np.array(larcv_batchdata.data())
+            # print("Array type: ", self._npy_data.dtype)
+            # Create an array to hold the data if it does not exits:
+            self._npy_data = np.ndarray(shape=(larcv_batchdata.data_size()), dtype=self._dtype)
+         self._npy_data = self._npy_data.reshape(self.batch_data_size())
+         if self._dtype == "float32":
+            larcv.copy_array_float(self._npy_data,larcv_batchdata.data())
+         elif self._dtype == "float64":
+            larcv.copy_array_double(self._npy_data,larcv_batchdata.data())
       else:
          self._npy_data = larcv.as_ndarray(larcv_batchdata.data())
       self._time_copy = time.time() - ctime
 
-      print("Internal mean: ", np.mean(self._npy_data))
 
       ctime = time.time()
       self._npy_data = self._npy_data.reshape(self._dim_data[0], int(self.batch_data_size()/self._dim_data[0]))
@@ -141,7 +140,6 @@ class larcv_threadio (object):
 
       # fetch batch filler info
       self._storage = {}
-      print(self._proc.batch_fillers())
       for i in range(len(self._proc.batch_fillers())):
          pid = self._proc.batch_fillers()[i]
          name = self._proc.storage_name(pid)
@@ -224,7 +222,6 @@ class larcv_threadio (object):
 
       self.release()
 
-      print("Next called!")
 
       self._read_start_time = time.time()
       sleep_ctr=0
@@ -241,8 +238,19 @@ class larcv_threadio (object):
 
       for name,storage in self._storage.items():
          dtype = storage.dtype()
-         if dtype == "float":
+         if dtype == "float32":
             factory = larcv.BatchDataStorageFactoryFloat.get()
+         elif dtype == "float64":
+            factory = larcv.BatchDataStorageFactoryDouble.get()
+         elif dtype == "int":
+            factory = larcv.BatchDataStorageFactoryInt.get()
+         # These here below are NOT yet wrapped with swig.  Submit a ticket if you need them!
+         # elif dtype == "char":
+         #    factory = larcv.BatchDataStorageFactoryDouble.get()
+         # elif dtype == "short":
+         #    factory = larcv.BatchDataStorageFactoryDouble.get()
+         # elif dtype == "string":
+         #    factory = larcv.BatchDataStorageFactoryDouble.get()
          else:
             factory = None
          batch_data = factory.get_storage(name).get_batch(next_storage_id)
