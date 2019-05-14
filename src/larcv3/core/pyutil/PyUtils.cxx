@@ -486,7 +486,7 @@ void _copy_array(PyObject *arrayin, const std::vector<T> &cvec) {
   SetPyUtil();
   PyArrayObject *ptr = (PyArrayObject *)(arrayin);
 
-  //std::cout<< PyArray_NDIM(ptr) << std::endl
+  // std::cout<< PyArray_NDIM(ptr) << std::endl
   //         << PyArray_DIM(ptr,0)<<std::endl
   //         << PyArray_SIZE(ptr) << std::endl;
 
