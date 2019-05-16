@@ -333,7 +333,7 @@ std::vector<double> ImageMeta<dimension>::position(const std::vector<size_t> & c
     positions.resize(dimension);
 
     // size_t index = 0;
-    for (size_t axis = dimension - 1; axis >= 0; -- axis) {
+    for (size_t axis = 0; axis < dimension; ++ axis) {
       // Calculate the voxel size:
       double voxel_size = (_image_sizes[axis] / _number_of_voxels[axis] );
       positions.at(axis) = coordinates.at(axis) * voxel_size;
