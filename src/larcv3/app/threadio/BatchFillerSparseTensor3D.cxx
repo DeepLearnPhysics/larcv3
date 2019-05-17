@@ -157,6 +157,7 @@ bool BatchFillerSparseTensor3D::process(IOManager& mgr) {
 
 
   for (auto const& voxel : voxel_data.as_vector()) {
+    if (voxel.id() >= meta.total_voxels() ) continue;
     auto coords = meta.coordinates(voxel.id());
     int i_x = coords.at(0);
     int i_y = coords.at(1);
