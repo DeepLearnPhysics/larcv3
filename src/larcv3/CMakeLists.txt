@@ -1,6 +1,5 @@
 add_subdirectory(core)
 add_subdirectory(app)
-# add_subdirectory(python)
 
 # This is admittedly pretty clunky, but it gets the job done to make one object file:
 add_library(larcv3 SHARED 
@@ -62,22 +61,20 @@ else ()
         # interesting reading: https://blog.kitware.com/upcoming-in-cmake-2-8-12-osx-rpath-support/
         # INSTALL_NAME_DIR overrides MACOSX_RPATH.  Try not to do that.
         # this sets the install_name of lib${name}.dylib as @rpath/libtriv_stats.dylib
-        SET_TARGET_PROPERTIES(${SWIG_MODULE_larcv_REAL_NAME} PROPERTIES MACOSX_RPATH TRUE)
-        SET_TARGET_PROPERTIES(${SWIG_MODULE_larcv_REAL_NAME} PROPERTIES CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+        set_target_properties(${SWIG_MODULE_larcv_REAL_NAME} PROPERTIES MACOSX_RPATH TRUE)
+        set_target_properties(${SWIG_MODULE_larcv_REAL_NAME} PROPERTIES CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
         # Use rpath for _simple_module.so
-        SET_TARGET_PROPERTIES(${SWIG_MODULE_larcv_REAL_NAME} PROPERTIES MACOSX_RPATH TRUE)
+        set_target_properties(${SWIG_MODULE_larcv_REAL_NAME} PROPERTIES MACOSX_RPATH TRUE)
 
         # append directories in the linker search path and outside the project to the INSTALL_RPATH
-        SET_TARGET_PROPERTIES(${SWIG_MODULE_larcv_REAL_NAME} PROPERTIES CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+        set_target_properties(${SWIG_MODULE_larcv_REAL_NAME} PROPERTIES CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
         # this is where liblarcv.dylib is installed relative to where ${SWIG_MODULE_larcv_REAL_NAME}.so is installed
-        SET_TARGET_PROPERTIES(${SWIG_MODULE_larcv_REAL_NAME} PROPERTIES INSTALL_RPATH "@loader_path/lib/")
+        set_target_properties(${SWIG_MODULE_larcv_REAL_NAME} PROPERTIES INSTALL_RPATH "@loader_path/lib/")
 
     else()
-
-     SET_TARGET_PROPERTIES(${SWIG_MODULE_larcv_REAL_NAME} PROPERTIES CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-     SET_TARGET_PROPERTIES(${SWIG_MODULE_larcv_REAL_NAME} PROPERTIES CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+        set_target_properties(${SWIG_MODULE_larcv_REAL_NAME} PROPERTIES LINK_FLAGS "-Wl,-rpath,$ORIGIN/lib/")
 
     endif()
 
@@ -88,6 +85,7 @@ else ()
     # Install swig python module
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/larcv.py 
         DESTINATION ${CMAKE_PACKAGE_DIR})
+
 endif(${CMAKE_NO_SWIG})
     
 
