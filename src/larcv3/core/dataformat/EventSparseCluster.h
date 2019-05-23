@@ -20,7 +20,6 @@
 #include "larcv3/core/dataformat/DataProductFactory.h"
 #include "larcv3/core/dataformat/Voxel.h"
 #include "larcv3/core/dataformat/ImageMeta.h"
-#include "larcv3/core/dataformat/VoxelSerializationHelper.h"
 
 namespace larcv3 {
 
