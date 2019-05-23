@@ -3,9 +3,9 @@
 
 #include "larcv3/core/dataformat/EventSparseCluster.h"
 
-#define VOXEL_EXTENTS_CHUNK_SIZE 100
+#define VOXEL_EXTENTS_CHUNK_SIZE 10
 #define VOXEL_IDEXTENTS_CHUNK_SIZE 100
-#define VOXEL_META_CHUNK_SIZE 1000
+#define VOXEL_META_CHUNK_SIZE 100
 #define VOXEL_DATA_CHUNK_SIZE 1000
 #define IMAGE_META_CHUNK_SIZE 100
 
@@ -781,6 +781,7 @@ namespace larcv3 {
 
 
         for (auto & v : temp_voxel_vector){
+          // if (v.id() >= _cluster_v.at(projection_id).meta().total_voxels()) continue;
           _cluster_v.at(projection_id).writeable_voxel_set(cluster_id).add(v);
         }
         _cluster_v.at(projection_id).writeable_voxel_set(cluster_id).id(this_cluster_extent.id);
