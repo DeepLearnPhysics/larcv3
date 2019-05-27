@@ -21,5 +21,6 @@ setup(
     project_urls={
         'Source Code': 'https://github.com/coreyjadams/larcv2'
     },
+    scripts=['bin/merge_larcv3_files.py'],
     packages=['larcv'],   
 )
