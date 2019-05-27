@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/DeepLearnPhysics/larcv2.svg?branch=develop)](https://travis-ci.org/DeepLearnPhysics/larcv2) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://raw.githubusercontent.com/DeepLearnPhysics/larcv2/develop/LICENSE) [![https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg](https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg)](https://singularity-hub.org/collections/459) [![https://img.shields.io/docker/build/deeplearnphysics/ml-larcv2.svg](https://img.shields.io/docker/build/deeplearnphysics/ml-larcv2.svg)](https://hub.docker.com/r/deeplearnphysics/ml-larcv2/)
+[![Build Status](https://travis-ci.org/DeepLearnPhysics/larcv3.svg?branch=develop)](https://travis-ci.org/DeepLearnPhysics/larcv3) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://raw.githubusercontent.com/DeepLearnPhysics/larcv2/develop/LICENSE) 
 
 
 # LArCV (Version 3)
