@@ -2,7 +2,7 @@ language: python
 
 os:
   - linux
-  # - osx
+  - osx
 
 compiler:
   - clang
@@ -16,8 +16,8 @@ python:
 #  system_site_packages: true
 
 before_install:
-  # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
-  # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python swig cmake hdf5; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python swig cmake hdf5; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install cmake libhdf5-serial-dev python-dev swig3.0; fi
 
 install:
