@@ -12,8 +12,8 @@ python:
   - 2.7
   - 3.6
 
-virtualenv:
-  system_site_packages: true
+#virtualenv:
+#  system_site_packages: true
 
 before_install:
   # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
