@@ -57,6 +57,7 @@ namespace larcv3 {
     void reset();
     void add_in_file(const std::string filename, const std::string dirname = "");
     void clear_in_file();
+    void set_core_driver(const bool opt = true);
     void set_out_file(const std::string name);
     ProducerID_t producer_id(const ProducerName_t& name) const;
     std::string product_type(const size_t id) const;

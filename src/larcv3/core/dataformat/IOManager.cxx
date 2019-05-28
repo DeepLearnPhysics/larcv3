@@ -73,6 +73,8 @@ void IOManager::add_in_file(const std::string filename,
 
 void IOManager::clear_in_file() { _in_file_v.clear(); }
 
+void IOManager::set_core_driver(const bool opt) { _h5_core_driver = opt; }
+
 void IOManager::set_out_file(const std::string name) { _out_file_name = name; }
 
 std::string IOManager::product_type(const size_t id) const {
@@ -300,10 +302,10 @@ void IOManager::prepare_input() {
     H5::H5File* fin;
 
     if (_h5_core_driver) {
+      LARCV_INFO() << "File will be stored entirely on memory." << std::endl;
       H5::FileAccPropList fapl(H5::FileAccPropList::DEFAULT);
       fapl.setCore(1024, false); // 1024 is number of bytes to increment each time more memory is needed; 'false': do not write contents to disk when the file is closed
       fin = new H5::H5File(fname.c_str(), H5F_ACC_RDONLY, H5::FileCreatPropList::DEFAULT, fapl);
-      LARCV_WARNING() << "File will be stored entirely on memory." << std::endl;
     } else {
       fin = new H5::H5File(fname.c_str(), H5F_ACC_RDONLY);
     }
