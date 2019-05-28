@@ -199,6 +199,7 @@ namespace larcv3 {
     std::map<std::string,std::set<std::string> > _read_only;
     std::vector<bool> _store_id_bool;
     std::vector<bool> _read_id_bool;
+    bool _h5_core_driver;
 
     // IOManager has to control the EventID dataset it's self for the output file.
     H5::DataSet _out_event_id_ds;
