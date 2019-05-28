@@ -2,9 +2,9 @@
 #define __CROPNEUTRINO3D_CXX__
 
 #include "CropNeutrino3D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "larcv3/core/DataFormat/EventVoxel3D.h"
 
-namespace larcv {
+namespace larcv3 {
 
 static CropNeutrino3DProcessFactory __global_CropNeutrino3DProcessFactory__;
 
@@ -58,7 +58,7 @@ bool CropNeutrino3D::process(IOManager& mgr)
   // have the same original meta sizes and such.
 
   auto ev_reference_cluster =
-      mgr.get_data<larcv::EventClusterVoxel3D>(_vertex_cluster3d_producer);
+      mgr.get_data<larcv3::EventClusterVoxel3D>(_vertex_cluster3d_producer);
   if (ev_reference_cluster.as_vector().size() == 0) {
     LARCV_CRITICAL() << "Input cluster not found by producer name "
                      << _vertex_cluster3d_producer << std::endl;
@@ -73,7 +73,7 @@ bool CropNeutrino3D::process(IOManager& mgr)
     // Get the data product, compare it's meta against the reference.
     if (_product_types_v.at(i) == "sparse3d") {
       auto const& ev_sparse3d =
-          mgr.get_data<larcv::EventSparseTensor3D>(_producer_names_v.at(i));
+          mgr.get_data<larcv3::EventSparseTensor3D>(_producer_names_v.at(i));
 
       if (ev_sparse3d.as_vector().size() == 0) {
         LARCV_CRITICAL() << "Input sparse3d not found by producer name "
@@ -94,7 +94,7 @@ bool CropNeutrino3D::process(IOManager& mgr)
 
     } else if (_product_types_v.at(i) == "cluster3d") {
       auto const& ev_cluster3d =
-          mgr.get_data<larcv::EventClusterVoxel3D>(_producer_names_v.at(i));
+          mgr.get_data<larcv3::EventClusterVoxel3D>(_producer_names_v.at(i));
 
       if (ev_cluster3d.as_vector().size() == 0) {
         LARCV_CRITICAL() << "Input cluster3d not found by producer name "
@@ -184,7 +184,7 @@ bool CropNeutrino3D::process(IOManager& mgr)
   //           <<std::endl;
 
   // Create a new meta object:
-  larcv::Voxel3DMeta new_meta;
+  larcv3::Voxel3DMeta new_meta;
   new_meta.set(min_x, min_y, min_z,
                max_x, max_y, max_z,
                _output_n_x, _output_n_y, _output_n_z,
@@ -197,9 +197,9 @@ bool CropNeutrino3D::process(IOManager& mgr)
     if (_product_types_v.at(i) == "sparse3d"){
       // std::cout << "Making a sparse3d crop" << std::endl;
       auto const& ev_sparse3d =
-          mgr.get_data<larcv::EventSparseTensor3D>(_producer_names_v.at(i));
+          mgr.get_data<larcv3::EventSparseTensor3D>(_producer_names_v.at(i));
 
-      larcv::VoxelSet _output_voxel_set;
+      larcv3::VoxelSet _output_voxel_set;
 
       for (auto & voxel : ev_sparse3d.as_vector() ){
         if (voxel.id() > original_meta.size() )
@@ -221,11 +221,11 @@ bool CropNeutrino3D::process(IOManager& mgr)
 
         // Ok, find the new ID:
         auto index = new_meta.index(new_i_x, new_i_y, new_i_z);
-        _output_voxel_set.insert(larcv::Voxel(index, voxel.value()));
+        _output_voxel_set.insert(larcv3::Voxel(index, voxel.value()));
       }
 
       // Make an output sparse3d producer
-      auto & ev_sparse3d_out = mgr.get_data<larcv::EventSparseTensor3D>(_output_producers_v.at(i));
+      auto & ev_sparse3d_out = mgr.get_data<larcv3::EventSparseTensor3D>(_output_producers_v.at(i));
       ev_sparse3d_out.emplace(std::move(_output_voxel_set), new_meta);
       // std::cout << "Finished a sparse3d crop" << std::endl;
 
@@ -233,13 +233,13 @@ bool CropNeutrino3D::process(IOManager& mgr)
     else if (_product_types_v.at(i) == "cluster3d"){
       // std::cout << "Making a cluster3d crop" << std::endl;
       auto const& ev_cluster3d =
-          mgr.get_data<larcv::EventClusterVoxel3D>(_producer_names_v.at(i));
+          mgr.get_data<larcv3::EventClusterVoxel3D>(_producer_names_v.at(i));
 
 
-      larcv::ClusterVoxel3D _output_cluster_set;
+      larcv3::ClusterVoxel3D _output_cluster_set;
       for (auto const & cluster : ev_cluster3d.as_vector()){
 
-        larcv::VoxelSet _output_voxel_set;
+        larcv3::VoxelSet _output_voxel_set;
         _output_voxel_set.id(cluster.id());
 
         for (auto & voxel : cluster.as_vector() ){
@@ -262,7 +262,7 @@ bool CropNeutrino3D::process(IOManager& mgr)
 
           // Ok, find the new ID:
           auto index = new_meta.index(new_i_x, new_i_y, new_i_z);
-          _output_voxel_set.insert(larcv::Voxel(index, voxel.value()));
+          _output_voxel_set.insert(larcv3::Voxel(index, voxel.value()));
         }
 
         _output_cluster_set.insert(_output_voxel_set);
@@ -271,7 +271,7 @@ bool CropNeutrino3D::process(IOManager& mgr)
 
 
       // Make an output sparse3d producer
-      auto & ev_cluster3d_out = mgr.get_data<larcv::EventClusterVoxel3D>(_output_producers_v.at(i));
+      auto & ev_cluster3d_out = mgr.get_data<larcv3::EventClusterVoxel3D>(_output_producers_v.at(i));
       ev_cluster3d_out.emplace(std::move(_output_cluster_set), new_meta);
       // std::cout << "Finished a cluster3d crop" << std::endl;
 

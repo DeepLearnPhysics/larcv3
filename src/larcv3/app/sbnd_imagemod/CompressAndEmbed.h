@@ -14,10 +14,10 @@
 #ifndef __COMPRESSANDEMBED_H__
 #define __COMPRESSANDEMBED_H__
 
-#include "larcv/core/Processor/ProcessBase.h"
-#include "larcv/core/Processor/ProcessFactory.h"
-#include "larcv/core/DataFormat/Image2D.h"
-namespace larcv {
+#include "larcv3/core/processor/ProcessBase.h"
+#include "larcv3/core/processor/ProcessFactory.h"
+#include "larcv3/core/dataformat/Image2D.h"
+namespace larcv3 {
 
   /**
      \class ProcessBase
@@ -55,8 +55,8 @@ namespace larcv {
   };
 
   /**
-     \class larcv::CompressAndEmbedFactory
-     \brief A concrete factory class for larcv::CompressAndEmbed
+     \class larcv3::CompressAndEmbedFactory
+     \brief A concrete factory class for larcv3::CompressAndEmbed
   */
   class CompressAndEmbedProcessFactory : public ProcessFactoryBase {
   public:

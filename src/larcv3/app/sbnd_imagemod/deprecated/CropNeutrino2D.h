@@ -14,10 +14,10 @@
 #ifndef __CROPNEUTRINO2D_H__
 #define __CROPNEUTRINO2D_H__
 
-#include "larcv/core/Processor/ProcessBase.h"
-#include "larcv/core/Processor/ProcessFactory.h"
-#include "larcv/core/DataFormat/Image2D.h"
-namespace larcv {
+#include "larcv3/core/processor/ProcessBase.h"
+#include "larcv3/core/processor/ProcessFactory.h"
+#include "larcv3/core/dataformat/Image2D.h"
+namespace larcv3 {
 
   /**
      \class ProcessBase
@@ -55,8 +55,8 @@ namespace larcv {
   };
 
   /**
-     \class larcv::CropNeutrino2DFactory
-     \brief A concrete factory class for larcv::CropNeutrino2D
+     \class larcv3::CropNeutrino2DFactory
+     \brief A concrete factory class for larcv3::CropNeutrino2D
   */
   class CropNeutrino2DProcessFactory : public ProcessFactoryBase {
   public:

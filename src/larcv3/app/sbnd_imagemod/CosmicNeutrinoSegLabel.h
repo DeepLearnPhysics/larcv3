@@ -14,13 +14,13 @@
 #ifndef __COSMICNEUTRINOSEGLABEL_H__
 #define __COSMICNEUTRINOSEGLABEL_H__
 
-#include "larcv/core/Processor/ProcessBase.h"
-#include "larcv/core/Processor/ProcessFactory.h"
-#include "larcv/core/DataFormat/Image2D.h"
-#include "larcv/core/DataFormat/Particle.h"
-#include "larcv/core/DataFormat/Voxel2D.h"
+#include "larcv3/core/processor/ProcessBase.h"
+#include "larcv3/core/processor/ProcessFactory.h"
+#include "larcv3/core/dataformat/Image2D.h"
+#include "larcv3/core/dataformat/Particle.h"
+#include "larcv3/core/dataformat/EventSparseCluster.h"
 
-namespace larcv {
+namespace larcv3 {
 
 /**
    \class ProcessBase
@@ -46,8 +46,8 @@ class CosmicNeutrinoSegLabel : public ProcessBase {
   void finalize();
 
   Image2D seg_image_creator(const std::vector<Particle> & particles,
-                            const ClusterPixel2D & clusters,
-                            const ImageMeta & meta);
+                            const SparseCluster2D & clusters,
+                            const ImageMeta2D & meta);
 
  private:
 
@@ -60,8 +60,8 @@ class CosmicNeutrinoSegLabel : public ProcessBase {
 };
 
 /**
-   \class larcv::CosmicNeutrinoSegLabelFactory
-   \brief A concrete factory class for larcv::CosmicNeutrinoSegLabel
+   \class larcv3::CosmicNeutrinoSegLabelFactory
+   \brief A concrete factory class for larcv3::CosmicNeutrinoSegLabel
 */
 class CosmicNeutrinoSegLabelProcessFactory
     : public ProcessFactoryBase {

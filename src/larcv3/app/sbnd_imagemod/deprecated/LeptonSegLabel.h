@@ -14,13 +14,13 @@
 #ifndef __LEPTONSEGLABEL_H__
 #define __LEPTONSEGLABEL_H__
 
-#include "larcv/core/Processor/ProcessBase.h"
-#include "larcv/core/Processor/ProcessFactory.h"
-#include "larcv/core/DataFormat/Image2D.h"
-#include "larcv/core/DataFormat/Particle.h"
-#include "larcv/core/DataFormat/Voxel2D.h"
+#include "larcv3/core/processor/ProcessBase.h"
+#include "larcv3/core/processor/ProcessFactory.h"
+#include "larcv3/core/dataformat/Image2D.h"
+#include "larcv3/core/dataformat/Particle.h"
+#include "larcv3/core/dataformat/Voxel2D.h"
 
-namespace larcv {
+namespace larcv3 {
 
 /**
    \class ProcessBase
@@ -60,8 +60,8 @@ class LeptonSegLabel : public ProcessBase {
 };
 
 /**
-   \class larcv::CosmicNeutrinoSegLabelFactory
-   \brief A concrete factory class for larcv::LeptonSegLabel
+   \class larcv3::CosmicNeutrinoSegLabelFactory
+   \brief A concrete factory class for larcv3::LeptonSegLabel
 */
 class LeptonSegLabelProcessFactory
     : public ProcessFactoryBase {

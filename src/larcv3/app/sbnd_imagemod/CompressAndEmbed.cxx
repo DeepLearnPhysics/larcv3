@@ -2,10 +2,11 @@
 #define __COMPRESSANDEMBED_CXX__
 
 #include "CompressAndEmbed.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
+#include "larcv3/core/dataformat/EventImage2D.h"
+#include "larcv3/core/dataformat/EventSparseTensor.h"
+#include "larcv3/core/dataformat/EventSparseCluster.h"
 
-namespace larcv {
+namespace larcv3 {
 
   static CompressAndEmbedProcessFactory __global_CompressAndEmbedProcessFactory__;
 
@@ -99,7 +100,7 @@ namespace larcv {
         }
       }
       else if (datatype == "cluster2d"){
-        auto ev_clust = (EventClusterPixel2D*)(mgr.get_data("cluster2d", producer));
+        auto ev_clust = (EventSparseCluster2D*)(mgr.get_data("cluster2d", producer));
         if (!ev_clust) {
           LARCV_CRITICAL() << "Input cluster2d not found by producer name " << producer << std::endl;
           throw larbys();
@@ -151,7 +152,7 @@ namespace larcv {
 
       if (datatype == "image2d"){
         auto ev_image = (EventImage2D*)(mgr.get_data("image2d", producer));
-        std::vector<larcv::Image2D> image_v;
+        std::vector<larcv3::Image2D> image_v;
         for (auto& img : ev_image->as_vector()) {
 
           auto const& original_rows = img.meta().rows();
@@ -161,7 +162,9 @@ namespace larcv {
           auto const& offset_cols = 0.5*(output_cols - (original_cols / col_compression));
 
           auto output_meta = img.meta();
-          output_meta.update(output_rows, output_cols);
+          output_meta.set_dimension(0, output_cols, output_cols);
+          output_meta.set_dimension(1, output_rows, output_rows);
+          // output_meta.update(output_rows, output_cols);
           image_v.push_back(Image2D(output_meta));
 
           for ( size_t col = offset_cols; col < output_cols - offset_cols; col ++ ){
@@ -176,11 +179,14 @@ namespace larcv {
                      orig_row < (row - offset_rows + 1)*row_compression;
                      orig_row ++){
                   if (orig_row >= img.meta().rows()) continue;
+                  std::vector<size_t> coords;
+                  coords.push_back(orig_col);
+                  coords.push_back(orig_row);
                   if (mode == Image2D::kMaxPool){
-                    value = ( value < img.pixel(orig_row, orig_col) ) ? img.pixel(orig_row, orig_col) : value;
+                    value = ( value < img.pixel(coords) ) ? img.pixel(coords) : value;
                   }
                   else{
-                    value += img.pixel(orig_row, orig_col);
+                    value += img.pixel(coords);
                     count ++;
                   }
 
@@ -189,7 +195,11 @@ namespace larcv {
               if (mode == Image2D::kAverage){
                 value /= (float) count;
               }
-              image_v.back().set_pixel(row, col, value);
+
+              std::vector<size_t> coords;
+              coords.push_back(col);
+              coords.push_back(row);
+              image_v.back().set_pixel(coords, value);
             }
           }
 
@@ -197,8 +207,8 @@ namespace larcv {
         ev_image->emplace(std::move(image_v));
       }
       else if (datatype == "cluster2d"){
-        auto ev_clust = (EventClusterPixel2D*)(mgr.get_data("cluster2d", producer));
-        std::vector<larcv::ClusterPixel2D> cluster_v;
+        auto ev_clust = (EventSparseCluster2D*)(mgr.get_data("cluster2d", producer));
+        std::vector<larcv3::SparseCluster2D> cluster_v;
 
         for (auto& clustPix : ev_clust->as_vector()) {
 
@@ -210,27 +220,31 @@ namespace larcv {
 
           auto const& original_meta = clustPix.meta();
           auto new_meta = clustPix.meta();
-          new_meta.update(output_rows, output_cols);
+          new_meta.set_dimension(0, output_cols, output_cols);
+          new_meta.set_dimension(1, output_rows, output_rows);
+          // new_meta.update(output_rows, output_cols);
 
-          cluster_v.push_back(ClusterPixel2D());
+          cluster_v.push_back(SparseCluster2D());
           cluster_v.back().meta(new_meta);
 
           // Loop over clusters in this plane
           for (auto & cluster : clustPix.as_vector()){
 
             // Prepare a new voxel set:
-            larcv::VoxelSet _new_cluster;
+            larcv3::VoxelSet _new_cluster;
 
             _new_cluster.id(cluster.id());
             // Loop over voxels in this cluster
             for (auto & voxel : cluster.as_vector()){
               // Need to calculate the original row, column in order to
               // Find the new row, colum, which tells the new index
-              auto original_row = original_meta.index_to_row(voxel.id());
-              auto original_col = original_meta.index_to_col(voxel.id());
-              auto new_row      = (original_row / row_compression) + offset_rows;
-              auto new_col      = (original_col / col_compression) + offset_cols;
-              auto new_index    = new_meta.index(new_row, new_col);
+              auto original_coords = original_meta.coordinates(voxel.id());
+              auto original_row = original_coords[1];
+              auto original_col = original_coords[0];
+              std::vector<size_t> new_coordinates;
+              new_coordinates.push_back((original_col / col_compression) + offset_cols);
+              new_coordinates.push_back((original_row / row_compression) + offset_rows);
+              auto new_index    = new_meta.index(new_coordinates);
               float value = voxel.value();
               if (mode == Image2D::kMaxPool){
                 if (_new_cluster.find(new_index).id() != kINVALID_VOXELID){
@@ -265,10 +279,10 @@ namespace larcv {
           //            orig_row ++){
           //         if (orig_row >= clustPix.meta().rows()) continue;
           //         if (mode == Image2D::kMaxPool){
-          //           value = ( value < clustPix.pixel(orig_row, orig_col) ) ? clustPix.pixel(orig_row, orig_col) : value;
+          //           value = ( value < clustPix.pixel(coords) ) ? clustPix.pixel(coords) : value;
           //         }
           //         else{
-          //           value += clustPix.pixel(orig_row, orig_col);
+          //           value += clustPix.pixel(coords);
           //           count ++;
           //         }
 
