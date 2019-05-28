@@ -294,7 +294,10 @@ void IOManager::prepare_input() {
     auto const& fname = _in_file_v[i_file];
     auto const& dname = _in_dir_v[i_file];
 
-    H5::H5File* fin = new H5::H5File(fname.c_str(), H5F_ACC_RDONLY);
+    H5::FileAccPropList fapl(H5::FileAccPropList::DEFAULT);
+    fapl.setCore(1024, false); // 1024 is number of bytes to increment each time more memory is needed; 'false': do not write contents to disk when the file is closed
+    H5::H5File* fin = new H5::H5File(fname.c_str(), H5F_ACC_RDONLY, H5::FileCreatPropList::DEFAULT, fapl);
+    //H5::H5File* fin = new H5::H5File(fname.c_str(), H5F_ACC_RDONLY);
     if (!fin) {
       LARCV_CRITICAL() << "Open attempt failed for a file: " << fname
                        << std::endl;
