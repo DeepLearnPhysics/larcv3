@@ -13,6 +13,20 @@ using namespace larcv3;
 using namespace std;
 %}
 
+%include exception.i       
+
+%exception {
+    try {
+        $action
+    } catch(const larcv3::larbys & e) {
+        SWIG_exception(SWIG_ValueError, "Larbys exception");
+    } catch(const std::exception& e) {
+        SWIG_exception(SWIG_UnknownError, "Standard exception");
+    } catch(...) {
+        SWIG_exception(SWIG_RuntimeError, "Unknown exception");
+    }
+}
+
 %include "core/base/base.wrapper"
 %include "core/dataformat/dataformat.wrapper"
 %include "core/processor/processor.wrapper"

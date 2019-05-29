@@ -1,4 +1,4 @@
-set(name filter)
+set(name sbnd_imagemod)
 
 
 # Get all the source files:

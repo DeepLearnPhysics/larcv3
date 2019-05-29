@@ -77,7 +77,8 @@ namespace larcv3 {
     H5::DSetCreatPropList extents_cparms;
     hsize_t      extents_chunk_dims[1] ={IMAGE_EXTENTS_CHUNK_SIZE};
     extents_cparms.setChunk( 1, extents_chunk_dims );
-
+    extents_cparms.setDeflate(IMAGE_COMPRESSION_LEVEL);
+    
     // Create the extents dataset:
     H5::DataSet extents_ds = group->createDataSet("extents", extents_datatype, extents_dataspace, extents_cparms);
 
@@ -102,7 +103,8 @@ namespace larcv3 {
     H5::DSetCreatPropList image_extents_cparms;
     hsize_t      image_extents_chunk_dims[1] ={IMAGE_IDEXTENTS_CHUNK_SIZE};
     image_extents_cparms.setChunk( 1, image_extents_chunk_dims );
-
+    image_extents_cparms.setDeflate(IMAGE_COMPRESSION_LEVEL);
+    
     // Create the extents dataset:
     H5::DataSet image_extents_ds = group->createDataSet("image_extents", 
       image_extents_datatype, image_extents_dataspace, image_extents_cparms);

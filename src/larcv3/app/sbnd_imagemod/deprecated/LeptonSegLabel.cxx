@@ -2,11 +2,11 @@
 #define __LEPTONSEGLABEL_CXX__
 
 #include "LeptonSegLabel.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
-#include "larcv/core/DataFormat/EventParticle.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
+#include "larcv3/core/dataformat/EventImage2D.h"
+#include "larcv3/core/dataformat/EventParticle.h"
+#include "larcv3/core/dataformat/EventVoxel2D.h"
 
-namespace larcv {
+namespace larcv3 {
 
 static LeptonSegLabelProcessFactory
     __global_LeptonSegLabelProcessFactory__;
@@ -30,14 +30,14 @@ bool LeptonSegLabel::process(IOManager& mgr) {
 
   // Read in the original source of segmentation, the cluster indexes:
   auto const& ev_cluster2d =
-      mgr.get_data<larcv::EventClusterPixel2D>(_cluster2d_producer);
+      mgr.get_data<larcv3::EventClusterPixel2D>(_cluster2d_producer);
 
   // Read in the particles that define the pdg types:
   auto const& ev_particle =
-      mgr.get_data<larcv::EventParticle>(_particle_producer);
+      mgr.get_data<larcv3::EventParticle>(_particle_producer);
 
   // The output is an instance of image2D, so prepare that:
-  auto& ev_image2d_output = mgr.get_data<larcv::EventImage2D>(_output_producer);
+  auto& ev_image2d_output = mgr.get_data<larcv3::EventImage2D>(_output_producer);
   ev_image2d_output.clear();
   // Next, loop over the particles and clusters per projection_ID
   // and set the values in the output image to the label specified by

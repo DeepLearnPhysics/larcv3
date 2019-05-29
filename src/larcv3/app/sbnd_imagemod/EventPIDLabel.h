@@ -15,13 +15,12 @@
 #ifndef __EVENTPIDLABEL_H__
 #define __EVENTPIDLABEL_H__
 
-#include "larcv/core/Processor/ProcessBase.h"
-#include "larcv/core/Processor/ProcessFactory.h"
-#include "larcv/core/DataFormat/Image2D.h"
-#include "larcv/core/DataFormat/Particle.h"
-#include "larcv/core/DataFormat/Voxel2D.h"
+#include "larcv3/core/processor/ProcessBase.h"
+#include "larcv3/core/processor/ProcessFactory.h"
+#include "larcv3/core/dataformat/Image2D.h"
+#include "larcv3/core/dataformat/Particle.h"
 
-namespace larcv {
+namespace larcv3 {
 
 /**
    \class ProcessBase
@@ -72,8 +71,8 @@ class EventPIDLabel : public ProcessBase {
 };
 
 /**
-   \class larcv::EventPIDLabelFactory
-   \brief A concrete factory class for larcv::EventPIDLabel
+   \class larcv3::EventPIDLabelFactory
+   \brief A concrete factory class for larcv3::EventPIDLabel
 */
 class EventPIDLabelProcessFactory
     : public ProcessFactoryBase {
