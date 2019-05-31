@@ -301,30 +301,17 @@ void IOManager::prepare_input() {
     auto const& fname = _in_file_v[i_file];
     auto const& dname = _in_dir_v[i_file];
 
-    H5::H5File* fin;
-
-    if (_h5_core_driver) {
-      LARCV_INFO() << "File will be stored entirely on memory." << std::endl;
-      H5::FileAccPropList fapl(H5::FileAccPropList::DEFAULT);
-      fapl.setCore(1024, false); // 1024 is number of bytes to increment each time more memory is needed; 'false': do not write contents to disk when the file is closed
-      fin = new H5::H5File(fname.c_str(), H5F_ACC_RDONLY, H5::FileCreatPropList::DEFAULT, fapl);
-    } else {
-      fin = new H5::H5File(fname.c_str(), H5F_ACC_RDONLY);
-    }
-
-    if (!fin) {
-      LARCV_CRITICAL() << "Open attempt failed for a file: " << fname
-                       << std::endl;
-      throw larbys();
-    }
+    // H5::H5File* fin;
 
     LARCV_NORMAL() << "Opening a file in READ mode: " << fname << std::endl;
+    open_new_input_file(fname);
+
 
     // Each file has (or should have) two groups: "Data" and "Events"
 
     try {
-      H5::Group data = fin->openGroup("/Data");
-      H5::Group events = fin->openGroup("/Events");
+      H5::Group data = _in_open_file.openGroup("/Data");
+      H5::Group events = _in_open_file.openGroup("/Events");
     } catch (...) {
       LARCV_CRITICAL() << "File " << fname
                        << " does not appear to be a larcv3 file, exiting."
@@ -333,8 +320,8 @@ void IOManager::prepare_input() {
     }
 
     // Re-open those groups after the check
-    H5::Group data = fin->openGroup("/Data");
-    H5::Group events = fin->openGroup("/Events");
+    H5::Group data = _in_open_file.openGroup("/Data");
+    H5::Group events = _in_open_file.openGroup("/Events");
 
     // Vist the extents group and determine how many events are present:
 
@@ -427,11 +414,31 @@ void IOManager::prepare_input() {
     }
   }
 
+  // Make sure the first file is open:
+  open_new_input_file(_in_file_v[0]);
 
 
-  // As preparation, open the first file:
-  _in_open_file =
-      H5::H5File(_in_file_v[_in_active_file_index].c_str(), H5F_ACC_RDONLY);
+}
+
+void IOManager::open_new_input_file(std::string filename){
+  
+  H5::FileAccPropList  fapl(H5::FileAccPropList::DEFAULT);
+
+  if (_h5_core_driver) {
+    LARCV_INFO() << "File will be stored entirely on memory." << std::endl;
+    // 1024 is number of bytes to increment each time more memory is needed; 
+    //'false': do not write contents to disk when the file is closed
+    fapl.setCore(1024, false);
+  } 
+  try{
+    _in_open_file = H5::H5File(filename.c_str(), H5F_ACC_RDONLY, H5::FileCreatPropList::DEFAULT, fapl);
+  }
+  catch ( ... ) {
+    LARCV_CRITICAL() << "Open attempt failed for a file: " << filename
+                     << std::endl;
+    throw larbys();
+  }
+
   _active_in_event_id_dataset   = _in_open_file.openGroup("Events").openDataSet("event_id");
   _active_in_event_id_dataspace = _active_in_event_id_dataset.getSpace();
 

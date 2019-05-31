@@ -139,6 +139,8 @@ namespace larcv3 {
     void   prepare_input();
     size_t register_producer(const ProducerName_t& name);
 
+    void open_new_input_file(std::string filename);
+
     void append_event_id();
 
     // The hdf5 model enforces the same number of entries per group,
