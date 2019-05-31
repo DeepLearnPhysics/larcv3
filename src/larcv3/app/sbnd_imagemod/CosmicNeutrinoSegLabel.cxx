@@ -2,11 +2,12 @@
 #define __COSMICNEUTRINOSEGLABEL_CXX__
 
 #include "CosmicNeutrinoSegLabel.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
-#include "larcv/core/DataFormat/EventParticle.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
+#include "larcv3/core/dataformat/EventImage2D.h"
+#include "larcv3/core/dataformat/EventParticle.h"
+#include "larcv3/core/dataformat/EventSparseCluster.h"
+#include "larcv3/core/dataformat/EventSparseTensor.h"
 
-namespace larcv {
+namespace larcv3 {
 
 static CosmicNeutrinoSegLabelProcessFactory
     __global_CosmicNeutrinoSegLabelProcessFactory__;
@@ -30,14 +31,14 @@ bool CosmicNeutrinoSegLabel::process(IOManager& mgr) {
 
   // Read in the original source of segmentation, the cluster indexes:
   auto const& ev_cluster2d =
-      mgr.get_data<larcv::EventClusterPixel2D>(_cluster2d_producer);
+      mgr.get_data<larcv3::EventSparseCluster2D>(_cluster2d_producer);
 
   // Read in the particles that define the pdg types:
   auto const& ev_particle =
-      mgr.get_data<larcv::EventParticle>(_particle_producer);
+      mgr.get_data<larcv3::EventParticle>(_particle_producer);
 
   // The output is an instance of image2D, so prepare that:
-  auto& ev_image2d_output = mgr.get_data<larcv::EventImage2D>(_output_producer);
+  auto& ev_image2d_output = mgr.get_data<larcv3::EventImage2D>(_output_producer);
   ev_image2d_output.clear();
   // Next, loop over the particles and clusters per projection_ID
   // and set the values in the output image to the label specified by
@@ -47,11 +48,11 @@ bool CosmicNeutrinoSegLabel::process(IOManager& mgr) {
   for (size_t projection_index = 0;
        projection_index < ev_cluster2d.size(); ++projection_index) {
     // For each projection index, get the list of clusters
-    auto const& clusters = ev_cluster2d.cluster_pixel_2d(projection_index);
+    auto const& clusters = ev_cluster2d.sparse_cluster(projection_index);
 
     auto const& out_image =
         seg_image_creator(particles, clusters,
-                          ev_cluster2d.cluster_pixel_2d(projection_index).meta());
+                          ev_cluster2d.sparse_cluster(projection_index).meta());
 
     // Append the output image2d:
     ev_image2d_output.append(out_image);
@@ -62,7 +63,7 @@ bool CosmicNeutrinoSegLabel::process(IOManager& mgr) {
 
 Image2D CosmicNeutrinoSegLabel::seg_image_creator(
     const std::vector<Particle> & particles,
-    const ClusterPixel2D & clusters, const ImageMeta & meta) {
+    const SparseCluster2D & clusters, const ImageMeta2D & meta) {
   // Prepare an output image2d:
   Image2D out_image(meta);
 

@@ -2,10 +2,10 @@
 #define __CROPNEUTRINO2D_CXX__
 
 #include "CropNeutrino2D.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
+#include "larcv3/core/dataformat/EventImage2D.h"
+#include "larcv3/core/dataformat/EventSparseCluster.h"
 
-namespace larcv {
+namespace larcv3 {
 
 static CropNeutrino2DProcessFactory __global_CropNeutrino2DProcessFactory__;
 
@@ -47,7 +47,7 @@ bool CropNeutrino2D::process(IOManager& mgr) {
   // std::cout << "Enter CropNeutrino2D::process " << std::endl;
 
   auto ev_reference_cluster =
-      mgr.get_data<larcv::EventClusterPixel2D>(_vertex_cluster2d_producer);
+      mgr.get_data<larcv3::EventSparseCluster2D>(_vertex_cluster2d_producer);
   if (ev_reference_cluster.as_vector().size() == 0) {
     LARCV_CRITICAL() << "Input cluster not found by producer name "
                      << _vertex_cluster2d_producer << std::endl;
@@ -64,7 +64,7 @@ bool CropNeutrino2D::process(IOManager& mgr) {
     // Get the data product, compare it's meta against the reference.
     if (_product_types_v.at(i) == "image2d") {
       auto const& ev_image2d =
-          mgr.get_data<larcv::EventImage2D>(_producer_names_v.at(i));
+          mgr.get_data<larcv3::EventImage2D>(_producer_names_v.at(i));
 
       if (ev_image2d.as_vector().size() == 0) {
         LARCV_CRITICAL() << "Input image not found by producer name "
@@ -81,9 +81,9 @@ bool CropNeutrino2D::process(IOManager& mgr) {
       }
       for (size_t projection_id = 0;
            projection_id < ev_image2d.as_vector().size(); projection_id++) {
-        auto image_meta = ev_image2d.at(projection_id).meta();
+        auto image_meta = ev_image2d.as_vector().at(projection_id).meta();
         auto ref_meta =
-            ev_reference_cluster.cluster_pixel_2d(projection_id).meta();
+            ev_reference_cluster.sparse_cluster(projection_id).meta();
 
         // Meta comparisons:
         if (image_meta != ref_meta) {
@@ -96,7 +96,7 @@ bool CropNeutrino2D::process(IOManager& mgr) {
 
     } else if (_product_types_v.at(i) == "cluster2d") {
       auto const& ev_cluster2d =
-          mgr.get_data<larcv::EventClusterPixel2D>(_producer_names_v.at(i));
+          mgr.get_data<larcv3::EventSparseCluster2D>(_producer_names_v.at(i));
       if (ev_cluster2d.as_vector().size() == 0) {
         LARCV_CRITICAL() << "Input clusters not found by producer name "
                          << _producer_names_v.at(i) << std::endl;
@@ -112,9 +112,9 @@ bool CropNeutrino2D::process(IOManager& mgr) {
       }
       for (size_t projection_id = 0;
            projection_id < ev_cluster2d.as_vector().size(); projection_id++) {
-        auto image_meta = ev_cluster2d.cluster_pixel_2d(projection_id).meta();
+        auto image_meta = ev_cluster2d.sparse_cluster(projection_id).meta();
         auto ref_meta =
-            ev_reference_cluster.cluster_pixel_2d(projection_id).meta();
+            ev_reference_cluster.sparse_cluster(projection_id).meta();
 
         // Meta comparisons:
         if (image_meta != ref_meta) {
@@ -135,7 +135,7 @@ bool CropNeutrino2D::process(IOManager& mgr) {
   // At reaching this point, we have validated size and meta matching across all
   // desired products.
 
-  std::vector<larcv::ImageMeta> new_metas;
+  std::vector<larcv3::ImageMeta2D> new_metas;
   std::vector<int> min_rows;
   std::vector<int> min_cols;
   std::vector<int> max_rows;
@@ -145,20 +145,21 @@ bool CropNeutrino2D::process(IOManager& mgr) {
   for (size_t projection_id = 0; projection_id < n_projections; projection_id ++ ){
 
 
-    auto& original_meta = ev_reference_cluster.cluster_pixel_2d(projection_id).meta();
+    auto& original_meta = ev_reference_cluster.sparse_cluster(projection_id).meta();
     auto& clust
-      = ev_reference_cluster.cluster_pixel_2d(projection_id).as_vector().front();
+      = ev_reference_cluster.sparse_cluster(projection_id).as_vector().front();
 
     // Take the average point of the clusters, weighted by value:
     float mean_x(0.0), mean_y(0.0);
     float weight = 0;
     for (auto & voxel : clust.as_vector()) {
-      if (voxel.id() > original_meta.size())
+      if (voxel.id() > original_meta.total_voxels())
         continue;
+      double position(size_t index, size_t axis) const;
       mean_x += voxel.value() *
-                original_meta.pos_x(original_meta.index_to_col(voxel.id()));
+                original_meta.position(voxel.id(),0);
       mean_y += voxel.value() *
-                original_meta.pos_y(original_meta.index_to_row(voxel.id()));
+                original_meta.position(voxel.id(),1);
       weight += voxel.value();
     }
     mean_x /= weight;
@@ -198,7 +199,7 @@ bool CropNeutrino2D::process(IOManager& mgr) {
                  << std::endl;
 
     // Create a new meta object:
-    larcv::ImageMeta new_meta(min_x, min_y, max_x, max_y, _output_rows,
+    larcv3::ImageMeta new_meta(min_x, min_y, max_x, max_y, _output_rows,
                               _output_cols, projection_id, original_meta.unit());
 
     new_metas.push_back(new_meta);
@@ -211,13 +212,13 @@ bool CropNeutrino2D::process(IOManager& mgr) {
     if (_product_types_v.at(i) == "image2d"){
 
       // Get the old image2d:
-      auto ev_image2d = mgr.get_data<larcv::EventImage2D>(_producer_names_v.at(i));
-      std::vector<larcv::Image2D> new_image_vector;
+      auto ev_image2d = mgr.get_data<larcv3::EventImage2D>(_producer_names_v.at(i));
+      std::vector<larcv3::Image2D> new_image_vector;
 
       for (size_t projection_id = 0; projection_id < n_projections; projection_id ++ ){
 
         // Make a new image:
-        larcv::Image2D new_image(new_metas.at(projection_id));
+        larcv3::Image2D new_image(new_metas.at(projection_id));
         auto old_image = ev_image2d.at(projection_id);
         // Populate the new image 2d from the old image 2d.
 
@@ -241,33 +242,33 @@ bool CropNeutrino2D::process(IOManager& mgr) {
       }
 
       // Make an output image producer
-      auto& ev_image2d_out = mgr.get_data<larcv::EventImage2D>(_output_producers_v.at(i));
+      auto& ev_image2d_out = mgr.get_data<larcv3::EventImage2D>(_output_producers_v.at(i));
       ev_image2d_out.emplace(std::move(new_image_vector));
 
     }
     else if (_product_types_v.at(i) == "cluster2d"){
 
       // Get the old cluster2d:
-      auto ev_cluster2d = mgr.get_data<larcv::EventClusterPixel2D>(_producer_names_v.at(i));
+      auto ev_cluster2d = mgr.get_data<larcv3::EventSparseCluster2D>(_producer_names_v.at(i));
 
       // Prepare a placeholder vector to hold the new set of clusters by plane:
-      std::vector<larcv::ClusterPixel2D> new_cluster2d_vector;
+      std::vector<larcv3::ClusterPixel2D> new_cluster2d_vector;
 
       for (size_t projection_id = 0; projection_id < n_projections; projection_id ++ ){
 
         // std::cout << "Projection id " << projection_id << std::endl;
 
         // Make a new image:
-        larcv::ClusterPixel2D new_cluster2ds;
+        larcv3::ClusterPixel2D new_cluster2ds;
         new_cluster2ds.meta(new_metas.at(projection_id));
 
-        auto old_clusters = ev_cluster2d.cluster_pixel_2d(projection_id);
+        auto old_clusters = ev_cluster2d.sparse_cluster(projection_id);
         // Populate the new cluster2d from the old cluster2d.
 
         // std::cout << " - Number of old clusters: " << old_clusters.as_vector().size() << std::endl;
 
         for (size_t cluster_index = 0; cluster_index < old_clusters.as_vector().size(); cluster_index ++){
-          larcv::VoxelSet new_vs;
+          larcv3::VoxelSet new_vs;
           auto const& cluster = old_clusters.as_vector().at(cluster_index);
 
           new_vs.id(cluster.id());
@@ -296,7 +297,7 @@ bool CropNeutrino2D::process(IOManager& mgr) {
             size_t new_index = new_metas.at(projection_id).index(new_row, new_col);
 
             //  This voxel is kept, store it:
-            new_vs.add(larcv::Voxel(new_index, voxel.value()));
+            new_vs.add(larcv3::Voxel(new_index, voxel.value()));
           }
           // std::cout << " -- Number of voxels in new cluster " << cluster_index << ": " << new_vs.as_vector().size() << std::endl;
           new_cluster2ds.emplace(std::move(new_vs));
@@ -309,7 +310,7 @@ bool CropNeutrino2D::process(IOManager& mgr) {
       }
 
       // Make an output image producer
-      auto& ev_cluster2d_out = mgr.get_data<larcv::EventClusterPixel2D>(_producer_names_v.at(i));
+      auto& ev_cluster2d_out = mgr.get_data<larcv3::EventSparseCluster2D>(_producer_names_v.at(i));
       for (auto & cluster_pix2d : new_cluster2d_vector){
         ev_cluster2d_out.emplace(std::move(cluster_pix2d));
       }

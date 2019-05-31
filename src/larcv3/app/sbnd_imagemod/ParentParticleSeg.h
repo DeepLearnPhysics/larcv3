@@ -15,14 +15,13 @@
 #ifndef __PARENTPARTICLESEG_H__
 #define __PARENTPARTICLESEG_H__
 
-#include "larcv/core/Processor/ProcessBase.h"
-#include "larcv/core/Processor/ProcessFactory.h"
-#include "larcv/core/DataFormat/Image2D.h"
-#include "larcv/core/DataFormat/Particle.h"
-#include "larcv/core/DataFormat/Voxel3D.h"
-#include "larcv/core/DataFormat/Voxel2D.h"
+#include "larcv3/core/processor/ProcessBase.h"
+#include "larcv3/core/processor/ProcessFactory.h"
+#include "larcv3/core/dataformat/Image2D.h"
+#include "larcv3/core/dataformat/Particle.h"
+#include "larcv3/core/dataformat/Voxel.h"
 
-namespace larcv {
+namespace larcv3 {
 
 /**
    \class ProcessBase
@@ -58,10 +57,10 @@ class ParentParticleSeg : public ProcessBase {
 
   void finalize();
 
-  larcv::VoxelSet cluster_merger(const larcv::ClusterPixel2D & clusters,
+  larcv3::VoxelSet cluster_merger(const larcv3::SparseCluster2D & clusters,
                                  particle_node * primary_node);
 
-  larcv::VoxelSet cluster_merger(const larcv::ClusterVoxel3D & clusters,
+  larcv3::VoxelSet cluster_merger(const larcv3::SparseCluster3D & clusters,
                                  particle_node * primary_node);
  private:
 
@@ -76,8 +75,8 @@ class ParentParticleSeg : public ProcessBase {
 };
 
 /**
-   \class larcv::ParentParticleSegFactory
-   \brief A concrete factory class for larcv::ParentParticleSeg
+   \class larcv3::ParentParticleSegFactory
+   \brief A concrete factory class for larcv3::ParentParticleSeg
 */
 class ParentParticleSegProcessFactory
     : public ProcessFactoryBase {

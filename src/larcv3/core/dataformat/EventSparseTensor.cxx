@@ -6,7 +6,7 @@
 #define VOXEL_META_CHUNK_SIZE 100
 #define VOXEL_DATA_CHUNK_SIZE 1000
 #define IMAGE_META_CHUNK_SIZE 100
-
+#define VOXEL_COMPRESSION 1
 
 #include "larcv3/core/dataformat/EventSparseTensor.h"
 
@@ -107,6 +107,7 @@ namespace larcv3 {
     H5::DSetCreatPropList extents_cparms;
     hsize_t      extents_chunk_dims[1] ={VOXEL_EXTENTS_CHUNK_SIZE};
     extents_cparms.setChunk( 1, extents_chunk_dims );
+    extents_cparms.setDeflate(VOXEL_COMPRESSION);
 
     // Create the extents dataset:
     H5::DataSet extents_ds = group->createDataSet("extents", extents_datatype, extents_dataspace, extents_cparms);
@@ -134,6 +135,7 @@ namespace larcv3 {
     H5::DSetCreatPropList id_extents_cparms;
     hsize_t      id_extents_chunk_dims[1] ={VOXEL_IDEXTENTS_CHUNK_SIZE};
     id_extents_cparms.setChunk( 1, id_extents_chunk_dims );
+    id_extents_cparms.setDeflate(VOXEL_COMPRESSION);
 
     // Create the extents dataset:
     H5::DataSet id_extents_ds = group->createDataSet("voxel_extents", 
@@ -161,6 +163,7 @@ namespace larcv3 {
     H5::DSetCreatPropList image_meta_cparms;
     hsize_t      image_meta_chunk_dims[1] ={IMAGE_META_CHUNK_SIZE};
     image_meta_cparms.setChunk( 1, image_meta_chunk_dims );
+    image_meta_cparms.setDeflate(VOXEL_COMPRESSION);
 
     // Create the extents dataset:
     H5::DataSet image_meta_ds = group->createDataSet("image_meta", 
@@ -189,6 +192,7 @@ namespace larcv3 {
     H5::DSetCreatPropList voxel_cparms;
     hsize_t      voxel_chunk_dims[1] ={VOXEL_DATA_CHUNK_SIZE};
     voxel_cparms.setChunk( 1, voxel_chunk_dims );
+    voxel_cparms.setDeflate(VOXEL_COMPRESSION);
 
     // Create the extents dataset:
     H5::DataSet voxel_ds = group->createDataSet("voxels", 

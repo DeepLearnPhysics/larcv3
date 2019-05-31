@@ -7,7 +7,8 @@
 #include "assert.h"
 #include "larcv3/core/base/LArCVBaseUtilFunc.h"
 
-#define EVENT_ID_CHUNK_SIZE 10
+#define EVENT_ID_CHUNK_SIZE 100
+#define EVENT_ID_COMPRESSION 1
 
 #include <mutex>
 std::mutex __ioman_mtx;
@@ -161,12 +162,13 @@ bool IOManager::initialize() {
     /*
      * Modify dataset creation properties, i.e. enable chunking.
      */
-    H5::DSetCreatPropList cparms;
+    H5::DSetCreatPropList cparams;
     hsize_t chunk_dims[1] = {EVENT_ID_CHUNK_SIZE};
-    cparms.setChunk(1, chunk_dims);
+    cparams.setChunk(1, chunk_dims);
+    cparams.setDeflate(EVENT_ID_COMPRESSION);
 
     _out_event_id_ds = _out_file.createDataSet(
-        "Events/event_id", larcv3::EventID::get_datatype(), dataspace, cparms);
+        "Events/event_id", larcv3::EventID::get_datatype(), dataspace, cparams);
   }
 
   if (_io_mode != kWRITE) {
