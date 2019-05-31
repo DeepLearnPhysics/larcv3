@@ -8,6 +8,12 @@
 #define IMAGE_META_CHUNK_SIZE 100
 #define VOXEL_COMPRESSION 1
 
+#define EXTENTS_DATASET 0
+#define VOXEL_EXTENTS_DATASET 1
+#define IMAGE_META_DATASET 2
+#define VOXELS_DATASET 3
+#define N_DATASETS 4
+
 #include "larcv3/core/dataformat/EventSparseTensor.h"
 
 
@@ -199,6 +205,31 @@ namespace larcv3 {
       voxel_datatype, voxel_dataspace, voxel_cparms);
 
   }
+
+  template<size_t dimension> 
+  void EventSparseTensor<dimension>::openDataSets(H5::Group * group){
+
+    if (_open_datasets.size() < N_DATASETS ){
+        std::cout << "Opening datasets" << std::endl;
+       _open_datasets.resize(4);
+       _open_dataspaces.resize(4);
+       _open_datasets[EXTENTS_DATASET]         = group->openDataSet("extents");
+       _open_dataspaces[EXTENTS_DATASET]       = _open_datasets[EXTENTS_DATASET].getSpace();
+
+       _open_datasets[VOXEL_EXTENTS_DATASET]   = group->openDataSet("voxel_extents");
+       _open_dataspaces[VOXEL_EXTENTS_DATASET] = _open_datasets[VOXEL_EXTENTS_DATASET].getSpace();
+
+       _open_datasets[IMAGE_META_DATASET]      = group->openDataSet("image_meta");
+       _open_dataspaces[IMAGE_META_DATASET]    = _open_datasets[IMAGE_META_DATASET].getSpace();
+
+       _open_datasets[VOXELS_DATASET]          = group->openDataSet("voxels");
+       _open_dataspaces[VOXELS_DATASET]        = _open_datasets[VOXELS_DATASET].getSpace();
+
+    }
+
+    return;
+  }
+
 
   template<size_t dimension> 
   void EventSparseTensor<dimension>::serialize  (H5::Group * group){
@@ -465,15 +496,15 @@ namespace larcv3 {
     // 4) Use the voxel_extents information to read the correct voxels
     // 5) Update the meta for each set correctly
 
-
+    openDataSets(group);
     /////////////////////////////////////////////////////////
     // Step 1: Get the extents information from extents dataset
     /////////////////////////////////////////////////////////
 
-    H5::DataSet extents_dataset = group->openDataSet("extents");
+    H5::DataSet * extents_dataset = &(_open_datasets[EXTENTS_DATASET]);
 
     // Get a dataspace inside this file:
-    H5::DataSpace extents_dataspace = extents_dataset.getSpace();
+    // H5::DataSpace extents_dataspace = extents_dataset->getSpace();
 
 
     // Create a dimension for the data to add (which is the hyperslab data)
@@ -488,15 +519,16 @@ namespace larcv3 {
     /////////////////////////////////////////////////////////
 
     // Now, select as a hyperslab the last section of data for writing:
-    // extents_dataspace = extents_dataset.getSpace();
-    extents_dataspace.selectHyperslab(H5S_SELECT_SET, extents_slab_dims, extents_offset);
+    // extents_dataspace = extents_dataset->getSpace();
+    _open_dataspaces[EXTENTS_DATASET].selectHyperslab(H5S_SELECT_SET, extents_slab_dims, extents_offset);
 
     // Define memory space:
     H5::DataSpace extents_memspace(1, extents_slab_dims);
 
     Extents_t input_extents;
     // Write the new data
-    extents_dataset.read(&(input_extents), larcv3::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
+    extents_dataset->read(&(input_extents), larcv3::get_datatype<Extents_t>(),
+        extents_memspace, _open_dataspaces[EXTENTS_DATASET]);
 
     /////////////////////////////////////////////////////////
     // Step 2: Get the voxel_extents information
@@ -510,10 +542,10 @@ namespace larcv3 {
         return;
     }
 
-    H5::DataSet voxel_extents_dataset = group->openDataSet("voxel_extents");
+    H5::DataSet * voxel_extents_dataset = &(_open_datasets[VOXEL_EXTENTS_DATASET]);
 
     // Get a dataspace inside this file:
-    H5::DataSpace voxel_extents_dataspace = voxel_extents_dataset.getSpace();
+    // H5::DataSpace voxel_extents_dataspace = voxel_extents_dataset->getSpace();
 
     // Create a dimension for the data to add (which is the hyperslab data)
     hsize_t voxel_extents_slab_dims[1];
@@ -524,7 +556,7 @@ namespace larcv3 {
 
     // Now, select as a hyperslab the last section of data for writing:
     // extents_dataspace = extents_dataset.getSpace();
-    voxel_extents_dataspace.selectHyperslab(H5S_SELECT_SET, voxel_extents_slab_dims, voxel_extents_offset);
+    _open_dataspaces[VOXEL_EXTENTS_DATASET].selectHyperslab(H5S_SELECT_SET, voxel_extents_slab_dims, voxel_extents_offset);
 
 
     H5::DataSpace voxel_extents_memspace(1, voxel_extents_slab_dims);
@@ -534,7 +566,8 @@ namespace larcv3 {
     // Reserve space for reading in voxel_extents:
     voxel_extents.resize(input_extents.n);
 
-    voxel_extents_dataset.read(&(voxel_extents[0]), larcv3::get_datatype<IDExtents_t>(), voxel_extents_memspace, voxel_extents_dataspace);
+    voxel_extents_dataset->read(&(voxel_extents[0]), larcv3::get_datatype<IDExtents_t>(), 
+        voxel_extents_memspace, _open_dataspaces[VOXEL_EXTENTS_DATASET]);
 
     // std::cout << "voxel_extents.size(): " << voxel_extents.size() << std::endl;
 
@@ -544,10 +577,10 @@ namespace larcv3 {
     // Step 3: Get the image_meta information
     /////////////////////////////////////////////////////////
 
-    H5::DataSet image_meta_dataset = group->openDataSet("image_meta");
+    H5::DataSet * image_meta_dataset = &(_open_datasets[IMAGE_META_DATASET]);
 
     // Get a dataspace inside this file:
-    H5::DataSpace image_meta_dataspace = image_meta_dataset.getSpace();
+    // H5::DataSpace image_meta_dataspace = image_meta_dataset->getSpace();
 
     // Create a dimension for the data to add (which is the hyperslab data)
     hsize_t image_meta_slab_dims[1];
@@ -558,7 +591,7 @@ namespace larcv3 {
 
     // Now, select as a hyperslab the last section of data for writing:
     // extents_dataspace = extents_dataset.getSpace();
-    image_meta_dataspace.selectHyperslab(H5S_SELECT_SET, image_meta_slab_dims, image_meta_offset);
+    _open_dataspaces[IMAGE_META_DATASET].selectHyperslab(H5S_SELECT_SET, image_meta_slab_dims, image_meta_offset);
 
 
     H5::DataSpace image_meta_memspace(1, image_meta_slab_dims);
@@ -568,9 +601,9 @@ namespace larcv3 {
     // Reserve space for reading in image_meta:
     image_meta.resize(input_extents.n);
 
-    image_meta_dataset.read(&(image_meta[0]), 
+    image_meta_dataset->read(&(image_meta[0]), 
       larcv3::ImageMeta<dimension>::get_datatype(), 
-      image_meta_memspace, image_meta_dataspace);
+      image_meta_memspace, _open_dataspaces[IMAGE_META_DATASET]);
 
     // std::cout << "image_meta.size(): " << image_meta.size() << std::endl;
         
@@ -593,10 +626,10 @@ namespace larcv3 {
       // }
 
       // Get the dataset for reading:
-      H5::DataSet voxels_dataset = group->openDataSet("voxels");
+      H5::DataSet * voxels_dataset = &(_open_datasets[VOXELS_DATASET]);
 
       // Get a dataspace inside this file:
-      H5::DataSpace voxels_dataspace = voxels_dataset.getSpace();
+      // H5::DataSpace voxels_dataspace = voxels_dataset->getSpace();
 
       // Create a dimension for the data to add (which is the hyperslab data)
       hsize_t voxels_slab_dims[1];
@@ -609,7 +642,7 @@ namespace larcv3 {
       //           << "offset: " << voxels_offset[0] << "\n"
       //           << std::endl;
       // Now, select as a hyperslab the last section of data for readomg:
-      voxels_dataspace.selectHyperslab(H5S_SELECT_SET, voxels_slab_dims, voxels_offset);
+      _open_dataspaces[VOXELS_DATASET].selectHyperslab(H5S_SELECT_SET, voxels_slab_dims, voxels_offset);
 
 
       H5::DataSpace voxels_memspace(1, voxels_slab_dims);
@@ -623,7 +656,8 @@ namespace larcv3 {
 
       // Reserve space for reading in voxels:
 
-      voxels_dataset.read(&(temp_voxel_vector[0]), larcv3::Voxel::get_datatype(), voxels_memspace, voxels_dataspace);
+      voxels_dataset->read(&(temp_voxel_vector[0]), larcv3::Voxel::get_datatype(),
+       voxels_memspace, _open_dataspaces[VOXELS_DATASET]);
 
       // std::cout << "temp_voxel_vector.size(): " << temp_voxel_vector.size() << std::endl;
 
