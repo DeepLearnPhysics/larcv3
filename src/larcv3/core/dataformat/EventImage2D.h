@@ -58,6 +58,7 @@ namespace larcv3 {
       return (EventImage2D *) e;
     }
   private:
+    void open_datasets(H5::Group * group);
 
     std::vector<larcv3::Image2D> _image_v;
 

@@ -36,6 +36,34 @@ namespace larcv3 {
   }
 
 
+  void EventImage2D::open_datasets(H5::Group * group){
+
+    // if (_open_datasets.size() < N_DATASETS ){
+    //     std::cout << "Opening datasets" << std::endl;
+    //    _open_datasets.resize(N_DATASETS);
+    //    _open_dataspaces.resize(N_DATASETS);
+       
+    //    _open_datasets[EXTENTS_DATASET]         = group->openDataSet("extents");
+    //    _open_dataspaces[EXTENTS_DATASET]       = _open_datasets[EXTENTS_DATASET].getSpace();
+
+    //    _open_datasets[PROJECTION_DATASET]         = group->openDataSet("projection");
+    //    _open_dataspaces[PROJECTION_DATASET]       = _open_datasets[PROJECTION_DATASET].getSpace();
+
+
+    //    _open_datasets[CLUSTER_EXTENTS_DATASET]   = group->openDataSet("cluster_extents");
+    //    _open_dataspaces[CLUSTER_EXTENTS_DATASET] = _open_datasets[CLUSTER_EXTENTS_DATASET].getSpace();
+
+    //    _open_datasets[IMAGE_META_DATASET]      = group->openDataSet("image_meta");
+    //    _open_dataspaces[IMAGE_META_DATASET]    = _open_datasets[IMAGE_META_DATASET].getSpace();
+
+    //    _open_datasets[VOXELS_DATASET]          = group->openDataSet("voxels");
+    //    _open_dataspaces[VOXELS_DATASET]        = _open_datasets[VOXELS_DATASET].getSpace();
+
+    // }
+
+    return;
+  }
+
   void EventImage2D::initialize (H5::Group * group){
 
     // Image2D creates a set of tables:

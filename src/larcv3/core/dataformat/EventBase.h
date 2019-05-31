@@ -5,7 +5,7 @@
  * 
  * \brief Class def header for a class EventBase
  *
- * @author kazuhiro
+ * @author cadams, kazuhiro
  */
 
 /** \addtogroup DataFormat
@@ -37,6 +37,11 @@ namespace larcv3 {
     virtual void initialize(H5::Group *) = 0;
     virtual void serialize(H5::Group * group) = 0;
     virtual void deserialize(H5::Group * group, size_t entry) = 0;
+
+    virtual void open_datasets(H5::Group * group ) = 0;
+
+    std::vector<H5::DataSet>   _open_datasets;
+    std::vector<H5::DataSpace> _open_dataspaces;
 
 // #endif
   };
