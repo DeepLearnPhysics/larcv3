@@ -31,7 +31,8 @@ IOManager::IOManager(IOMode_t mode, std::string name)
       _product_ctr(0),
       _product_ptr_v(),
       _product_type_v(),
-      _producer_name_v() {
+      _producer_name_v(),
+      _h5_core_driver(false) {
   reset();
 }
 
@@ -73,6 +74,8 @@ void IOManager::add_in_file(const std::string filename,
 
 void IOManager::clear_in_file() { _in_file_v.clear(); }
 
+void IOManager::set_core_driver(const bool opt) { _h5_core_driver = opt; }
+
 void IOManager::set_out_file(const std::string name) { _out_file_name = name; }
 
 std::string IOManager::product_type(const size_t id) const {
@@ -91,6 +94,8 @@ void IOManager::configure(const PSet& cfg) {
       (msg::Level_t)(cfg.get<unsigned short>("Verbosity", logger().level())));
   _io_mode = (IOMode_t)(cfg.get<unsigned short>("IOMode"));
   _out_file_name = cfg.get<std::string>("OutFileName", "");
+
+  _h5_core_driver = cfg.get<bool>("UseH5CoreDriver", false);
 
   // Figure out input files
   _in_file_v.clear();
@@ -296,7 +301,17 @@ void IOManager::prepare_input() {
     auto const& fname = _in_file_v[i_file];
     auto const& dname = _in_dir_v[i_file];
 
-    H5::H5File* fin = new H5::H5File(fname.c_str(), H5F_ACC_RDONLY);
+    H5::H5File* fin;
+
+    if (_h5_core_driver) {
+      LARCV_INFO() << "File will be stored entirely on memory." << std::endl;
+      H5::FileAccPropList fapl(H5::FileAccPropList::DEFAULT);
+      fapl.setCore(1024, false); // 1024 is number of bytes to increment each time more memory is needed; 'false': do not write contents to disk when the file is closed
+      fin = new H5::H5File(fname.c_str(), H5F_ACC_RDONLY, H5::FileCreatPropList::DEFAULT, fapl);
+    } else {
+      fin = new H5::H5File(fname.c_str(), H5F_ACC_RDONLY);
+    }
+
     if (!fin) {
       LARCV_CRITICAL() << "Open attempt failed for a file: " << fname
                        << std::endl;

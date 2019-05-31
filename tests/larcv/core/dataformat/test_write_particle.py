@@ -14,7 +14,6 @@ def rand_num_events():
 
 def write_particles(tempfile, rand_num_events):
 
-
     io_manager = larcv.IOManager(larcv.IOManager.kWRITE)
     io_manager.set_out_file(tempfile)
     io_manager.initialize()
@@ -47,10 +46,11 @@ def write_particles(tempfile, rand_num_events):
 
     return
  
-def read_particles(tempfile):
-
+def read_particles(tempfile, use_core_driver=False):
 
     io_manager = larcv.IOManager(larcv.IOManager.kREAD)
+    if use_core_driver: 
+      io_manager.set_core_driver()
     io_manager.add_in_file(tempfile)
     io_manager.initialize()
 
@@ -71,4 +71,10 @@ def test_write_particles(tempfile, rand_num_events):
     n_read = read_particles(tempfile)
 
     # assert(n_read == rand_num_events)
+
+def test_read_particles_coredriver(tempfile, rand_num_events):
+
+    #write_particles(tempfile, rand_num_events)
+    n_read = read_particles(tempfile, True)
+
 
