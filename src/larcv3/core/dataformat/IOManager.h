@@ -189,6 +189,10 @@ namespace larcv3 {
     EventID   _set_event_id;
     EventID   _last_event_id;
 
+    H5::DataSet    _active_in_event_id_dataset;
+    H5::DataSpace  _active_in_event_id_dataspace;
+
+
     // Keeping track of products and producers:
     std::map<larcv3::ProducerName_t, larcv3::ProducerID_t> _key_list;
     size_t                          _product_ctr;

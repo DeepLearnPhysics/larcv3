@@ -417,6 +417,9 @@ void IOManager::prepare_input() {
   // As preparation, open the first file:
   _in_open_file =
       H5::H5File(_in_file_v[_in_active_file_index].c_str(), H5F_ACC_RDONLY);
+  _active_in_event_id_dataset   = _in_open_file.openGroup("Events").openDataSet("event_id");
+  _active_in_event_id_dataspace = _active_in_event_id_dataset.getSpace();
+
 }
 
 bool IOManager::read_entry(const size_t index, bool force_reload) {
@@ -463,14 +466,19 @@ bool IOManager::read_entry(const size_t index, bool force_reload) {
       _in_active_file_index = _this_file_index;
       _in_open_file =
           H5::H5File(_in_file_v[_in_active_file_index].c_str(), H5F_ACC_RDONLY);
+
+      _active_in_event_id_dataset   = _in_open_file.openGroup("Events").openDataSet("event_id");
+      _active_in_event_id_dataspace = _active_in_event_id_dataset.getSpace();
+
+
       LARCV_NORMAL() << "Opening new file for continued event reading"
                      << std::endl;
     }
 
     // Now, we can open the events folder and figure out what's what.
-    H5::DataSet events_dataset =
-        _in_open_file.openGroup("Events").openDataSet("event_id");
-    H5::DataSpace events_dataspace = events_dataset.getSpace();
+    // H5::DataSet events_dataset =
+        // _in_open_file.openGroup("Events").openDataSet("event_id");
+    // H5::DataSpace events_dataspace = events_dataset.getSpace();
 
     hsize_t events_slab_dims[1];
     events_slab_dims[0] = 1;
@@ -480,7 +488,7 @@ bool IOManager::read_entry(const size_t index, bool force_reload) {
     // for this file
     events_offset[0] = _in_index - _current_offset;
 
-    events_dataspace.selectHyperslab(H5S_SELECT_SET, events_slab_dims,
+    _active_in_event_id_dataspace.selectHyperslab(H5S_SELECT_SET, events_slab_dims,
                                      events_offset);
 
     // Define memory space:
@@ -488,8 +496,8 @@ bool IOManager::read_entry(const size_t index, bool force_reload) {
 
     EventID input_event_id;
     // Write the new data
-    events_dataset.read(&(input_event_id), EventID::get_datatype(),
-                        events_memspace, events_dataspace);
+    _active_in_event_id_dataset.read(&(input_event_id), EventID::get_datatype(),
+                        events_memspace, _active_in_event_id_dataspace);
     _event_id = input_event_id;
 
     // _in_open_file
