@@ -1,18 +1,18 @@
-#ifndef __IMAGEFROMTensor2D_CXX__
-#define __IMAGEFROMTensor2D_CXX__
+#ifndef __LARCV_IMAGE2DFROMTENSOR2D_CXX__
+#define __LARCV_IMAGE2DFROMTENSOR2D_CXX__
 
-#include "ImageFromTensor2D.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
-namespace larcv {
+#include "Image2DFromTensor2D.h"
+#include "larcv3/core/dataformat/EventSparseTensor.h"
+#include "larcv3/core/dataformat/EventImage2D.h"
+namespace larcv3 {
 
-  static ImageFromTensor2DProcessFactory __global_ImageFromTensor2DProcessFactory__;
+  static Image2DFromTensor2DProcessFactory __global_Image2DFromTensor2DProcessFactory__;
 
-  ImageFromTensor2D::ImageFromTensor2D(const std::string name)
+  Image2DFromTensor2D::Image2DFromTensor2D(const std::string name)
     : ProcessBase(name)
   {}
 
-  void ImageFromTensor2D::configure_labels(const PSet& cfg)
+  void Image2DFromTensor2D::configure_labels(const PSet& cfg)
   {
     LARCV_DEBUG() << "start" << std::endl;
     _tensor2d_producer_v.clear();
@@ -46,7 +46,7 @@ namespace larcv {
     LARCV_DEBUG() << "end" << std::endl;
   }
 
-  void ImageFromTensor2D::configure(const PSet& cfg)
+  void Image2DFromTensor2D::configure(const PSet& cfg)
   {
     configure_labels(cfg);
     _type_pi_v = cfg.get<std::vector<unsigned short> >("TypePIList", _type_pi_v);
@@ -77,9 +77,9 @@ namespace larcv {
     }
   }
 
-  void ImageFromTensor2D::initialize() {}
+  void Image2DFromTensor2D::initialize() {}
 
-  bool ImageFromTensor2D::process(IOManager& mgr)
+  bool Image2DFromTensor2D::process(IOManager& mgr)
   {
     for (size_t producer_index = 0; producer_index < _tensor2d_producer_v.size(); ++producer_index) {
       auto const& tensor2d_producer = _tensor2d_producer_v[producer_index];
@@ -89,10 +89,10 @@ namespace larcv {
       auto const type_pi = (PIType_t)(_type_pi_v[producer_index]);
 
 
-      auto const& ev_tensor2d = mgr.get_data<larcv::EventSparseTensor2D>(tensor2d_producer);
-      auto& ev_out_image = mgr.get_data<larcv::EventImage2D>(output_producer);
+      auto const& ev_tensor2d = mgr.get_data<larcv3::EventSparseTensor2D>(tensor2d_producer);
+      auto& ev_out_image = mgr.get_data<larcv3::EventImage2D>(output_producer);
 
-      std::vector<larcv::Image2D> image_v;
+      std::vector<larcv3::Image2D> image_v;
       for (auto const& tensor2d_v : ev_tensor2d.as_vector()) {
 
         auto const& meta = tensor2d_v.meta();
@@ -115,14 +115,14 @@ namespace larcv {
           }
           img_data[vox.id()] = val;
         }
-        larcv::Image2D img2d(std::move(meta), std::move(img_data));
+        larcv3::Image2D img2d(std::move(meta), std::move(img_data));
         ev_out_image.emplace(std::move(img2d));
       }
     }
     return true;
   }
 
-  void ImageFromTensor2D::finalize()
+  void Image2DFromTensor2D::finalize()
   {}
 
 }

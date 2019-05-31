@@ -1,10 +1,13 @@
-#ifndef __TENSOR2DFROMIMAGE2D_CXX__
-#define __TENSOR2DFROMIMAGE2D_CXX__
+#ifndef __LARCV_TENSOR2DFROMIMAGE2D_CXX__
+#define __LARCV_TENSOR2DFROMIMAGE2D_CXX__
 
 #include "Tensor2DFromImage2D.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
-namespace larcv {
+#include "larcv3/core/dataformat/EventSparseTensor.h"
+#include "larcv3/core/dataformat/EventImage2D.h"
+
+#include <math.h>
+
+namespace larcv3 {
 
   static Tensor2DFromImage2DProcessFactory
   __global_Tensor2DFromImage2DProcessFactory__;
@@ -57,13 +60,13 @@ namespace larcv {
 
     // Get the image 2d data from the specified producer.
     auto const& ev_image2d =
-      mgr.get_data<larcv::EventImage2D>(_image2d_producer);
+      mgr.get_data<larcv3::EventImage2D>(_image2d_producer);
 
 
     // Get the reference tensor 2d, if it's specified:
-    larcv::EventSparseTensor2D * reference_tensor = NULL;
+    larcv3::EventSparseTensor2D * reference_tensor = NULL;
     if (_reference_tensor2d != ""){
-      reference_tensor = & mgr.get_data<larcv::EventSparseTensor2D>(_reference_tensor2d);
+      reference_tensor = & mgr.get_data<larcv3::EventSparseTensor2D>(_reference_tensor2d);
     }
 
     if (_reference_tensor2d != "" && (reference_tensor == NULL || reference_tensor->as_vector().size() == 0) ){
@@ -78,17 +81,17 @@ namespace larcv {
     }
 
     // Create a placeholder for the output tensor2d
-    auto& ev_output = mgr.get_data<larcv::EventSparseTensor2D>(_output_producer);
+    auto& ev_output = mgr.get_data<larcv3::EventSparseTensor2D>(_output_producer);
 
 
 
     // Loop over projection IDs, and convert each image into a tensor 2D and preserve the image meta.
     for (size_t projection_id = 0; projection_id < ev_image2d.as_vector().size(); projection_id ++){
       
-      auto image2d = ev_image2d.at(projection_id);
+      auto image2d = ev_image2d.as_vector().at(projection_id);
       auto meta = image2d.meta();
 
-      larcv::VoxelSet vs;
+      larcv3::VoxelSet vs;
 
       float this_threshold = 0.0;
 
@@ -101,20 +104,20 @@ namespace larcv {
       if (_reference_tensor2d == ""){
         for (size_t i = 0; i < image2d.size(); ++i){
           if (fabs(image2d.as_vector().at(i)) > this_threshold){
-            vs.add(larcv::Voxel(i, image2d.as_vector().at(i)));
+            vs.add(larcv3::Voxel(i, image2d.as_vector().at(i)));
           }
         }
       }
       else{
         // if there is a reference 2d, use the indexes from it to pick points from the image:
-        auto & reference_set = reference_tensor->sparse_tensor_2d(projection_id);
-        if (reference_set.meta().size() != meta.size()){
+        auto & reference_set = reference_tensor->sparse_tensor(projection_id);
+        if (reference_set.meta().total_voxels() != meta.total_voxels()){
           LARCV_CRITICAL() << "Meta size mismatch between target image and reference voxel set" << std::endl;
           throw larbys();
         }
         for (auto & ref_voxel : reference_set.as_vector()){
           float value = image2d.as_vector().at(ref_voxel.id());
-          vs.add(larcv::Voxel(ref_voxel.id(), value) );
+          vs.add(larcv3::Voxel(ref_voxel.id(), value) );
         }
       }
 

@@ -1,4 +1,4 @@
-set(name filter)
+set(name imagemod)
 
 
 # Get all the source files:
@@ -7,9 +7,6 @@ file(GLOB HEADERS *.h)
 
 # Add a shared library
 add_library(${name} OBJECT ${SOURCES})
-
-
-
 
 
 install (FILES ${HEADERS}
