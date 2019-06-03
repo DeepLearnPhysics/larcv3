@@ -212,6 +212,7 @@ namespace larcv3 {
 
     // IOManager has to control the EventID dataset it's self for the output file.
     H5::DataSet _out_event_id_ds;
+    H5::DataType _event_id_datatype;
 
   };
 

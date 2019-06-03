@@ -528,7 +528,7 @@ bool IOManager::read_entry(const size_t index, bool force_reload) {
 
     EventID input_event_id;
     // Write the new data
-    _active_in_event_id_dataset.read(&(input_event_id), EventID::get_datatype(),
+    _active_in_event_id_dataset.read(&(input_event_id), _event_id_datatype,
                         events_memspace, _active_in_event_id_dataspace);
     _event_id = input_event_id;
 
@@ -801,7 +801,6 @@ void IOManager::set_id() {
 
 void IOManager::finalize() {
   LARCV_DEBUG() << "start" << std::endl;
-
   if (_io_mode != kREAD) {
     // _out_file->cd();
     if (_store_id_bool.empty()) {
@@ -859,6 +858,7 @@ void IOManager::reset() {
   _store_only.clear();
   _read_id_bool.clear();
   _store_id_bool.clear();
+  _event_id_datatype = larcv3::get_datatype<Extents_t>();
 }
 
 }  // namespace larcv3

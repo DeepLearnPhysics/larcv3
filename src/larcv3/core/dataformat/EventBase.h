@@ -32,6 +32,7 @@ namespace larcv3 {
     friend class DataProductFactory;
   public:
     
+    virtual ~EventBase() = 0;
 
     virtual void clear() = 0;
     virtual void initialize(H5::Group *) = 0;
@@ -45,6 +46,7 @@ namespace larcv3 {
 
 // #endif
   };
+
 }
 
 #endif //inc guard
