@@ -59,7 +59,6 @@ namespace larcv3{
   void EventParticle::open_datasets(H5::Group * group){
 
     if (_open_datasets.size() < N_DATASETS ){
-        std::cout << "Opening datasets" << std::endl;
        _open_datasets.resize(N_DATASETS);
        _open_dataspaces.resize(N_DATASETS);
        
@@ -104,7 +103,7 @@ namespace larcv3{
     /////////////////////////////////////////////////////////
     // Get and extend the particles dataset
     /////////////////////////////////////////////////////////
-    H5::DataSet * particles_dataset = &(_open_datasets[PARTICLES_DATASET]);
+    // H5::DataSet * particles_dataset = &(_open_datasets[PARTICLES_DATASET]);
 
     // Get a dataspace inside this file:
     // H5::DataSpace particles_dataspace = particles_dataset.getSpace();
@@ -130,7 +129,7 @@ namespace larcv3{
 
 
     // Extend the dataset to accomodate the new data
-    particles_dataset->extend(particles_size);
+    _open_datasets[PARTICLES_DATASET].extend(particles_size);
 
 
     /////////////////////////////////////////////////////////
@@ -138,6 +137,8 @@ namespace larcv3{
     /////////////////////////////////////////////////////////
 
     // Select as a hyperslab the last section of data for writing:
+    // Need to reopen the dataspace after extension:
+    _open_dataspaces[PARTICLES_DATASET] = _open_datasets[PARTICLES_DATASET].getSpace();
     _open_dataspaces[PARTICLES_DATASET].selectHyperslab(H5S_SELECT_SET, 
         particles_slab_dims, particles_dims_current);
 
@@ -146,7 +147,7 @@ namespace larcv3{
 
 
     // Write the new data
-    particles_dataset->write(&(_part_v[0]), _particle_datatype, 
+    _open_datasets[PARTICLES_DATASET].write(&(_part_v[0]), _particle_datatype, 
         particles_memspace, _open_dataspaces[PARTICLES_DATASET]);
 
 
@@ -183,6 +184,7 @@ namespace larcv3{
     /////////////////////////////////////////////////////////
 
     // Now, select as a hyperslab the last section of data for writing:
+    _open_dataspaces[EXTENTS_DATASET] = _open_datasets[EXTENTS_DATASET].getSpace();
     _open_dataspaces[EXTENTS_DATASET].selectHyperslab(H5S_SELECT_SET, extents_slab_dims, extents_dims_current);
 
     // Define memory space:
