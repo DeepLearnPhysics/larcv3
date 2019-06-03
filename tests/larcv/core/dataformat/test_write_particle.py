@@ -77,4 +77,7 @@ def test_read_particles_coredriver(tempfile, rand_num_events):
     #write_particles(tempfile, rand_num_events)
     n_read = read_particles(tempfile, True)
 
-
+if __name__ == '__main__':
+    tmpdir = "./particle_test.h5"
+    rand_num_events = 5
+    test_write_particles(tmpdir, rand_num_events)
