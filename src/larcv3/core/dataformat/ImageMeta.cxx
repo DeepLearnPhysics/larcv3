@@ -285,7 +285,7 @@ size_t ImageMeta<dimension>::coordinate(size_t index, size_t axis) const{
 
     // size_t index = 0;
     for (size_t loop_axis = dimension - 1; loop_axis >= 0; -- loop_axis) {
-      size_t stride = _number_of_voxels[dimension-1];
+      size_t stride = _number_of_voxels[loop_axis];
       size_t coordinate = index % stride;
       index = index / stride;
       if (loop_axis == axis){
