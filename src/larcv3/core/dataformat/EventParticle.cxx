@@ -290,7 +290,7 @@ namespace larcv3{
 
     open_datasets(group);
 
-    H5::DataSet * extents_dataset = &(_open_datasets[EXTENTS_DATASET]);
+    // H5::DataSet * extents_dataset = &(_open_datasets[EXTENTS_DATASET]);
 
     // Get a dataspace inside this file:
     // H5::DataSpace extents_dataspace = extents_dataset.getSpace();
@@ -329,7 +329,7 @@ namespace larcv3{
 
     Extents_t input_extents;
     // Write the new data
-    extents_dataset->read(&(input_extents), _extents_datatype,
+    _open_datasets[EXTENTS_DATASET].read(&(input_extents), _extents_datatype,
       extents_memspace, _open_dataspaces[EXTENTS_DATASET]);
 
     // std::cout << " Extents start: " << input_extents.first << ", end: "
@@ -343,7 +343,7 @@ namespace larcv3{
         return;
     }
 
-    H5::DataSet * particles_dataset = &(_open_datasets[PARTICLES_DATASET]);
+    // H5::DataSet * particles_dataset = &(_open_datasets[PARTICLES_DATASET]);
 
     // Get a dataspace inside this file:
     // H5::DataSpace particles_dataspace = particles_dataset.getSpace();
@@ -365,7 +365,7 @@ namespace larcv3{
     // Reserve space for reading in particles:
     _part_v.resize(input_extents.n);
 
-    particles_dataset->read(&(_part_v[0]), _particle_datatype,
+    _open_datasets[PARTICLES_DATASET].read(&(_part_v[0]), _particle_datatype,
         particles_memspace, _open_dataspaces[PARTICLES_DATASET]);
 
     

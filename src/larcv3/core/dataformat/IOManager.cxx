@@ -10,6 +10,7 @@
 #define EVENT_ID_CHUNK_SIZE 100
 #define EVENT_ID_COMPRESSION 1
 
+
 #include <mutex>
 std::mutex __ioman_mtx;
 namespace larcv3 {
@@ -146,6 +147,10 @@ void IOManager::configure(const PSet& cfg) {
 bool IOManager::initialize() {
   LARCV_DEBUG() << "start" << std::endl;
 
+  // Lock:
+  __ioman_mtx.lock();
+
+
   if (_io_mode != kREAD) {
     if (_out_file_name.empty()) throw larbys("Must set output file name!");
     LARCV_INFO() << "Opening an output file: " << _out_file_name << std::endl;
@@ -209,6 +214,7 @@ bool IOManager::initialize() {
   // _in_index = 0;
   _out_index = 0;
   _prepared = true;
+  __ioman_mtx.unlock();
 
   return true;
 }
@@ -258,6 +264,7 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
 
 void IOManager::prepare_input() {
   logger::default_level(msg::kDEBUG);
+
 
   LARCV_DEBUG() << "start" << std::endl;
   if (_product_ctr) {
@@ -347,8 +354,8 @@ void IOManager::prepare_input() {
       char c[2] = "_";
       if (obj_name.find_first_of(c) > obj_name.size() ||
           obj_name.find_first_of(c) == obj_name.find_last_of(c)) {
-        std::cout << "Skipping " << obj_name << " ... (not LArCV3 Group)"
-                     << std::endl;
+        LARCV_CRITICAL() << "Skipping " << obj_name << " ... (not LArCV3 Group)"
+                         << std::endl;
         continue;
       }
 
@@ -445,6 +452,9 @@ void IOManager::open_new_input_file(std::string filename){
 }
 
 bool IOManager::read_entry(const size_t index, bool force_reload) {
+  
+  __ioman_mtx.lock();
+
   LARCV_DEBUG() << "start" << std::endl;
   if (_io_mode == kWRITE) {
     LARCV_WARNING() << "Nothing to read in kWRITE mode..." << std::endl;
@@ -526,6 +536,9 @@ bool IOManager::read_entry(const size_t index, bool force_reload) {
     // Open the right file, if necessary
   }
   LARCV_DEBUG() << "Current input group index: " << _in_index << std::endl;
+
+  __ioman_mtx.unlock();
+
   return true;
 }
 
@@ -709,6 +722,7 @@ EventBase* IOManager::get_data(const std::string& type,
 
 EventBase* IOManager::get_data(const size_t id) {
   __ioman_mtx.lock();
+
   LARCV_DEBUG() << "start" << std::endl;
 
   if (id >= _product_ctr) {

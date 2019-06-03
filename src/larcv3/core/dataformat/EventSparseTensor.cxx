@@ -26,7 +26,6 @@ namespace larcv3 {
   
   template<size_t dimension> 
   EventSparseTensor<dimension>::EventSparseTensor(){
-    std::cout << "constructing" << std::endl;
     _extents_datatype = larcv3::get_datatype<Extents_t>();
     _id_extents_datatype = larcv3::get_datatype<IDExtents_t>();
     _image_meta_datatype = larcv3::ImageMeta<dimension>::get_datatype();
@@ -220,7 +219,7 @@ namespace larcv3 {
   void EventSparseTensor<dimension>::open_datasets(H5::Group * group){
 
     if (_open_datasets.size() < N_DATASETS ){
-        std::cout << "Opening datasets" << std::endl;
+        // std::cout << "Opening datasets" << std::endl;
        _open_datasets.resize(N_DATASETS);
        _open_dataspaces.resize(N_DATASETS);
        
@@ -512,7 +511,7 @@ namespace larcv3 {
     // Step 1: Get the extents information from extents dataset
     /////////////////////////////////////////////////////////
 
-    H5::DataSet * extents_dataset = &(_open_datasets[EXTENTS_DATASET]);
+    // H5::DataSet * extents_dataset = &(_open_datasets[EXTENTS_DATASET]);
 
     // Get a dataspace inside this file:
     // H5::DataSpace extents_dataspace = extents_dataset->getSpace();
@@ -538,8 +537,10 @@ namespace larcv3 {
 
     Extents_t input_extents;
     // Write the new data
-    extents_dataset->read(&(input_extents), _extents_datatype,
-        extents_memspace, _open_dataspaces[EXTENTS_DATASET]);
+    _open_datasets[EXTENTS_DATASET].read(&(input_extents), 
+      _extents_datatype,
+      extents_memspace, 
+      _open_dataspaces[EXTENTS_DATASET]);
 
     /////////////////////////////////////////////////////////
     // Step 2: Get the voxel_extents information
@@ -553,7 +554,7 @@ namespace larcv3 {
         return;
     }
 
-    H5::DataSet * voxel_extents_dataset = &(_open_datasets[VOXEL_EXTENTS_DATASET]);
+    // H5::DataSet * voxel_extents_dataset = &(_open_datasets[VOXEL_EXTENTS_DATASET]);
 
     // Get a dataspace inside this file:
     // H5::DataSpace voxel_extents_dataspace = voxel_extents_dataset->getSpace();
@@ -577,7 +578,7 @@ namespace larcv3 {
     // Reserve space for reading in voxel_extents:
     voxel_extents.resize(input_extents.n);
 
-    voxel_extents_dataset->read(&(voxel_extents[0]), _id_extents_datatype, 
+    _open_datasets[VOXEL_EXTENTS_DATASET].read(&(voxel_extents[0]), _id_extents_datatype, 
         voxel_extents_memspace, _open_dataspaces[VOXEL_EXTENTS_DATASET]);
 
     // std::cout << "voxel_extents.size(): " << voxel_extents.size() << std::endl;
@@ -588,7 +589,7 @@ namespace larcv3 {
     // Step 3: Get the image_meta information
     /////////////////////////////////////////////////////////
 
-    H5::DataSet * image_meta_dataset = &(_open_datasets[IMAGE_META_DATASET]);
+    // H5::DataSet * image_meta_dataset = &(_open_datasets[IMAGE_META_DATASET]);
 
     // Get a dataspace inside this file:
     // H5::DataSpace image_meta_dataspace = image_meta_dataset->getSpace();
@@ -612,7 +613,7 @@ namespace larcv3 {
     // Reserve space for reading in image_meta:
     image_meta.resize(input_extents.n);
 
-    image_meta_dataset->read(&(image_meta[0]), 
+    _open_datasets[IMAGE_META_DATASET].read(&(image_meta[0]), 
       _image_meta_datatype, 
       image_meta_memspace, _open_dataspaces[IMAGE_META_DATASET]);
 
@@ -637,7 +638,7 @@ namespace larcv3 {
       // }
 
       // Get the dataset for reading:
-      H5::DataSet * voxels_dataset = &(_open_datasets[VOXELS_DATASET]);
+      // H5::DataSet * voxels_dataset = &(_open_datasets[VOXELS_DATASET]);
 
       // Get a dataspace inside this file:
       // H5::DataSpace voxels_dataspace = voxels_dataset->getSpace();
@@ -667,7 +668,7 @@ namespace larcv3 {
 
       // Reserve space for reading in voxels:
 
-      voxels_dataset->read(&(temp_voxel_vector[0]), _voxel_datatype,
+      _open_datasets[VOXELS_DATASET].read(&(temp_voxel_vector[0]), _voxel_datatype,
        voxels_memspace, _open_dataspaces[VOXELS_DATASET]);
 
       // std::cout << "temp_voxel_vector.size(): " << temp_voxel_vector.size() << std::endl;
