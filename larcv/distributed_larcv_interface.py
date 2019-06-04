@@ -11,7 +11,7 @@ from larcv.dataloader2 import larcv_threadio
 
 class larcv_interface(object):
 
-    def __init__(self, verbose=False, root=0, comm=MPI.COMM_WORLD, distribute_to_root=True):
+    def __init__(self, verbose=False, root=0, comm=MPI.COMM_WORLD, distribute_to_root=True, read_from_all_ranks=False):
         object.__init__(self)
 
         # MPI parameters:
@@ -22,6 +22,9 @@ class larcv_interface(object):
 
         # This option controls whether or not to distrubute data to the root process
         self._distribute_to_root = distribute_to_root
+
+        # If this is true, all ranks will read the data (every rank will read a different chunk of data)
+        self._read_all_ranks = read_from_all_ranks
 
         # Parameters based from the non MPI version:
         self._dims        = {}
@@ -61,7 +64,7 @@ class larcv_interface(object):
         self._data_keys[mode] = data_keys
 
 
-        if self._rank == self._root:
+        if self._rank == self._root or self._read_all_ranks:
     
             if mode in self._dataloaders:
                 raise Exception("Can not prepare manager for mode {}, already exists".format(mode))
@@ -71,12 +74,15 @@ class larcv_interface(object):
                 if req not in io_config:
                     raise Exception("io_config for mode {} is missing required key {}".format(mode, req))
 
-
+            print ('Initializing rank', self._rank, 'with mode', mode, '- it will read', minibatch_size, 'entries.')
 
             start = time.time()
 
             # Initialize and configure a manager:
             io = larcv_threadio()
+            if self._read_all_ranks:
+              io.set_start_entry(self._rank * minibatch_size)
+              io.set_entry_skip(self._size * minibatch_size)
             io.configure(io_config)
             io.start_manager(minibatch_size)
 
@@ -93,6 +99,8 @@ class larcv_interface(object):
             for key in self._data_keys[mode]:
                 self._raw_dims[mode][key]   = self._dataloaders[mode].fetch_data(self._data_keys[mode][key]).dim()
                 self._raw_dtypes[mode][key] = self._dataloaders[mode].fetch_data(self._data_keys[mode][key]).data().dtype
+
+            end = time.time()
 
             # Print out how long it took to start IO:
             if self._verbose:
@@ -114,45 +122,65 @@ class larcv_interface(object):
         do not call it yourself.
         '''
 
-        if self._rank != self._root:
-            dims = None
+        if self._read_all_ranks:
+            self._dims[mode] = self._raw_dims[mode]
+            self._datasize[mode] = self._dataloaders[mode].fetch_n_entries()
+            self._dtypes[mode] = self._raw_dtypes[mode]
+
+            self._counts[mode] = {}
+            self._displs[mode] = {}
+
         else:
-            # the number of events per worker needs to evenly divide the number
-            # of batches for this to succeed.  So, check and adjust the dims:
-            first_key = next(iter(self._data_keys[mode]))
-            n_raw_batch_size = self._raw_dims[mode][first_key][0]
 
-            # How many worker nodes depends on whether or not we're distributing to the root node:
-            n_worker_nodes = self._size if self._distribute_to_root else self._size - 1
+            if self._rank != self._root:
+                dims = None
+            else:
+                # the number of events per worker needs to evenly divide the number
+                # of batches for this to succeed.  So, check and adjust the dims:
+                first_key = next(iter(self._data_keys[mode]))
+                n_raw_batch_size = self._raw_dims[mode][first_key][0]
 
-            if n_raw_batch_size % n_worker_nodes != 0:
-                raise Exception("Requested to broadcast {} images to {} workers, please adjust to distribute evenly".format(
-                    n_raw_batch_size, n_worker_nodes))
+                # How many worker nodes depends on whether or not we're distributing to the root node:
+                n_worker_nodes = self._size if self._distribute_to_root else self._size - 1
+
+                if n_raw_batch_size % n_worker_nodes != 0:
+                    raise Exception("Requested to broadcast {} images to {} workers, please adjust to distribute evenly".format(
+                        n_raw_batch_size, n_worker_nodes))
             
-            # Make a copy of the raw dimensions so we can scale it down for broadcasting:
-            dims = copy.deepcopy(self._raw_dims[mode])
-            for key in self._data_keys[mode]:
-                dims[key][0] /= n_worker_nodes
+                # Make a copy of the raw dimensions so we can scale it down for broadcasting:
+                dims = copy.deepcopy(self._raw_dims[mode])
+                for key in self._data_keys[mode]:
+                    dims[key][0] /= n_worker_nodes
 
-        # Actually broadcast the dimensions:
-        dims = self._comm.bcast(dims, root=self._root)
-        # Note: this is relying on pickling the dimensions, which is a dict of numpy arrays
-        # It's slow, yes, but the data is so small that it shoul not be a big overhead.
+            # Actually broadcast the dimensions:
+            dims = self._comm.bcast(dims, root=self._root)
+            # Note: this is relying on pickling the dimensions, which is a dict of numpy arrays
+            # It's slow, yes, but the data is so small that it shoul not be a big overhead.
 
-        # And store them:
-        self._dims[mode] = dims
+            # And store them:
+            self._dims[mode] = dims
 
-        # Broadcast the total size of the dataset:
-        if self._rank == self._root:
-            datasize = self._dataloaders[mode].fetch_n_entries()
-        else:
-            datasize = 0
+            # Broadcast the total size of the dataset:
+            if self._rank == self._root:
+                datasize = self._dataloaders[mode].fetch_n_entries()
+            else:
+                datasize = 0
 
-        self._datasize[mode] = self._comm.bcast(datasize, root = self._root)
+            self._datasize[mode] = self._comm.bcast(datasize, root = self._root)
 
-        # Distribute the counts and displacements necessary for scatterv
-        self._counts[mode] = {}
-        self._displs[mode] = {}
+            # Distribute the counts and displacements necessary for scatterv
+            self._counts[mode] = {}
+            self._displs[mode] = {}
+
+            # Lastly, distribute the dtypes necessary for scatterv to work properly:
+            if self._rank != self._root:
+                dtypes = None
+            else:
+                dtypes = self._raw_dtypes[mode]
+
+            self._dtypes[mode]= self._comm.bcast(dtypes, root=self._root)
+
+
 
         # Calculate the total size of each message recieved by each node, 
         # And it's displacement from the start of the total message
@@ -168,14 +196,6 @@ class larcv_interface(object):
 
             # The displacements is just the sum of the counts, but started from 0
             self._displs[mode][key] = numpy.cumsum(self._counts[mode][key]) - size
-        
-        # Lastly, distribute the dtypes necessary for scatterv to work properly:
-        if self._rank != self._root:
-            dtypes = None
-        else:
-            dtypes = self._raw_dtypes[mode]
-
-        self._dtypes[mode]= self._comm.bcast(dtypes, root=self._root)
         
         return 
 
@@ -210,8 +230,8 @@ class larcv_interface(object):
                                   self._counts[mode][key], 
                                   self._displs[mode][key],
                                   MPI._typedict[self._dtypes[mode][key].char]],
-                                recvbuff,
-                                root=self._root)
+                                  recvbuff,
+                                  root=self._root)
 
 
             # Reshape the data (all ranks except root, unless distributing to root)
@@ -236,7 +256,7 @@ class larcv_interface(object):
         # sys.stdout.write("Rank {} starting to fetch minibatch data\n".format(self._rank))
 
         # If this is the root node, read the data from disk:
-        if self._rank == self._root:
+        if self._rank == self._root or self._read_all_ranks:
             unscattered_data = {}
             for key in self._data_keys[mode]:
                 unscattered_data[key] = self._dataloaders[mode].fetch_data(self._data_keys[mode][key]).data()
@@ -245,11 +265,16 @@ class larcv_interface(object):
             for key in self._data_keys[mode]:
                 unscattered_data[key]  = None
 
+        this_data = {}
 
-        this_data = self.read_and_distribute_data(mode, unscattered_data)
+        if not self._read_all_ranks:
+            this_data = self.read_and_distribute_data(mode, unscattered_data)
+        else:
+            for key in self._data_keys[mode]:
+                if key not in unscattered_data: continue
+                this_data[key] = numpy.reshape(unscattered_data[key], self._dims[mode][key])
 
-
-        if self._rank == self._root:
+        if self._rank == self._root or self._read_all_ranks:
             self._dataloaders[mode].next()
 
         return this_data
