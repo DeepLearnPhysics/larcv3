@@ -4,8 +4,8 @@ import time
 
 import numpy
 
-from larcv.dataloader2  import larcv_threadio
-from larcv.larcv_writer import larcv_writer
+from .dataloader2  import larcv_threadio
+from .larcv_writer import larcv_writer
 
 
 class larcv_interface(object):
