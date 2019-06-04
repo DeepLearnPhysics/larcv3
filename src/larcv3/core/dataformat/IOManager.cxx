@@ -35,6 +35,7 @@ IOManager::IOManager(IOMode_t mode, std::string name)
       _producer_name_v(),
       _h5_core_driver(false) {
   reset();
+  _event_id_datatype = larcv3::get_datatype<Extents_t>();
 }
 
 IOManager::IOManager(const PSet& cfg)
@@ -858,7 +859,6 @@ void IOManager::reset() {
   _store_only.clear();
   _read_id_bool.clear();
   _store_id_bool.clear();
-  _event_id_datatype = larcv3::get_datatype<Extents_t>();
 }
 
 }  // namespace larcv3
