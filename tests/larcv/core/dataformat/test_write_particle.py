@@ -65,17 +65,23 @@ def read_particles(tempfile, use_core_driver=False):
 
     return read_events
 
-def test_write_particles(tempfile, rand_num_events):
+
+def test_write_particles(tmpdir, rand_num_events):
+
+    tempfile = str(tmpdir + "/test_write_particles.h5")
 
     write_particles(tempfile, rand_num_events)
     n_read = read_particles(tempfile)
 
-    # assert(n_read == rand_num_events)
+    assert(n_read == rand_num_events)
 
-def test_read_particles_coredriver(tempfile, rand_num_events):
+# def test_read_particles_coredriver(tmpdir, rand_num_events):
 
-    #write_particles(tempfile, rand_num_events)
-    n_read = read_particles(tempfile, True)
+#     tempfile = str(tmpdir + "/test_write_particles.h5")
+
+#     write_particles(tempfile, rand_num_events)
+#     n_read = read_particles(tempfile, True)
+#     assert(n_read == rand_num_events)
 
 if __name__ == '__main__':
     tmpdir = "./particle_test.h5"
