@@ -7,9 +7,24 @@
 #define PARTICLE_DATA_CHUNK_SIZE 500
 #define PARTICLE_COMPRESSION 1
 
+
+#define EXTENTS_DATASET 0
+#define PARTICLES_DATASET 1
+#define N_DATASETS 2
+
 namespace larcv3{
   /// Global larcv3::SBClusterFactory to register ClusterAlgoFactory
   static EventParticleFactory __global_EventParticleFactory__;
+
+  EventParticle::EventParticle(){
+
+    _data_types.resize(N_DATASETS);
+    _data_types[EXTENTS_DATASET] = new H5::DataType(larcv3::get_datatype<Extents_t>());
+    _data_types[PARTICLES_DATASET] = new H5::DataType(larcv3::Particle::get_datatype());
+
+
+  }
+
 
 
   void EventParticle::set(const std::vector<larcv3::Particle>& part_v)
@@ -44,6 +59,25 @@ namespace larcv3{
 ////////Serialization is hidden from SWIG:
 // #ifndef SWIG
 
+
+  void EventParticle::open_datasets(H5::Group * group){
+
+    if (_open_datasets.size() < N_DATASETS ){
+       _open_datasets.resize(N_DATASETS);
+       _open_dataspaces.resize(N_DATASETS);
+       
+       _open_datasets[EXTENTS_DATASET]         = group->openDataSet("extents");
+       _open_dataspaces[EXTENTS_DATASET]       = _open_datasets[EXTENTS_DATASET].getSpace();
+
+       _open_datasets[PARTICLES_DATASET]         = group->openDataSet("particles");
+       _open_dataspaces[PARTICLES_DATASET]       = _open_datasets[PARTICLES_DATASET].getSpace();
+
+    }
+
+    return;
+  }
+
+
   void EventParticle::serialize(H5::Group * group){
 
 
@@ -61,6 +95,7 @@ namespace larcv3{
     //  - Append the latest extents
     // Return
 
+    open_datasets(group);
 
     /////////////////////////////////////////////////////////
     // Create the new extents object
@@ -72,14 +107,14 @@ namespace larcv3{
     /////////////////////////////////////////////////////////
     // Get and extend the particles dataset
     /////////////////////////////////////////////////////////
-    H5::DataSet particles_dataset = group->openDataSet("particles");
+    // H5::DataSet * particles_dataset = &(_open_datasets[PARTICLES_DATASET]);
 
     // Get a dataspace inside this file:
-    H5::DataSpace particles_dataspace = particles_dataset.getSpace();
+    // H5::DataSpace particles_dataspace = particles_dataset.getSpace();
 
     // Get the dataset current size
     hsize_t particles_dims_current[1];
-    particles_dataspace.getSimpleExtentDims(particles_dims_current, NULL);
+    _open_dataspaces[PARTICLES_DATASET].getSimpleExtentDims(particles_dims_current, NULL);
 
     // Make a note of the first index:
     next_extents.first = particles_dims_current[0];
@@ -98,7 +133,7 @@ namespace larcv3{
 
 
     // Extend the dataset to accomodate the new data
-    particles_dataset.extend(particles_size);
+    _open_datasets[PARTICLES_DATASET].extend(particles_size);
 
 
     /////////////////////////////////////////////////////////
@@ -106,15 +141,18 @@ namespace larcv3{
     /////////////////////////////////////////////////////////
 
     // Select as a hyperslab the last section of data for writing:
-    particles_dataspace = particles_dataset.getSpace();
-    particles_dataspace.selectHyperslab(H5S_SELECT_SET, particles_slab_dims, particles_dims_current);
+    // Need to reopen the dataspace after extension:
+    _open_dataspaces[PARTICLES_DATASET] = _open_datasets[PARTICLES_DATASET].getSpace();
+    _open_dataspaces[PARTICLES_DATASET].selectHyperslab(H5S_SELECT_SET, 
+        particles_slab_dims, particles_dims_current);
 
     // Define memory space:
     H5::DataSpace particles_memspace(1, particles_slab_dims);
 
 
     // Write the new data
-    particles_dataset.write(&(_part_v[0]), larcv3::Particle::get_datatype(), particles_memspace, particles_dataspace);
+    _open_datasets[PARTICLES_DATASET].write(&(_part_v[0]), *_data_types[PARTICLES_DATASET], 
+        particles_memspace, _open_dataspaces[PARTICLES_DATASET]);
 
 
 
@@ -122,15 +160,15 @@ namespace larcv3{
     // Get the extents dataset
     /////////////////////////////////////////////////////////
 
-    H5::DataSet extents_dataset = group->openDataSet("extents");
+    // H5::DataSet * extents_dataset = &(_open_datasets[EXTENTS_DATASET]);
 
     // Get a dataspace inside this file:
-    H5::DataSpace extents_dataspace = extents_dataset.getSpace();
+    // H5::DataSpace extents_dataspace = extents_dataset.getSpace();
 
 
     // Get the dataset current size
     hsize_t extents_dims_current[1];
-    extents_dataspace.getSimpleExtentDims(extents_dims_current, NULL);
+    _open_dataspaces[EXTENTS_DATASET].getSimpleExtentDims(extents_dims_current, NULL);
 
     // Create a dimension for the data to add (which is the hyperslab data)
     hsize_t extents_slab_dims[1];
@@ -142,7 +180,7 @@ namespace larcv3{
     extents_size[0] = extents_dims_current[0] + extents_slab_dims[0];
 
     // Extend the dataset to accomodate the new data
-    extents_dataset.extend(extents_size);
+    _open_datasets[EXTENTS_DATASET].extend(extents_size);
 
 
     /////////////////////////////////////////////////////////
@@ -150,15 +188,16 @@ namespace larcv3{
     /////////////////////////////////////////////////////////
 
     // Now, select as a hyperslab the last section of data for writing:
-    extents_dataspace = extents_dataset.getSpace();
-    extents_dataspace.selectHyperslab(H5S_SELECT_SET, extents_slab_dims, extents_dims_current);
+    _open_dataspaces[EXTENTS_DATASET] = _open_datasets[EXTENTS_DATASET].getSpace();
+    _open_dataspaces[EXTENTS_DATASET].selectHyperslab(H5S_SELECT_SET, extents_slab_dims, extents_dims_current);
 
     // Define memory space:
     H5::DataSpace extents_memspace(1, extents_slab_dims);
 
 
     // Write the new data
-    extents_dataset.write(&(next_extents), larcv3::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
+    _open_datasets[EXTENTS_DATASET].write(&(next_extents), 
+        *_data_types[EXTENTS_DATASET], extents_memspace, _open_dataspaces[EXTENTS_DATASET]);
 
 
     /////////////////////////////////////////////////////////
@@ -190,9 +229,6 @@ namespace larcv3{
     // particles in the data tree.
 
 
-    // Get the data type for extents:
-    H5::DataType extents_datatype = larcv3::get_datatype<Extents_t>();
-
 
     // Get the starting size (0) and dimensions (unlimited)
     hsize_t extents_starting_dim[] = {0};
@@ -210,7 +246,8 @@ namespace larcv3{
     extents_cparms.setDeflate(PARTICLE_COMPRESSION);
 
     // Create the extents dataset:
-    H5::DataSet extents_ds = group->createDataSet("extents", extents_datatype, extents_dataspace, extents_cparms);
+    H5::DataSet extents_ds = group->createDataSet("extents", 
+        *_data_types[EXTENTS_DATASET], extents_dataspace, extents_cparms);
 
 
     /////////////////////////////////////////////////////////
@@ -218,10 +255,6 @@ namespace larcv3{
     /////////////////////////////////////////////////////////
 
     // The particles table is a flat table of particles, one event appended to another
-
-
-    // Get the data type for extents:
-    H5::DataType particle_datatype = larcv3::Particle::get_datatype();
 
 
     // Get the starting size (0) and dimensions (unlimited)
@@ -240,7 +273,8 @@ namespace larcv3{
     particle_cparms.setDeflate(PARTICLE_COMPRESSION);
 
     // Create the extents dataset:
-    H5::DataSet particle_ds = group->createDataSet("particles", particle_datatype, particle_dataspace, particle_cparms);
+    H5::DataSet particle_ds = group->createDataSet("particles", 
+        *_data_types[PARTICLES_DATASET], particle_dataspace, particle_cparms);
 
 
   }
@@ -256,10 +290,12 @@ namespace larcv3{
     // Get the extents information from extents dataset
     /////////////////////////////////////////////////////////
 
-    H5::DataSet extents_dataset = group->openDataSet("extents");
+    open_datasets(group);
+
+    // H5::DataSet * extents_dataset = &(_open_datasets[EXTENTS_DATASET]);
 
     // Get a dataspace inside this file:
-    H5::DataSpace extents_dataspace = extents_dataset.getSpace();
+    // H5::DataSpace extents_dataspace = extents_dataset.getSpace();
 
 
     // // Get the dataset current size
@@ -288,14 +324,15 @@ namespace larcv3{
 
     // Now, select as a hyperslab the last section of data for writing:
     // extents_dataspace = extents_dataset.getSpace();
-    extents_dataspace.selectHyperslab(H5S_SELECT_SET, extents_slab_dims, extents_offset);
+    _open_dataspaces[EXTENTS_DATASET].selectHyperslab(H5S_SELECT_SET, extents_slab_dims, extents_offset);
 
     // Define memory space:
     H5::DataSpace extents_memspace(1, extents_slab_dims);
 
     Extents_t input_extents;
     // Write the new data
-    extents_dataset.read(&(input_extents), larcv3::get_datatype<Extents_t>(), extents_memspace, extents_dataspace);
+    _open_datasets[EXTENTS_DATASET].read(&(input_extents), *_data_types[EXTENTS_DATASET],
+      extents_memspace, _open_dataspaces[EXTENTS_DATASET]);
 
     // std::cout << " Extents start: " << input_extents.first << ", end: "
     //           << input_extents.first + input_extents.n << std::endl;
@@ -308,10 +345,10 @@ namespace larcv3{
         return;
     }
 
-    H5::DataSet particles_dataset = group->openDataSet("particles");
+    // H5::DataSet * particles_dataset = &(_open_datasets[PARTICLES_DATASET]);
 
     // Get a dataspace inside this file:
-    H5::DataSpace particles_dataspace = particles_dataset.getSpace();
+    // H5::DataSpace particles_dataspace = particles_dataset.getSpace();
 
     // Create a dimension for the data to add (which is the hyperslab data)
     hsize_t particles_slab_dims[1];
@@ -322,7 +359,7 @@ namespace larcv3{
 
     // Now, select as a hyperslab the last section of data for writing:
     // extents_dataspace = extents_dataset.getSpace();
-    particles_dataspace.selectHyperslab(H5S_SELECT_SET, particles_slab_dims, particles_offset);
+    _open_dataspaces[PARTICLES_DATASET].selectHyperslab(H5S_SELECT_SET, particles_slab_dims, particles_offset);
 
 
     H5::DataSpace particles_memspace(1, particles_slab_dims);
@@ -330,7 +367,8 @@ namespace larcv3{
     // Reserve space for reading in particles:
     _part_v.resize(input_extents.n);
 
-    particles_dataset.read(&(_part_v[0]), larcv3::Particle::get_datatype(), particles_memspace, particles_dataspace);
+    _open_datasets[PARTICLES_DATASET].read(&(_part_v[0]), *_data_types[PARTICLES_DATASET],
+        particles_memspace, _open_dataspaces[PARTICLES_DATASET]);
 
     
 

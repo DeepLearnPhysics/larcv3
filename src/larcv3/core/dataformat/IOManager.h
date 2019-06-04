@@ -57,6 +57,7 @@ namespace larcv3 {
     void reset();
     void add_in_file(const std::string filename, const std::string dirname = "");
     void clear_in_file();
+    void set_core_driver(const bool opt = true);
     void set_out_file(const std::string name);
     ProducerID_t producer_id(const ProducerName_t& name) const;
     std::string product_type(const size_t id) const;
@@ -131,10 +132,14 @@ namespace larcv3 {
     const std::vector<std::string>& file_list() const
     { return _in_file_v; }
 
+
+
   private:
     void   set_id();
     void   prepare_input();
     size_t register_producer(const ProducerName_t& name);
+
+    void open_new_input_file(std::string filename);
 
     void append_event_id();
 
@@ -187,6 +192,10 @@ namespace larcv3 {
     EventID   _set_event_id;
     EventID   _last_event_id;
 
+    H5::DataSet    _active_in_event_id_dataset;
+    H5::DataSpace  _active_in_event_id_dataspace;
+
+
     // Keeping track of products and producers:
     std::map<larcv3::ProducerName_t, larcv3::ProducerID_t> _key_list;
     size_t                          _product_ctr;
@@ -199,9 +208,11 @@ namespace larcv3 {
     std::map<std::string,std::set<std::string> > _read_only;
     std::vector<bool> _store_id_bool;
     std::vector<bool> _read_id_bool;
+    bool _h5_core_driver;
 
     // IOManager has to control the EventID dataset it's self for the output file.
     H5::DataSet _out_event_id_ds;
+    H5::DataType _event_id_datatype;
 
   };
 

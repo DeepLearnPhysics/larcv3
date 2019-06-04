@@ -209,9 +209,12 @@ def test_read_write_sparse_clusters(tmpdir, rand_num_events, dimension, n_projec
 
 
 
-
-
-
+if __name__ == '__main__':
+    tmpdir = "./"
+    rand_num_events = 5
+    n_projections = 3
+    dimension = 2
+    test_read_write_sparse_clusters(tmpdir, rand_num_events, dimension, n_projections)
 
 
 

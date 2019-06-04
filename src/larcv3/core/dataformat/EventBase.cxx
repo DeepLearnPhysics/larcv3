@@ -1,9 +1,15 @@
-// #ifndef __LARCV_EVENTBASE_CXX
-// #define __LARCV_EVENTBASE_CXX
+#ifndef __LARCV_EVENTBASE_CXX
+#define __LARCV_EVENTBASE_CXX
 
-// #include "EventBase.h"
+#include "EventBase.h"
 // #include <sstream>
 // #include <iomanip>
 
-
-// #endif
+namespace larcv3{
+    EventBase::~EventBase(){
+        for (auto & p : _data_types){
+            delete p;
+        }
+    }
+}
+#endif

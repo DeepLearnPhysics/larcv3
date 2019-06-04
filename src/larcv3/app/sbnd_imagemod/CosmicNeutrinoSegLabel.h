@@ -11,8 +11,8 @@
 /** \addtogroup ImageMod
 
     @{*/
-#ifndef __COSMICNEUTRINOSEGLABEL_H__
-#define __COSMICNEUTRINOSEGLABEL_H__
+#ifndef __LARCV_COSMICNEUTRINOSEGLABEL_H__
+#define __LARCV_COSMICNEUTRINOSEGLABEL_H__
 
 #include "larcv3/core/processor/ProcessBase.h"
 #include "larcv3/core/processor/ProcessFactory.h"
