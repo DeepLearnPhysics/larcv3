@@ -1,5 +1,5 @@
-#ifndef __COMPRESSANDEMBED_CXX__
-#define __COMPRESSANDEMBED_CXX__
+#ifndef __LARCV_COMPRESSANDEMBED_CXX__
+#define __LARCV_COMPRESSANDEMBED_CXX__
 
 #include "CompressAndEmbed.h"
 #include "larcv3/core/dataformat/EventImage2D.h"

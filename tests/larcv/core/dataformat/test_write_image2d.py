@@ -105,7 +105,7 @@ def test_write_image2d(tmpdir, rand_num_events, n_projections):
 
 
 @pytest.mark.parametrize('n_projections', [1,2,3])
-def test_read_write_image2d(tmpdir, rand_num_events, n_projections):
+def test_write_read_image2d(tmpdir, rand_num_events, n_projections):
 
     import numpy
 
@@ -137,5 +137,9 @@ def test_read_write_image2d(tmpdir, rand_num_events, n_projections):
 
 
 
-
+if __name__ == '__main__':
+    tmpdir = "./"
+    rand_num_events = 5
+    n_projections = 3
+    test_write_read_image2d(tmpdir, rand_num_events, n_projections)
 

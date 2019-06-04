@@ -1,5 +1,5 @@
-#ifndef __COSMICNEUTRINOSEGLABEL_CXX__
-#define __COSMICNEUTRINOSEGLABEL_CXX__
+#ifndef __LARCV_COSMICNEUTRINOSEGLABEL_CXX__
+#define __LARCV_COSMICNEUTRINOSEGLABEL_CXX__
 
 #include "CosmicNeutrinoSegLabel.h"
 #include "larcv3/core/dataformat/EventImage2D.h"

@@ -8,6 +8,7 @@
 #include "larcv3/core/cpputil/cpputil.i"
 #include "larcv3/app/filter/filter.i"
 #include "larcv3/app/threadio/threadio.i"
+#include "larcv3/app/imagemod/imagemod.i"
 
 using namespace larcv3;
 using namespace std;
@@ -34,3 +35,4 @@ using namespace std;
 %include "core/pyutil/pyutil.wrapper"
 %include "larcv3/app/filter/filter.wrapper"
 %include "larcv3/app/threadio/threadio.wrapper"
+%include "larcv3/app/imagemod/imagemod.wrapper"

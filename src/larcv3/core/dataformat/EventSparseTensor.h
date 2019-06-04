@@ -37,7 +37,7 @@ namespace larcv3 {
   public:
 
     /// Default constructor
-    EventSparseTensor() {}
+    EventSparseTensor();
 
 
     //
@@ -76,9 +76,12 @@ namespace larcv3 {
     }
 
   private:
+    void open_datasets(H5::Group * group);
 
     std::vector<larcv3::SparseTensor<dimension> >  _tensor_v;
-    
+
+
+
   };
 
 

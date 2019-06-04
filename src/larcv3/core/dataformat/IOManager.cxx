@@ -10,6 +10,7 @@
 #define EVENT_ID_CHUNK_SIZE 100
 #define EVENT_ID_COMPRESSION 1
 
+
 #include <mutex>
 std::mutex __ioman_mtx;
 namespace larcv3 {
@@ -31,7 +32,8 @@ IOManager::IOManager(IOMode_t mode, std::string name)
       _product_ctr(0),
       _product_ptr_v(),
       _product_type_v(),
-      _producer_name_v() {
+      _producer_name_v(),
+      _h5_core_driver(false) {
   reset();
 }
 
@@ -73,6 +75,8 @@ void IOManager::add_in_file(const std::string filename,
 
 void IOManager::clear_in_file() { _in_file_v.clear(); }
 
+void IOManager::set_core_driver(const bool opt) { _h5_core_driver = opt; }
+
 void IOManager::set_out_file(const std::string name) { _out_file_name = name; }
 
 std::string IOManager::product_type(const size_t id) const {
@@ -91,6 +95,8 @@ void IOManager::configure(const PSet& cfg) {
       (msg::Level_t)(cfg.get<unsigned short>("Verbosity", logger().level())));
   _io_mode = (IOMode_t)(cfg.get<unsigned short>("IOMode"));
   _out_file_name = cfg.get<std::string>("OutFileName", "");
+
+  _h5_core_driver = cfg.get<bool>("UseH5CoreDriver", false);
 
   // Figure out input files
   _in_file_v.clear();
@@ -140,6 +146,10 @@ void IOManager::configure(const PSet& cfg) {
 
 bool IOManager::initialize() {
   LARCV_DEBUG() << "start" << std::endl;
+
+  // Lock:
+  __ioman_mtx.lock();
+
 
   if (_io_mode != kREAD) {
     if (_out_file_name.empty()) throw larbys("Must set output file name!");
@@ -204,6 +214,7 @@ bool IOManager::initialize() {
   // _in_index = 0;
   _out_index = 0;
   _prepared = true;
+  __ioman_mtx.unlock();
 
   return true;
 }
@@ -254,6 +265,7 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
 void IOManager::prepare_input() {
   logger::default_level(msg::kDEBUG);
 
+
   LARCV_DEBUG() << "start" << std::endl;
   if (_product_ctr) {
     LARCV_CRITICAL() << "Cannot call prepare_input before calling reset()!"
@@ -296,20 +308,17 @@ void IOManager::prepare_input() {
     auto const& fname = _in_file_v[i_file];
     auto const& dname = _in_dir_v[i_file];
 
-    H5::H5File* fin = new H5::H5File(fname.c_str(), H5F_ACC_RDONLY);
-    if (!fin) {
-      LARCV_CRITICAL() << "Open attempt failed for a file: " << fname
-                       << std::endl;
-      throw larbys();
-    }
+    // H5::H5File* fin;
 
     LARCV_NORMAL() << "Opening a file in READ mode: " << fname << std::endl;
+    open_new_input_file(fname);
+
 
     // Each file has (or should have) two groups: "Data" and "Events"
 
     try {
-      H5::Group data = fin->openGroup("/Data");
-      H5::Group events = fin->openGroup("/Events");
+      H5::Group data = _in_open_file.openGroup("/Data");
+      H5::Group events = _in_open_file.openGroup("/Events");
     } catch (...) {
       LARCV_CRITICAL() << "File " << fname
                        << " does not appear to be a larcv3 file, exiting."
@@ -318,8 +327,8 @@ void IOManager::prepare_input() {
     }
 
     // Re-open those groups after the check
-    H5::Group data = fin->openGroup("/Data");
-    H5::Group events = fin->openGroup("/Events");
+    H5::Group data = _in_open_file.openGroup("/Data");
+    H5::Group events = _in_open_file.openGroup("/Events");
 
     // Vist the extents group and determine how many events are present:
 
@@ -345,8 +354,8 @@ void IOManager::prepare_input() {
       char c[2] = "_";
       if (obj_name.find_first_of(c) > obj_name.size() ||
           obj_name.find_first_of(c) == obj_name.find_last_of(c)) {
-        std::cout << "Skipping " << obj_name << " ... (not LArCV3 Group)"
-                     << std::endl;
+        LARCV_CRITICAL() << "Skipping " << obj_name << " ... (not LArCV3 Group)"
+                         << std::endl;
         continue;
       }
 
@@ -412,14 +421,40 @@ void IOManager::prepare_input() {
     }
   }
 
+  // Make sure the first file is open:
+  open_new_input_file(_in_file_v[0]);
 
 
-  // As preparation, open the first file:
-  _in_open_file =
-      H5::H5File(_in_file_v[_in_active_file_index].c_str(), H5F_ACC_RDONLY);
+}
+
+void IOManager::open_new_input_file(std::string filename){
+  
+  H5::FileAccPropList  fapl(H5::FileAccPropList::DEFAULT);
+
+  if (_h5_core_driver) {
+    LARCV_INFO() << "File will be stored entirely on memory." << std::endl;
+    // 1024 is number of bytes to increment each time more memory is needed; 
+    //'false': do not write contents to disk when the file is closed
+    fapl.setCore(1024, false);
+  } 
+  try{
+    _in_open_file = H5::H5File(filename.c_str(), H5F_ACC_RDONLY, H5::FileCreatPropList::DEFAULT, fapl);
+  }
+  catch ( ... ) {
+    LARCV_CRITICAL() << "Open attempt failed for a file: " << filename
+                     << std::endl;
+    throw larbys();
+  }
+
+  _active_in_event_id_dataset   = _in_open_file.openGroup("Events").openDataSet("event_id");
+  _active_in_event_id_dataspace = _active_in_event_id_dataset.getSpace();
+
 }
 
 bool IOManager::read_entry(const size_t index, bool force_reload) {
+  
+  __ioman_mtx.lock();
+
   LARCV_DEBUG() << "start" << std::endl;
   if (_io_mode == kWRITE) {
     LARCV_WARNING() << "Nothing to read in kWRITE mode..." << std::endl;
@@ -463,14 +498,19 @@ bool IOManager::read_entry(const size_t index, bool force_reload) {
       _in_active_file_index = _this_file_index;
       _in_open_file =
           H5::H5File(_in_file_v[_in_active_file_index].c_str(), H5F_ACC_RDONLY);
+
+      _active_in_event_id_dataset   = _in_open_file.openGroup("Events").openDataSet("event_id");
+      _active_in_event_id_dataspace = _active_in_event_id_dataset.getSpace();
+
+
       LARCV_NORMAL() << "Opening new file for continued event reading"
                      << std::endl;
     }
 
     // Now, we can open the events folder and figure out what's what.
-    H5::DataSet events_dataset =
-        _in_open_file.openGroup("Events").openDataSet("event_id");
-    H5::DataSpace events_dataspace = events_dataset.getSpace();
+    // H5::DataSet events_dataset =
+        // _in_open_file.openGroup("Events").openDataSet("event_id");
+    // H5::DataSpace events_dataspace = events_dataset.getSpace();
 
     hsize_t events_slab_dims[1];
     events_slab_dims[0] = 1;
@@ -480,7 +520,7 @@ bool IOManager::read_entry(const size_t index, bool force_reload) {
     // for this file
     events_offset[0] = _in_index - _current_offset;
 
-    events_dataspace.selectHyperslab(H5S_SELECT_SET, events_slab_dims,
+    _active_in_event_id_dataspace.selectHyperslab(H5S_SELECT_SET, events_slab_dims,
                                      events_offset);
 
     // Define memory space:
@@ -488,14 +528,17 @@ bool IOManager::read_entry(const size_t index, bool force_reload) {
 
     EventID input_event_id;
     // Write the new data
-    events_dataset.read(&(input_event_id), EventID::get_datatype(),
-                        events_memspace, events_dataspace);
+    _active_in_event_id_dataset.read(&(input_event_id), _event_id_datatype,
+                        events_memspace, _active_in_event_id_dataspace);
     _event_id = input_event_id;
 
     // _in_open_file
     // Open the right file, if necessary
   }
   LARCV_DEBUG() << "Current input group index: " << _in_index << std::endl;
+
+  __ioman_mtx.unlock();
+
   return true;
 }
 
@@ -679,6 +722,7 @@ EventBase* IOManager::get_data(const std::string& type,
 
 EventBase* IOManager::get_data(const size_t id) {
   __ioman_mtx.lock();
+
   LARCV_DEBUG() << "start" << std::endl;
 
   if (id >= _product_ctr) {
@@ -757,7 +801,6 @@ void IOManager::set_id() {
 
 void IOManager::finalize() {
   LARCV_DEBUG() << "start" << std::endl;
-
   if (_io_mode != kREAD) {
     // _out_file->cd();
     if (_store_id_bool.empty()) {
@@ -815,6 +858,7 @@ void IOManager::reset() {
   _store_only.clear();
   _read_id_bool.clear();
   _store_id_bool.clear();
+  _event_id_datatype = larcv3::get_datatype<Extents_t>();
 }
 
 }  // namespace larcv3
