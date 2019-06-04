@@ -230,7 +230,7 @@ class larcv_threadio (object):
          next_storage_id = 0
 
       while self.is_reading(next_storage_id):
-         time.sleep(0.00005)
+         time.sleep(0.005)
          #sleep_ctr+=1
          #if sleep_ctr%1000 ==0:
          #   print 'queueing storage %d ... (%f sec)' % (next_storage_id,0.05*sleep_ctr)

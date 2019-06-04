@@ -7,38 +7,61 @@
 
 namespace larcv3{
 
-  template<>
-  H5::DataType get_datatype<int>()                {return H5::PredType::NATIVE_INT;}
+
 
   template<>
-  H5::DataType get_datatype<bool>()               {return H5::PredType::NATIVE_HBOOL;}
+  H5::DataType get_datatype<int>()                {
+    H5::DataType _copied_type(H5::PredType::NATIVE_INT);
+    return _copied_type;}
 
   template<>
-  H5::DataType get_datatype<float>()              {return H5::PredType::NATIVE_FLOAT;}
+  H5::DataType get_datatype<bool>()               {
+    H5::DataType _copied_type(H5::PredType::NATIVE_HBOOL);
+    return _copied_type;}
 
   template<>
-  H5::DataType get_datatype<double>()             {return H5::PredType::NATIVE_DOUBLE;}
+  H5::DataType get_datatype<float>()              {
+    H5::DataType _copied_type(H5::PredType::NATIVE_FLOAT);
+    return _copied_type;}
 
   template<>
-  H5::DataType get_datatype<unsigned short>()     {return H5::PredType::NATIVE_USHORT;}
+  H5::DataType get_datatype<double>()             {
+    H5::DataType _copied_type(H5::PredType::NATIVE_DOUBLE);
+    return _copied_type;}
 
   template<>
-  H5::DataType get_datatype<unsigned int>()       {return H5::PredType::NATIVE_UINT;}
+  H5::DataType get_datatype<unsigned short>()     {
+    H5::DataType _copied_type(H5::PredType::NATIVE_USHORT);
+    return _copied_type;}
 
   template<>
-  H5::DataType get_datatype<short>()              {return H5::PredType::NATIVE_SHORT;}
+  H5::DataType get_datatype<unsigned int>()       {
+    H5::DataType _copied_type(H5::PredType::NATIVE_UINT);
+    return _copied_type;}
 
   template<>
-  H5::DataType get_datatype<unsigned long long>() {return H5::PredType::NATIVE_ULLONG;}
+  H5::DataType get_datatype<short>()              {
+    H5::DataType _copied_type(H5::PredType::NATIVE_SHORT);
+    return _copied_type;}
+
+  template<>
+  H5::DataType get_datatype<unsigned long long>() {
+    H5::DataType _copied_type(H5::PredType::NATIVE_ULLONG);
+    return _copied_type;}
   
   template<>
-  H5::DataType get_datatype<size_t>()             {return H5::PredType::NATIVE_HSIZE;}
+  H5::DataType get_datatype<size_t>()             {
+    H5::DataType _copied_type(H5::PredType::NATIVE_HSIZE);
+    return _copied_type;}
 
   template<>
   H5::DataType get_datatype<ShapeType_t>()        {return get_datatype<int>();}
 
   template<>
-  H5::DataType get_datatype<long>()               {return H5::PredType::NATIVE_LONG;}
+  H5::DataType get_datatype<long>()               {
+    H5::DataType _long_copy(H5::PredType::NATIVE_LONG);
+    return _long_copy;
+  }
 
 
   template<>

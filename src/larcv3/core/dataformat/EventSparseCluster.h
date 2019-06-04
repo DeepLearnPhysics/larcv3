@@ -33,7 +33,7 @@ namespace larcv3 {
   public:
 
     /// Default constructor
-    EventSparseCluster() {}
+    EventSparseCluster();
 
     /// Default destructor
     virtual ~EventSparseCluster() {}
@@ -69,13 +69,15 @@ namespace larcv3 {
     void serialize  (H5::Group * group);
     void deserialize(H5::Group * group, size_t entry);
 
+
     static EventSparseCluster * to_sparse_cluster(EventBase * e){
       return (EventSparseCluster *) e;
     }
 
   private:
+    void open_datasets(H5::Group * group);
     std::vector<larcv3::SparseCluster<dimension> > _cluster_v;
-    
+
   };
 
 typedef EventSparseCluster<2> EventSparseCluster2D;

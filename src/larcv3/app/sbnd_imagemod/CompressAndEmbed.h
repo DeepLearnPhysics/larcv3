@@ -11,8 +11,8 @@
 /** \addtogroup Package_Name
 
     @{*/
-#ifndef __COMPRESSANDEMBED_H__
-#define __COMPRESSANDEMBED_H__
+#ifndef __LARCV_COMPRESSANDEMBED_H__
+#define __LARCV_COMPRESSANDEMBED_H__
 
 #include "larcv3/core/processor/ProcessBase.h"
 #include "larcv3/core/processor/ProcessFactory.h"
