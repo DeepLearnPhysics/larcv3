@@ -43,6 +43,7 @@ namespace larcv3 {
 
     std::vector<H5::DataSet>   _open_datasets;
     std::vector<H5::DataSpace> _open_dataspaces;
+    std::vector<H5::DataType*> _data_types;
 
 // #endif
   };

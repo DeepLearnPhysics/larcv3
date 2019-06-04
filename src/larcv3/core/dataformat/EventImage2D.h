@@ -30,6 +30,8 @@ namespace larcv3 {
     
   public:
     
+    EventImage2D();
+
     /// Clears an array of larcv3::Image
     void clear();
 
@@ -61,6 +63,7 @@ namespace larcv3 {
     void open_datasets(H5::Group * group);
 
     std::vector<larcv3::Image2D> _image_v;
+
 
   };
 

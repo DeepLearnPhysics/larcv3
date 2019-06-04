@@ -33,7 +33,7 @@ namespace larcv3 {
   public:
 
     /// Default constructor
-    EventSparseCluster() {}
+    EventSparseCluster();
 
     /// Default destructor
     virtual ~EventSparseCluster() {}
@@ -77,7 +77,7 @@ namespace larcv3 {
   private:
     void open_datasets(H5::Group * group);
     std::vector<larcv3::SparseCluster<dimension> > _cluster_v;
-    H5::CompType _voxel_type;
+
   };
 
 typedef EventSparseCluster<2> EventSparseCluster2D;

@@ -64,8 +64,6 @@ namespace larcv3 {
 
     void open_datasets(H5::Group * group);
     
-    H5::CompType _particle_datatype;
-    H5::DataType _extents_datatype;
 
     std::vector<larcv3::Particle> _part_v; ///< a collection of particles (index maintained)
 

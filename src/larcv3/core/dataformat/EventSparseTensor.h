@@ -79,10 +79,7 @@ namespace larcv3 {
     void open_datasets(H5::Group * group);
 
     std::vector<larcv3::SparseTensor<dimension> >  _tensor_v;
-    H5::CompType _voxel_datatype;
-    H5::DataType _extents_datatype;
-    H5::DataType _id_extents_datatype;
-    H5::CompType _image_meta_datatype;
+
 
 
   };

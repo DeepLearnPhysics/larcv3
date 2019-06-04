@@ -6,6 +6,10 @@
 // #include <iomanip>
 
 namespace larcv3{
-    EventBase::~EventBase(){}
+    EventBase::~EventBase(){
+        for (auto & p : _data_types){
+            delete p;
+        }
+    }
 }
 #endif

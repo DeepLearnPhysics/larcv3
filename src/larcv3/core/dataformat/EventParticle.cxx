@@ -17,8 +17,12 @@ namespace larcv3{
   static EventParticleFactory __global_EventParticleFactory__;
 
   EventParticle::EventParticle(){
-    _extents_datatype = larcv3::get_datatype<Extents_t>();
-    _particle_datatype = larcv3::Particle::get_datatype();
+
+    _data_types.resize(N_DATASETS);
+    _data_types[EXTENTS_DATASET] = new H5::DataType(larcv3::get_datatype<Extents_t>());
+    _data_types[PARTICLES_DATASET] = new H5::DataType(larcv3::Particle::get_datatype());
+
+
   }
 
 
@@ -147,7 +151,7 @@ namespace larcv3{
 
 
     // Write the new data
-    _open_datasets[PARTICLES_DATASET].write(&(_part_v[0]), _particle_datatype, 
+    _open_datasets[PARTICLES_DATASET].write(&(_part_v[0]), *_data_types[PARTICLES_DATASET], 
         particles_memspace, _open_dataspaces[PARTICLES_DATASET]);
 
 
@@ -192,7 +196,8 @@ namespace larcv3{
 
 
     // Write the new data
-    _open_datasets[EXTENTS_DATASET].write(&(next_extents), _extents_datatype, extents_memspace, _open_dataspaces[EXTENTS_DATASET]);
+    _open_datasets[EXTENTS_DATASET].write(&(next_extents), 
+        *_data_types[EXTENTS_DATASET], extents_memspace, _open_dataspaces[EXTENTS_DATASET]);
 
 
     /////////////////////////////////////////////////////////
@@ -224,9 +229,6 @@ namespace larcv3{
     // particles in the data tree.
 
 
-    // Get the data type for extents:
-    H5::DataType extents_datatype = _extents_datatype;
-
 
     // Get the starting size (0) and dimensions (unlimited)
     hsize_t extents_starting_dim[] = {0};
@@ -244,7 +246,8 @@ namespace larcv3{
     extents_cparms.setDeflate(PARTICLE_COMPRESSION);
 
     // Create the extents dataset:
-    H5::DataSet extents_ds = group->createDataSet("extents", extents_datatype, extents_dataspace, extents_cparms);
+    H5::DataSet extents_ds = group->createDataSet("extents", 
+        *_data_types[EXTENTS_DATASET], extents_dataspace, extents_cparms);
 
 
     /////////////////////////////////////////////////////////
@@ -252,10 +255,6 @@ namespace larcv3{
     /////////////////////////////////////////////////////////
 
     // The particles table is a flat table of particles, one event appended to another
-
-
-    // Get the data type for extents:
-    H5::DataType particle_datatype = _particle_datatype;
 
 
     // Get the starting size (0) and dimensions (unlimited)
@@ -274,7 +273,8 @@ namespace larcv3{
     particle_cparms.setDeflate(PARTICLE_COMPRESSION);
 
     // Create the extents dataset:
-    H5::DataSet particle_ds = group->createDataSet("particles", particle_datatype, particle_dataspace, particle_cparms);
+    H5::DataSet particle_ds = group->createDataSet("particles", 
+        *_data_types[PARTICLES_DATASET], particle_dataspace, particle_cparms);
 
 
   }
@@ -331,7 +331,7 @@ namespace larcv3{
 
     Extents_t input_extents;
     // Write the new data
-    _open_datasets[EXTENTS_DATASET].read(&(input_extents), _extents_datatype,
+    _open_datasets[EXTENTS_DATASET].read(&(input_extents), *_data_types[EXTENTS_DATASET],
       extents_memspace, _open_dataspaces[EXTENTS_DATASET]);
 
     // std::cout << " Extents start: " << input_extents.first << ", end: "
@@ -367,7 +367,7 @@ namespace larcv3{
     // Reserve space for reading in particles:
     _part_v.resize(input_extents.n);
 
-    _open_datasets[PARTICLES_DATASET].read(&(_part_v[0]), _particle_datatype,
+    _open_datasets[PARTICLES_DATASET].read(&(_part_v[0]), *_data_types[PARTICLES_DATASET],
         particles_memspace, _open_dataspaces[PARTICLES_DATASET]);
 
     
