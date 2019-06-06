@@ -86,6 +86,11 @@ class larcv_interface(object):
             io.configure(io_config)
             io.start_manager(minibatch_size)
 
+            # Wait for manager to start
+            while (not io.manager_started()):
+                print ('Waiting for manager to start for mode {}...'.format(mode))
+                time.wait(0.05)
+
             # Save the manager
             self._dataloaders.update({mode : io})
             self._dataloaders[mode].next()
