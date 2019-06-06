@@ -9,10 +9,23 @@ from mpi4py import MPI
 
 from larcv.dataloader2 import larcv_threadio
 
+from enum import Enum
+
+read_option 
+class ReadOption(Enum):
+    'read_from_last_rank' = 0
+    'read_from_all_ranks' = 1 
+    'read_from_all_last_local_ranks' = 2
+
 class larcv_interface(object):
 
-    def __init__(self, verbose=False, root=0, comm=MPI.COMM_WORLD, distribute_to_root=True, read_from_all_ranks=False):
+    def __init__(self, verbose=False, root=0, comm=MPI.COMM_WORLD, distribute_to_root=True, read_option=None):#read_from_all_ranks=False):
         object.__init__(self)
+
+        if read_option is None:
+          read_option = ReadOption('read_from_last_rank')
+        else:
+          read_option = ReadOption(read_option)
 
         # MPI parameters:
         self._comm = comm
@@ -23,8 +36,8 @@ class larcv_interface(object):
         # This option controls whether or not to distrubute data to the root process
         self._distribute_to_root = distribute_to_root
 
-        # If this is true, all ranks will read the data (every rank will read a different chunk of data)
-        self._read_all_ranks = read_from_all_ranks
+        ## If this is true, all ranks will read the data (every rank will read a different chunk of data)
+        #self._read_all_ranks = read_from_all_ranks
 
         # Parameters based from the non MPI version:
         self._dims        = {}
@@ -64,7 +77,9 @@ class larcv_interface(object):
         self._data_keys[mode] = data_keys
 
 
-        if self._rank == self._root or self._read_all_ranks:
+        if (self._rank == self._root) 
+          or (read_option is ReadOption('read_from_all_ranks')) 
+          or (self._local_rank == self._root and read_option is ReadOption('read_from_all_last_ranks')):
     
             if mode in self._dataloaders:
                 raise Exception("Can not prepare manager for mode {}, already exists".format(mode))
@@ -80,7 +95,7 @@ class larcv_interface(object):
 
             # Initialize and configure a manager:
             io = larcv_threadio()
-            if self._read_all_ranks:
+            if read_option is ReadOption('read_from_all_ranks'):
               io.set_start_entry(self._rank * minibatch_size)
               io.set_entry_skip(self._size * minibatch_size)
             io.configure(io_config)
@@ -127,7 +142,7 @@ class larcv_interface(object):
         do not call it yourself.
         '''
 
-        if self._read_all_ranks:
+        if read_option is ReadOption('read_from_all_ranks'):
             self._dims[mode] = self._raw_dims[mode]
             self._datasize[mode] = self._dataloaders[mode].fetch_n_entries()
             self._dtypes[mode] = self._raw_dtypes[mode]
@@ -261,7 +276,7 @@ class larcv_interface(object):
         # sys.stdout.write("Rank {} starting to fetch minibatch data\n".format(self._rank))
 
         # If this is the root node, read the data from disk:
-        if self._rank == self._root or self._read_all_ranks:
+        if self._rank == self._root or read_option is ReadOption('read_from_last_rank'):
             unscattered_data = {}
             for key in self._data_keys[mode]:
                 unscattered_data[key] = self._dataloaders[mode].fetch_data(self._data_keys[mode][key]).data()
@@ -272,14 +287,14 @@ class larcv_interface(object):
 
         this_data = {}
 
-        if not self._read_all_ranks:
+        if read_option is not ReadOption('read_from_last_rank'):
             this_data = self.read_and_distribute_data(mode, unscattered_data)
         else:
             for key in self._data_keys[mode]:
                 if key not in unscattered_data: continue
                 this_data[key] = numpy.reshape(unscattered_data[key], self._dims[mode][key])
 
-        if self._rank == self._root or self._read_all_ranks:
+        if self._rank == self._root or read_option is ReadOption('read_from_last_rank'):
             self._dataloaders[mode].next()
 
         return this_data
