@@ -191,7 +191,7 @@ class larcv_threadio (object):
 
    def stop_manager(self):
       if not self._proc or not self._proc.configured():
-         sys.stderr.write('must call configure(cfg) before start_manager()!\n')
+         sys.stderr.write('must call configure(cfg) before stop_manager()!\n')
          return
 
       self._batch=None
@@ -199,7 +199,7 @@ class larcv_threadio (object):
 
    def purge_storage(self):
       if not self._proc or not self._proc.configured():
-         sys.stderr.write('must call configure(cfg) before start_manager()!\n')
+         sys.stderr.write('must call configure(cfg) before purge_storage()!\n')
          return
       self.stop_manager()
       self._proc.release_data()
@@ -208,9 +208,14 @@ class larcv_threadio (object):
       self._tree_entries = None
       self._event_ids = None
 
+   def manager_started(self):
+     if not self._proc or not self._proc.configured():
+         sys.stderr.write('must call configure(cfg) before manager_started()!\n')
+     return self._proc.manager_started()
+
    def set_next_index(self,index):
       if not self._proc or not self._proc.configured():
-         sys.stderr.write('must call configure(cfg) before start_manager()!\n')
+         sys.stderr.write('must call configure(cfg) before set_next_index()!\n')
          return
       self._proc.set_next_index(index)
 
