@@ -11,27 +11,32 @@ from larcv.dataloader2 import larcv_threadio
 
 from enum import Enum
 
-read_option 
 class ReadOption(Enum):
-    'read_from_last_rank' = 0
-    'read_from_all_ranks' = 1 
-    'read_from_all_last_local_ranks' = 2
+    read_from_single_rank = 0
+    read_from_all_ranks = 1 
+    read_from_single_local_rank = 2
 
 class larcv_interface(object):
 
-    def __init__(self, verbose=False, root=0, comm=MPI.COMM_WORLD, distribute_to_root=True, read_option=None):#read_from_all_ranks=False):
+    def __init__(self, verbose=False, root=0, comm=MPI.COMM_WORLD, distribute_to_root=True, read_option=None, local_rank=None):#read_from_all_ranks=False):
         object.__init__(self)
 
         if read_option is None:
-          read_option = ReadOption('read_from_last_rank')
+          self._read_option = ReadOption['read_from_single_rank']
         else:
-          read_option = ReadOption(read_option)
+          self._read_option = ReadOption[read_option]
 
         # MPI parameters:
         self._comm = comm
         self._size = comm.Get_size()
         self._rank = comm.Get_rank()
         self._root = root
+
+
+        self._local_rank = local_rank
+        if self._local_rank is None and self._read_option is ReadOption['read_from_single_local_rank']:
+            print ('You have selected option {} but have not specified the local rank. Please do so.'.format(self._read_option.name))
+            raise Exception("Please specify local_rank in larcv_interface constructor.")
 
         # This option controls whether or not to distrubute data to the root process
         self._distribute_to_root = distribute_to_root
@@ -77,9 +82,9 @@ class larcv_interface(object):
         self._data_keys[mode] = data_keys
 
 
-        if (self._rank == self._root) 
-          or (read_option is ReadOption('read_from_all_ranks')) 
-          or (self._local_rank == self._root and read_option is ReadOption('read_from_all_last_ranks')):
+        if ((self._rank == self._root and self._read_option is ReadOption['read_from_single_rank'])  
+          or (self._read_option is ReadOption['read_from_all_ranks']) 
+          or (self._local_rank == self._root and self._read_option is ReadOption['read_from_single_local_ranks'])):
     
             if mode in self._dataloaders:
                 raise Exception("Can not prepare manager for mode {}, already exists".format(mode))
@@ -95,7 +100,7 @@ class larcv_interface(object):
 
             # Initialize and configure a manager:
             io = larcv_threadio()
-            if read_option is ReadOption('read_from_all_ranks'):
+            if self._read_option is ReadOption['read_from_all_ranks']:
               io.set_start_entry(self._rank * minibatch_size)
               io.set_entry_skip(self._size * minibatch_size)
             io.configure(io_config)
@@ -142,7 +147,7 @@ class larcv_interface(object):
         do not call it yourself.
         '''
 
-        if read_option is ReadOption('read_from_all_ranks'):
+        if self._read_option is ReadOption['read_from_all_ranks']:
             self._dims[mode] = self._raw_dims[mode]
             self._datasize[mode] = self._dataloaders[mode].fetch_n_entries()
             self._dtypes[mode] = self._raw_dtypes[mode]
@@ -219,6 +224,31 @@ class larcv_interface(object):
         
         return 
 
+    def read_summon_and_distribute_data(self, mode, unscattered_data=None):
+      '''
+      '''
+
+      # We have the private data only on the root rank:
+      private_data = {}
+
+      for key in self._data_keys[mode]:
+          if key not in unscattered_data:
+              continue
+
+          recvdata = None
+          senddata = unscattered_data[key] #(rank+1)*numpy.arange(a_size,dtype=numpy.float64)
+          counts=self._counts[mode][key]
+          dspls=self._displs[mode][key]
+
+          if self._local_rank == self._root:
+              recvdata = numpy.empty(self._size * self._counts[mode][key][self._rank], dtype=self._dtypes[mode][key])
+
+          sendbuf = [senddata, counts[self._rank]]
+          recvbuf = [recvdata, counts, dspls, MPI._typedict[self._dtypes[mode][key].char]]
+
+          self._comm.Allgatherv(sendbuf,recvbuf)
+          print ('on task',rank,'after Gatherv:    data = ',recvdata)
+
     def read_and_distribute_data(self, mode, unscattered_data=None):
         '''
         Read the next batch of data from the interface (which, presumably, is 
@@ -276,7 +306,9 @@ class larcv_interface(object):
         # sys.stdout.write("Rank {} starting to fetch minibatch data\n".format(self._rank))
 
         # If this is the root node, read the data from disk:
-        if self._rank == self._root or read_option is ReadOption('read_from_last_rank'):
+        if ((self._rank == self._root and ReadOption['read_from_single_rank'])
+          or self._read_option is ReadOption['read_from_all_ranks']
+          or (self._local_rank == self._root and self._read_option is ReadOption['read_from_single_local_ranks'])):
             unscattered_data = {}
             for key in self._data_keys[mode]:
                 unscattered_data[key] = self._dataloaders[mode].fetch_data(self._data_keys[mode][key]).data()
@@ -287,14 +319,17 @@ class larcv_interface(object):
 
         this_data = {}
 
-        if read_option is not ReadOption('read_from_last_rank'):
+        if ((self._rank == self._root and ReadOption['read_from_single_rank'])
+          or (self._local_rank == self._root and self._read_option is ReadOption['read_from_single_local_ranks'])):
             this_data = self.read_and_distribute_data(mode, unscattered_data)
         else:
             for key in self._data_keys[mode]:
                 if key not in unscattered_data: continue
                 this_data[key] = numpy.reshape(unscattered_data[key], self._dims[mode][key])
 
-        if self._rank == self._root or read_option is ReadOption('read_from_last_rank'):
+        if ((self._rank == self._root and ReadOption['read_from_single_rank'])
+          or self._read_option is ReadOption['read_from_all_ranks']
+          or (self._local_rank == self._root and self._read_option is ReadOption['read_from_single_local_ranks'])):
             self._dataloaders[mode].next()
 
         return this_data
