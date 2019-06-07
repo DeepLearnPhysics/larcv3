@@ -10,21 +10,20 @@ from mpi4py import MPI
 from larcv.dataloader2 import larcv_threadio
 
 from enum import Enum
-
 class ReadOption(Enum):
-    read_from_single_rank = 0
-    read_from_all_ranks = 1 
-    read_from_single_local_rank = 2
+    read_from_single_rank = 0           # Use only the specified root rank to read the data, and the distribute to all other ranks
+    read_from_all_ranks = 1             # Use only one local rank to read the data, and the distribute to all other ranks in subgroup
+    read_from_single_local_rank = 2     # Use all ranks to read the data, no distribution is needed
 
 class larcv_interface(object):
 
-    def __init__(self, verbose=False, root=0, comm=MPI.COMM_WORLD, distribute_to_root=True, read_option=None, local_rank=None):#read_from_all_ranks=False):
+    def __init__(self, verbose=False, root=0, comm=MPI.COMM_WORLD, distribute_to_root=True, read_from_all_ranks=False, read_option=None, local_rank=None, local_size=None):
         object.__init__(self)
 
         if read_option is None:
-          self._read_option = ReadOption['read_from_single_rank']
+            self._read_option = ReadOption['read_from_single_rank']
         else:
-          self._read_option = ReadOption[read_option]
+            self._read_option = ReadOption[read_option]
 
         # MPI parameters:
         self._comm = comm
@@ -32,17 +31,47 @@ class larcv_interface(object):
         self._rank = comm.Get_rank()
         self._root = root
 
-
+        # MPI local parameters, only needed if reading with option read_from_single_local_rank
         self._local_rank = local_rank
-        if self._local_rank is None and self._read_option is ReadOption['read_from_single_local_rank']:
+        self._local_size = local_size
+        self._n_groups = None
+        self._group_nr = None
+        self._comm_gr = []
+
+        if (self._local_rank is None) and (self._read_option is ReadOption['read_from_single_local_rank']):
             print ('You have selected option {} but have not specified the local rank. Please do so.'.format(self._read_option.name))
             raise Exception("Please specify local_rank in larcv_interface constructor.")
+
+        if (self._local_size is None) and (self._read_option is ReadOption['read_from_single_local_rank']):
+            print ('You have selected option {} but have not specified the local size. Please do so.'.format(self._read_option.name))
+            raise Exception("Please specify local_size in larcv_interface constructor.")
+
+        if (self._read_option is ReadOption['read_from_single_local_rank']) and (self._size % self._local_size != 0):
+            print ('You have selected option {} but global size is not a multiple of local size.'.format(self._read_option.name))
+            raise Exception("Global size is not a multiple of local size..")
+
+        # Need to define group MPI comminicators 
+        # to communicate among ranks in a single node
+        if (self._read_option is ReadOption['read_from_single_local_rank']):
+            self._n_groups = int(self._size / local_size)
+            self._group_nr = int(self._rank / local_size)
+            self._comm_gr = []
+
+            rank_indeces = numpy.arange(comm.Get_size())
+            rank_indeces = numpy.split(rank_indeces, self._n_groups)
+            
+            for index_group in rank_indeces:
+                group = comm.group.Incl(index_group)
+
+                comm_group = comm.Create_group(group)
+                self._comm_gr.append(comm_group)
+
 
         # This option controls whether or not to distrubute data to the root process
         self._distribute_to_root = distribute_to_root
 
-        ## If this is true, all ranks will read the data (every rank will read a different chunk of data)
-        #self._read_all_ranks = read_from_all_ranks
+        # If this is true, all ranks will read the data (every rank will read a different chunk of data)
+        self._read_all_ranks = read_from_all_ranks
 
         # Parameters based from the non MPI version:
         self._dims        = {}
@@ -78,14 +107,12 @@ class larcv_interface(object):
         if type(data_keys) is not OrderedDict:
             raise Exception("Please pass the data keys via OrderedDict, to ensure mpi messaging order is well defined.")
 
-
         self._data_keys[mode] = data_keys
 
-
-        if ((self._rank == self._root and self._read_option is ReadOption['read_from_single_rank'])  
-          or (self._read_option is ReadOption['read_from_all_ranks']) 
-          or (self._local_rank == self._root and self._read_option is ReadOption['read_from_single_local_ranks'])):
-    
+        if ((self._rank == self._root and self._read_option is ReadOption['read_from_single_rank']) 
+          or (self._read_option is ReadOption['read_from_all_ranks'])
+          or (self._local_rank == self._root and self._read_option is ReadOption['read_from_single_local_rank'])):
+        
             if mode in self._dataloaders:
                 raise Exception("Can not prepare manager for mode {}, already exists".format(mode))
 
@@ -100,9 +127,14 @@ class larcv_interface(object):
 
             # Initialize and configure a manager:
             io = larcv_threadio()
-            if self._read_option is ReadOption['read_from_all_ranks']:
-              io.set_start_entry(self._rank * minibatch_size)
-              io.set_entry_skip(self._size * minibatch_size)
+
+            if (self._read_option is ReadOption['read_from_all_ranks']):
+                io.set_start_entry(self._rank * minibatch_size)
+                io.set_entry_skip(self._size * minibatch_size)
+            if (self._read_option is ReadOption['read_from_single_local_rank']):
+                io.set_start_entry(self._group_nr * minibatch_size)
+                io.set_entry_skip(self._n_groups * minibatch_size)
+
             io.configure(io_config)
             io.start_manager(minibatch_size)
 
@@ -114,7 +146,6 @@ class larcv_interface(object):
             # Save the manager
             self._dataloaders.update({mode : io})
             self._dataloaders[mode].next()
-
 
     
             # Read and save the dimensions of the data:
@@ -131,11 +162,8 @@ class larcv_interface(object):
             if self._verbose:
                 sys.stdout.write("Time to start {0} IO: {1:.2}s\n".format(mode, end - start))
 
-
-
         # call set dims to distribute the dimensions to everyone:
         self._set_dims(mode)
-
 
         return
 
@@ -147,13 +175,61 @@ class larcv_interface(object):
         do not call it yourself.
         '''
 
-        if self._read_option is ReadOption['read_from_all_ranks']:
+        if (self._read_option is ReadOption['read_from_all_ranks']):
             self._dims[mode] = self._raw_dims[mode]
             self._datasize[mode] = self._dataloaders[mode].fetch_n_entries()
             self._dtypes[mode] = self._raw_dtypes[mode]
 
             self._counts[mode] = {}
             self._displs[mode] = {}
+
+        elif (self._read_option is ReadOption['read_from_single_local_rank']):
+
+            if self._local_rank != self._root:
+                dims = None
+            else:
+                # the number of events per worker needs to evenly divide the number
+                # of batches for this to succeed.  So, check and adjust the dims:
+                first_key = next(iter(self._data_keys[mode]))
+                n_raw_batch_size = self._raw_dims[mode][first_key][0]
+                n_worker_nodes = self._local_size 
+                if n_raw_batch_size % n_worker_nodes != 0:
+                    print ("Requested to broadcast {} images to {} workers, please adjust to distribute evenly".format(
+                        n_raw_batch_size, n_worker_nodes))
+                    raise Exception("Requested to broadcast {} images to {} workers, please adjust to distribute evenly".format(
+                        n_raw_batch_size, n_worker_nodes))
+                # Make a copy of the raw dimensions so we can scale it down for broadcasting:
+                dims = copy.deepcopy(self._raw_dims[mode])
+                for key in self._data_keys[mode]:
+                    dims[key][0] /= n_worker_nodes
+
+            # Actually broadcast the dimensions:
+            dims = self._comm.bcast(dims, root=self._root)
+            # Note: this is relying on pickling the dimensions, which is a dict of numpy arrays
+            # It's slow, yes, but the data is so small that it shoul not be a big overhead.
+
+            # And store them:
+            self._dims[mode] = dims
+
+            # Broadcast the total size of the dataset:
+            if self._local_rank == self._root:
+                datasize = self._dataloaders[mode].fetch_n_entries()
+            else:
+                datasize = 0
+
+            self._datasize[mode] = self._comm.bcast(datasize, root = self._root)
+
+            # Distribute the counts and displacements necessary for scatterv
+            self._counts[mode] = {}
+            self._displs[mode] = {}
+
+            # Lastly, distribute the dtypes necessary for scatterv to work properly:
+            if self._local_rank != self._root:
+                dtypes = None
+            else:
+                dtypes = self._raw_dtypes[mode]
+
+            self._dtypes[mode]= self._comm.bcast(dtypes, root=self._root)
 
         else:
 
@@ -210,10 +286,14 @@ class larcv_interface(object):
         # Calculate the total size of each message recieved by each node, 
         # And it's displacement from the start of the total message
 
+        this_size = self._size
+        if self._read_option is ReadOption['read_from_single_local_rank']:
+            this_size = self._local_size
+
         for key in self._data_keys[mode]:
             size = int(numpy.prod(self._dims[mode][key]))
             # Size of the message is just the produce of the worker batch dims
-            self._counts[mode][key] = numpy.ones((self._size), numpy.int)*size
+            self._counts[mode][key] = numpy.ones(this_size, numpy.int) * size
             
             # If not distributing to root, the root node gets nothing:
             if not self._distribute_to_root:
@@ -224,30 +304,6 @@ class larcv_interface(object):
         
         return 
 
-    def read_summon_and_distribute_data(self, mode, unscattered_data=None):
-      '''
-      '''
-
-      # We have the private data only on the root rank:
-      private_data = {}
-
-      for key in self._data_keys[mode]:
-          if key not in unscattered_data:
-              continue
-
-          recvdata = None
-          senddata = unscattered_data[key] #(rank+1)*numpy.arange(a_size,dtype=numpy.float64)
-          counts=self._counts[mode][key]
-          dspls=self._displs[mode][key]
-
-          if self._local_rank == self._root:
-              recvdata = numpy.empty(self._size * self._counts[mode][key][self._rank], dtype=self._dtypes[mode][key])
-
-          sendbuf = [senddata, counts[self._rank]]
-          recvbuf = [recvdata, counts, dspls, MPI._typedict[self._dtypes[mode][key].char]]
-
-          self._comm.Allgatherv(sendbuf,recvbuf)
-          print ('on task',rank,'after Gatherv:    data = ',recvdata)
 
     def read_and_distribute_data(self, mode, unscattered_data=None):
         '''
@@ -256,7 +312,17 @@ class larcv_interface(object):
         to the MPI Comm specified (Default = MPI.COMM_WORLD)
         '''
 
-        # We have the private data only on the root rank:
+        # Use the world communicator and global rank if scattering to all ranks
+        comm = self._comm
+        rank = self._rank
+
+        # Find the right communicator for this group and use the local rank if reading from every node
+        if self._read_option is ReadOption['read_from_single_local_rank']:
+            gr_number = int(self._rank / self._local_size)
+            comm = self._comm_gr[gr_number]
+            rank = self._local_rank
+
+        # We have the private data only on the root rank (or local rank):
         private_data = {}
 
         for key in self._data_keys[mode]:
@@ -267,33 +333,39 @@ class larcv_interface(object):
             # Create a buffer for the data to scatter
             # Which is just a reference to the numpy array
             sendbuff = None
-            if self._rank==self._root:
+            if rank == self._root:
                 sendbuff = unscattered_data[key]
                 
             # The recvbuff must be properly sized:
-            recvbuff = numpy.empty((self._counts[mode][key][self._rank]), dtype=self._dtypes[mode][key])
+            recvbuff = numpy.empty((self._counts[mode][key][rank]), dtype=self._dtypes[mode][key])
 
             # Scatterv will scatter numpy arrays, and note the automatic lookup of 
             # dtypes from numpy to MPI.  If you are getting crazy, undefined or NaN values,
             # the dtype is a good start for investigating.
-            self._comm.Scatterv([ sendbuff,
-                                  self._counts[mode][key], 
-                                  self._displs[mode][key],
-                                  MPI._typedict[self._dtypes[mode][key].char]],
-                                  recvbuff,
-                                  root=self._root)
+            comm.Scatterv([ sendbuff,
+                            self._counts[mode][key], 
+                            self._displs[mode][key],
+                            MPI._typedict[self._dtypes[mode][key].char]],
+                            recvbuff,
+                            root=self._root)
 
+            #print (self._rank, self._local_rank, 'done Scatterv!')
 
             # Reshape the data (all ranks except root, unless distributing to root)
-            if self._distribute_to_root or self._rank != self._root:                
+            if self._distribute_to_root or rank != self._root:                
                 private_data[key] = numpy.reshape(recvbuff, self._dims[mode][key])
             else:
                 private_data[key] = None
 
         return private_data
 
+
     def finish(self):
-        if self._rank == self._root:
+        rank = self._rank
+        if self._read_option is ReadOption['read_from_single_local_rank']:
+            rank = self._local_rank
+
+        if rank == self._root:
             for mode in self._dataloaders:
                 self._dataloaders[mode].stop_manager()
 
@@ -306,9 +378,9 @@ class larcv_interface(object):
         # sys.stdout.write("Rank {} starting to fetch minibatch data\n".format(self._rank))
 
         # If this is the root node, read the data from disk:
-        if ((self._rank == self._root and ReadOption['read_from_single_rank'])
-          or self._read_option is ReadOption['read_from_all_ranks']
-          or (self._local_rank == self._root and self._read_option is ReadOption['read_from_single_local_ranks'])):
+        if ((self._rank == self._root and self._read_option is ReadOption['read_from_single_rank']) 
+          or (self._read_option is ReadOption['read_from_all_ranks'])
+          or (self._local_rank == self._root and self._read_option is ReadOption['read_from_single_local_rank'])):
             unscattered_data = {}
             for key in self._data_keys[mode]:
                 unscattered_data[key] = self._dataloaders[mode].fetch_data(self._data_keys[mode][key]).data()
@@ -318,18 +390,16 @@ class larcv_interface(object):
                 unscattered_data[key]  = None
 
         this_data = {}
-
-        if ((self._rank == self._root and ReadOption['read_from_single_rank'])
-          or (self._local_rank == self._root and self._read_option is ReadOption['read_from_single_local_ranks'])):
+        if (self._read_option is not ReadOption['read_from_all_ranks']):
             this_data = self.read_and_distribute_data(mode, unscattered_data)
         else:
             for key in self._data_keys[mode]:
                 if key not in unscattered_data: continue
                 this_data[key] = numpy.reshape(unscattered_data[key], self._dims[mode][key])
 
-        if ((self._rank == self._root and ReadOption['read_from_single_rank'])
-          or self._read_option is ReadOption['read_from_all_ranks']
-          or (self._local_rank == self._root and self._read_option is ReadOption['read_from_single_local_ranks'])):
+        if ((self._rank == self._root and self._read_option is ReadOption['read_from_single_rank'])
+          or (self._read_option is ReadOption['read_from_all_ranks'])
+          or (self._local_rank == self._root and self._read_option is ReadOption['read_from_single_local_rank'])):
             self._dataloaders[mode].next()
 
         return this_data
