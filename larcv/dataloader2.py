@@ -63,7 +63,14 @@ class batch_pydata(object):
          elif self._dtype == "float64":
             larcv.copy_array_double(self._npy_data,larcv_batchdata.data())
       else:
-         self._npy_data = larcv.as_ndarray(larcv_batchdata.data())
+         if self._dtype == "int":
+            self._npy_data = larcv.as_ndarray_int(larcv_batchdata.data())
+         elif self._dtype == "uint":
+            self._npy_data = larcv.as_ndarray_uint(larcv_batchdata.data())
+         elif self._dtype == "float32":
+            self._npy_data = larcv.as_ndarray_float(larcv_batchdata.data())
+         elif self._dtype == "float64":
+            self._npy_data = larcv.as_ndarray_double(larcv_batchdata.data())
       self._time_copy = time.time() - ctime
 
 
@@ -98,6 +105,8 @@ class larcv_threadio (object):
       self._storage = {}
       self._tree_entries = None
       self._event_ids = None
+      self._start_entry = None
+      self._entry_skip = None
 
    def reset(self):
       if self._proc: self._proc.reset()
@@ -138,6 +147,14 @@ class larcv_threadio (object):
 
       self._proc.configure(self._cfg_file)
 
+      # Set the start entry
+      if self._start_entry is not None:
+         self._proc.set_start_entry(self._start_entry)
+
+      if self._entry_skip is not None:
+         self._proc.set_entries_skip(self._entry_skip)
+
+
       # fetch batch filler info
       self._storage = {}
       for i in range(len(self._proc.batch_fillers())):
@@ -151,6 +168,12 @@ class larcv_threadio (object):
       # all success?
       # register *this* instance
       self.__class__._instance_m[self._name] = self
+
+   def set_start_entry(self, start_entry):
+      self._start_entry = start_entry
+
+   def set_entry_skip(self, entry_skip):
+      self._entry_skip = entry_skip
 
    def start_manager(self, batch_size):
       if not self._proc or not self._proc.configured():
@@ -175,7 +198,7 @@ class larcv_threadio (object):
 
    def stop_manager(self):
       if not self._proc or not self._proc.configured():
-         sys.stderr.write('must call configure(cfg) before start_manager()!\n')
+         sys.stderr.write('must call configure(cfg) before stop_manager()!\n')
          return
 
       self._batch=None
@@ -183,7 +206,7 @@ class larcv_threadio (object):
 
    def purge_storage(self):
       if not self._proc or not self._proc.configured():
-         sys.stderr.write('must call configure(cfg) before start_manager()!\n')
+         sys.stderr.write('must call configure(cfg) before purge_storage()!\n')
          return
       self.stop_manager()
       self._proc.release_data()
@@ -192,9 +215,14 @@ class larcv_threadio (object):
       self._tree_entries = None
       self._event_ids = None
 
+   def manager_started(self):
+     if not self._proc or not self._proc.configured():
+         sys.stderr.write('must call configure(cfg) before manager_started()!\n')
+     return self._proc.manager_started()
+
    def set_next_index(self,index):
       if not self._proc or not self._proc.configured():
-         sys.stderr.write('must call configure(cfg) before start_manager()!\n')
+         sys.stderr.write('must call configure(cfg) before set_next_index()!\n')
          return
       self._proc.set_next_index(index)
 
