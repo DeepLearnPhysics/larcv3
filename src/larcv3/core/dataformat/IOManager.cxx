@@ -743,7 +743,15 @@ EventBase* IOManager::get_data(const size_t id) {
     // std::cout << "_in_index: " << _in_index << std::endl;
     // std::cout << "_current_offset: " << _current_offset << std::endl;
 
-    H5::Group group = _in_open_file.openGroup(group_name);
+    H5::Group group;
+    auto iter = _groups.find(group_name);
+    if (iter == _groups.end()) {
+      group = _in_open_file.openGroup(group_name);
+      _groups[group_name] = group;
+    } else {
+      group = iter->second;
+    }
+
     try {
       _product_ptr_v[id]->deserialize(&group, _in_index - _current_offset);
     }
