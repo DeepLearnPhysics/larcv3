@@ -3,6 +3,7 @@ import os
 import time
 import copy
 from collections import OrderedDict
+import socket, zlib
 
 import numpy
 from mpi4py import MPI
@@ -34,9 +35,9 @@ class larcv_interface(object):
         # MPI local parameters, only needed if reading with option read_from_single_local_rank
         self._local_rank = local_rank
         self._local_size = local_size
+        self._local_comm = None
         self._n_groups = None
         self._group_nr = None
-        self._comm_gr = []
 
         if (self._local_rank is None) and (self._read_option is ReadOption['read_from_single_local_rank']):
             print ('You have selected option {} but have not specified the local rank. Please do so.'.format(self._read_option.name))
@@ -50,21 +51,28 @@ class larcv_interface(object):
             print ('You have selected option {} but global size is not a multiple of local size.'.format(self._read_option.name))
             raise Exception("Global size is not a multiple of local size..")
 
-        # Need to define group MPI comminicators 
+        # Need to define group MPI communicators 
         # to communicate among ranks in a single node
         if (self._read_option is ReadOption['read_from_single_local_rank']):
+            
+            # Get the hostname
+            hostname = socket.gethostname().encode('utf-8')
+
+            # Get unique integer (color) from name
+            color = zlib.crc32(hostname)
+            c_max_int = 2147483647
+            while (color >= c_max_int):
+                color -= c_max_int
+
+            # Split the world comm into local comm based on color
+            local_comm = comm.Split(color, self._rank)
+
+            # Save the local comm
+            self._local_comm = local_comm
+            
+            # Find out how many local comm we have
             self._n_groups = int(self._size / local_size)
             self._group_nr = int(self._rank / local_size)
-            self._comm_gr = []
-
-            rank_indeces = numpy.arange(comm.Get_size())
-            rank_indeces = numpy.split(rank_indeces, self._n_groups)
-            
-            for index_group in rank_indeces:
-                group = comm.group.Incl(index_group)
-
-                comm_group = comm.Create_group(group)
-                self._comm_gr.append(comm_group)
 
 
         # This option controls whether or not to distrubute data to the root process
@@ -210,7 +218,7 @@ class larcv_interface(object):
 
             # And store them:
             self._dims[mode] = dims
-
+            
             # Broadcast the total size of the dataset:
             if self._local_rank == self._root:
                 datasize = self._dataloaders[mode].fetch_n_entries()
@@ -260,7 +268,7 @@ class larcv_interface(object):
 
             # And store them:
             self._dims[mode] = dims
-
+            
             # Broadcast the total size of the dataset:
             if self._rank == self._root:
                 datasize = self._dataloaders[mode].fetch_n_entries()
@@ -318,9 +326,8 @@ class larcv_interface(object):
 
         # Find the right communicator for this group and use the local rank if reading from every node
         if self._read_option is ReadOption['read_from_single_local_rank']:
-            gr_number = int(self._rank / self._local_size)
-            comm = self._comm_gr[gr_number]
             rank = self._local_rank
+            comm = self._local_comm
 
         # We have the private data only on the root rank (or local rank):
         private_data = {}
