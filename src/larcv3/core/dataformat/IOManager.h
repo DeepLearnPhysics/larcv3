@@ -195,11 +195,13 @@ namespace larcv3 {
     H5::DataSet    _active_in_event_id_dataset;
     H5::DataSpace  _active_in_event_id_dataspace;
 
+    std::map<std::string, H5::Group> _groups;
+
 
     // Keeping track of products and producers:
     std::map<larcv3::ProducerName_t, larcv3::ProducerID_t> _key_list;
     size_t                          _product_ctr;
-    std::vector<larcv3::EventBase*>  _product_ptr_v;
+    std::vector<larcv3::EventBase*> _product_ptr_v;
     std::vector<std::string>        _product_type_v;
     std::vector<std::string>        _producer_name_v;
 
