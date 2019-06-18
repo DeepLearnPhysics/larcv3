@@ -475,7 +475,7 @@ void ImageMeta<dimension>::set_dimension(size_t axis, double image_size, size_t 
   // to be non zero:
 
   size_t n_voxels = 1;
-  #pragma omp unroll
+  // #pragma omp unroll
   for (size_t i = 0; i < dimension; i++){
     n_voxels *= _number_of_voxels[i];
   }
