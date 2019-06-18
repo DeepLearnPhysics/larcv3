@@ -84,6 +84,7 @@ def copy_data_product(input_file, output_file, group_name):
   # In particular, the 'first' column in every extents dataset must be modified
   # by adding the total number of the last entry in the existing table (first + n)
 
+
   full_path = "Data/" + group_name + "/"
 
 
@@ -92,6 +93,7 @@ def copy_data_product(input_file, output_file, group_name):
 
 
   for dataset in input_file[full_path].keys():
+
 
     # Get the input dataset:
     input_dataset = input_file[full_path + dataset]
@@ -123,7 +125,9 @@ def copy_data_product(input_file, output_file, group_name):
       if 'extents' in dataset:
 
         # Get the offsets for the new table before resizing:
-        existing_offset = output_table[-1]['first'] + output_table[-1]['N']
+        existing_offset = output_table['first'][-1]+ output_table['N'][-1]
+        index = len(output_table)
+
 
 
       output_table.resize(new_shape) 
@@ -132,7 +136,7 @@ def copy_data_product(input_file, output_file, group_name):
 
       # Update the offset values:
       if 'extents' in dataset:
-        output_table[original_offset:]['first'] += existing_offset
+        output_table['first', original_offset:] += existing_offset
 
   pass
 
