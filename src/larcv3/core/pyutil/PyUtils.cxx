@@ -833,6 +833,7 @@ template<> int ctype_to_numpy<int>() { SetPyUtil(); return NPY_INT32; }
 template<> int ctype_to_numpy<unsigned int>() { SetPyUtil(); return NPY_UINT32; }
 template<> int ctype_to_numpy<long long>() { SetPyUtil(); return NPY_INT64; }
 template<> int ctype_to_numpy<unsigned long long>() { SetPyUtil(); return NPY_UINT64; }
+template<> int ctype_to_numpy<size_t>() { SetPyUtil(); return NPY_INTP; }
 template<> int ctype_to_numpy<float>() { SetPyUtil(); return NPY_FLOAT32; }
 template<> int ctype_to_numpy<double>() { SetPyUtil(); return NPY_FLOAT64; }
 
@@ -878,6 +879,7 @@ template PyObject* _as_ndarray< unsigned short     > (const std::vector< unsigne
 template PyObject* _as_ndarray< int                > (const std::vector< int                >& vec);
 template PyObject* _as_ndarray< unsigned int       > (const std::vector< unsigned int       >& vec);
 template PyObject* _as_ndarray< long long          > (const std::vector< long long          >& vec);
+template PyObject* _as_ndarray< size_t > (const std::vector< size_t >& vec);
 template PyObject* _as_ndarray< unsigned long long > (const std::vector< unsigned long long >& vec);
 template PyObject* _as_ndarray< float              > (const std::vector< float              >& vec);
 template PyObject* _as_ndarray< double             > (const std::vector< double             >& vec);
@@ -887,6 +889,7 @@ PyObject* as_ndarray(const std::vector< unsigned short     >& vec) { return _as_
 PyObject* as_ndarray(const std::vector< int                >& vec) { return _as_ndarray< int                >(vec); }
 PyObject* as_ndarray(const std::vector< unsigned int       >& vec) { return _as_ndarray< unsigned int       >(vec); }
 PyObject* as_ndarray(const std::vector< long long          >& vec) { return _as_ndarray< long long          >(vec); }
+PyObject* as_ndarray(const std::vector< size_t >& vec) { return _as_ndarray< size_t >(vec); }
 PyObject* as_ndarray(const std::vector< unsigned long long >& vec) { return _as_ndarray< unsigned long long >(vec); }
 PyObject* as_ndarray(const std::vector< float              >& vec) { return _as_ndarray< float              >(vec); }
 PyObject* as_ndarray(const std::vector< double             >& vec) { return _as_ndarray< double             >(vec); }

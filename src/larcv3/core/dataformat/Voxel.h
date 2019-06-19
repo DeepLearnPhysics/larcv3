@@ -169,6 +169,12 @@ namespace larcv3 {
     /// Size (count) of voxels
     inline size_t size() const { return _voxel_v.size(); }
 
+    /// Get the value of all voxels in this set
+    std::vector<float> values();
+
+    /// Get the index of all voxels in this set
+    std::vector<size_t> indexes();
+
     //
     // Write-access
     //    

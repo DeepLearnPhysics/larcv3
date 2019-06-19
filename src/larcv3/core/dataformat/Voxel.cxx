@@ -135,6 +135,30 @@ namespace larcv3 {
     return;
   }
 
+  std::vector<float> VoxelSet::values(){
+    std::vector<float> ret;
+    ret.resize(_voxel_v.size());
+    size_t i = 0;
+    for (auto & vox : _voxel_v){
+      ret[i] = vox.value();
+      i += 1;
+    }
+    return ret;
+  }
+
+  std::vector<size_t> VoxelSet::indexes(){
+    std::vector<size_t> ret;
+    ret.resize(_voxel_v.size());
+    size_t i = 0;
+    for (auto & vox : _voxel_v){
+      ret[i] = vox.id();
+      i += 1;
+    }
+    return ret;
+  }
+
+
+
   //
   // VoxelSetArray
   //
