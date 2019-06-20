@@ -215,10 +215,10 @@ class larcv_threadio (object):
       self._tree_entries = None
       self._event_ids = None
 
-   def manager_started(self):
-     if not self._proc or not self._proc.configured():
-         sys.stderr.write('must call configure(cfg) before manager_started()!\n')
-     return self._proc.manager_started()
+   #def manager_started(self):
+   #  if not self._proc or not self._proc.configured():
+   #      sys.stderr.write('must call configure(cfg) before manager_started()!\n')
+   #  return self._proc.manager_started()
 
    def set_next_index(self,index):
       if not self._proc or not self._proc.configured():
