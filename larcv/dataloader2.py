@@ -148,11 +148,11 @@ class larcv_threadio (object):
       self._proc.configure(self._cfg_file)
 
       # Set the start entry
-      if self._start_entry is not None:
-         self._proc.set_start_entry(self._start_entry)
+      #if self._start_entry is not None:
+      #   self._proc.set_start_entry(self._start_entry)
 
-      if self._entry_skip is not None:
-         self._proc.set_entries_skip(self._entry_skip)
+      #if self._entry_skip is not None:
+      #   self._proc.set_entries_skip(self._entry_skip)
 
 
       # fetch batch filler info
@@ -169,11 +169,11 @@ class larcv_threadio (object):
       # register *this* instance
       self.__class__._instance_m[self._name] = self
 
-   def set_start_entry(self, start_entry):
-      self._start_entry = start_entry
+   #def set_start_entry(self, start_entry):
+   #   self._start_entry = start_entry
 
-   def set_entry_skip(self, entry_skip):
-      self._entry_skip = entry_skip
+   #def set_entry_skip(self, entry_skip):
+   #   self._entry_skip = entry_skip
 
    def start_manager(self, batch_size):
       if not self._proc or not self._proc.configured():
