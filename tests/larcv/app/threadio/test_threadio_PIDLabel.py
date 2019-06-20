@@ -1,42 +1,34 @@
-# import pytest
-# import unittest
-# import random
+import pytest
+import unittest
+import random
 
-# @pytest.fixture()
-# def tempfile(tmpdir):
-#     return str(tmpdir.dirpath() + "/test.h5")
+from larcv import larcv, data_generator
 
-# @pytest.fixture()
-# def rand_num_events():
-#     return random.randint(1, 10)
+@pytest.fixture()
+def tempfile(tmpdir):
+    return str(tmpdir.dirpath() + "/test.h5")
 
-# def write_temp_file(tempfile, rand_num_events):
-#     from larcv import dataformat
-
-
-#     # This function is purely to test the IO read write capabilities.
-#     io_manager = dataformat.IOManager(dataformat.IOManager.kWRITE)
-#     io_manager.set_out_file(tempfile)
-#     io_manager.initialize()
-#     for i in range(rand_num_events):
-#         io_manager.set_id(0,0,i)
-#         io_manager.save_entry()
-#     io_manager.finalize()
-
-# def read_temp_file(tempfile, rand_num_events):
-#     from larcv import dataformat
-
-#     # This function is purely to test the IO read write capabilities.
-#     io_manager = dataformat.IOManager(dataformat.IOManager.kREAD)
-#     io_manager.add_in_file(tempfile)
-#     io_manager.initialize()
-
-#     return io_manager.get_n_entries()
+@pytest.fixture()
+def rand_num_events():
+    return random.randint(1, 10)
 
 
-# def test_file_open(tempfile, rand_num_events):
+def create_particle_file(file_name, rand_num_events):
 
-#     write_temp_file(tempfile, rand_num_events)
-#     n_read = read_temp_file(tempfile, rand_num_events)
 
-#     assert(n_read == rand_num_events)
+    data_generator.write_particles(file_name, rand_num_events, particles_per_event=1)
+
+
+def test_particle_threadio(tempfile):
+
+
+
+
+def test_write_particles(tmpdir, rand_num_events):
+
+    tempfile = str(tmpdir + "/test_write_particles.h5")
+
+    data_generator.write_particles(tempfile, rand_num_events)
+    n_read = data_generator.read_particles(tempfile)
+
+    assert(n_read == rand_num_events)
