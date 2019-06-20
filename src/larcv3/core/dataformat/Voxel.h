@@ -89,8 +89,8 @@ namespace larcv3 {
   public: 
     static H5::CompType get_datatype() {
       H5::CompType datatype(sizeof(Voxel));
-      datatype.insertMember("id", offsetof(Voxel, _id), H5::PredType::NATIVE_ULLONG);
-      datatype.insertMember("value", offsetof(Voxel, _value), H5::PredType::NATIVE_FLOAT);
+      datatype.insertMember(H5std_string("id"), offsetof(Voxel, _id), H5::PredType::NATIVE_ULLONG);
+      datatype.insertMember(H5std_string("value"), offsetof(Voxel, _value), H5::PredType::NATIVE_FLOAT);
       return datatype;
     }
 #endif

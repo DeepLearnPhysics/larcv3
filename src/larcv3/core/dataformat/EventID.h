@@ -90,9 +90,9 @@ class EventID {
   public: 
     static H5::CompType get_datatype() {
       H5::CompType datatype(sizeof(EventID));
-      datatype.insertMember("run",    offsetof(EventID, _run),    larcv3::get_datatype<long>());
-      datatype.insertMember("subrun", offsetof(EventID, _subrun), larcv3::get_datatype<long>());
-      datatype.insertMember("event",  offsetof(EventID, _event),  larcv3::get_datatype<long>());
+      datatype.insertMember(H5std_string("run"),    offsetof(EventID, _run),    larcv3::get_datatype<long>());
+      datatype.insertMember(H5std_string("subrun"), offsetof(EventID, _subrun), larcv3::get_datatype<long>());
+      datatype.insertMember(H5std_string("event"),  offsetof(EventID, _event),  larcv3::get_datatype<long>());
       return datatype;
     }
 #endif

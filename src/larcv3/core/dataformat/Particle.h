@@ -171,31 +171,31 @@ namespace larcv3 {
       // Get the compound types:
       H5::StrType string_type(0, PARTICLE_PROCESS_STRLEN);
 
-      datatype.insertMember("id",               offsetof(Particle, _id),               larcv3::get_datatype<InstanceID_t>());
-      datatype.insertMember("mcst_index",       offsetof(Particle, _mcst_index),       larcv3::get_datatype<MCSTIndex_t>());
-      datatype.insertMember("mct_index",        offsetof(Particle, _mct_index),        larcv3::get_datatype<MCTIndex_t>());
-      datatype.insertMember("shape",            offsetof(Particle, _shape),            larcv3::get_datatype<ShapeType_t>());
-      datatype.insertMember("current_type",     offsetof(Particle, _current_type),     larcv3::get_datatype<short>());
-      datatype.insertMember("interaction_type", offsetof(Particle, _interaction_type), larcv3::get_datatype<short>());
-      datatype.insertMember("trackid",          offsetof(Particle, _trackid),          larcv3::get_datatype<unsigned int>());
-      datatype.insertMember("pdg",              offsetof(Particle, _pdg),              larcv3::get_datatype<int>());
-      datatype.insertMember("px",               offsetof(Particle, _px),               larcv3::get_datatype<double>());
-      datatype.insertMember("py",               offsetof(Particle, _py),               larcv3::get_datatype<double>());
-      datatype.insertMember("pz",               offsetof(Particle, _pz),               larcv3::get_datatype<double>());
-      datatype.insertMember("vtx",              offsetof(Particle, _vtx),              Vertex::get_datatype());
-      datatype.insertMember("end_pt",           offsetof(Particle, _end_pt),           Vertex::get_datatype());
-      datatype.insertMember("first_step",       offsetof(Particle, _first_step),       Vertex::get_datatype());
-      datatype.insertMember("last_step",        offsetof(Particle, _last_step),        Vertex::get_datatype());
-      datatype.insertMember("dist_travel",      offsetof(Particle, _dist_travel),      larcv3::get_datatype<double>());
-      datatype.insertMember("energy_init",      offsetof(Particle, _energy_init),      larcv3::get_datatype<double>());
-      datatype.insertMember("energy_deposit",   offsetof(Particle, _energy_deposit),   larcv3::get_datatype<double>());
-      datatype.insertMember("process",          offsetof(Particle, _process),          string_type);
-      datatype.insertMember("parent_trackid",   offsetof(Particle, _parent_trackid),   larcv3::get_datatype<unsigned int>());
-      datatype.insertMember("parent_pdg",       offsetof(Particle, _parent_pdg),       larcv3::get_datatype<int>());
-      datatype.insertMember("parent_vtx",       offsetof(Particle, _parent_vtx),       Vertex::get_datatype());
-      datatype.insertMember("ancestor_trackid", offsetof(Particle, _ancestor_trackid), larcv3::get_datatype<unsigned int>());
-      datatype.insertMember("ancestor_pdg",     offsetof(Particle, _ancestor_pdg),     larcv3::get_datatype<int>());
-      datatype.insertMember("ancestor_vtx",     offsetof(Particle, _ancestor_vtx),     Vertex::get_datatype());
+      datatype.insertMember(H5std_string("id"),               offsetof(Particle, _id),               larcv3::get_datatype<InstanceID_t>());
+      datatype.insertMember(H5std_string("mcst_index"),       offsetof(Particle, _mcst_index),       larcv3::get_datatype<MCSTIndex_t>());
+      datatype.insertMember(H5std_string("mct_index"),        offsetof(Particle, _mct_index),        larcv3::get_datatype<MCTIndex_t>());
+      datatype.insertMember(H5std_string("shape"),            offsetof(Particle, _shape),            larcv3::get_datatype<ShapeType_t>());
+      datatype.insertMember(H5std_string("current_type"),     offsetof(Particle, _current_type),     larcv3::get_datatype<short>());
+      datatype.insertMember(H5std_string("interaction_type"), offsetof(Particle, _interaction_type), larcv3::get_datatype<short>());
+      datatype.insertMember(H5std_string("trackid"),          offsetof(Particle, _trackid),          larcv3::get_datatype<unsigned int>());
+      datatype.insertMember(H5std_string("pdg"),              offsetof(Particle, _pdg),              larcv3::get_datatype<int>());
+      datatype.insertMember(H5std_string("px"),               offsetof(Particle, _px),               larcv3::get_datatype<double>());
+      datatype.insertMember(H5std_string("py"),               offsetof(Particle, _py),               larcv3::get_datatype<double>());
+      datatype.insertMember(H5std_string("pz"),               offsetof(Particle, _pz),               larcv3::get_datatype<double>());
+      datatype.insertMember(H5std_string("vtx"),              offsetof(Particle, _vtx),              Vertex::get_datatype());
+      datatype.insertMember(H5std_string("end_pt"),           offsetof(Particle, _end_pt),           Vertex::get_datatype());
+      datatype.insertMember(H5std_string("first_step"),       offsetof(Particle, _first_step),       Vertex::get_datatype());
+      datatype.insertMember(H5std_string("last_step"),        offsetof(Particle, _last_step),        Vertex::get_datatype());
+      datatype.insertMember(H5std_string("dist_travel"),      offsetof(Particle, _dist_travel),      larcv3::get_datatype<double>());
+      datatype.insertMember(H5std_string("energy_init"),      offsetof(Particle, _energy_init),      larcv3::get_datatype<double>());
+      datatype.insertMember(H5std_string("energy_deposit"),   offsetof(Particle, _energy_deposit),   larcv3::get_datatype<double>());
+      datatype.insertMember(H5std_string("process"),          offsetof(Particle, _process),          string_type);
+      datatype.insertMember(H5std_string("parent_trackid"),   offsetof(Particle, _parent_trackid),   larcv3::get_datatype<unsigned int>());
+      datatype.insertMember(H5std_string("parent_pdg"),       offsetof(Particle, _parent_pdg),       larcv3::get_datatype<int>());
+      datatype.insertMember(H5std_string("parent_vtx"),       offsetof(Particle, _parent_vtx),       Vertex::get_datatype());
+      datatype.insertMember(H5std_string("ancestor_trackid"), offsetof(Particle, _ancestor_trackid), larcv3::get_datatype<unsigned int>());
+      datatype.insertMember(H5std_string("ancestor_pdg"),     offsetof(Particle, _ancestor_pdg),     larcv3::get_datatype<int>());
+      datatype.insertMember(H5std_string("ancestor_vtx"),     offsetof(Particle, _ancestor_vtx),     Vertex::get_datatype());
 
       return datatype;
     }
