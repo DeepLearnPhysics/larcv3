@@ -100,7 +100,7 @@ namespace larcv3 {
     while (_run_manager_thread) {
       LARCV_INFO() << "Calling batch_process" << std::endl;
       t_start = std::chrono::high_resolution_clock::now();
-      auto state   = batch_process(batch_size);
+      batch_process(batch_size);
       t_end   = std::chrono::high_resolution_clock::now();
       LARCV_INFO() << "Returned from batch_process: "
                    << (long long)(std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_start).count())

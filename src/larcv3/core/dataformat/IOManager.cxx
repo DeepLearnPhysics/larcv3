@@ -307,7 +307,7 @@ void IOManager::prepare_input() {
                << std::endl;
   for (size_t i_file = 0; i_file < _in_file_v.size(); ++i_file) {
     auto const& fname = _in_file_v[i_file];
-    auto const& dname = _in_dir_v[i_file];
+    // auto const& dname = _in_dir_v[i_file];
 
     // H5::H5File* fin;
 

@@ -30,6 +30,7 @@ PyObject* as_ndarray(const std::vector< unsigned short     > &data);
 PyObject* as_ndarray(const std::vector< int                > &data);
 PyObject* as_ndarray(const std::vector< unsigned int       > &data);
 PyObject* as_ndarray(const std::vector< long long          > &data);
+PyObject* as_ndarray(const std::vector< size_t             > &data);
 PyObject* as_ndarray(const std::vector< unsigned long long > &data);
 PyObject* as_ndarray(const std::vector< float              > &data);
 PyObject* as_ndarray(const std::vector< double             > &data);
