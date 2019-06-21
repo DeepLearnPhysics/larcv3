@@ -67,7 +67,7 @@ def read_image2d(file_name):
 
     return event_image_list
 
-def build_image2d(rand_num_events, n_projections):
+def build_image2d(rand_num_events, n_projections, shape=None):
     from larcv import larcv
     import numpy
 
@@ -78,9 +78,11 @@ def build_image2d(rand_num_events, n_projections):
 
         # Get a piece of data, image2d:
         for projection in range(n_projections):
-            shape = []
-            for dim in range(2):
-                shape.append(random.randint(1, 1e3))
+            if shape is None:
+                shape = []
+                for dim in range(2):
+                    shape.append(random.randint(1, 1e3))
+                    
             raw_image = numpy.random.random(shape).astype("float32")
             event_image_list[i].append(raw_image)
 
@@ -108,7 +110,7 @@ def write_sparse_clusters(file_name, voxel_set_array_list, dimension=2, n_projec
 
         for dim in range(dimension):
             L = 10.
-            N = 2048
+            N = 128
             meta_list[-1].set_dimension(dim, L, N)
 
         meta_list[-1].set_projection_id(projection)
@@ -219,7 +221,7 @@ def build_sparse_cluster_list(rand_num_events, n_projections=3):
                 n_voxels = random.randint(1,50)
                 cluster_d = {                    
                     'values'  : [],
-                    'indexes' : random.sample(range(512*512), n_voxels),
+                    'indexes' : random.sample(range(128*128), n_voxels),
                     'n_voxels': n_voxels}
                 for j in range(n_voxels):
                     cluster_d['values'].append(random.uniform(-1e3, 1e3) )
@@ -249,7 +251,7 @@ def write_sparse_tensors(file_name, voxel_set_list, dimension, n_projections):
 
         for dim in range(dimension):
             L = 10.
-            N = 512
+            N = 128
             meta_list[-1].set_dimension(dim, L, N)
 
         meta_list[-1].set_projection_id(projection)
@@ -329,10 +331,10 @@ def build_sparse_tensor(rand_num_events, n_projections=3):
         voxel_set_list.append([])
         # Get a piece of data, sparse tensor:
         for projection in range(n_projections):
-            n_voxels = random.randint(0,50)
+            n_voxels = random.randint(25,50)
             voxel_set_list[i].append({
                 'values'  : [],
-                'indexes' : random.sample(range(512*512), n_voxels),
+                'indexes' : random.sample(range(128*128), n_voxels),
                 'n_voxels': n_voxels
                 })
             for j in range(voxel_set_list[i][projection]['n_voxels']):
@@ -350,13 +352,11 @@ def write_particles(tempfile, rand_num_events, particles_per_event=-1):
 
 
     for i in range(rand_num_events):
-        print(io_manager.current_entry())
         io_manager.set_id(1001, 0, i)
         
         # Get a piece of data, particle:
         ev_particle = larcv.EventParticle.to_particle(io_manager.get_data("particle","test"))
 
-        print(type(ev_particle))
 
 
         if particles_per_event == -1:
@@ -370,7 +370,6 @@ def write_particles(tempfile, rand_num_events, particles_per_event=-1):
             part.pdg_code(0)
             ev_particle.emplace_back(part)
 
-        print(ev_particle.size())
 
         io_manager.save_entry()
 
