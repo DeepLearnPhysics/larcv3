@@ -1,6 +1,6 @@
 import numpy
 
-from larcv import larcv
+from . import larcv
 
 from random import Random
 random = Random()
