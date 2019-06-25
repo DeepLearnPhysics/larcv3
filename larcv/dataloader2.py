@@ -196,6 +196,9 @@ class larcv_threadio (object):
       self._current_storage_id=-1
       self._current_storage_state = -1
 
+      while not self._proc.manager_started():
+         time.sleep(0.01)
+
    def stop_manager(self):
       if not self._proc or not self._proc.configured():
          sys.stderr.write('must call configure(cfg) before stop_manager()!\n')

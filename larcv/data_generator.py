@@ -68,7 +68,6 @@ def read_image2d(file_name):
     return event_image_list
 
 def build_image2d(rand_num_events, n_projections, shape=None):
-    from larcv import larcv
     import numpy
 
     event_image_list = []
