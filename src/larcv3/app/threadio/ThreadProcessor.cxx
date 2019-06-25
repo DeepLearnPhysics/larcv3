@@ -79,8 +79,11 @@ namespace larcv3 {
     }
     if (_manager_thread.joinable()) _manager_thread.join();
 
+    std::cout << "Trying to start manager thread ..." << std::endl;
     std::thread t(&ThreadProcessor::manager_batch_process, this, batch_size);
+    std::cout << "Trying to move manager thread ..." << std::endl;
     _manager_thread = std::move(t);
+    std::cout << "Waiting ..." << std::endl;
     this->wait(std::chrono::microseconds(5000));
     return;
   }
@@ -93,7 +96,9 @@ namespace larcv3 {
 
   void ThreadProcessor::manager_batch_process(size_t batch_size)
   {
+    std::cout << "Setting run manager thread." << std::endl;
     _run_manager_thread = true;
+    std::cout << "Run manager thread is set to " << _run_manager_thread << std::endl;
     auto t_start = std::chrono::high_resolution_clock::now();
     auto t_end   = std::chrono::high_resolution_clock::now();
     while (_run_manager_thread) {
