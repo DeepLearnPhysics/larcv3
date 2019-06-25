@@ -1,49 +1,37 @@
 language: python
-
 os:
-  - linux
-#  - osx
-
+- linux
 compiler:
-  - clang
-  - gcc
-
+- clang
+- gcc
 python:
-  - 2.7
-  - 3.6
-
-#virtualenv:
-#  system_site_packages: true
-
+- 2.7
+- 3.6
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python swig cmake hdf5; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install cmake libhdf5-serial-dev python-dev swig3.0; fi
-
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python swig cmake hdf5; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install cmake libhdf5-serial-dev
+  python-dev swig3.0; fi
 install:
-  - pip install scikit-build
-  - pip install -e .
-  - echo $PYTHONPATH
-  - echo $LD_LIBRARY_PATH
-  # - python setup.py install
+- pip install scikit-build
+- pip install -e .
+- echo $PYTHONPATH
+- echo $LD_LIBRARY_PATH
 
 branches:
   only:
-    - develop
-# services:
-# - docker
-# install:
-# - docker build -t larcv2_image -f .Dockerfile .
-# script:
-# - docker run --name test_build larcv2_image python -c "import larcv"
-# notifications:
-# Emails are sent to the committer's git-configured email address by default,
-# but only if they have access to the repository.  To enable Travis on your
-# public fork of Caffe, just go to travis-ci.org and flip the switch on for
-# your Caffe fork.  To configure your git email address, use:
-#     git config --global user.email me@example.com
-  # email:
-    # on_success: always
+  - develop
 
-script: 
-  - pytest tests/
+script:
+- pytest tests/
+
+deploy:
+  provider: pypi
+  user: "Your username"
+  password:
+    secure: k16JeEEON4ygZGiO9fA0WEWOZ8UrEO5UeAHRERTFElgNgoWrSR10mJnR17fq9b/DZWh1CjNGOPvRuI2qVGcDQQn/cHO3DmpN0kztiuTdb1X8X/d9HhJL/Krjn5Q/2JsBFhaPQFXEk3eNtGzNdKe+kdlg158pLV6KypcyH/u91VvmABiTXKvAur+T5ApY/kigb6hhqOT+Y4OXLkQzhZmyJb6ej86zXP2zLu1WToCFQH3GUWiVkp9lUA0GAzfSy9azLouWXNOl5YTPrvPxF3mypI3oab9mQPUIxpyN3cwlshIOutc1dtrCWA/88sR5QDMTk9ouMdnEstYdzejwvVTH4sa80nF/FSTBGZuKPbH/f7V7vnybzQQkmRhRLwoQAgX1U4DsXyodMTxQIkPGkRZax7vqQvT0YaOCQSP8gIkdziBiRRjGDMdtFM8Tx04m6QQZFfmPqNVX0Cd/zlOLc1cSyYXOqfISnwG8q8eXKvPvg+4sxFi7zBkbVs3zF0elB9Ouwc6IHMaMJJUREFruXk+hyDFDqbcOB6VW1Ikevq6wOlOLvIuZEHZbrxSYi5Assq+yZ2DBc+1SN2CsxNR5wi9ERpwHkM+c0zlYsOCIBs59TC8nGM5BYWizsCden33PJRDsGxspsF/u4OpSzBiRoKGiFa+mHBY00zaEGFnQ/9jb3LI=
+  on:
+    tags: true
+    branch: develop
+  distributions: "sdist bdist_wheel"
+  skip_existing: true
