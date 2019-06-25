@@ -66,7 +66,7 @@ def test_sparsetensor2d_threadio(tmpdir, num_threads, num_storage, make_copy, ba
 
     config_file = tmpdir + "/test_threadio_sparsetensor2d_{}.cfg".format(threadio_name) 
 
-    with open(config_file, 'w') as _f:
+    with open(str(config_file), 'w') as _f:
         _f.write(config_contents)
 
     # Prepare data managers:

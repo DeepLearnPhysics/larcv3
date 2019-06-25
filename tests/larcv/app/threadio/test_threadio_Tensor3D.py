@@ -63,7 +63,7 @@ def test_tensor3d_threadio(tmpdir, num_threads, num_storage, make_copy, batch_si
 
     config_file = tmpdir + "/test_threadio_tensor3d_{}.cfg".format(threadio_name) 
 
-    with open(config_file, 'w') as _f:
+    with open(str(config_file), 'w') as _f:
         _f.write(config_contents)
 
     # Prepare data managers:

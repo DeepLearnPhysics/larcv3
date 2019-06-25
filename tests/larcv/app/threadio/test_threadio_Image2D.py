@@ -2,6 +2,7 @@ import pytest
 import unittest
 import random
 import uuid
+import time
 
 from larcv import larcv, data_generator, larcv_interface
 
@@ -34,11 +35,11 @@ def create_image2d_file(file_name, rand_num_events, n_projections):
     data_generator.write_image2d(file_name, event_image_list)
 
 
-@pytest.mark.parametrize('num_storage', [1,2])
-@pytest.mark.parametrize('num_threads', [1,2])
+@pytest.mark.parametrize('num_storage', [1, 2])
+@pytest.mark.parametrize('num_threads', [1, 2])
 @pytest.mark.parametrize('make_copy', [True, False])
-@pytest.mark.parametrize('batch_size', [2])
-@pytest.mark.parametrize('n_projections', [1,2])
+@pytest.mark.parametrize('batch_size', [1, 2])
+@pytest.mark.parametrize('n_projections', [1, 2])
 def test_image2d_threadio(tmpdir, num_threads, num_storage, make_copy, batch_size, n_projections, n_reads=10):
 
 
@@ -67,7 +68,7 @@ def test_image2d_threadio(tmpdir, num_threads, num_storage, make_copy, batch_siz
 
     config_file = tmpdir + "/test_threadio_image2ds_{}.cfg".format(threadio_name) 
 
-    with open(config_file, 'w') as _f:
+    with open(str(config_file), 'w') as _f:
         _f.write(config_contents)
 
     # Prepare data managers:
@@ -92,6 +93,7 @@ def test_image2d_threadio(tmpdir, num_threads, num_storage, make_copy, batch_siz
         data = li.fetch_minibatch_data('primary')
         assert(data['label'].shape[0] == batch_size)
 
+    li.stop()
 
 if __name__ == "__main__":
     test_image2d_threadio("./", num_threads=1, num_storage=1, make_copy=False, batch_size=2, n_projections=1, n_reads=10)
