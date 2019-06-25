@@ -34,6 +34,10 @@ class larcv_interface(object):
         self._writer      = None
 
 
+    def __del__(self):
+        # Make sure to stop readers when going out of scope.
+        self.stop()
+
     def prepare_writer(self, io_config, output_file=None):
 
         if self._writer is not None:
@@ -141,6 +145,11 @@ class larcv_interface(object):
         # self._dataloaders['train'].fetch_data(keyword_label).dim() as an example
         return self._dims[mode]
 
+    # def is_active(self):
+    #     _is_active = False
+    #     for mode in self._dataloaders:
+    #         _is_active = _is_active and self._dataloaders[mode].
+
     def stop(self):
 
         for mode in self._dataloaders:
@@ -154,6 +163,9 @@ class larcv_interface(object):
     def size(self, mode):
         # return the number of images in the specified mode:
         return self._dataloaders[mode].fetch_n_entries()
+
+    def ready(self, mode):
+        return self._dataloaders[mode].ready()
 
 
     def write_output(self, data, datatype, producer, entries, event_ids):
