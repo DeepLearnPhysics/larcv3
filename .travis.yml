@@ -30,6 +30,7 @@ install:
 branches:
   only:
     - develop
+    - distributed_tests
 # services:
 # - docker
 # install:
