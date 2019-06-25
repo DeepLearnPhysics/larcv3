@@ -281,6 +281,9 @@ class larcv_threadio (object):
          #    factory = larcv.BatchDataStorageFactoryDouble.get()
          else:
             factory = None
+         batch_storage = factory.get_storage(name)
+         while not batch_storage.is_batch_ready(next_storage_id):
+            time.sleep(0.01)
          batch_data = factory.get_storage(name).get_batch(next_storage_id)
          storage.set_data(next_storage_id, batch_data)
 
