@@ -64,6 +64,12 @@ namespace larcv3 {
 
     void set_next_batch(const std::vector<size_t>& index_v);
 
+    /// Sets the first entry the IOManager should look at 
+    void set_start_entry(size_t entry);
+
+    /// Sets the number of entries that should be skipped between batches 
+    void set_entries_skip(size_t nskip);
+
     bool thread_running(size_t thread_id) const;
 
     bool thread_running() const;
@@ -126,6 +132,7 @@ namespace larcv3 {
     bool _enable_filter;
     size_t _num_threads;
     size_t _next_entry;
+    size_t _n_skip;
     size_t _num_batch_storage;
 
     std::vector<std::string> _input_fname_v;

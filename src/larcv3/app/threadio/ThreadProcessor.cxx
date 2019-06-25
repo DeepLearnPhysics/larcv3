@@ -22,6 +22,7 @@ namespace larcv3 {
     , _configured(false)
     , _enable_filter(false)
     , _next_entry(0)
+    , _n_skip(0)
     , _num_batch_storage(0)
     , _optional_next_index(kINVALID_SIZE)
     , _batch_global_counter(0)
@@ -267,6 +268,7 @@ namespace larcv3 {
     _num_batch_storage = 1;
     _num_threads = 1;
     _next_entry = kINVALID_SIZE;
+    _n_skip = 0;
     _batch_global_counter = 0;
   }
 
@@ -619,13 +621,13 @@ namespace larcv3 {
     if (start_entry == kINVALID_SIZE)
       start_entry = 0;
 
-    LARCV_INFO() << "Instantiating thread ID " << thread_id
+    LARCV_INFO() << "Instantiating thread ID " << thread_id 
 		 << " (exec counter " << _thread_exec_ctr_v[thread_id] << ")"
 		 << " for storage id " << storage_id
 		 << " (from entry " << start_entry
 		 << ", for " << nentries << " entries)" << std::endl;
     
-    _next_entry = start_entry + nentries;
+    _next_entry = start_entry + nentries + _n_skip;
 
     //
     // Assign appropriate batch data storage pointer
@@ -824,6 +826,17 @@ namespace larcv3 {
 
     //LARCV_NORMAL() << "Thread " << thread_id << " finished filling storage " << storage_id << std::endl;
     return true;
+  }
+
+  void ThreadProcessor::set_start_entry(size_t entry) 
+  { 
+    _next_entry = entry; 
+  }
+
+  /// Sets the number of entries that should be skipped between batches 
+  void ThreadProcessor::set_entries_skip(size_t nskip) 
+  { 
+    _n_skip = nskip; 
   }
 }
 
