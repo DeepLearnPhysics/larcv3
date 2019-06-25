@@ -69,10 +69,10 @@ namespace larcv3 {
   public: 
     static H5::CompType get_datatype() {
       H5::CompType datatype(sizeof(Vertex));
-      datatype.insertMember("x", offsetof(Vertex, _x), larcv3::get_datatype<double>());
-      datatype.insertMember("y", offsetof(Vertex, _y), larcv3::get_datatype<double>());
-      datatype.insertMember("z", offsetof(Vertex, _z), larcv3::get_datatype<double>());
-      datatype.insertMember("t", offsetof(Vertex, _t), larcv3::get_datatype<double>());
+      datatype.insertMember(H5std_string("x"), offsetof(Vertex, _x), larcv3::get_datatype<double>());
+      datatype.insertMember(H5std_string("y"), offsetof(Vertex, _y), larcv3::get_datatype<double>());
+      datatype.insertMember(H5std_string("z"), offsetof(Vertex, _z), larcv3::get_datatype<double>());
+      datatype.insertMember(H5std_string("t"), offsetof(Vertex, _t), larcv3::get_datatype<double>());
       return datatype;
     }
 #endif

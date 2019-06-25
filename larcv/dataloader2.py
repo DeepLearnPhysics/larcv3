@@ -196,6 +196,9 @@ class larcv_threadio (object):
       self._current_storage_id=-1
       self._current_storage_state = -1
 
+      while not self._proc.manager_started():
+         time.sleep(0.01)
+
    def stop_manager(self):
       if not self._proc or not self._proc.configured():
          sys.stderr.write('must call configure(cfg) before stop_manager()!\n')
@@ -281,6 +284,9 @@ class larcv_threadio (object):
          #    factory = larcv.BatchDataStorageFactoryDouble.get()
          else:
             factory = None
+         batch_storage = factory.get_storage(name)
+         while not batch_storage.is_batch_ready(next_storage_id):
+            time.sleep(0.01)
          batch_data = factory.get_storage(name).get_batch(next_storage_id)
          storage.set_data(next_storage_id, batch_data)
 
