@@ -177,11 +177,11 @@ class ImageMeta {
       H5::ArrayType double_type(larcv3::get_datatype<double>(), 1, array_dimensions);
       H5::ArrayType size_t_type(larcv3::get_datatype<size_t>(), 1, array_dimensions);
 
-      datatype.insertMember("valid",            offsetof(ImageMeta, _valid),            larcv3::get_datatype<bool>());
-      datatype.insertMember("projection_id",    offsetof(ImageMeta, _projection_id),    larcv3::get_datatype<size_t>());
-      datatype.insertMember("image_sizes",      offsetof(ImageMeta, _image_sizes),      double_type);
-      datatype.insertMember("number_of_voxels", offsetof(ImageMeta, _number_of_voxels), size_t_type);
-      datatype.insertMember("origin",           offsetof(ImageMeta, _origin),           double_type);
+      datatype.insertMember(H5std_string("valid"),            offsetof(ImageMeta, _valid),            larcv3::get_datatype<bool>());
+      datatype.insertMember(H5std_string("projection_id"),    offsetof(ImageMeta, _projection_id),    larcv3::get_datatype<size_t>());
+      datatype.insertMember(H5std_string("image_sizes"),      offsetof(ImageMeta, _image_sizes),      double_type);
+      datatype.insertMember(H5std_string("number_of_voxels"), offsetof(ImageMeta, _number_of_voxels), size_t_type);
+      datatype.insertMember(H5std_string("origin"),           offsetof(ImageMeta, _origin),           double_type);
 
       return datatype;
     }

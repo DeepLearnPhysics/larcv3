@@ -350,7 +350,10 @@ void IOManager::prepare_input() {
     // Next, visit the available groups and see what producers are available.
     std::set<std::string> processed_object;
     for (size_t i_obj = 0; i_obj < data.getNumObjs(); ++i_obj) {
-      std::string obj_name = data.getObjnameByIdx(i_obj);
+      char temp_name[128];
+      // std::string obj_name = 
+      int real_size = data.getObjnameByIdx(i_obj, temp_name, 128);
+      std::string obj_name(temp_name);
       processed_object.insert(obj_name);
       char c[2] = "_";
       if (obj_name.find_first_of(c) > obj_name.size() ||
@@ -746,7 +749,7 @@ EventBase* IOManager::get_data(const size_t id) {
     H5::Group group;
     auto iter = _groups.find(group_name);
     if (iter == _groups.end()) {
-      group = _in_open_file.openGroup(group_name);
+      group = _in_open_file.openGroup(group_name.c_str());
       _groups[group_name] = group;
     } else {
       group = iter->second;
