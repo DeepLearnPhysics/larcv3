@@ -100,7 +100,7 @@ def test_image2d_threadio(tmpdir, num_threads, num_storage, make_copy, batch_siz
 @pytest.mark.parametrize('num_storage', [1, 2])
 @pytest.mark.parametrize('num_threads', [1, 2])
 @pytest.mark.parametrize('make_copy', [True, False])
-@pytest.mark.parametrize('batch_size', [3, 6])
+@pytest.mark.parametrize('batch_size', [2, 4])
 @pytest.mark.parametrize('n_projections', [1, 2])
 def test_image2d_threadio_distributed(tmpdir, num_threads, num_storage, make_copy, batch_size, n_projections, n_reads=10):
 
