@@ -8,7 +8,7 @@ import socket, zlib
 import numpy
 from mpi4py import MPI
 
-from larcv.dataloader2 import larcv_threadio
+from .dataloader2 import larcv_threadio
 
 from enum import Enum
 class ReadOption(Enum):

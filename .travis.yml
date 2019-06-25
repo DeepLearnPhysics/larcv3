@@ -46,4 +46,5 @@ branches:
     # on_success: always
 
 script: 
-  - pytest tests/
+  - pytest -m "not distributed_test" tests/
+  - mpiexec -n 3 pytest -m distributed_test tests/
