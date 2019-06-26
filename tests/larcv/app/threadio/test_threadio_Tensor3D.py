@@ -96,7 +96,7 @@ def test_tensor3d_threadio(tmpdir, num_threads, num_storage, make_copy, batch_si
 @pytest.mark.parametrize('num_storage', [1,2])
 @pytest.mark.parametrize('num_threads', [1,2])
 @pytest.mark.parametrize('make_copy', [False])
-@pytest.mark.parametrize('batch_size', [2])
+@pytest.mark.parametrize('batch_size', [4])
 def test_tensor3d_threadio_distributed(tmpdir, num_threads, num_storage, make_copy, batch_size, n_reads=2):
 
 
