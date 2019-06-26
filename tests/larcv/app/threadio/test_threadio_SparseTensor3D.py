@@ -3,7 +3,7 @@ import unittest
 import random
 import uuid
 
-from larcv import larcv, data_generator, larcv_interface, distributed_larcv_interface
+from larcv import larcv, data_generator, larcv_interface
 
 from collections import OrderedDict
 
@@ -99,6 +99,7 @@ def test_sparsetensor3d_threadio(tmpdir, num_threads, num_storage, make_copy, ba
 @pytest.mark.parametrize('read_option', ['read_from_single_rank', 'read_from_all_ranks'])
 def test_sparsetensor3d_threadio_distributed(tmpdir, num_threads, num_storage, make_copy, local_batch_size, read_option, n_reads=10):
 
+    from larcv import distributed_larcv_interface
     from mpi4py import MPI
     comm = MPI.COMM_WORLD
 
