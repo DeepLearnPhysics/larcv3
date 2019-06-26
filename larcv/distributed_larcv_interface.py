@@ -18,7 +18,7 @@ class ReadOption(Enum):
 
 class larcv_interface(object):
 
-    def __init__(self, verbose=False, root=0, comm=MPI.COMM_WORLD, distribute_to_root=True, read_from_all_ranks=False, read_option=None, local_rank=None, local_size=None):
+    def __init__(self, verbose=False, root=0, comm=MPI.COMM_WORLD, distribute_to_root=True, read_option=None, local_rank=None, local_size=None):
         object.__init__(self)
 
         if read_option is None:
@@ -77,9 +77,6 @@ class larcv_interface(object):
 
         # This option controls whether or not to distrubute data to the root process
         self._distribute_to_root = distribute_to_root
-
-        # If this is true, all ranks will read the data (every rank will read a different chunk of data)
-        self._read_all_ranks = read_from_all_ranks
 
         # Parameters based from the non MPI version:
         self._dims        = {}
