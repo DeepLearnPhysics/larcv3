@@ -50,4 +50,4 @@ branches:
 
 script: 
   - pytest -m "not distributed_test" tests/
-  - mpiexec -n 2 pytest -m distributed_test tests/
+  - mpiexec -n 2 pytest -n0 -m distributed_test tests/
