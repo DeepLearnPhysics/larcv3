@@ -96,7 +96,8 @@ def test_sparsetensor3d_threadio(tmpdir, num_threads, num_storage, make_copy, ba
 @pytest.mark.parametrize('num_threads', [1,2])
 @pytest.mark.parametrize('make_copy', [True, False])
 @pytest.mark.parametrize('batch_size', [4])
-def test_sparsetensor3d_threadio_distributed(tmpdir, num_threads, num_storage, make_copy, batch_size, n_reads=10):
+@pytest.mark.parametrize('read_option', ['read_from_single_rank', 'read_from_all_ranks'])
+def test_sparsetensor3d_threadio_distributed(tmpdir, num_threads, num_storage, make_copy, batch_size, read_option, n_reads=10):
 
     from mpi4py import MPI
     comm = MPI.COMM_WORLD
@@ -110,7 +111,9 @@ def test_sparsetensor3d_threadio_distributed(tmpdir, num_threads, num_storage, m
     file_name = str(tmpdir + "/test_threadio_sparsetensor3d_{}.h5".format(threadio_name))
 
     # Next, write some sparsetensor3ds to that file:
-    if (comm.Get_rank() == root_rank):
+    if (comm.Get_rank() == root_rank and read_option == 'read_from_single_rank'):
+        create_sparsetensor3d_file(file_name, rand_num_events=25)
+    if (read_option == 'read_from_all_ranks'):
         create_sparsetensor3d_file(file_name, rand_num_events=25)
 
 
@@ -142,17 +145,20 @@ def test_sparsetensor3d_threadio_distributed(tmpdir, num_threads, num_storage, m
 
 
 
-    li = distributed_larcv_interface.larcv_interface(root=root_rank)
+    li = distributed_larcv_interface.larcv_interface(root=root_rank, read_option=read_option)
     li.prepare_manager('primary', io_config, batch_size, data_keys)
 
 
     for i in range(n_reads):
         data = li.fetch_minibatch_data('primary')
-        assert(data['label'].shape[0] == batch_size/comm.Get_size())
+        bs = batch_size
+        if read_option == 'read_from_single_rank':
+            bs /= comm.Get_size()
+        assert(data['label'].shape[0] == bs)
 
 
 if __name__ == "__main__":
-    test_sparsetensor3d_threadio("./", num_threads=1, num_storage=1, make_copy=False, batch_size=2,  n_reads=10)
-    test_sparsetensor3d_threadio("./", num_threads=1, num_storage=2, make_copy=False, batch_size=2,  n_reads=10)
-    # test_sparsetensor3d_threadio_distributed("./", num_threads=1, num_storage=2, make_copy=False, batch_size=2,  n_reads=10)
+    # test_sparsetensor3d_threadio("./", num_threads=1, num_storage=1, make_copy=False, batch_size=2,  n_reads=10)
+    # test_sparsetensor3d_threadio("./", num_threads=1, num_storage=2, make_copy=False, batch_size=2,  n_reads=10)
+    test_sparsetensor3d_threadio_distributed("./", num_threads=1, num_storage=2, make_copy=False, batch_size=2, read_option='read_from_all_ranks', n_reads=10)
     print("Success")
