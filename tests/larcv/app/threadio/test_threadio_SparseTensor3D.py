@@ -95,14 +95,15 @@ def test_sparsetensor3d_threadio(tmpdir, num_threads, num_storage, make_copy, ba
 @pytest.mark.parametrize('num_storage', [1,2])
 @pytest.mark.parametrize('num_threads', [1,2])
 @pytest.mark.parametrize('make_copy', [True, False])
-@pytest.mark.parametrize('batch_size', [4])
+@pytest.mark.parametrize('local_batch_size', [2])
 @pytest.mark.parametrize('read_option', ['read_from_single_rank', 'read_from_all_ranks'])
-def test_sparsetensor3d_threadio_distributed(tmpdir, num_threads, num_storage, make_copy, batch_size, read_option, n_reads=10):
+def test_sparsetensor3d_threadio_distributed(tmpdir, num_threads, num_storage, make_copy, local_batch_size, read_option, n_reads=10):
 
     from mpi4py import MPI
     comm = MPI.COMM_WORLD
 
     root_rank = comm.Get_size() - 1
+    comm_size = comm.Get_size()
 
     threadio_name = "threadio_{}".format(uuid.uuid4())
 
@@ -146,14 +147,15 @@ def test_sparsetensor3d_threadio_distributed(tmpdir, num_threads, num_storage, m
 
 
     li = distributed_larcv_interface.larcv_interface(root=root_rank, read_option=read_option)
-    li.prepare_manager('primary', io_config, batch_size, data_keys)
+    # Scale the number of images to the mpi comm size:
+    li.prepare_manager('primary', io_config, comm_size * local_batch_size, data_keys)
 
 
     for i in range(n_reads):
         data = li.fetch_minibatch_data('primary')
-        bs = batch_size
-        if read_option == 'read_from_single_rank':
-            bs /= comm.Get_size()
+        bs = local_batch_size
+        if read_option == 'read_from_all_ranks':
+            bs *= comm.Get_size()
         assert(data['label'].shape[0] == bs)
 
 
