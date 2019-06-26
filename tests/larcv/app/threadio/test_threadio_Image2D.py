@@ -95,6 +95,7 @@ def test_image2d_threadio(tmpdir, num_threads, num_storage, make_copy, batch_siz
 
     li.stop()
 
+
 if __name__ == "__main__":
     test_image2d_threadio("./", num_threads=1, num_storage=1, make_copy=False, batch_size=2, n_projections=1, n_reads=10)
     test_image2d_threadio("./", num_threads=1, num_storage=2, make_copy=False, batch_size=2, n_projections=3, n_reads=10)
