@@ -23,6 +23,7 @@ before_install:
 
 install:
   - pip install scikit-build
+  - pip install pytest-xdist
   - pip install mpi4py
   - pip install -e .
   - echo $PYTHONPATH
