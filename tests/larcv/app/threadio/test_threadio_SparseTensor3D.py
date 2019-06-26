@@ -158,7 +158,7 @@ def test_sparsetensor3d_threadio_distributed(tmpdir, num_threads, num_storage, m
 
 
 if __name__ == "__main__":
-    # test_sparsetensor3d_threadio("./", num_threads=1, num_storage=1, make_copy=False, batch_size=2,  n_reads=10)
-    # test_sparsetensor3d_threadio("./", num_threads=1, num_storage=2, make_copy=False, batch_size=2,  n_reads=10)
-    test_sparsetensor3d_threadio_distributed("./", num_threads=1, num_storage=2, make_copy=False, batch_size=2, read_option='read_from_all_ranks', n_reads=10)
+    test_sparsetensor3d_threadio("./", num_threads=1, num_storage=1, make_copy=False, batch_size=2,  n_reads=10)
+    test_sparsetensor3d_threadio("./", num_threads=1, num_storage=2, make_copy=False, batch_size=2,  n_reads=10)
+    # test_sparsetensor3d_threadio_distributed("./", num_threads=1, num_storage=2, make_copy=False, batch_size=2, read_option='read_from_all_ranks', n_reads=10)
     print("Success")
