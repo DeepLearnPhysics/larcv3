@@ -23,7 +23,7 @@ def rand_num_events():
 def test_write_sparse_clusters(tmpdir, rand_num_events, dimension, n_projections):
 
     voxel_set_array_list = data_generator.build_sparse_cluster_list(rand_num_events, n_projections)
-    random_file_name = str(tmpdir + "/test_write_sparse_tensors.h5")
+    random_file_name = str(tmpdir + "/test_write_sparse_clusters.h5")
     data_generator.write_sparse_clusters(random_file_name, voxel_set_array_list, dimension, n_projections)
 
 
@@ -36,8 +36,13 @@ def test_read_write_sparse_clusters(tmpdir, rand_num_events, dimension, n_projec
    
 
     voxel_set_array_list = data_generator.build_sparse_cluster_list(rand_num_events, n_projections)
-    random_file_name = str(tmpdir + "/test_write_sparse_tensors.h5")
+    random_file_name = str(tmpdir + "/test_write_sparse_clusters.h5")
 
+    print(len(voxel_set_array_list))
+    for e in voxel_set_array_list:
+        print("  " + str(len(e)))
+        for p in e:
+            print("    " + str(len(p)))
 
     data_generator.write_sparse_clusters(random_file_name, voxel_set_array_list, dimension, n_projections)
     read_voxel_set_array_list = data_generator.read_sparse_clusters(random_file_name, dimension)
