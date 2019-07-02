@@ -56,15 +56,15 @@ namespace larcv3 {
   };
 
   /**
-     \class larcv3::Cluster2DThresholdFactory
+     \class larcv3::ThresholdFactory
      \brief A concrete factory class for larcv3::Threshold
   */
-  class Cluster2DThresholdProcessFactory : public ProcessFactoryBase {
+  class ThresholdProcessFactory : public ProcessFactoryBase {
   public:
     /// ctor
-    Cluster2DThresholdProcessFactory() { ProcessFactory::get().add_factory("Threshold",this); }
+    ThresholdProcessFactory() { ProcessFactory::get().add_factory("Threshold",this); }
     /// dtor
-    ~Cluster2DThresholdProcessFactory() {}
+    ~ThresholdProcessFactory() {}
     /// creation method
     ProcessBase* create(const std::string instance_name) { return new Threshold(instance_name); }
   };
