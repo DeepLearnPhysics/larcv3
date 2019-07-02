@@ -6,7 +6,6 @@ this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-print(long_description)
 
 
 setup(
@@ -26,7 +25,7 @@ setup(
     project_urls={
         'Source Code': 'https://github.com/DeepLearnPhysics/larcv3'
     },
-    scripts=['bin/merge_larcv3_files.py'],
+    scripts=['bin/merge_larcv3_files.py', 'bin/run_processor.py'],
     packages=['larcv'],   
     install_requires=[
         'numpy',
