@@ -62,8 +62,8 @@ namespace larcv3 {
 
   private:
 
-    void open_datasets(H5::Group * group);
-    
+    void open_in_datasets(H5::Group * group);
+    void open_out_datasets(H5::Group * group);    
 
     std::vector<larcv3::Particle> _part_v; ///< a collection of particles (index maintained)
 
