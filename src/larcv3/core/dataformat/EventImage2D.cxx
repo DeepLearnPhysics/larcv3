@@ -510,7 +510,7 @@ namespace larcv3 {
 
     return;
   }
-  void EventImage2D::deserialize(H5::Group * group, size_t entry){
+  void EventImage2D::deserialize(H5::Group * group, size_t entry, bool reopen_groups){
    
     // This function reads in a set of images
     // The function implementation is:
@@ -521,6 +521,11 @@ namespace larcv3 {
     // 3) Read the images directly into the correct memory locations
 
 
+    if (reopen_groups){
+      _open_in_dataspaces.clear();
+      _open_in_datasets.clear();
+    }
+    
     open_in_datasets(group);
 
     /////////////////////////////////////////////////////////

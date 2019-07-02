@@ -67,32 +67,45 @@ Image2D CosmicNeutrinoSegLabel::seg_image_creator(
   // Prepare an output image2d:
   Image2D out_image(meta);
 
-  std::set<std::string> processes;
-  std::set<int> interaction_types;
+  // std::set<std::string> processes;
+  // std::set<int> interaction_types;
 
   // Loop over the particles and get the cluster that matches:
   for (size_t particle_index = 0; particle_index < particles.size();
        ++particle_index) {
     // Deterime this particles PDG code and if it's in the list:
     auto const& particle = particles.at(particle_index);
-    int pixel_label = 0;
-    processes.insert(particle.creation_process());
-    interaction_types.insert(particle.nu_interaction_type());
+    particleLabel pixel_label = kBackground;
+    // processes.insert(particle.creation_process());
+    // interaction_types.insert(particle.nu_interaction_type());
     if (particle.nu_interaction_type() == _neutrino_label){
-      pixel_label = 2;
+      pixel_label = kNeutrino;
     }
     else if (particle.nu_interaction_type() == _cosmic_label) {
-      pixel_label = 1;
+      pixel_label = kCosmic;
     }
     // If the label is not zero, go ahead and set the pixels to this label
     // in the output image:
     if (pixel_label != 0) {
       auto const& cluster = clusters.as_vector().at(particle_index);
       // Loop over the pixels in this cluster:
-      for (size_t voxel_index = 0; voxel_index < cluster.as_vector().size();
-           ++voxel_index) {
+      for ( size_t voxel_index = 0;  
+            voxel_index < cluster.as_vector().size();
+            ++voxel_index) {
         auto const& voxel = cluster.as_vector().at(voxel_index);
-        out_image.set_pixel(voxel.id(), pixel_label);
+
+        // if (out_image.pixel(voxel.id()) != pixel_label){
+        //   std::cout << "Changing pixel value from " << out_image.pixel(voxel.id())
+        //             << " to " << pixel_label << std::endl;
+        // }
+
+        // We have to make sure that we don't overwrite a neutrino pixel with a cosmic pixel.
+        if (out_image.pixel(voxel.id()) == kNeutrino){
+          continue;
+        }
+        else{
+          out_image.set_pixel(voxel.id(), pixel_label);
+        } 
       }
     }
   }

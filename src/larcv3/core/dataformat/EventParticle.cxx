@@ -295,7 +295,7 @@ namespace larcv3{
 
   }
 
-  void EventParticle::deserialize(H5::Group * group, size_t entry){
+  void EventParticle::deserialize(H5::Group * group, size_t entry, bool reopen_groups){
     
     // Deserialization is, in some ways, easier than serialization.
     // We just have to read data from the file, and wrap it into an std::vector.
@@ -305,6 +305,11 @@ namespace larcv3{
     /////////////////////////////////////////////////////////
     // Get the extents information from extents dataset
     /////////////////////////////////////////////////////////
+    
+    if (reopen_groups){
+      _open_in_dataspaces.clear();
+      _open_in_datasets.clear();
+    }
 
     open_in_datasets(group);
 

@@ -53,7 +53,7 @@ namespace larcv3 {
     void clear();
     void initialize (H5::Group * group);
     void serialize  (H5::Group * group);
-    void deserialize(H5::Group * group, size_t entry);
+    void deserialize(H5::Group * group, size_t entry, bool reopen_groups=false);
 // #endif
 
     static EventParticle * to_particle(EventBase * e){

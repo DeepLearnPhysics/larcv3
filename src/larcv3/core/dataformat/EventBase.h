@@ -37,7 +37,7 @@ namespace larcv3 {
     virtual void clear() = 0;
     virtual void initialize(H5::Group *) = 0;
     virtual void serialize(H5::Group * group) = 0;
-    virtual void deserialize(H5::Group * group, size_t entry) = 0;
+    virtual void deserialize(H5::Group * group, size_t entry, bool reopen_groups) = 0;
 
     virtual void open_in_datasets(H5::Group * group ) = 0;
     virtual void open_out_datasets(H5::Group * group ) = 0;

@@ -609,7 +609,7 @@ namespace larcv3 {
   }
 
   template<size_t dimension> 
-  void EventSparseCluster<dimension>::deserialize(H5::Group * group, size_t entry){
+  void EventSparseCluster<dimension>::deserialize(H5::Group * group, size_t entry, bool reopen_groups){
 
 
     // This function reads in a set of voxels for sparse clusters
@@ -620,6 +620,11 @@ namespace larcv3 {
     // 4) Use the projection_extents information to get the cluster extents information
     // 5) Use the cluster_extents information to read the correct voxels
     // 6) Update the meta for each set correctly
+    
+    if (reopen_groups){
+      _open_in_dataspaces.clear();
+      _open_in_datasets.clear();
+    }
 
     open_in_datasets(group);
     /////////////////////////////////////////////////////////

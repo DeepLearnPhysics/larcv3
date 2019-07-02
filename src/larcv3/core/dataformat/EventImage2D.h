@@ -54,7 +54,7 @@ namespace larcv3 {
     
     void initialize (H5::Group * group);
     void serialize  (H5::Group * group);
-    void deserialize(H5::Group * group, size_t entry);
+    void deserialize(H5::Group * group, size_t entry, bool reopen_groups=false);
 
     static EventImage2D * to_image2d(EventBase * e){
       return (EventImage2D *) e;

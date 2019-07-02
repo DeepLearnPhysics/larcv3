@@ -30,6 +30,9 @@ namespace larcv3 {
 */
 class CosmicNeutrinoSegLabel : public ProcessBase {
  public:
+
+  enum particleLabel {kBackground, kNeutrino, kCosmic};
+
   /// Default constructor
   CosmicNeutrinoSegLabel(
       const std::string name = "CosmicNeutrinoSegLabel");

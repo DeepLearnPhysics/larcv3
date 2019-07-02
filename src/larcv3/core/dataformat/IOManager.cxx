@@ -21,11 +21,11 @@ IOManager::IOManager(IOMode_t mode, std::string name)
       _prepared(false),
       _out_index(0),
       _out_entries(0),
-      _out_group_v(),
       _out_file_name(""),
       _in_index(0),
       _current_offset(0),
       _in_entries_total(0),
+      _out_group_v(),
       _in_file_v(),
       _in_dir_v(),
       _key_list(),
@@ -33,9 +33,10 @@ IOManager::IOManager(IOMode_t mode, std::string name)
       _product_ptr_v(),
       _product_type_v(),
       _producer_name_v(),
-      _h5_core_driver(false) {
+      _h5_core_driver(false),
+      _force_reopen_groups(false) {
   reset();
-  _event_id_datatype = larcv3::get_datatype<Extents_t>();
+  _event_id_datatype = larcv3::EventID::get_datatype();
 }
 
 IOManager::IOManager(const PSet& cfg)
@@ -155,7 +156,7 @@ bool IOManager::initialize() {
   if (_io_mode != kREAD) {
     if (_out_file_name.empty()) throw larbys("Must set output file name!");
     LARCV_INFO() << "Opening an output file: " << _out_file_name << std::endl;
-    // _out_file = TFile::Open(_out_file_name.c_str(), "RECREATE");
+
     _out_file = H5::H5File(_out_file_name.c_str(), H5F_ACC_TRUNC);
 
     // Create the top level groups in the output file.
@@ -180,6 +181,7 @@ bool IOManager::initialize() {
 
     _out_event_id_ds = _out_file.createDataSet(
         "Events/event_id", larcv3::EventID::get_datatype(), dataspace, cparams);
+
   }
 
   if (_io_mode != kWRITE) {
@@ -242,6 +244,33 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
   _product_type_v[_product_ctr] = name.first;
   _producer_name_v[_product_ctr] = name.second;
 
+  // Determine the status of this product.  Check if it is in the input file:
+  auto in_input_iter = _in_key_list.find(name);
+
+  // If it's found, the status is kInputFileUnread
+  if (in_input_iter != _in_key_list.end()){
+    _product_status_v[_product_ctr] = kInputFileUnread;
+  }
+  else{
+    // if it's not in the input, it's either virtual or output only.
+    // It's virtual if the mode is kREAD
+    // It's virtual if the mode is kWRITE/kBOTH AND this pair is not in the write list.
+    if (_io_mode != kREAD){
+
+      if (!_store_id_bool.empty() && _store_id_bool[_product_ctr]){
+        _product_status_v[_product_ctr] = kOutputOnly;
+      }
+      else{
+        _product_status_v[_product_ctr] = kVirtual;
+      }
+    }
+    else {
+      _product_status_v[_product_ctr] = kVirtual;
+    }
+
+  }
+
+
   const ProducerID_t id = _product_ctr;
   _key_list.insert(std::make_pair(name, id));
 
@@ -253,11 +282,16 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
 
   if (_io_mode != kREAD) {
     LARCV_INFO() << "kWRITE/kBOTH mode: creating an output group" << std::endl;
-    LARCV_DEBUG() << "Data pointer: " << _product_ptr_v[id] << "(" << id << "/"
+    LARCV_INFO() << "Data pointer: " << _product_ptr_v[id] << "(" << id << "/"
                   << _product_ptr_v.size() << ")" << std::endl;
-    _out_group_v[id] = new H5::Group(_out_file.createGroup(group_loc.c_str()));
-    _product_ptr_v[id]->initialize(_out_group_v[id]);
-    LARCV_DEBUG() << "Created Group @ " << _out_group_v[id] << std::endl;
+    if (_out_group_v.size() <= id){
+      _out_group_v.resize(id + 1);
+    }
+    _out_group_v[id] = _out_file.createGroup(group_loc.c_str());
+    _product_ptr_v[id]->initialize(&_out_group_v[id]);
+    LARCV_DEBUG() << "Created Group " << group_loc << " @ " << &_out_group_v[id] << std::endl;
+  }else{
+
   }
 
   return id;
@@ -300,6 +334,7 @@ void IOManager::prepare_input() {
 
   // List of total entries in input files?
   _in_entries_v.reserve(_in_file_v.size());
+
   // List of producer/product pairs in the input files
   _in_key_list.clear();
 
@@ -313,7 +348,7 @@ void IOManager::prepare_input() {
 
     LARCV_NORMAL() << "Opening a file in READ mode: " << fname << std::endl;
     open_new_input_file(fname);
-
+    read_current_event_id();
 
     // Each file has (or should have) two groups: "Data" and "Events"
 
@@ -401,17 +436,10 @@ void IOManager::prepare_input() {
         auto id = register_producer(name);
         LARCV_INFO() << "Registered: producer=" << producer_name
                      << " Key=" << id << std::endl;
-
+        // Set the product status:
+        _product_status_v[id] = kInputFileUnread;
         _in_key_list.insert(std::make_pair(name, id));
-      } else {
-        // Producer is already registered, so just make sure this combo is in
-        // the in_key_list and is not new:
-        // auto id = producer_id(name);
-        auto iter = _in_key_list.find(name);
-        if (iter == _key_list.end()) {
-          LARCV_CRITICAL() << "New group found in file!" << std::endl;
-          throw larbys();
-        }
+
       }
 
 
@@ -419,7 +447,7 @@ void IOManager::prepare_input() {
     // After looping over all the objects, make sure there are none missing.
     // We've made sure every one found is supposed to be there, so it suffices
     // to make sure we have the same amount:
-    if (processed_object.size() != _in_key_list.size()) {
+    if (processed_object.size() != _key_list.size()) {
       LARCV_CRITICAL() << "Group number mismatch across files!" << std::endl;
       throw larbys();
     }
@@ -458,6 +486,9 @@ void IOManager::open_new_input_file(std::string filename){
 bool IOManager::read_entry(const size_t index, bool force_reload) {
   
   __ioman_mtx.lock();
+
+  // Don't reopen groups unless absolutely necessary:
+  _force_reopen_groups = false;
 
   LARCV_DEBUG() << "start" << std::endl;
   if (_io_mode == kWRITE) {
@@ -507,11 +538,63 @@ bool IOManager::read_entry(const size_t index, bool force_reload) {
       _active_in_event_id_dataspace = _active_in_event_id_dataset.getSpace();
 
 
-      LARCV_NORMAL() << "Opening new file for continued event reading"
+      LARCV_INFO() << "Opening new file for continued event reading"
                      << std::endl;
+      _force_reopen_groups = true;
     }
 
-    // Now, we can open the events folder and figure out what's what.
+
+    read_current_event_id();
+
+    // Make sure to reset all the data status:
+    for (size_t id = 0; id < _product_status_v.size(); ++id){
+    if (!_product_ptr_v[id]) break;
+      if (_product_status_v[id] == kInputFileRead){
+        _product_status_v[id] = kInputFileUnread;
+      }
+      else{
+        // Do nothing?
+      }
+    }
+
+    // // Now, we can open the events folder and figure out what's what.
+    // // H5::DataSet events_dataset =
+    //     // _in_open_file.openGroup("Events").openDataSet("event_id");
+    // // H5::DataSpace events_dataspace = events_dataset.getSpace();
+
+    // hsize_t events_slab_dims[1];
+    // events_slab_dims[0] = 1;
+
+    // hsize_t events_offset[1];
+    // // Calculate the _current_offset based on requested index + _current_offset
+    // // for this file
+    // events_offset[0] = _in_index - _current_offset;
+
+    // _active_in_event_id_dataspace.selectHyperslab(H5S_SELECT_SET, events_slab_dims,
+    //                                  events_offset);
+
+    // // Define memory space:
+    // H5::DataSpace events_memspace(1, events_slab_dims);
+
+    // EventID input_event_id;
+    // // Write the new data
+    // _active_in_event_id_dataset.read(&(input_event_id), _event_id_datatype,
+    //                     events_memspace, _active_in_event_id_dataspace);
+    // std::cout << "Active in event id for index " << index << ": " << input_event_id.event_key() << std::endl;
+    // _event_id = input_event_id;
+
+    // _in_open_file
+    // Open the right file, if necessary
+  }
+  LARCV_DEBUG() << "Current input group index: " << _in_index << std::endl;
+
+  __ioman_mtx.unlock();
+
+  return true;
+}
+
+void IOManager::read_current_event_id(){
+      // Now, we can open the events folder and figure out what's what.
     // H5::DataSet events_dataset =
         // _in_open_file.openGroup("Events").openDataSet("event_id");
     // H5::DataSpace events_dataspace = events_dataset.getSpace();
@@ -535,18 +618,10 @@ bool IOManager::read_entry(const size_t index, bool force_reload) {
     _active_in_event_id_dataset.read(&(input_event_id), _event_id_datatype,
                         events_memspace, _active_in_event_id_dataspace);
     _event_id = input_event_id;
-
-    // _in_open_file
-    // Open the right file, if necessary
-  }
-  LARCV_DEBUG() << "Current input group index: " << _in_index << std::endl;
-
-  __ioman_mtx.unlock();
-
-  return true;
 }
 
 bool IOManager::save_entry() {
+
   LARCV_DEBUG() << "start" << std::endl;
   if (!_prepared) {
     LARCV_CRITICAL() << "Cannot be called before initialize()!" << std::endl;
@@ -560,14 +635,24 @@ bool IOManager::save_entry() {
 
   // in kBOTH mode make sure all Group entries are read-in
   if (_io_mode == kBOTH) {
-    for (size_t id = 0; id < _in_entries_v.size(); ++id) {
-      if (_store_id_bool.size() && (id >= _store_id_bool.size() ||
-      !_store_id_bool[id])) continue; if (_in_entries_v[id] == _in_index)
-      continue; get_data(id);
+    for (size_t id = 0; id < _out_group_v.size(); ++id) {
+      if ( _store_id_bool.size() && 
+           (id >= _store_id_bool.size() || !_store_id_bool[id]) 
+          ) continue; 
+      if (_product_status_v[id] == kInputFileUnread){
+        get_data(id);
+        _product_status_v[id] = kInputFileRead;
+      }
+      // if (_product_status_v[id] == kInputFileUnread)
+      // std::cout << _out_read_entries[id] << std::endl;
+      // if (!_out_read_entries[id]){
+      //   std::cout << "Call get_data for id " << id << std::endl;
+      // }
     }
   }
 
   LARCV_INFO() << "Saving new entry " << std::endl;
+
 
   set_id();
 
@@ -581,12 +666,11 @@ bool IOManager::save_entry() {
     this->append_event_id();
 
     for (size_t i = 0; i < _out_group_v.size(); ++i) {
-      auto& t = _out_group_v[i];
+      auto t = &_out_group_v[i];
       auto& p = _product_ptr_v[i];
+
       if (!t) break;
-      // TODO = address this debug line with the updated API
-      // LARCV_DEBUG() << "Saving " << t-GetName>() << " entry " <<
-      // t->GetEntries() << std::endl; t->write();
+
       p->serialize(t);
       p->clear();
     }
@@ -603,7 +687,7 @@ bool IOManager::save_entry() {
 
     for (size_t i = 0; i < _store_id_bool.size(); ++i) {
       if (!_store_id_bool[i]) continue;
-      auto& t = _out_group_v[i];
+      auto t = &_out_group_v[i];
       auto& p = _product_ptr_v[i];
       LARCV_DEBUG() << "Saving "
                     << t->fromClass()
@@ -626,7 +710,6 @@ void IOManager::append_event_id() {
   //////////////////////////////////////////////////////////////////
   // First, we get information about the current status of the dataset:
   //////////////////////////////////////////////////////////////////
-
   // Get the dataspace of the event ID dataset:
   H5::DataSpace dataspace = _out_event_id_ds.getSpace();
 
@@ -665,6 +748,16 @@ void IOManager::append_event_id() {
 }
 
 void IOManager::clear_entry() {
+  for (size_t id = 0; id < _product_status_v.size(); ++id){
+    if (!_product_ptr_v[id]) break;
+    if (_product_status_v[id] == kInputFileRead){
+      _product_status_v[id] = kInputFileUnread;
+    }
+    else{
+      // Do nothing?
+    }
+  }
+
   for (auto& p : _product_ptr_v) {
     if (!p) break;
     p->clear();
@@ -718,7 +811,10 @@ EventBase* IOManager::get_data(const std::string& type,
       LARCV_NORMAL() << type << " created w/ producer name " << producer
                      << " but won't be stored in file (kREAD mode)"
                      << std::endl;
+      _product_status_v[id] = kVirtual;
     }
+    // We specify that get data has already been "called" on this producer/product
+    // to make it virtual until serialization, if it ever happens.
 
   }
   return get_data(id);
@@ -735,9 +831,10 @@ EventBase* IOManager::get_data(const size_t id) {
   }
 
   if (_io_mode != kWRITE && _in_index != kINVALID_SIZE &&
-      (id >= _read_id_bool.size() || _read_id_bool[id])) {
+      (id >= _read_id_bool.size() || _read_id_bool[id]) &&
+      _product_status_v[id] == kInputFileUnread ) {
     // Reading in is just getting the group, calling deserialize with the right
-    // index:
+    // index.
 
     // The group name is "product_producer_group"
     std::string group_name = _product_type_v[id];
@@ -748,7 +845,7 @@ EventBase* IOManager::get_data(const size_t id) {
 
     H5::Group group;
     auto iter = _groups.find(group_name);
-    if (iter == _groups.end()) {
+    if (iter == _groups.end() || _force_reopen_groups) {
       group = _in_open_file.openGroup(group_name.c_str());
       _groups[group_name] = group;
     } else {
@@ -756,7 +853,8 @@ EventBase* IOManager::get_data(const size_t id) {
     }
 
     try {
-      _product_ptr_v[id]->deserialize(&group, _in_index - _current_offset);
+      _product_ptr_v[id]->deserialize(&group, _in_index - _current_offset, _force_reopen_groups);
+      _product_status_v[id] = kInputFileRead;
     }
     catch (...){
       // When there is an error in deserialization, close the open input file gracefully:
@@ -805,32 +903,32 @@ void IOManager::set_id() {
   LARCV_INFO() << "Setting event id for output groups: "
                << _event_id.event_key() << std::endl;
 
-  for (size_t i = 0; i < _product_ptr_v.size(); ++i) {
-    auto& p = _product_ptr_v[i];
-    if (!p) break;
-  }
+  // for (size_t i = 0; i < _product_ptr_v.size(); ++i) {
+  //   auto& p = _product_ptr_v[i];
+  //   if (!p) break;
+  // }
 }
 
 void IOManager::finalize() {
   LARCV_DEBUG() << "start" << std::endl;
   if (_io_mode != kREAD) {
     // _out_file->cd();
-    if (_store_id_bool.empty()) {
-      for (auto& t : _out_group_v) {
-        if (!t) break;
-        LARCV_NORMAL() << "Writing "
-                       << t->fromClass()
-                       << std::endl;
-      }
-    } else {
-      for (size_t i = 0; i < _store_id_bool.size(); ++i) {
-        if (!_store_id_bool[i]) continue;
-        auto& t = _out_group_v[i];
-        LARCV_NORMAL() << "Writing "
-                       << t->fromClass()
-                       << std::endl;
-      }
-    }
+    // if (_store_id_bool.empty()) {
+    //   for (auto& t : _out_group_v) {
+    //     // if (!t) break;
+    //     LARCV_NORMAL() << "Writing "
+    //                    << t.fromClass()
+    //                    << std::endl;
+    //   }
+    // } else {
+    //   for (size_t i = 0; i < _store_id_bool.size(); ++i) {
+    //     if (!_store_id_bool[i]) continue;
+    //     auto t = &_out_group_v[i];
+    //     LARCV_NORMAL() << "Writing "
+    //                    << t->fromClass()
+    //                    << std::endl;
+    //   }
+    // }
     LARCV_NORMAL() << "Closing output file" << std::endl;
     _out_file.close();
   }
@@ -849,13 +947,15 @@ void IOManager::reset() {
   _set_event_id.clear();
   _in_entries_v.clear();
   _out_group_v.clear();
-  _out_group_v.resize(1000, nullptr);
+  // _out_group_v.resize(1000, nullptr);
   _product_ptr_v.clear();
   _product_ptr_v.resize(1000, nullptr);
   _product_type_v.clear();
   _product_type_v.resize(1000, "");
   _producer_name_v.clear();
   _producer_name_v.resize(1000, "");
+  _product_status_v.clear();
+  _product_status_v.resize(1000, kUnknown);
   _product_ctr = 0;
   _in_index = 0;
   _current_offset = 0;
@@ -866,6 +966,7 @@ void IOManager::reset() {
   _in_file_v.clear();
   _in_dir_v.clear();
   _key_list.clear();
+  _in_key_list.clear();
   _read_only.clear();
   _store_only.clear();
   _read_id_bool.clear();

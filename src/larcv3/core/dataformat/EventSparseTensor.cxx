@@ -537,7 +537,7 @@ namespace larcv3 {
   }
 
   template<size_t dimension> 
-  void EventSparseTensor<dimension>::deserialize(H5::Group * group, size_t entry){
+  void EventSparseTensor<dimension>::deserialize(H5::Group * group, size_t entry, bool reopen_groups){
 
     // This function reads in a set of voxels for either sparse tensors or sparse clusters
     // The function implementation is:
@@ -546,6 +546,11 @@ namespace larcv3 {
     // 3) Use the entry information to get the image_meta table information
     // 4) Use the voxel_extents information to read the correct voxels
     // 5) Update the meta for each set correctly
+
+    if (reopen_groups){
+      _open_in_dataspaces.clear();
+      _open_in_datasets.clear();
+    }
 
     open_in_datasets(group);
     /////////////////////////////////////////////////////////
