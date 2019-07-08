@@ -8,17 +8,17 @@ import socket, zlib
 import numpy
 from mpi4py import MPI
 
-from larcv.dataloader2 import larcv_threadio
+from .dataloader2 import larcv_threadio
 
 from enum import Enum
 class ReadOption(Enum):
     read_from_single_rank = 0           # Use only the specified root rank to read the data, and the distribute to all other ranks
-    read_from_all_ranks = 1             # Use only one local rank to read the data, and the distribute to all other ranks in subgroup
-    read_from_single_local_rank = 2     # Use all ranks to read the data, no distribution is needed
+    read_from_all_ranks = 1             # Use all ranks to read the data, no distribution is needed
+    read_from_single_local_rank = 2     # Use only one local rank to read the data, and the distribute to all other ranks in subgroup
 
 class larcv_interface(object):
 
-    def __init__(self, verbose=False, root=0, comm=MPI.COMM_WORLD, distribute_to_root=True, read_from_all_ranks=False, read_option=None, local_rank=None, local_size=None):
+    def __init__(self, verbose=False, root=0, comm=MPI.COMM_WORLD, distribute_to_root=True, read_option=None, local_rank=None, local_size=None):
         object.__init__(self)
 
         if read_option is None:
@@ -77,9 +77,6 @@ class larcv_interface(object):
 
         # This option controls whether or not to distrubute data to the root process
         self._distribute_to_root = distribute_to_root
-
-        # If this is true, all ranks will read the data (every rank will read a different chunk of data)
-        self._read_all_ranks = read_from_all_ranks
 
         # Parameters based from the non MPI version:
         self._dims        = {}
