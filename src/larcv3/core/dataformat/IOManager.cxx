@@ -125,7 +125,14 @@ void IOManager::configure(const PSet& cfg) {
     throw larbys();
   }
   for (size_t i = 0; i < store_only_name.size(); ++i) {
+    // Store only is a map to a set.
+    // Map key is by type (image2d, cluster2d, etc)
+    // Set values are producers
+    // Therefore, this loop is going over the names in store_only_name
+    // and for each name, it finds the set in store only
+    // for the corresponding type:
     auto& val = _store_only[store_only_type[i]];
+    // The type of val is then an std::set of producers, so insert the name:
     val.insert(store_only_name[i]);
   }
 
@@ -185,6 +192,8 @@ bool IOManager::initialize() {
   }
 
   if (_io_mode != kWRITE) {
+    // Prepare input will register producers for all producers in the input file.
+    // It will not make output groups for store_only objects
     prepare_input();
     if (!_in_entries_total) {
       LARCV_ERROR() << "Found 0 entries from input files..." << std::endl;
@@ -200,19 +209,34 @@ bool IOManager::initialize() {
   // This has not been verified for larcv3
   _store_id_bool.clear();
   if (_io_mode != kREAD && _store_only.size()) {
+    // Creating a vector of the storage status
     std::vector<size_t> store_only_id;
+    _store_id_bool.resize(_product_ctr, false);
     for (auto const& type_name_s: _store_only) {
       auto const& type = type_name_s.first;
       auto const& name_s = type_name_s.second;
-      for (auto const& name : name_s)
-        store_only_id.push_back(register_producer(ProducerName_t(type,
-        name)));
+      for (auto const& name : name_s){
+        // Get the producer id for this product:
+        // std::cout << "Registering " << type << " by " << name << " in beginning." <<std::endl;
+        auto id = register_producer(ProducerName_t(type,name));
+        // std::cout << "Registered id is " << id << std::endl;
+        // If it's an existing producer, change the value:
+        if (id < _store_id_bool.size()) _store_id_bool[id] = true;
+        // Else:
+        // Add it to the store only list:
+        else{
+          store_only_id.push_back(id);          
+        }
+      }
     }
-    _store_id_bool.resize(_product_ctr, false);
     if ( _product_ctr > _read_id_bool.size() ) // append to read-in counters
       _read_id_bool.resize(_product_ctr, false);
-    for (auto const& id : store_only_id) _store_id_bool.at(id) = true;
+    for (auto const& id : store_only_id) {
+      if (id >= _store_id_bool.size()) _store_id_bool.resize(id+1);
+      _store_id_bool.at(id) = true;
+    }
   }
+
 
   // _in_index = 0;
   _out_index = 0;
@@ -221,6 +245,7 @@ bool IOManager::initialize() {
 
   return true;
 }
+
 
 size_t IOManager::register_producer(const ProducerName_t& name) {
   LARCV_DEBUG() << "start" << std::endl;
@@ -280,18 +305,41 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
                << std::endl;
 
 
-  if (_io_mode != kREAD) {
-    LARCV_INFO() << "kWRITE/kBOTH mode: creating an output group" << std::endl;
-    LARCV_INFO() << "Data pointer: " << _product_ptr_v[id] << "(" << id << "/"
-                  << _product_ptr_v.size() << ")" << std::endl;
-    if (_out_group_v.size() <= id){
-      _out_group_v.resize(id + 1);
-    }
-    _out_group_v[id] = _out_file.createGroup(group_loc.c_str());
-    _product_ptr_v[id]->initialize(&_out_group_v[id]);
-    LARCV_DEBUG() << "Created Group " << group_loc << " @ " << &_out_group_v[id] << std::endl;
-  }else{
 
+  if (_io_mode != kREAD) {
+    // _store_id_bool is not set until this function returns.  So we can't use it yet.
+    // But we can't create and output group if we are not storing that product.
+
+    // Check _store_only instead:
+    
+    bool storing(false);
+    
+    if (_store_only.empty()){
+      storing = true;
+    }
+    else if (_store_only.find(name.first) != _store_only.end() ){
+      if (_store_only[name.first].find(name.second) != _store_only[name.first].end()){
+        storing = true;
+      }
+    }
+
+
+
+    if (storing){ 
+      LARCV_INFO() << "kWRITE/kBOTH mode: creating an output group" << std::endl;
+      LARCV_INFO() << "Data pointer: " << _product_ptr_v[id] << "(" << id << "/"
+                    << _product_ptr_v.size() << ")" << std::endl;
+      if (_out_group_v.size() <= id){
+        _out_group_v.resize(id + 1);
+      }
+      _out_group_v[id] = _out_file.createGroup(group_loc.c_str());
+      _product_ptr_v[id]->initialize(&_out_group_v[id]);
+      LARCV_DEBUG() << "Created Group " << group_loc << " @ " << &_out_group_v[id] << std::endl;
+    }
+    else{
+      LARCV_DEBUG() << "kWRITE/kBOTH mode is on, but skipping storage for output group " << group_name << std::endl;
+    }
+    
   }
 
   return id;
@@ -656,14 +704,14 @@ bool IOManager::save_entry() {
 
   set_id();
 
+  // First, update the eventID group
+  this->append_event_id();
+
   if (_store_id_bool.empty()) {
     for (auto& p : _product_ptr_v) {
       if (!p) break;
 
     }
-
-    // First, update the eventID group
-    this->append_event_id();
 
     for (size_t i = 0; i < _out_group_v.size(); ++i) {
       auto t = &_out_group_v[i];
@@ -676,6 +724,11 @@ bool IOManager::save_entry() {
     }
 
   } else {
+
+    // // First, update the eventID group
+    // this->append_event_id();
+
+
     for (size_t i = 0; i < _store_id_bool.size(); ++i) {
       auto const& p = _product_ptr_v[i];
       if (!_store_id_bool[i]) {
@@ -686,11 +739,20 @@ bool IOManager::save_entry() {
     }
 
     for (size_t i = 0; i < _store_id_bool.size(); ++i) {
+      LARCV_DEBUG() << "Store_id_bool value for id " << i << ": "
+                    << _product_type_v[i] << " by "
+                    << _producer_name_v[i]
+                    << " == " << _store_id_bool[i]
+                    << std::endl;
+    }
+
+    for (size_t i = 0; i < _store_id_bool.size(); ++i) {
       if (!_store_id_bool[i]) continue;
       auto t = &_out_group_v[i];
       auto& p = _product_ptr_v[i];
-      LARCV_DEBUG() << "Saving "
-                    << t->fromClass()
+      LARCV_DEBUG() << "Saving id " << i << ": "
+                    << _product_type_v[i] << " by "
+                    << _producer_name_v[i]
                     // << " entry " << t->GetEntries()
                     << std::endl;
       p->serialize(t);
@@ -840,8 +902,6 @@ EventBase* IOManager::get_data(const size_t id) {
     std::string group_name = _product_type_v[id];
     group_name = "Data/" + group_name + "_" + _producer_name_v[id] + "_group";
 
-    // std::cout << "_in_index: " << _in_index << std::endl;
-    // std::cout << "_current_offset: " << _current_offset << std::endl;
 
     H5::Group group;
     auto iter = _groups.find(group_name);
