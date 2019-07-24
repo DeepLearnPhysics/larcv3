@@ -66,7 +66,7 @@ namespace larcv3 {
 
 
     // IO functions:
-    void initialize (H5::Group * group);
+    void initialize (H5::Group * group, uint compression);
     void serialize  (H5::Group * group);
     void deserialize(H5::Group * group, size_t entry, bool reopen_groups=false);
 

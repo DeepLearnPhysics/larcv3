@@ -156,6 +156,8 @@ namespace larcv3 {
     // General Parameters
     IOMode_t    _io_mode;
     bool        _prepared;
+    // This can override the compression level across the entire file:
+    uint _compression_override;
 
 
     // Parameters controlling output file large scale tracking:
@@ -226,6 +228,7 @@ namespace larcv3 {
     std::vector<bool> _store_id_bool;
     std::vector<bool> _read_id_bool;
     bool _h5_core_driver;
+
 
     // IOManager has to control the EventID dataset it's self for the output file.
     H5::DataSet  _out_event_id_ds;

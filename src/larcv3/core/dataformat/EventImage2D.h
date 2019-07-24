@@ -52,7 +52,7 @@ namespace larcv3 {
     void move(std::vector<larcv3::Image2D>& image_v)
     { image_v = std::move(_image_v); }
     
-    void initialize (H5::Group * group);
+    void initialize (H5::Group * group, uint compression);
     void serialize  (H5::Group * group);
     void deserialize(H5::Group * group, size_t entry, bool reopen_groups=false);
 
@@ -65,6 +65,7 @@ namespace larcv3 {
 
     std::vector<larcv3::Image2D> _image_v;
 
+    uint _compression;
 
   };
 

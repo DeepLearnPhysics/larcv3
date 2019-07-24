@@ -8,7 +8,6 @@
 #include "larcv3/core/base/LArCVBaseUtilFunc.h"
 
 #define EVENT_ID_CHUNK_SIZE 100
-#define EVENT_ID_COMPRESSION 1
 
 
 #include <mutex>
@@ -19,6 +18,7 @@ IOManager::IOManager(IOMode_t mode, std::string name)
     : larcv_base(name),
       _io_mode(mode),
       _prepared(false),
+      _compression_override(1),
       _out_index(0),
       _out_entries(0),
       _out_file_name(""),
@@ -97,6 +97,8 @@ void IOManager::configure(const PSet& cfg) {
       (msg::Level_t)(cfg.get<unsigned short>("Verbosity", logger().level())));
   _io_mode = (IOMode_t)(cfg.get<unsigned short>("IOMode"));
   _out_file_name = cfg.get<std::string>("OutFileName", "");
+
+  _compression_override = cfg.get<uint>("Compression", _compression_override);
 
   _h5_core_driver = cfg.get<bool>("UseH5CoreDriver", false);
 
@@ -184,7 +186,7 @@ bool IOManager::initialize() {
     H5::DSetCreatPropList cparams;
     hsize_t chunk_dims[1] = {EVENT_ID_CHUNK_SIZE};
     cparams.setChunk(1, chunk_dims);
-    cparams.setDeflate(EVENT_ID_COMPRESSION);
+    cparams.setDeflate(_compression_override);
 
     _out_event_id_ds = _out_file.createDataSet(
         "Events/event_id", larcv3::EventID::get_datatype(), dataspace, cparams);
@@ -333,13 +335,13 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
         _out_group_v.resize(id + 1);
       }
       _out_group_v[id] = _out_file.createGroup(group_loc.c_str());
-      _product_ptr_v[id]->initialize(&_out_group_v[id]);
+      _product_ptr_v[id]->initialize(&_out_group_v[id], _compression_override);
       LARCV_DEBUG() << "Created Group " << group_loc << " @ " << &_out_group_v[id] << std::endl;
     }
     else{
       LARCV_DEBUG() << "kWRITE/kBOTH mode is on, but skipping storage for output group " << group_name << std::endl;
     }
-    
+  
   }
 
   return id;

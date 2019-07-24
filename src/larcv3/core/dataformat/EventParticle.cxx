@@ -5,7 +5,6 @@
 
 #define PARTICLE_EXTENTS_CHUNK_SIZE 100
 #define PARTICLE_DATA_CHUNK_SIZE 500
-#define PARTICLE_COMPRESSION 1
 
 
 #define EXTENTS_DATASET 0
@@ -224,7 +223,7 @@ namespace larcv3{
     return;
   }
 
-  void EventParticle::initialize(H5::Group * group){
+  void EventParticle::initialize(H5::Group * group, uint compression){
 
     // Initialize is ONLY meant to be called on an empty group.  So, verify this group 
     // is empty:
@@ -259,7 +258,9 @@ namespace larcv3{
     H5::DSetCreatPropList extents_cparms;
     hsize_t      extents_chunk_dims[1] ={PARTICLE_EXTENTS_CHUNK_SIZE};
     extents_cparms.setChunk( 1, extents_chunk_dims );
-    extents_cparms.setDeflate(PARTICLE_COMPRESSION);
+    if (compression){
+      extents_cparms.setDeflate(compression);
+    }
 
     // Create the extents dataset:
     H5::DataSet extents_ds = group->createDataSet("extents", 
@@ -286,7 +287,9 @@ namespace larcv3{
     H5::DSetCreatPropList particle_cparms;
     hsize_t      particle_chunk_dims[1] ={PARTICLE_DATA_CHUNK_SIZE};
     particle_cparms.setChunk( 1, particle_chunk_dims );
-    particle_cparms.setDeflate(PARTICLE_COMPRESSION);
+    if (compression){
+      particle_cparms.setDeflate(compression);
+    }
 
     // Create the extents dataset:
     H5::DataSet particle_ds = group->createDataSet("particles", 

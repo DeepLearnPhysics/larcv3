@@ -7,7 +7,6 @@
 #define IMAGE_EXTENTS_CHUNK_SIZE 1
 #define IMAGE_IDEXTENTS_CHUNK_SIZE 1000
 #define IMAGE_META_CHUNK_SIZE 1000
-#define IMAGE_COMPRESSION_LEVEL 1
 
 #define IMAGES_DATASET 0
 #define EXTENTS_DATASET 1
@@ -102,8 +101,7 @@ namespace larcv3 {
     return;
   }
 
-
-  void EventImage2D::initialize (H5::Group * group){
+  void EventImage2D::initialize (H5::Group * group, uint compression){
 
     // Image2D creates a set of tables:
     // 1) extents: indicates which entries in the image_extents table correspond to the entry
@@ -140,7 +138,9 @@ namespace larcv3 {
     H5::DSetCreatPropList extents_cparms;
     hsize_t      extents_chunk_dims[1] ={IMAGE_EXTENTS_CHUNK_SIZE};
     extents_cparms.setChunk( 1, extents_chunk_dims );
-    extents_cparms.setDeflate(IMAGE_COMPRESSION_LEVEL);
+    if (compression){
+        extents_cparms.setDeflate(compression);
+    }
     
     // Create the extents dataset:
     H5::DataSet extents_ds = group->createDataSet("extents", 
@@ -164,7 +164,9 @@ namespace larcv3 {
     H5::DSetCreatPropList image_extents_cparms;
     hsize_t      image_extents_chunk_dims[1] ={IMAGE_IDEXTENTS_CHUNK_SIZE};
     image_extents_cparms.setChunk( 1, image_extents_chunk_dims );
-    image_extents_cparms.setDeflate(IMAGE_COMPRESSION_LEVEL);
+    if (compression){
+        image_extents_cparms.setDeflate(compression);
+    }
     
     // Create the extents dataset:
     H5::DataSet image_extents_ds = group->createDataSet("image_extents", 
@@ -191,14 +193,16 @@ namespace larcv3 {
     H5::DSetCreatPropList image_meta_cparms;
     hsize_t      image_meta_chunk_dims[1] ={IMAGE_META_CHUNK_SIZE};
     image_meta_cparms.setChunk( 1, image_meta_chunk_dims );
-    image_meta_cparms.setDeflate(IMAGE_COMPRESSION_LEVEL);
+    if (compression){
+        image_meta_cparms.setDeflate(compression);
+    }
 
     // Create the extents dataset:
     H5::DataSet image_meta_ds = group->createDataSet("image_meta", 
       *_data_types[IMAGE_META_DATASET], image_meta_dataspace, image_meta_cparms);
 
 
-    
+    _compression = compression;
     return;
   }
   void EventImage2D::serialize  (H5::Group * group){
@@ -236,7 +240,9 @@ namespace larcv3 {
         H5::DSetCreatPropList image_cparms;
         hsize_t      image_chunk_dims[1] ={chunk_size};
         image_cparms.setChunk( 1, image_chunk_dims );
-        image_cparms.setDeflate(IMAGE_COMPRESSION_LEVEL);
+        if (_compression){
+            image_cparms.setDeflate(_compression);
+        }
         // Create the extents dataset:
         H5::DataSet image_ds = group->createDataSet("images", 
             *_data_types[IMAGES_DATASET], image_dataspace, image_cparms);

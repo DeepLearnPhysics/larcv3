@@ -35,7 +35,7 @@ namespace larcv3 {
     virtual ~EventBase() = 0;
 
     virtual void clear() = 0;
-    virtual void initialize(H5::Group *) = 0;
+    virtual void initialize(H5::Group *, uint compression) = 0;
     virtual void serialize(H5::Group * group) = 0;
     virtual void deserialize(H5::Group * group, size_t entry, bool reopen_groups) = 0;
 
