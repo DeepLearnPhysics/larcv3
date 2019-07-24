@@ -166,6 +166,8 @@ namespace larcv3 {
           output_meta.set_dimension(1, output_rows, output_rows);
           // output_meta.update(output_rows, output_cols);
           image_v.push_back(Image2D(output_meta));
+          std::vector<size_t> coords1; coords1.resize(2);
+          std::vector<size_t> coords2; coords2.resize(2);
 
           for ( size_t col = offset_cols; col < output_cols - offset_cols; col ++ ){
             for (size_t row = offset_rows; row < output_rows - offset_rows; row ++ ){
@@ -179,14 +181,13 @@ namespace larcv3 {
                      orig_row < (row - offset_rows + 1)*row_compression;
                      orig_row ++){
                   if (orig_row >= img.meta().rows()) continue;
-                  std::vector<size_t> coords;
-                  coords.push_back(orig_col);
-                  coords.push_back(orig_row);
+                  coords1[0] = orig_col;
+                  coords1[1] = orig_row;
                   if (mode == Image2D::kMaxPool){
-                    value = ( value < img.pixel(coords) ) ? img.pixel(coords) : value;
+                    value = ( value < img.pixel(coords1) ) ? img.pixel(coords1) : value;
                   }
                   else{
-                    value += img.pixel(coords);
+                    value += img.pixel(coords1);
                     count ++;
                   }
 
@@ -196,10 +197,9 @@ namespace larcv3 {
                 value /= (float) count;
               }
 
-              std::vector<size_t> coords;
-              coords.push_back(col);
-              coords.push_back(row);
-              image_v.back().set_pixel(coords, value);
+              coords2[0] = col;
+              coords2[1] = row;
+              image_v.back().set_pixel(coords2, value);
             }
           }
 
@@ -235,15 +235,15 @@ namespace larcv3 {
 
             _new_cluster.id(cluster.id());
             // Loop over voxels in this cluster
+            std::vector<size_t> new_coordinates; new_coordinates.resize(2);
             for (auto & voxel : cluster.as_vector()){
               // Need to calculate the original row, column in order to
               // Find the new row, colum, which tells the new index
               auto original_coords = original_meta.coordinates(voxel.id());
               auto original_row = original_coords[1];
               auto original_col = original_coords[0];
-              std::vector<size_t> new_coordinates;
-              new_coordinates.push_back((original_col / col_compression) + offset_cols);
-              new_coordinates.push_back((original_row / row_compression) + offset_rows);
+              new_coordinates[0] = (original_col / col_compression) + offset_cols;
+              new_coordinates[1] = (original_row / row_compression) + offset_rows;
               auto new_index    = new_meta.index(new_coordinates);
               float value = voxel.value();
               if (mode == Image2D::kMaxPool){
