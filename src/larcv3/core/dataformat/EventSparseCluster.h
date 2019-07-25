@@ -65,9 +65,9 @@ namespace larcv3 {
 
 
     // IO functions:
-    void initialize (H5::Group * group);
+    void initialize (H5::Group * group, uint compression);
     void serialize  (H5::Group * group);
-    void deserialize(H5::Group * group, size_t entry);
+    void deserialize(H5::Group * group, size_t entry, bool reopen_groups=false);
 
 
     static EventSparseCluster * to_sparse_cluster(EventBase * e){
@@ -75,7 +75,8 @@ namespace larcv3 {
     }
 
   private:
-    void open_datasets(H5::Group * group);
+    void open_in_datasets(H5::Group * group);
+    void open_out_datasets(H5::Group * group);
     std::vector<larcv3::SparseCluster<dimension> > _cluster_v;
 
   };

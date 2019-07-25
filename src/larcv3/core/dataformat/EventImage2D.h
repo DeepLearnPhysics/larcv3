@@ -52,18 +52,20 @@ namespace larcv3 {
     void move(std::vector<larcv3::Image2D>& image_v)
     { image_v = std::move(_image_v); }
     
-    void initialize (H5::Group * group);
+    void initialize (H5::Group * group, uint compression);
     void serialize  (H5::Group * group);
-    void deserialize(H5::Group * group, size_t entry);
+    void deserialize(H5::Group * group, size_t entry, bool reopen_groups=false);
 
     static EventImage2D * to_image2d(EventBase * e){
       return (EventImage2D *) e;
     }
   private:
-    void open_datasets(H5::Group * group);
+    void open_in_datasets(H5::Group * group);
+    void open_out_datasets(H5::Group * group);
 
     std::vector<larcv3::Image2D> _image_v;
 
+    uint _compression;
 
   };
 

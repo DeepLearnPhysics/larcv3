@@ -40,6 +40,7 @@ namespace larcv3 {
   public:
     /// Three IO modes: read, write, or read-and-write
     enum IOMode_t { kREAD, kWRITE, kBOTH };
+    enum ProductStatus_t {kUnknown, kInputFileUnread, kInputFileRead, kOutputOnly, kVirtual};
 
     /// Default constructor
     IOManager(IOMode_t mode = kREAD, std::string name = "IOManager");
@@ -140,8 +141,11 @@ namespace larcv3 {
     size_t register_producer(const ProducerName_t& name);
 
     void open_new_input_file(std::string filename);
+    void read_current_event_id();
 
     void append_event_id();
+
+
 
     // The hdf5 model enforces the same number of entries per group,
     // since the entry list is defined per file.
@@ -152,21 +156,21 @@ namespace larcv3 {
     // General Parameters
     IOMode_t    _io_mode;
     bool        _prepared;
+    // This can override the compression level across the entire file:
+    uint _compression_override;
 
 
-    // Output Parameters
+    // Parameters controlling output file large scale tracking:
     // Name of the output file
     H5::H5File  _out_file; 
     // Current output index
     size_t      _out_index;
     // Total output entries 
     size_t      _out_entries;
-    // Output groups.  Since these are stored and need to be initialized, this is a member:
-    std::vector<H5::Group*>         _out_group_v;
     // Output file name:
     std::string _out_file_name;
 
-    // Input Parameters
+    // Parameters controllign input file large scale tracking:
     // Current index in the input files
     size_t      _in_index;
     size_t      _current_offset;
@@ -180,14 +184,10 @@ namespace larcv3 {
     std::vector<std::string>        _in_dir_v;
     // Currently open file:
     H5::H5File  _in_open_file;
-
-   
-    // List of total entries in input files?
+    // List of total entries in input files
     std::vector<size_t>             _in_entries_v;
-    // List of producer/product pairs in the input files
-    std::map<larcv3::ProducerName_t, larcv3::ProducerID_t> _in_key_list;
 
-    // Event id information:
+    // Parameters for the event ID management:     
     EventID   _event_id;
     EventID   _set_event_id;
     EventID   _last_event_id;
@@ -195,15 +195,32 @@ namespace larcv3 {
     H5::DataSet    _active_in_event_id_dataset;
     H5::DataSpace  _active_in_event_id_dataspace;
 
+
+    // Parameters controlling the internals of an event.
+    // Dealing with input groups:
+
+
+    // Output groups.  Since these are stored and need to be initialized, this is a member:
+    std::vector<H5::Group> _out_group_v;
+
+
+    // Key list keeps track of the mapping from producer/product to an id:
+    std::map<larcv3::ProducerName_t, larcv3::ProducerID_t> _key_list;
+    // This is the key list for all producers in the input file only:
+    std::map<larcv3::ProducerName_t, larcv3::ProducerID_t> _in_key_list;
+   
+
+
+
     std::map<std::string, H5::Group> _groups;
 
 
     // Keeping track of products and producers:
-    std::map<larcv3::ProducerName_t, larcv3::ProducerID_t> _key_list;
     size_t                          _product_ctr;
     std::vector<larcv3::EventBase*> _product_ptr_v;
     std::vector<std::string>        _product_type_v;
     std::vector<std::string>        _producer_name_v;
+    std::vector<ProductStatus_t>    _product_status_v;
 
     // General IO:
     std::map<std::string,std::set<std::string> > _store_only;
@@ -212,9 +229,13 @@ namespace larcv3 {
     std::vector<bool> _read_id_bool;
     bool _h5_core_driver;
 
+
     // IOManager has to control the EventID dataset it's self for the output file.
-    H5::DataSet _out_event_id_ds;
+    H5::DataSet  _out_event_id_ds;
     H5::DataType _event_id_datatype;
+
+    // Internal bookkeeping for when the input file switches:
+    bool _force_reopen_groups;
 
   };
 

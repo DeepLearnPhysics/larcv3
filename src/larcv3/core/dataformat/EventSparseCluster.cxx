@@ -8,7 +8,6 @@
 #define VOXEL_META_CHUNK_SIZE 100
 #define VOXEL_DATA_CHUNK_SIZE 1000
 #define IMAGE_META_CHUNK_SIZE 100
-#define VOXEL_COMPRESSION 1
 
 #define EXTENTS_DATASET 0
 #define CLUSTER_EXTENTS_DATASET 1
@@ -93,7 +92,7 @@ namespace larcv3 {
 
   // IO functions: 
   template<size_t dimension> 
-  void EventSparseCluster<dimension>::initialize (H5::Group * group){
+  void EventSparseCluster<dimension>::initialize (H5::Group * group, uint compression){
 
 
     if (group -> getNumObjs() != 0){
@@ -131,7 +130,9 @@ namespace larcv3 {
     H5::DSetCreatPropList extents_cparms;
     hsize_t      extents_chunk_dims[1] ={VOXEL_EXTENTS_CHUNK_SIZE};
     extents_cparms.setChunk( 1, extents_chunk_dims );
-    extents_cparms.setDeflate(VOXEL_COMPRESSION);
+    if (compression){
+      extents_cparms.setDeflate(compression);
+    }
 
     // Create the extents dataset:
     H5::DataSet extents_ds = group->createDataSet("extents", *_data_types[EXTENTS_DATASET], extents_dataspace, extents_cparms);
@@ -156,7 +157,9 @@ namespace larcv3 {
     H5::DSetCreatPropList projection_extents_cparms;
     hsize_t      projection_extents_chunk_dims[1] ={VOXEL_IDEXTENTS_CHUNK_SIZE};
     projection_extents_cparms.setChunk( 1, projection_extents_chunk_dims );
-    projection_extents_cparms.setDeflate(VOXEL_COMPRESSION);
+    if (compression){
+      projection_extents_cparms.setDeflate(compression);
+    }
 
     // Create the extents dataset:
     H5::DataSet projection_extents_ds = group->createDataSet("projection_extents", 
@@ -181,7 +184,9 @@ namespace larcv3 {
     H5::DSetCreatPropList image_meta_cparms;
     hsize_t      image_meta_chunk_dims[1] ={IMAGE_META_CHUNK_SIZE};
     image_meta_cparms.setChunk( 1, image_meta_chunk_dims );
-    image_meta_cparms.setDeflate(VOXEL_COMPRESSION);
+    if (compression){
+      image_meta_cparms.setDeflate(compression);
+    }
 
     // Create the extents dataset:
     H5::DataSet image_meta_ds = group->createDataSet("image_meta", 
@@ -206,7 +211,9 @@ namespace larcv3 {
     H5::DSetCreatPropList cluster_extents_cparms;
     hsize_t      cluster_extents_chunk_dims[1] ={VOXEL_IDEXTENTS_CHUNK_SIZE};
     cluster_extents_cparms.setChunk( 1, cluster_extents_chunk_dims );
-    cluster_extents_cparms.setDeflate(VOXEL_COMPRESSION);
+    if (compression){
+      cluster_extents_cparms.setDeflate(compression);
+    }
 
     // Create the extents dataset:
     H5::DataSet cluster_extents_ds = group->createDataSet("cluster_extents", 
@@ -231,7 +238,9 @@ namespace larcv3 {
     H5::DSetCreatPropList voxel_cparms;
     hsize_t      voxel_chunk_dims[1] ={VOXEL_DATA_CHUNK_SIZE};
     voxel_cparms.setChunk( 1, voxel_chunk_dims );
-    voxel_cparms.setDeflate(VOXEL_COMPRESSION);
+    if (compression){
+      voxel_cparms.setDeflate(compression);
+    }
 
     // Create the extents dataset:
     H5::DataSet voxel_ds = group->createDataSet("voxels", 
@@ -241,28 +250,52 @@ namespace larcv3 {
   }
 
   template<size_t dimension> 
-  void EventSparseCluster<dimension>::open_datasets(H5::Group * group){
+  void EventSparseCluster<dimension>::open_in_datasets(H5::Group * group){
 
-    if (_open_datasets.size() < N_DATASETS ){
-        std::cout << "Opening datasets" << std::endl;
-       _open_datasets.resize(N_DATASETS);
-       _open_dataspaces.resize(N_DATASETS);
+    if (_open_in_datasets.size() < N_DATASETS ){
+       _open_in_datasets.resize(N_DATASETS);
+       _open_in_dataspaces.resize(N_DATASETS);
        
-       _open_datasets[EXTENTS_DATASET]            = group->openDataSet("extents");
-       _open_dataspaces[EXTENTS_DATASET]          = _open_datasets[EXTENTS_DATASET].getSpace();
+       _open_in_datasets[EXTENTS_DATASET]            = group->openDataSet("extents");
+       _open_in_dataspaces[EXTENTS_DATASET]          = _open_in_datasets[EXTENTS_DATASET].getSpace();
 
-       _open_datasets[PROJECTION_DATASET]         = group->openDataSet("projection_extents");
-       _open_dataspaces[PROJECTION_DATASET]       = _open_datasets[PROJECTION_DATASET].getSpace();
+       _open_in_datasets[PROJECTION_DATASET]         = group->openDataSet("projection_extents");
+       _open_in_dataspaces[PROJECTION_DATASET]       = _open_in_datasets[PROJECTION_DATASET].getSpace();
 
-       _open_datasets[CLUSTER_EXTENTS_DATASET]    = group->openDataSet("cluster_extents");
-       _open_dataspaces[CLUSTER_EXTENTS_DATASET]  = _open_datasets[CLUSTER_EXTENTS_DATASET].getSpace();
+       _open_in_datasets[CLUSTER_EXTENTS_DATASET]    = group->openDataSet("cluster_extents");
+       _open_in_dataspaces[CLUSTER_EXTENTS_DATASET]  = _open_in_datasets[CLUSTER_EXTENTS_DATASET].getSpace();
 
-       _open_datasets[IMAGE_META_DATASET]         = group->openDataSet("image_meta");
-       _open_dataspaces[IMAGE_META_DATASET]       = _open_datasets[IMAGE_META_DATASET].getSpace();
+       _open_in_datasets[IMAGE_META_DATASET]         = group->openDataSet("image_meta");
+       _open_in_dataspaces[IMAGE_META_DATASET]       = _open_in_datasets[IMAGE_META_DATASET].getSpace();
 
-       _open_datasets[VOXELS_DATASET]             = group->openDataSet("voxels");
-       _open_dataspaces[VOXELS_DATASET]           = _open_datasets[VOXELS_DATASET].getSpace();
+       _open_in_datasets[VOXELS_DATASET]             = group->openDataSet("voxels");
+       _open_in_dataspaces[VOXELS_DATASET]           = _open_in_datasets[VOXELS_DATASET].getSpace();
+     }
 
+    return;
+  }
+
+  template<size_t dimension> 
+  void EventSparseCluster<dimension>::open_out_datasets(H5::Group * group){
+
+    if (_open_out_datasets.size() < N_DATASETS ){
+       _open_out_datasets.resize(N_DATASETS);
+       _open_out_dataspaces.resize(N_DATASETS);
+       
+       _open_out_datasets[EXTENTS_DATASET]            = group->openDataSet("extents");
+       _open_out_dataspaces[EXTENTS_DATASET]          = _open_out_datasets[EXTENTS_DATASET].getSpace();
+
+       _open_out_datasets[PROJECTION_DATASET]         = group->openDataSet("projection_extents");
+       _open_out_dataspaces[PROJECTION_DATASET]       = _open_out_datasets[PROJECTION_DATASET].getSpace();
+
+       _open_out_datasets[CLUSTER_EXTENTS_DATASET]    = group->openDataSet("cluster_extents");
+       _open_out_dataspaces[CLUSTER_EXTENTS_DATASET]  = _open_out_datasets[CLUSTER_EXTENTS_DATASET].getSpace();
+
+       _open_out_datasets[IMAGE_META_DATASET]         = group->openDataSet("image_meta");
+       _open_out_dataspaces[IMAGE_META_DATASET]       = _open_out_datasets[IMAGE_META_DATASET].getSpace();
+
+       _open_out_datasets[VOXELS_DATASET]             = group->openDataSet("voxels");
+       _open_out_dataspaces[VOXELS_DATASET]           = _open_out_datasets[VOXELS_DATASET].getSpace();
     }
 
     return;
@@ -291,34 +324,34 @@ namespace larcv3 {
     // 5) Update the image_meta table with the meta vector for this object.
     // 6) Update the cluster_extents table with the cluster_extents vector for this object.
     // 7) Update the voxels table with the voxels from this event, using the cluster_extents vector
-
-    open_datasets(group);
+    open_out_datasets(group);
     /////////////////////////////////////////////////////////
     // Step 1: Get the current dataset dimensions
     /////////////////////////////////////////////////////////
 
+
     // Get the dataset current size
     hsize_t extents_dims_current[1];
-    _open_dataspaces[EXTENTS_DATASET].getSimpleExtentDims(extents_dims_current, NULL);
+    _open_out_dataspaces[EXTENTS_DATASET].getSimpleExtentDims(extents_dims_current, NULL);
 
 
     // Get the dataset current size
     hsize_t projection_extents_dims_current[1];
-    _open_dataspaces[PROJECTION_DATASET].getSimpleExtentDims(projection_extents_dims_current, NULL);
+    _open_out_dataspaces[PROJECTION_DATASET].getSimpleExtentDims(projection_extents_dims_current, NULL);
 
 
     // Get the dataset current size
     hsize_t image_meta_dims_current[1];
-    _open_dataspaces[IMAGE_META_DATASET].getSimpleExtentDims(image_meta_dims_current, NULL);
+    _open_out_dataspaces[IMAGE_META_DATASET].getSimpleExtentDims(image_meta_dims_current, NULL);
 
     // Get the dataset current size
     hsize_t cluster_extents_dims_current[1];
-    _open_dataspaces[CLUSTER_EXTENTS_DATASET].getSimpleExtentDims(cluster_extents_dims_current, NULL);
+    _open_out_dataspaces[CLUSTER_EXTENTS_DATASET].getSimpleExtentDims(cluster_extents_dims_current, NULL);
 
 
     // Get the dataset current size
     hsize_t voxels_dims_current[1];
-    _open_dataspaces[VOXELS_DATASET].getSimpleExtentDims(voxels_dims_current, NULL);
+    _open_out_dataspaces[VOXELS_DATASET].getSimpleExtentDims(voxels_dims_current, NULL);
 
 
     /////////////////////////////////////////////////////////
@@ -370,8 +403,9 @@ namespace larcv3 {
     hsize_t extents_size[1];
     extents_size[0] = extents_dims_current[0] + extents_slab_dims[0];
 
+
     // Extend the dataset to accomodate the new data
-    _open_datasets[EXTENTS_DATASET].extend(extents_size);
+    _open_out_datasets[EXTENTS_DATASET].extend(extents_size);
 
     // Create an extents object to go into the extents table:
 
@@ -385,8 +419,8 @@ namespace larcv3 {
     /////////////////////////////////////////////////////////
 
     // Now, select as a hyperslab the last section of data for writing:
-    _open_dataspaces[EXTENTS_DATASET] = _open_datasets[EXTENTS_DATASET].getSpace();
-    _open_dataspaces[EXTENTS_DATASET].selectHyperslab(H5S_SELECT_SET, 
+    _open_out_dataspaces[EXTENTS_DATASET] = _open_out_datasets[EXTENTS_DATASET].getSpace();
+    _open_out_dataspaces[EXTENTS_DATASET].selectHyperslab(H5S_SELECT_SET, 
       extents_slab_dims, extents_dims_current);
 
     // Define memory space:
@@ -394,8 +428,8 @@ namespace larcv3 {
 
 
     // Write the new data
-    _open_datasets[EXTENTS_DATASET].write(&(next_extents), 
-      *_data_types[EXTENTS_DATASET], extents_memspace, _open_dataspaces[EXTENTS_DATASET]);
+    _open_out_datasets[EXTENTS_DATASET].write(&(next_extents), 
+      *_data_types[EXTENTS_DATASET], extents_memspace, _open_out_dataspaces[EXTENTS_DATASET]);
 
 
 
@@ -414,7 +448,7 @@ namespace larcv3 {
     projection_extents_size[0] = projection_extents_dims_current[0] + projection_extents_slab_dims[0];
 
     // Extend the dataset to accomodate the new data
-    _open_datasets[PROJECTION_DATASET].extend(projection_extents_size);
+    _open_out_datasets[PROJECTION_DATASET].extend(projection_extents_size);
 
 
     /////////////////////////////////////////////////////////
@@ -422,16 +456,16 @@ namespace larcv3 {
     /////////////////////////////////////////////////////////
 
     // Select as a hyperslab the last section of data for writing:
-    _open_dataspaces[PROJECTION_DATASET] = _open_datasets[PROJECTION_DATASET].getSpace();
-    _open_dataspaces[PROJECTION_DATASET].selectHyperslab(H5S_SELECT_SET, projection_extents_slab_dims, projection_extents_dims_current);
+    _open_out_dataspaces[PROJECTION_DATASET] = _open_out_datasets[PROJECTION_DATASET].getSpace();
+    _open_out_dataspaces[PROJECTION_DATASET].selectHyperslab(H5S_SELECT_SET, projection_extents_slab_dims, projection_extents_dims_current);
 
     // Define memory space:
     H5::DataSpace projection_extents_memspace(1, projection_extents_slab_dims);
 
 
     // Write the new data
-    _open_datasets[PROJECTION_DATASET].write(&(projection_extents[0]), 
-      *_data_types[PROJECTION_DATASET], projection_extents_memspace, _open_dataspaces[PROJECTION_DATASET]);
+    _open_out_datasets[PROJECTION_DATASET].write(&(projection_extents[0]), 
+      *_data_types[PROJECTION_DATASET], projection_extents_memspace, _open_out_dataspaces[PROJECTION_DATASET]);
 
     /////////////////////////////////////////////////////////
     // Step 5: Write image meta
@@ -447,12 +481,12 @@ namespace larcv3 {
     image_meta_size[0] = image_meta_dims_current[0] + image_meta_slab_dims[0];
 
     // Extend the dataset to accomodate the new data
-    _open_datasets[IMAGE_META_DATASET].extend(image_meta_size);
+    _open_out_datasets[IMAGE_META_DATASET].extend(image_meta_size);
 
 
     // Select as a hyperslab the last section of data for writing:
-    _open_dataspaces[IMAGE_META_DATASET] = _open_datasets[IMAGE_META_DATASET].getSpace();
-    _open_dataspaces[IMAGE_META_DATASET].selectHyperslab(H5S_SELECT_SET, 
+    _open_out_dataspaces[IMAGE_META_DATASET] = _open_out_datasets[IMAGE_META_DATASET].getSpace();
+    _open_out_dataspaces[IMAGE_META_DATASET].selectHyperslab(H5S_SELECT_SET, 
       image_meta_slab_dims, image_meta_dims_current);
 
     // Define memory space:
@@ -460,9 +494,9 @@ namespace larcv3 {
 
 
     // Write the new data
-    _open_datasets[IMAGE_META_DATASET].write(&(image_meta[0]), 
+    _open_out_datasets[IMAGE_META_DATASET].write(&(image_meta[0]), 
       *_data_types[IMAGE_META_DATASET], image_meta_memspace, 
-      _open_dataspaces[IMAGE_META_DATASET]);
+      _open_out_dataspaces[IMAGE_META_DATASET]);
 
     /////////////////////////////////////////////////////////
     // Step 4: Update the cluster extents table
@@ -501,7 +535,7 @@ namespace larcv3 {
     cluster_extents_size[0] = cluster_extents_dims_current[0] + cluster_extents_slab_dims[0];
 
     // Extend the dataset to accomodate the new data
-    _open_datasets[CLUSTER_EXTENTS_DATASET].extend(cluster_extents_size);
+    _open_out_datasets[CLUSTER_EXTENTS_DATASET].extend(cluster_extents_size);
 
 
     /////////////////////////////////////////////////////////
@@ -509,8 +543,8 @@ namespace larcv3 {
     /////////////////////////////////////////////////////////
 
     // Select as a hyperslab the last section of data for writing:
-    _open_dataspaces[CLUSTER_EXTENTS_DATASET] = _open_datasets[CLUSTER_EXTENTS_DATASET].getSpace();
-    _open_dataspaces[CLUSTER_EXTENTS_DATASET].selectHyperslab(H5S_SELECT_SET, 
+    _open_out_dataspaces[CLUSTER_EXTENTS_DATASET] = _open_out_datasets[CLUSTER_EXTENTS_DATASET].getSpace();
+    _open_out_dataspaces[CLUSTER_EXTENTS_DATASET].selectHyperslab(H5S_SELECT_SET, 
       cluster_extents_slab_dims, cluster_extents_dims_current);
 
     // Define memory space:
@@ -518,9 +552,9 @@ namespace larcv3 {
 
 
     // Write the new data
-    _open_datasets[CLUSTER_EXTENTS_DATASET].write(&(cluster_extents[0]), 
+    _open_out_datasets[CLUSTER_EXTENTS_DATASET].write(&(cluster_extents[0]), 
       *_data_types[CLUSTER_EXTENTS_DATASET], 
-      cluster_extents_memspace, _open_dataspaces[CLUSTER_EXTENTS_DATASET]);
+      cluster_extents_memspace, _open_out_dataspaces[CLUSTER_EXTENTS_DATASET]);
 
 
     /////////////////////////////////////////////////////////
@@ -537,8 +571,8 @@ namespace larcv3 {
     voxels_size[0] = voxels_dims_current[0] + voxels_slab_dims[0];
 
     // Extend the dataset to accomodate the new data
-    _open_datasets[VOXELS_DATASET].extend(voxels_size);
-    _open_dataspaces[VOXELS_DATASET] = _open_datasets[VOXELS_DATASET].getSpace();
+    _open_out_datasets[VOXELS_DATASET].extend(voxels_size);
+    _open_out_dataspaces[VOXELS_DATASET] = _open_out_datasets[VOXELS_DATASET].getSpace();
 
     // Write all of the voxels to file:
 
@@ -561,7 +595,7 @@ namespace larcv3 {
         //           << std::endl;
 
         // Select as a hyperslab the last section of data for writing:
-        _open_dataspaces[VOXELS_DATASET].selectHyperslab(H5S_SELECT_SET,
+        _open_out_dataspaces[VOXELS_DATASET].selectHyperslab(H5S_SELECT_SET,
           new_voxels_slab_dims, offset_voxels_slab_dims);
 
         // Define memory space:
@@ -569,8 +603,8 @@ namespace larcv3 {
 
 
         // Write the new data
-        _open_datasets[VOXELS_DATASET].write(&(_cluster_v.at(projection_id).as_vector().at(cluster_id).as_vector()[0]), 
-          *_data_types[VOXELS_DATASET], voxels_memspace, _open_dataspaces[VOXELS_DATASET]);
+        _open_out_datasets[VOXELS_DATASET].write(&(_cluster_v.at(projection_id).as_vector().at(cluster_id).as_vector()[0]), 
+          *_data_types[VOXELS_DATASET], voxels_memspace, _open_out_dataspaces[VOXELS_DATASET]);
 
         starting_index += new_voxels_slab_dims[0];
       }
@@ -584,7 +618,7 @@ namespace larcv3 {
   }
 
   template<size_t dimension> 
-  void EventSparseCluster<dimension>::deserialize(H5::Group * group, size_t entry){
+  void EventSparseCluster<dimension>::deserialize(H5::Group * group, size_t entry, bool reopen_groups){
 
 
     // This function reads in a set of voxels for sparse clusters
@@ -595,8 +629,13 @@ namespace larcv3 {
     // 4) Use the projection_extents information to get the cluster extents information
     // 5) Use the cluster_extents information to read the correct voxels
     // 6) Update the meta for each set correctly
+    
+    if (reopen_groups){
+      _open_in_dataspaces.clear();
+      _open_in_datasets.clear();
+    }
 
-    open_datasets(group);
+    open_in_datasets(group);
     /////////////////////////////////////////////////////////
     // Step 1: Get the extents information from extents dataset
     /////////////////////////////////////////////////////////
@@ -620,7 +659,7 @@ namespace larcv3 {
 
     // Now, select as a hyperslab the last section of data for writing:
     // _open_datapaces[EXTENTS_DATASET] = extents_dataset.getSpace();
-    _open_dataspaces[EXTENTS_DATASET].selectHyperslab(H5S_SELECT_SET, 
+    _open_in_dataspaces[EXTENTS_DATASET].selectHyperslab(H5S_SELECT_SET, 
       extents_slab_dims, extents_offset);
 
     // Define memory space:
@@ -628,8 +667,8 @@ namespace larcv3 {
 
     Extents_t input_extents;
     // Write the new data
-    _open_datasets[EXTENTS_DATASET].read(&(input_extents), *_data_types[EXTENTS_DATASET],
-     extents_memspace, _open_dataspaces[EXTENTS_DATASET]);
+    _open_in_datasets[EXTENTS_DATASET].read(&(input_extents), *_data_types[EXTENTS_DATASET],
+     extents_memspace, _open_in_dataspaces[EXTENTS_DATASET]);
 
 
     /////////////////////////////////////////////////////////
@@ -653,8 +692,8 @@ namespace larcv3 {
     projection_extents_offset[0] = input_extents.first;
 
     // Now, select as a hyperslab the last section of data for writing:
-    // _open_datapaces[EXTENTS_DATASET] = extents_dataset.getSpace();
-    _open_dataspaces[PROJECTION_DATASET].selectHyperslab(H5S_SELECT_SET, 
+    // _open_in_datapaces[EXTENTS_DATASET] = extents_dataset.getSpace();
+    _open_in_dataspaces[PROJECTION_DATASET].selectHyperslab(H5S_SELECT_SET, 
       projection_extents_slab_dims, projection_extents_offset);
 
 
@@ -665,9 +704,9 @@ namespace larcv3 {
     // Reserve space for reading in projection_extents:
     projection_extents.resize(input_extents.n);
 
-    _open_datasets[PROJECTION_DATASET].read(&(projection_extents[0]), 
+    _open_in_datasets[PROJECTION_DATASET].read(&(projection_extents[0]), 
       *_data_types[PROJECTION_DATASET], projection_extents_memspace, 
-      _open_dataspaces[PROJECTION_DATASET]);
+      _open_in_dataspaces[PROJECTION_DATASET]);
 
     // std::cout << "voxel_extents.size(): " << voxel_extents.size() << std::endl;
 
@@ -686,8 +725,8 @@ namespace larcv3 {
     image_meta_offset[0] = input_extents.first;
 
     // Now, select as a hyperslab the last section of data for writing:
-    // _open_datapaces[EXTENTS_DATASET] = extents_dataset.getSpace();
-    _open_dataspaces[IMAGE_META_DATASET].selectHyperslab(H5S_SELECT_SET,
+    // _open_in_datapaces[EXTENTS_DATASET] = extents_dataset.getSpace();
+    _open_in_dataspaces[IMAGE_META_DATASET].selectHyperslab(H5S_SELECT_SET,
      image_meta_slab_dims, image_meta_offset);
 
 
@@ -698,10 +737,10 @@ namespace larcv3 {
     // Reserve space for reading in image_meta:
     image_meta.resize(input_extents.n);
 
-    _open_datasets[IMAGE_META_DATASET].read(&(image_meta[0]), 
+    _open_in_datasets[IMAGE_META_DATASET].read(&(image_meta[0]), 
       *_data_types[IMAGE_META_DATASET], 
       image_meta_memspace, 
-      _open_dataspaces[IMAGE_META_DATASET]);
+      _open_in_dataspaces[IMAGE_META_DATASET]);
 
     // std::cout << "image_meta.size(): " << image_meta.size() << std::endl;
         
@@ -723,8 +762,8 @@ namespace larcv3 {
     cluster_extents_offset[0] = projection_extents.front().first;
 
     // Now, select as a hyperslab the last section of data for writing:
-    // _open_datapaces[EXTENTS_DATASET] = extents_dataset.getSpace();
-    _open_dataspaces[CLUSTER_EXTENTS_DATASET].selectHyperslab(H5S_SELECT_SET, 
+    // _open_in_datapaces[EXTENTS_DATASET] = extents_dataset.getSpace();
+    _open_in_dataspaces[CLUSTER_EXTENTS_DATASET].selectHyperslab(H5S_SELECT_SET, 
       cluster_extents_slab_dims, cluster_extents_offset);
 
 
@@ -735,8 +774,8 @@ namespace larcv3 {
     // Reserve space for reading in cluster_extents:
     cluster_extents.resize(n_total_clusters);
 
-    _open_datasets[CLUSTER_EXTENTS_DATASET].read(&(cluster_extents[0]), 
-      *_data_types[CLUSTER_EXTENTS_DATASET], cluster_extents_memspace, _open_dataspaces[CLUSTER_EXTENTS_DATASET]);
+    _open_in_datasets[CLUSTER_EXTENTS_DATASET].read(&(cluster_extents[0]), 
+      *_data_types[CLUSTER_EXTENTS_DATASET], cluster_extents_memspace, _open_in_dataspaces[CLUSTER_EXTENTS_DATASET]);
 
     // std::cout << "voxel_extents.size(): " << voxel_extents.size() << std::endl;
 
@@ -781,7 +820,7 @@ namespace larcv3 {
         //           << "offset: " << voxels_offset[0] << "\n"
         //           << std::endl;
         // Now, select as a hyperslab the last section of data for readomg:
-        _open_dataspaces[VOXELS_DATASET].selectHyperslab(H5S_SELECT_SET,
+        _open_in_dataspaces[VOXELS_DATASET].selectHyperslab(H5S_SELECT_SET,
           voxels_slab_dims, voxels_offset);
 
 
@@ -796,8 +835,8 @@ namespace larcv3 {
 
         // Reserve space for reading in voxels:
 
-        _open_datasets[VOXELS_DATASET].read(&(temp_voxel_vector[0]), 
-          *_data_types[VOXELS_DATASET], voxels_memspace, _open_dataspaces[VOXELS_DATASET]);
+        _open_in_datasets[VOXELS_DATASET].read(&(temp_voxel_vector[0]), 
+          *_data_types[VOXELS_DATASET], voxels_memspace, _open_in_dataspaces[VOXELS_DATASET]);
 
         // std::cout << "temp_voxel_vector.size(): " << temp_voxel_vector.size() << std::endl;
 

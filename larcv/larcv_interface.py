@@ -34,9 +34,9 @@ class larcv_interface(object):
         self._writer      = None
 
 
-    def __del__(self):
-        # Make sure to stop readers when going out of scope.
-        self.stop()
+    # def __del__(self):
+    #     # Make sure to stop readers when going out of scope.
+    #     self.stop()
 
     def prepare_writer(self, io_config, output_file=None):
 
