@@ -15,7 +15,10 @@ setup(
     cmake_source_dir='src/',
     cmake_args=[
         '-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.9',
-        '-DCMAKE_NO_SWIG=False'
+        '-DCMAKE_NO_SWIG=False',
+        '-DMPI:BOOL=ON',
+        # '-DCMAKE_C_COMPILER=mpicc',
+        # '-DCMAKE_CXX_COMPILER=mpicxx',
     ],
     # extra_link_args=["-stdlib=libc++", "-mmacosx-version-min=10.9"],
     include_package_data=True,

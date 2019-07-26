@@ -135,7 +135,7 @@ namespace larcv3 {
 
 
 
-  private:
+  protected:
     void   set_id();
     void   prepare_input();
     size_t register_producer(const ProducerName_t& name);
@@ -210,7 +210,8 @@ namespace larcv3 {
     std::map<larcv3::ProducerName_t, larcv3::ProducerID_t> _in_key_list;
    
 
-
+    // Hold a copy of the file access property list:
+    H5::FileAccPropList _fapl;
 
     std::map<std::string, H5::Group> _groups;
 

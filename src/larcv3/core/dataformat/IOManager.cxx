@@ -29,6 +29,7 @@ IOManager::IOManager(IOMode_t mode, std::string name)
       _in_file_v(),
       _in_dir_v(),
       _key_list(),
+      _fapl(H5::FileAccPropList::DEFAULT),
       _product_ctr(0),
       _product_ptr_v(),
       _product_type_v(),
@@ -101,6 +102,12 @@ void IOManager::configure(const PSet& cfg) {
   _compression_override = cfg.get<uint>("Compression", _compression_override);
 
   _h5_core_driver = cfg.get<bool>("UseH5CoreDriver", false);
+  if (_h5_core_driver) {
+    LARCV_INFO() << "File will be stored entirely on memory." << std::endl;
+    // 1024 is number of bytes to increment each time more memory is needed; 
+    //'false': do not write contents to disk when the file is closed
+    _fapl.setCore(1024, false);
+  } 
 
   // Figure out input files
   _in_file_v.clear();
@@ -509,18 +516,14 @@ void IOManager::prepare_input() {
 
 }
 
+
+
 void IOManager::open_new_input_file(std::string filename){
   
-  H5::FileAccPropList  fapl(H5::FileAccPropList::DEFAULT);
 
-  if (_h5_core_driver) {
-    LARCV_INFO() << "File will be stored entirely on memory." << std::endl;
-    // 1024 is number of bytes to increment each time more memory is needed; 
-    //'false': do not write contents to disk when the file is closed
-    fapl.setCore(1024, false);
-  } 
+
   try{
-    _in_open_file = H5::H5File(filename.c_str(), H5F_ACC_RDONLY, H5::FileCreatPropList::DEFAULT, fapl);
+    _in_open_file = H5::H5File(filename.c_str(), H5F_ACC_RDONLY, H5::FileCreatPropList::DEFAULT, _fapl);
   }
   catch ( ... ) {
     LARCV_CRITICAL() << "Open attempt failed for a file: " << filename

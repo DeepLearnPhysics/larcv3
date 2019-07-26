@@ -2,17 +2,32 @@ add_subdirectory(core)
 add_subdirectory(app)
 
 # This is admittedly pretty clunky, but it gets the job done to make one object file:
-add_library(larcv3 SHARED 
-    $<TARGET_OBJECTS:base> 
-    $<TARGET_OBJECTS:dataformat> 
-    $<TARGET_OBJECTS:processor> 
-    $<TARGET_OBJECTS:pyutil> 
-    $<TARGET_OBJECTS:cpputil> 
-    $<TARGET_OBJECTS:filter> 
-    $<TARGET_OBJECTS:threadio> 
-    $<TARGET_OBJECTS:imagemod> 
-    $<TARGET_OBJECTS:sbnd_imagemod> 
-    )
+if(MPI)
+    add_library(larcv3 SHARED 
+        $<TARGET_OBJECTS:base> 
+        $<TARGET_OBJECTS:dataformat> 
+        $<TARGET_OBJECTS:processor> 
+        $<TARGET_OBJECTS:pyutil> 
+        $<TARGET_OBJECTS:cpputil> 
+        $<TARGET_OBJECTS:filter> 
+        $<TARGET_OBJECTS:threadio> 
+        $<TARGET_OBJECTS:imagemod> 
+        $<TARGET_OBJECTS:sbnd_imagemod> 
+        $<TARGET_OBJECTS:mpi_io>
+        )
+else()
+        add_library(larcv3 SHARED 
+        $<TARGET_OBJECTS:base> 
+        $<TARGET_OBJECTS:dataformat> 
+        $<TARGET_OBJECTS:processor> 
+        $<TARGET_OBJECTS:pyutil> 
+        $<TARGET_OBJECTS:cpputil> 
+        $<TARGET_OBJECTS:filter> 
+        $<TARGET_OBJECTS:threadio> 
+        $<TARGET_OBJECTS:imagemod> 
+        $<TARGET_OBJECTS:sbnd_imagemod> 
+        )
+endif()
 
 # Link against hdf5:
 target_link_libraries(larcv3 ${HDF5_CXX_LIBRARIES})
@@ -20,6 +35,10 @@ target_link_libraries(larcv3 ${HDF5_CXX_LIBRARIES})
 # Link against python:
 target_link_libraries(larcv3 ${PYTHON_LIBRARIES})
  
+
+if (MPI)
+    target_link_libraries(larcv3 ${MPI_LIBRARIES})
+endif()
 
 if(${CMAKE_NO_SWIG})
     message("Swig bingings turned OFF")
