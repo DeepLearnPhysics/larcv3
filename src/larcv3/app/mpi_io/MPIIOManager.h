@@ -49,12 +49,16 @@ namespace larcv3 {
     /// Destructor
     ~MPIIOManager();
 
-    bool initialize();
+    bool initialize(int color=0);
 
   private:
 
     void open_new_input_file(std::string filename);
-   
+
+    MPI_Comm _private_comm;
+    int _private_rank;
+    int _private_size;
+
   };
 
 }

@@ -104,10 +104,10 @@ void IOManager::configure(const PSet& cfg) {
   _h5_core_driver = cfg.get<bool>("UseH5CoreDriver", false);
   if (_h5_core_driver) {
     LARCV_INFO() << "File will be stored entirely on memory." << std::endl;
-    // 1024 is number of bytes to increment each time more memory is needed; 
+    // 1024 is number of bytes to increment each time more memory is needed;
     //'false': do not write contents to disk when the file is closed
     _fapl.setCore(1024, false);
-  } 
+  }
 
   // Figure out input files
   _in_file_v.clear();
@@ -162,7 +162,7 @@ void IOManager::configure(const PSet& cfg) {
   }
 }
 
-bool IOManager::initialize() {
+bool IOManager::initialize(int _placeholder) {
   LARCV_DEBUG() << "start" << std::endl;
 
   // Lock:
@@ -234,7 +234,7 @@ bool IOManager::initialize() {
         // Else:
         // Add it to the store only list:
         else{
-          store_only_id.push_back(id);          
+          store_only_id.push_back(id);
         }
       }
     }
@@ -320,9 +320,9 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
     // But we can't create and output group if we are not storing that product.
 
     // Check _store_only instead:
-    
+
     bool storing(false);
-    
+
     if (_store_only.empty()){
       storing = true;
     }
@@ -334,7 +334,7 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
 
 
 
-    if (storing){ 
+    if (storing){
       LARCV_INFO() << "kWRITE/kBOTH mode: creating an output group" << std::endl;
       LARCV_INFO() << "Data pointer: " << _product_ptr_v[id] << "(" << id << "/"
                     << _product_ptr_v.size() << ")" << std::endl;
@@ -348,7 +348,7 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
     else{
       LARCV_DEBUG() << "kWRITE/kBOTH mode is on, but skipping storage for output group " << group_name << std::endl;
     }
-  
+
   }
 
   return id;
@@ -438,12 +438,12 @@ void IOManager::prepare_input() {
     _in_entries_v.push_back(dims_current[0]);
     _in_entries_total += dims_current[0];
 
-    
+
     // Next, visit the available groups and see what producers are available.
     std::set<std::string> processed_object;
     for (size_t i_obj = 0; i_obj < data.getNumObjs(); ++i_obj) {
       char temp_name[128];
-      // std::string obj_name = 
+      // std::string obj_name =
       int real_size = data.getObjnameByIdx(i_obj, temp_name, 128);
       std::string obj_name(temp_name);
       processed_object.insert(obj_name);
@@ -519,7 +519,7 @@ void IOManager::prepare_input() {
 
 
 void IOManager::open_new_input_file(std::string filename){
-  
+
 
 
   try{
@@ -537,7 +537,7 @@ void IOManager::open_new_input_file(std::string filename){
 }
 
 bool IOManager::read_entry(const size_t index, bool force_reload) {
-  
+
   __ioman_mtx.lock();
 
   // Don't reopen groups unless absolutely necessary:
@@ -689,9 +689,9 @@ bool IOManager::save_entry() {
   // in kBOTH mode make sure all Group entries are read-in
   if (_io_mode == kBOTH) {
     for (size_t id = 0; id < _out_group_v.size(); ++id) {
-      if ( _store_id_bool.size() && 
-           (id >= _store_id_bool.size() || !_store_id_bool[id]) 
-          ) continue; 
+      if ( _store_id_bool.size() &&
+           (id >= _store_id_bool.size() || !_store_id_bool[id])
+          ) continue;
       if (_product_status_v[id] == kInputFileUnread){
         get_data(id);
         _product_status_v[id] = kInputFileRead;

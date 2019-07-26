@@ -2,7 +2,7 @@
  * \file ProcessDriver.h
  *
  * \ingroup core_Processor
- * 
+ *
  * \brief Class def header for a class larcv3::ProcessDriver
  *
  * @author drinkingkazu
@@ -27,9 +27,9 @@ namespace larcv3 {
      The configuration of larcv3::ProcessDriver itself can contain larcv3::IOManager configuration.
   */
   class ProcessDriver : public larcv_base {
-    
+
   public:
-    
+
     /// Default constructor
     ProcessDriver(std::string name="ProcessDriver");
     /// Default destructor
@@ -70,20 +70,20 @@ namespace larcv3 {
     /// Must be called after initialize() or process_entry/batch_process. Closes IO and calls finalize method of process modules.
     void finalize();
 
-    inline void clear_entry(){_io.clear_entry();}
+    inline void clear_entry(){_io->clear_entry();}
 
     //
     // Information setter method
     //
     /// A method to force re-set the run/subrun/event ID of a currently processed event, useful when "creating an event".
     void set_id(size_t run, size_t subrun, size_t event)
-    { _io.set_id(run,subrun,event); }
+    { _io->set_id(run,subrun,event); }
     //
     // Information access methods
     //
     /// Returns larcv3::EventBase object that contains an "ID" (run/event integers)
-    inline const EventID& event_id() const 
-    { return ( _io.io_mode() == larcv3::IOManager::kREAD ? _io.event_id() : _io.last_event_id()); }
+    inline const EventID& event_id() const
+    { return ( _io->io_mode() == larcv3::IOManager::kREAD ? _io->event_id() : _io->last_event_id()); }
     /// Returns a unique ID (integer) assigned for a process module (provide the module's name in argument)
     ProcessID_t process_id(std::string name) const;
     /// Returns the set of process modules' name
@@ -93,13 +93,13 @@ namespace larcv3 {
     /// Returns an attached process module's pointer given a unique ID in the argument
     const ProcessBase* process_ptr(ProcessID_t id) const;
     /// Returns read-only larcv3::IOManager instance
-    const IOManager& io() const { return _io; }
-    /// When run in random-access IO mode, returns original event entry number for a randomized index number 
+    const IOManager& io() const { return * _io; }
+    /// When run in random-access IO mode, returns original event entry number for a randomized index number
     size_t get_tree_index( size_t entry ) const;
     /// Returns true if after any entry is processed (process_entry/batch_process) but not yet finalized
     inline bool processing() const { return _processing; }
 
-  private:
+  protected:
 
     bool _process_entry_();
     size_t _batch_start_entry;
@@ -108,7 +108,7 @@ namespace larcv3 {
     bool _enable_filter;
     int _random_access;
     std::vector<size_t> _access_entry_v;
-    IOManager _io;
+    IOManager * _io;
     std::map<std::string,larcv3::ProcessID_t> _proc_m;
     std::vector<larcv3::ProcessBase*> _proc_v;
     bool _processing;
@@ -117,5 +117,4 @@ namespace larcv3 {
 }
 
 #endif
-/** @} */ // end of doxygen group 
-
+/** @} */ // end of doxygen group
