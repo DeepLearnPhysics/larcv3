@@ -21,6 +21,10 @@
 
 #include "H5Cpp.h"
 
+#ifdef LARCV_MPI
+#include <mpi.h>
+#endif
+
 #include "larcv3/core/base/larcv_base.h"
 #include "larcv3/core/base/larbys.h"
 #include "larcv3/core/base/PSet.h"
@@ -63,7 +67,7 @@ namespace larcv3 {
     ProducerID_t producer_id(const ProducerName_t& name) const;
     std::string product_type(const size_t id) const;
     void configure(const PSet& cfg);
-    bool initialize(int _placeholder=0);
+    bool initialize(int color=0);
     bool read_entry(const size_t index, bool force_reload = false);
     bool save_entry();
     void finalize();
@@ -237,6 +241,15 @@ namespace larcv3 {
 
     // Internal bookkeeping for when the input file switches:
     bool _force_reopen_groups;
+
+    // MPI Variables:
+#ifdef LARCV_MPI
+
+    MPI_Comm _private_comm;
+    int _private_rank;
+    int _private_size;
+
+#endif
 
   };
 

@@ -162,8 +162,48 @@ void IOManager::configure(const PSet& cfg) {
   }
 }
 
-bool IOManager::initialize(int _placeholder) {
+bool IOManager::initialize(int color) {
   LARCV_DEBUG() << "start" << std::endl;
+
+#ifdef LARCV_MPI
+
+  int mpi_initialized;
+  MPI_Initialized(&mpi_initialized);
+
+  if (!mpi_initialized){
+    int ierr = MPI_Init(NULL, NULL) ;  
+  }
+
+  // Get the number of processes
+  int world_size;
+  MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+
+  // Get the rank of the process
+  int world_rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+
+
+  // The first step for this communicator is to divide COMM_WORLD
+  // based on the initialize parameter.  If color is not passed,
+  // This duplicates COMM_WORLD
+  MPI_Comm_split(
+    MPI_COMM_WORLD,
+    color,
+    world_rank,
+    &_private_comm);
+
+  // Get the number of processes
+  MPI_Comm_size(_private_comm, &_private_size);
+
+  // Get the rank of the process
+  MPI_Comm_rank(_private_comm, &_private_rank);
+
+  if (_io_mode != kREAD && _private_size != 1){
+    LARCV_CRITICAL() << "Only read only mode is compatible with MPI with more than one rank!" << std::endl;
+    throw larbys();
+  }
+
+#endif
 
   // Lock:
   __ioman_mtx.lock();
@@ -511,7 +551,8 @@ void IOManager::prepare_input() {
   }
 
   // Make sure the first file is open:
-  open_new_input_file(_in_file_v[0]);
+  if (_in_file_v.size() > 0) 
+    open_new_input_file(_in_file_v[0]);
 
 
 }
@@ -519,7 +560,6 @@ void IOManager::prepare_input() {
 
 
 void IOManager::open_new_input_file(std::string filename){
-
 
 
   try{
@@ -918,7 +958,9 @@ EventBase* IOManager::get_data(const size_t id) {
     }
 
     try {
+      LARCV_DEBUG() << "Calling deserialize for " << group_name << std::endl;
       _product_ptr_v[id]->deserialize(&group, _in_index - _current_offset, _force_reopen_groups);
+      LARCV_DEBUG() << "Done deserialize for " << group_name << std::endl;
       _product_status_v[id] = kInputFileRead;
     }
     catch (...){

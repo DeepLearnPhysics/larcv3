@@ -17,12 +17,11 @@ ProcessDriver::ProcessDriver(std::string name)
       _random_access(0),
       _proc_v(),
       _processing(false) {
-        _io = new IOManager();
       }
 
 void ProcessDriver::reset() {
   LARCV_DEBUG() << "Called" << std::endl;
-  _io->reset();
+  _io.reset();
   _enable_filter = false;
   _random_access = 0;
   for (size_t i = 0; i < _proc_v.size(); ++i) {
@@ -35,13 +34,13 @@ void ProcessDriver::reset() {
 
 void ProcessDriver::override_input_file(const std::vector<std::string>& flist) {
   LARCV_DEBUG() << "Called" << std::endl;
-  _io->clear_in_file();
-  for (auto const& f : flist) _io->add_in_file(f);
+  _io.clear_in_file();
+  for (auto const& f : flist) _io.add_in_file(f);
 }
 
 void ProcessDriver::override_output_file(const std::string fname) {
   LARCV_DEBUG() << "Called" << std::endl;
-  _io->set_out_file(fname);
+  _io.set_out_file(fname);
 }
 
 void ProcessDriver::override_ana_file(const std::string fname) {
@@ -101,7 +100,6 @@ void ProcessDriver::configure(const std::string config_file) {
     LARCV_CRITICAL() << "Config file not set!" << std::endl;
     throw larbys();
   }
-
   // check cfg content top level
   auto main_cfg = CreatePSetFromFile(config_file);
   if (!main_cfg.contains_pset(name())) {
@@ -111,6 +109,7 @@ void ProcessDriver::configure(const std::string config_file) {
                      << main_cfg.dump() << std::endl;
     throw larbys();
   }
+
   auto const cfg = main_cfg.get<larcv3::PSet>(name());
   configure(cfg);
 }
@@ -142,8 +141,7 @@ void ProcessDriver::configure(const PSet& cfg) {
 
   // Prepare IO manager
   LARCV_INFO() << "Configuring IO" << std::endl;
-  if (_io) delete _io;
-  _io =  new IOManager(io_config);
+  _io.configure(io_config);
   // Set ProcessDriver
   LARCV_INFO() << "Retrieving self (ProcessDriver) config" << std::endl;
   set_verbosity(
@@ -237,11 +235,11 @@ void ProcessDriver::initialize() {
 
   // Initialize IO
   LARCV_INFO() << "Initializing IO " << std::endl;
-  _io->initialize();
+  _io.initialize();
 
   // Handle invalid cases
-  auto const nentries = _io->get_n_entries();
-  auto const io_mode = _io->io_mode();
+  auto const nentries = _io.get_n_entries();
+  auto const io_mode = _io.io_mode();
 
   // Random access + write mode cannot be combined
   if (_random_access != 0 && io_mode == IOManager::kWRITE) {
@@ -297,25 +295,25 @@ bool ProcessDriver::_process_entry_() {
   bool good_status = true;
   // bool cleared=false;
   for (auto& p : _proc_v) {
-    good_status = good_status && p->_process_(*_io);
+    good_status = good_status && p->_process_(_io);
     if (!good_status && _enable_filter) break;
   }
   // No event-write to be done if _has_event_creator is set. Otherwise go ahead
   if (!_has_event_creator) {
     // If not read mode save entry
-    if (_io->io_mode() != IOManager::kREAD && (!_enable_filter || good_status)) {
+    if (_io.io_mode() != IOManager::kREAD && (!_enable_filter || good_status)) {
       // cleared = true;
-      _io->save_entry();
+      _io.save_entry();
     }
     /*
     if(!cleared)
-      _io->clear_entry();
+      _io.clear_entry();
     cleared=true;
     */
   }
   /*
-  if(!cleared && _io->io_mode() == IOManager::kREAD)
-    _io->clear_entry();
+  if(!cleared && _io.io_mode() == IOManager::kREAD)
+    _io.clear_entry();
   */
   // Bump up entry record
   ++_current_entry;
@@ -335,15 +333,15 @@ bool ProcessDriver::process_entry() {
   }
 
   // Check if input entry exists in case of read/both io mode
-  if (_io->io_mode() != IOManager::kWRITE) {
+  if (_io.io_mode() != IOManager::kWRITE) {
     if (_access_entry_v.size() <= _current_entry) {
       LARCV_NORMAL() << "Entry " << _current_entry
                      << " exceeds available events in a file!" << std::endl;
       return false;
     }
     // if exist then move read pointer
-    //_io->clear_entry();
-    _io->read_entry(_access_entry_v[_current_entry]);
+    //_io.clear_entry();
+    _io.read_entry(_access_entry_v[_current_entry]);
   }
   // Execute processes
   return _process_entry_();
@@ -361,15 +359,15 @@ bool ProcessDriver::process_entry(size_t entry, bool force_reload) {
   }
 
   // Check if input entry exists in case of read/both io mode
-  if (_io->io_mode() != IOManager::kWRITE) {
+  if (_io.io_mode() != IOManager::kWRITE) {
     if (_access_entry_v.size() <= entry) {
       LARCV_ERROR() << "Entry " << entry
                     << " exceeds available events in a file!" << std::endl;
       return false;
     }
     // if exist then move read pointer
-    //_io->clear_entry();
-    _io->read_entry(_access_entry_v[entry], force_reload);
+    //_io.clear_entry();
+    _io.read_entry(_access_entry_v[entry], force_reload);
     _current_entry = entry;
   }
   // Execute processes
@@ -395,7 +393,7 @@ void ProcessDriver::batch_process(size_t start_entry, size_t num_entries) {
 
   // Check if start_entry is 0 for write mode (no entry should be specified for
   // write mode)
-  if (_io->io_mode() == IOManager::kWRITE) {
+  if (_io.io_mode() == IOManager::kWRITE) {
     if (start_entry) {
       LARCV_CRITICAL()
           << "Cannot specify start entry (1st arg) in kWRITE IO mode!"
@@ -406,12 +404,12 @@ void ProcessDriver::batch_process(size_t start_entry, size_t num_entries) {
 
   } else {
     _current_entry = start_entry;
-    if (!num_entries) max_entry = start_entry + _io->get_n_entries();
+    if (!num_entries) max_entry = start_entry + _io.get_n_entries();
   }
 
   // Make sure max entry does not exceed the physical max from input. If so,
   // truncate.
-  if (_io->io_mode() != IOManager::kWRITE &&
+  if (_io.io_mode() != IOManager::kWRITE &&
       max_entry > _access_entry_v.size()) {
     LARCV_WARNING() << "Requested to process entries from " << start_entry
                     << " to " << max_entry - 1 << " ... but there are only "
@@ -426,9 +424,9 @@ void ProcessDriver::batch_process(size_t start_entry, size_t num_entries) {
   size_t num_processed = 0;
   size_t num_fraction = (max_entry - _current_entry) / 10;
   while (_current_entry < max_entry) {
-    if (_io->io_mode() != IOManager::kWRITE) {
-      //_io->clear_entry();
-      _io->read_entry(_access_entry_v[_current_entry]);
+    if (_io.io_mode() != IOManager::kWRITE) {
+      //_io.clear_entry();
+      _io.read_entry(_access_entry_v[_current_entry]);
     }
     _process_entry_();
 
@@ -472,7 +470,7 @@ void ProcessDriver::finalize() {
                    << msg << std::endl;
 
   LARCV_INFO() << "Finalizing IO..." << std::endl;
-  _io->finalize();
+  _io.finalize();
   LARCV_INFO() << "Resetting..." << std::endl;
   reset();
 }
