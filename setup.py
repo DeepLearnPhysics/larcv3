@@ -16,7 +16,7 @@ setup(
     cmake_args=[
         '-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.9',
         '-DCMAKE_NO_SWIG=False',
-        '-DMPI:BOOL=ON',
+        '-DMPI:BOOL=OFF',
         # '-DCMAKE_C_COMPILER=mpicc',
         # '-DCMAKE_CXX_COMPILER=mpicxx',
     ],

@@ -10,8 +10,6 @@
 #include "larcv3/app/threadio/threadio.i"
 #include "larcv3/app/imagemod/imagemod.i"
 
-#include "larcv3/app/mpi_io/mpi_io.i"
-
 
 using namespace larcv3;
 using namespace std;
@@ -39,4 +37,3 @@ using namespace std;
 %include "larcv3/app/filter/filter.wrapper"
 %include "larcv3/app/threadio/threadio.wrapper"
 %include "larcv3/app/imagemod/imagemod.wrapper"
-%include "larcv3/app/mpi_io/mpi_io.wrapper"
