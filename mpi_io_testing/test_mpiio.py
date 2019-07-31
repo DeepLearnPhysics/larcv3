@@ -19,9 +19,6 @@ else:
 
 
 a.initialize(rank % 2)
-# a.reset()
-# a.initialize(rank % 2)
-
 a.read_entry(rank)
 
 sparse = larcv.EventSparseTensor2D.to_sparse_tensor(a.get_data("sparse2d", "sbndwire"))
