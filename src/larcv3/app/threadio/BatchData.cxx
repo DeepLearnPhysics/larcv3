@@ -94,6 +94,8 @@ namespace larcv3 {
       ++entry_idx;
       ++_current_size;
     }
+    // _data = std::move(entry_data);
+    // _current_size = entry_data.size();
 
     if (_current_size == _data.size())
       _state = BatchDataState_t::kBatchStateFilled;

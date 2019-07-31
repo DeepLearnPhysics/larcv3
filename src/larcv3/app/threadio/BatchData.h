@@ -42,6 +42,7 @@ namespace larcv3 {
 
     inline const std::vector<int>& dim() const { return _dim; }
 
+    // Data size is number of elements regardless of the size of each element
     size_t data_size(bool calculate=false) const;
 
     inline size_t current_data_size() const { return _current_size; }
