@@ -195,6 +195,7 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
   // record the entry data
   LARCV_INFO() << "Inserting entry data of size " << _entry_data.size()
                << std::endl;
+
   set_entry_data(_entry_data);
 
   return true;

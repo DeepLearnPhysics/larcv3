@@ -64,6 +64,7 @@ namespace larcv3 {
 
   bool BatchFillerPIDLabel::process(IOManager & mgr)
   {
+
     auto const& event_part = mgr.get_data<larcv3::EventParticle>(_part_producer);
 
     if (batch_data().dim().empty()) {
@@ -95,6 +96,8 @@ namespace larcv3 {
     _entry_data.resize(_num_class, 0);
     for (auto& v : _entry_data) v = 0;
     _entry_data.at(label) = 1.;
+
+
     set_entry_data(_entry_data);
 
     return true;

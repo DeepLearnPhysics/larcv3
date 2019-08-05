@@ -79,6 +79,8 @@ namespace larcv3 {
 
     // bool thread_running() const;
 
+    bool is_reading() const {return _processing;}
+
     // size_t num_thread_running() const;
 
     void status_dump() const;
@@ -107,7 +109,7 @@ namespace larcv3 {
 
     const ProcessDriver & pd();
 
-    // const std::string& storage_name(size_t process_id) const;
+    const std::string& storage_name(size_t process_id) const;
 
     size_t process_id(const std::string& name) const;
 

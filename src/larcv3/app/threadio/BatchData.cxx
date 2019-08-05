@@ -96,9 +96,9 @@ namespace larcv3 {
     }
     // _data = std::move(entry_data);
     // _current_size = entry_data.size();
-
-    if (_current_size == _data.size())
+    if (_current_size == _data.size()){
       _state = BatchDataState_t::kBatchStateFilled;
+    }
   }
 
   template <class T>
