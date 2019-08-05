@@ -6,11 +6,16 @@
 namespace larcv3 {
 
   PSet::PSet(const std::string name,
-	     const std::string data)
+             const std::string data)
   {
-    if(name.empty()) throw larbys("Cannot make PSet with an empty name!");
+    if(name.empty()) {
+      LARCV_CRITICAL() << "Cannot make PSet with an empty name!" << std::endl;
+      throw larbys("Cannot make PSet with an empty name!");
+    }
     _name = name;
-    if(!data.empty()) this->add(data);
+    if(!data.empty()) {
+      this->add(data);
+    }
   }
 
   size_t PSet::size() const
@@ -80,10 +85,13 @@ namespace larcv3 {
     if(txt.find(" ") < txt.size()) {
       std::stringstream ss;
       ss << " Processing: " << txt.c_str() << " ... Space not allowed!";
+      LARCV_CRITICAL() << ss.str() << std::endl;
       throw larbys(ss.str());
     }
-    if(txt.find("\t") < txt.size())
+    if(txt.find("\t") < txt.size()){
+      LARCV_CRITICAL() << "Tab not allowed!" << std::endl;
       throw larbys("Tab not allowed!");
+    }
   }
 
   std::pair<PSet::KeyChar_t,size_t> PSet::search(const std::string& txt, const size_t start) const
@@ -120,17 +128,21 @@ namespace larcv3 {
   }
 
   void PSet::add_value(std::string key,
-		       std::string value)
+                       std::string value)
   {
     //std::cout<<"  "<<key<<" => "<<value<<std::endl;
     if( _data_value.find(key) != _data_value.end() ||
         _data_pset.find(key)  != _data_pset.end() ) {
       std::string msg;
       msg = " Duplicate key: \"" + key + "\"";
+      LARCV_CRITICAL() << msg << std::endl;
       throw larbys(msg.c_str());
     }
     no_space(key);
-    if(key.empty()) throw larbys("Empty key cannot be registered!");
+    if(key.empty()) {
+      LARCV_CRITICAL() << "Empty key cannot be registered!" << std::endl;
+      throw larbys("Empty key cannot be registered!");
+    }
     //std::cout<<"value: @"<<value<<"@"<<std::endl;
     trim_space(value);
     //if(value.empty()) throw larbys("Empty value cannot be registered!");
@@ -143,22 +155,27 @@ namespace larcv3 {
         _data_pset.find(p.name())  != _data_pset.end() ) {
       std::string msg;
       msg = " Duplicate key: \"" + p.name() + "\"";
+      LARCV_CRITICAL() << msg << std::endl;
       throw larbys(msg.c_str());
     }    
     _data_pset.insert(std::make_pair(p.name(),p));
   }
   
   void PSet::add_pset(std::string key,
-		      std::string value)
+                      std::string value)
   {
     if( _data_value.find(key) != _data_value.end() ||
         _data_pset.find(key)  != _data_pset.end() ) {
       std::string msg;
       msg = " Duplicate key: \"" + key + "\"";
+      LARCV_CRITICAL() << msg << std::endl;
       throw larbys(msg.c_str());
     }
     no_space(key);
-    if(key.empty()) throw larbys("Empty key cannot be registered!");
+    if(key.empty()) {
+      LARCV_CRITICAL() << "Empty key cannot be registered!" << std::endl;
+      throw larbys("Empty key cannot be registered!");
+    }
     strip(value," ");
     rstrip(value," ");
     _data_pset.emplace(key,PSet(key,value));
@@ -180,27 +197,24 @@ namespace larcv3 {
 
     std::string key,value,tmp;
     KeyChar_t last_mark=kNone;
-
     while(index <= end_index) {
       
       auto next_marker = this->search(contents,index);
-
       if(next_marker.first == kString) {
 
-	//std::cout<<"String found in here: "<<contents.substr(index,(next_marker.second-index))<<std::endl;
+        //std::cout<<"String found in here: "<<contents.substr(index,(next_marker.second-index))<<std::endl;
 
-	while(next_marker.second < end_index+1) {
+        while(next_marker.second < end_index+1) {
 
-	  next_marker = this->search(contents,next_marker.second+1);
+          next_marker = this->search(contents,next_marker.second+1);
 
-	  if(next_marker.first == kString) {
-	    next_marker = this->search(contents,next_marker.second+1);
-	    break;
-	  }
-	}
-	//std::cout<<"String found in here: "<<contents.substr(index,next_marker.second-index)<<std::endl;
+          if(next_marker.first == kString) {
+            next_marker = this->search(contents,next_marker.second+1);
+            break;
+          }
+        }
+        //std::cout<<"String found in here: "<<contents.substr(index,next_marker.second-index)<<std::endl;
       }
-      
       if(next_marker.second > end_index) break;
       if(next_marker.first == kNone) break;
       /*
@@ -210,101 +224,120 @@ namespace larcv3 {
       std::cout<<"last  : "<<last_mark<<std::endl;
       std::cout<<"Inspecting: "<<"\""<<contents.substr(index,(next_marker.second-index))<<"\""<<std::endl;
       */
+      
       if(next_marker.first == kParamDef) {
-	if(last_mark ==  kNone || last_mark == kBlockEnd){
-	  key = contents.substr(index,(next_marker.second-index));
-	  no_space(key);
-	}
-	else if(last_mark == kParamDef || last_mark == kString) {
-	  tmp = contents.substr(index,(next_marker.second-index));
-	  //std::cout<<"Inspecting: \""<<tmp<<"\"" <<std::endl;
-	  strip(tmp," ");
-	  rstrip(tmp," ");
-	  size_t sep_index = tmp.rfind(" ");
-	  if(sep_index >= tmp.size())
-	    throw larbys("Invalid format (key:value)");
+        if(last_mark ==  kNone || last_mark == kBlockEnd){
+          key = contents.substr(index,(next_marker.second-index));
+          no_space(key);
+        }
+        else if(last_mark == kParamDef || last_mark == kString) {
+          tmp = contents.substr(index,(next_marker.second-index));
+          //std::cout<<"Inspecting: \""<<tmp<<"\"" <<std::endl;
+          strip(tmp," ");
+          rstrip(tmp," ");
+          size_t sep_index = tmp.rfind(" ");
+          if(sep_index >= tmp.size()){
+            LARCV_CRITICAL() << "Invalid format (key:value)" << std::endl;
+            throw larbys("Invalid format (key:value)");
+          }
 
-	  value = tmp.substr(0,sep_index);
-	  // complete pair
-	  this->add_value(key,value);
-	  //std::cout<<"Found value: "<<value<<std::endl;	  
-	  key = value = "";
-	  key = tmp.substr(sep_index+1,(tmp.size()-sep_index-1));
-	  no_space(key);
-	}
-	
-      }else if(next_marker.first == kBlockEnd)
-	throw larbys("Block end logic error!");
+          value = tmp.substr(0,sep_index);
+          // complete pair
+          this->add_value(key,value);
+          //std::cout<<"Found value: "<<value<<std::endl;          
+          key = value = "";
+          key = tmp.substr(sep_index+1,(tmp.size()-sep_index-1));
+          no_space(key);
+        }
+        
+      }else if(next_marker.first == kBlockEnd){
+        LARCV_CRITICAL() << "Block end logic error!" << std::endl;
+        throw larbys("Block end logic error!");
+      }
 
       else if(next_marker.first == kBlockStart){
-	//std::cout<<"Block start!"<<std::endl;
-	if(last_mark != kParamDef)
-	  throw larbys("Invalid paramter set start!");
-	
-	// fast forward till this block ends
-	int start_ctr = 1;
-	index = next_marker.second + 1;
-	while(start_ctr && next_marker.second <= end_index) {
-	  
-	  next_marker = this->search(contents,next_marker.second+1);
+        //std::cout<<"Block start!"<<std::endl;
+        if(last_mark != kParamDef){
+          LARCV_CRITICAL() << "Invalid paramter set start!" << std::endl;
+          throw larbys("Invalid paramter set start!");
+        }
+        
+        // fast forward till this block ends
+        int start_ctr = 1;
+        index = next_marker.second + 1;
+        while(start_ctr && next_marker.second <= end_index) {
+          
+          next_marker = this->search(contents,next_marker.second+1);
 
-	  if(next_marker.first == kString) {
+          if(next_marker.first == kString) {
 
-	    while(next_marker.second < end_index+1) {
+            while(next_marker.second < end_index+1) {
 
-	      next_marker = this->search(contents,next_marker.second+1);
+              next_marker = this->search(contents,next_marker.second+1);
 
-	      auto tmp_next_marker = this->search(contents,next_marker.second+1);
+              auto tmp_next_marker = this->search(contents,next_marker.second+1);
 
-	      if(next_marker.first == kString && tmp_next_marker.second != kString) {
+              if(next_marker.first == kString && tmp_next_marker.second != kString) {
 
-		next_marker = tmp_next_marker;
-		break;
-	      }
+                next_marker = tmp_next_marker;
+                break;
+              }
 
-	    }
-	    //std::cout<<"Found string :"<<contents.substr(index,next_marker.second)<<std::endl;
-	  }
+            }
+            //std::cout<<"Found string :"<<contents.substr(index,next_marker.second)<<std::endl;
+          }
 
-	  switch(next_marker.first){
-	  case kBlockStart:
-	    start_ctr +=1;
-	    break;
-	  case kBlockEnd:
-	    start_ctr -=1;
-	    break;
-	  default:
-	    break;
-	  }
-	}
-	if(start_ctr) {
-	  std::string msg;
-	  msg = "Invalid block:\n" + contents.substr(index,next_marker.second-index) + "\n";
-	  throw larbys(msg.c_str());
-	}
-	value = contents.substr(index,next_marker.second-index);
-	//std::cout<<"PSET!\n"<<value<<"\n"<<std::endl;
-	// complete key/value
-	this->add_pset(key,value);
+          switch(next_marker.first){
+          case kBlockStart:
+            start_ctr +=1;
+            break;
+          case kBlockEnd:
+            start_ctr -=1;
+            break;
+          default:
+            break;
+          }
+        }
+        if(start_ctr) {
+          std::string msg;
+          msg = "Invalid block:\n" + contents.substr(index,next_marker.second-index) + "\n";
+          LARCV_CRITICAL() << msg << std::endl;
+          throw larbys(msg.c_str());
+        }
+        value = contents.substr(index,next_marker.second-index);
+        //std::cout<<"PSET!\n"<<value<<"\n"<<std::endl;
+        // complete key/value
+        this->add_pset(key,value);
 
-	key="";
-	value="";
+        key="";
+        value="";
       }
-      else throw larbys("Unknown error!");
-      
+      else {
+        LARCV_CRITICAL() << "Unknown error!" << std::endl;
+        throw larbys("Unknown error!");
+      }
       index = next_marker.second+1;
       last_mark = next_marker.first;
     }
 
     if(index <= end_index) {
       
-      if(!value.empty()) throw larbys("Non-empty value @ process-end!");
-      if(key.empty()) throw larbys("Empty key @ process-end!");
+      if(!value.empty()) {
+        LARCV_CRITICAL() << "Non-empty value @ process-end!" << std::endl;
+        throw larbys("Non-empty value @ process-end!");
+      }
+      if(key.empty()) {
+        LARCV_CRITICAL() << "Empty key @ process-end!" << std::endl;
+        throw larbys("Empty key @ process-end!");
+      }
       
       tmp = contents.substr(index+1,end_index-index);
       //no_space(tmp);
       trim_space(tmp);
-      if(tmp.empty()) throw larbys("Empty value @ end!");
+      if(tmp.empty()) {
+        LARCV_CRITICAL() << "Empty value @ end!" << std::endl;
+        throw larbys("Empty value @ end!");
+      }
       value = tmp;
       this->add_value(key,value);
 
@@ -359,6 +392,7 @@ namespace larcv3 {
     if( iter == _data_pset.end() ) {
       std::string msg;
       msg = "Key does not exist: \"" + key + "\"";
+      LARCV_CRITICAL() << msg << std::endl;
       throw larbys(msg);
     }
     return (*iter).second;
