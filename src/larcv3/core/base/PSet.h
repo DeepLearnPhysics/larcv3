@@ -19,6 +19,8 @@
 #include <map>
 #include "larcv3/core/base/larbys.h"
 #include "larcv3/core/base/Parser.h"
+#include "larcv3/core/base/larcv_logger.h"
+
 namespace larcv3 {
   /**
      \class PSet

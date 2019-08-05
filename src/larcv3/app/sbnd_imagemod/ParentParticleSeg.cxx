@@ -221,7 +221,7 @@ bool ParentParticleSeg::process(IOManager& mgr) {
     auto const& ev_cluster2d =
         mgr.get_data<larcv3::EventSparseCluster2D>(_cluster2d_producer);
 
-
+    if (ev_cluster2d.as_vector().size() < 2) return false;
     // The output is an instance of cluster2d, so prepare that:
     auto& ev_cluster2d_output =
         mgr.get_data<larcv3::EventSparseCluster2D>(_output_producer);
@@ -231,7 +231,7 @@ bool ParentParticleSeg::process(IOManager& mgr) {
          projection_index < ev_cluster2d.as_vector().size(); ++projection_index) {
       // For each projection index, get the list of clusters
       auto const& clusters = ev_cluster2d.sparse_cluster(projection_index);
-
+      if (clusters.size() == 1) return false;
       larcv3::SparseCluster2D new_clusters;
       new_clusters.meta(clusters.meta());
 
@@ -258,6 +258,9 @@ bool ParentParticleSeg::process(IOManager& mgr) {
     // Read in the original source of segmentation, the cluster indexes:
     auto const& ev_cluster3d =
         mgr.get_data<larcv3::EventSparseCluster3D>(_cluster3d_producer);
+    
+    // std::cout << "ev_cluster3d.size() " << ev_cluster3d.size() << std::endl;
+    // if (ev_cluster3d.size() < 2) return false;
 
     // The output is an instance of cluster3d, so prepare that:
     auto& ev_cluster3d_output =
@@ -267,6 +270,8 @@ bool ParentParticleSeg::process(IOManager& mgr) {
     // For each projection index, get the list of clusters
     larcv3::SparseCluster3D new_clusters;
     new_clusters.meta(ev_cluster3d.as_vector().front().meta());
+
+    if(ev_cluster3d.sparse_cluster(0).as_vector().size() == 1) return false;
 
     int i = 0;
     for (auto ancestor_node : primary_nodes) {
@@ -359,7 +364,7 @@ larcv3::VoxelSet ParentParticleSeg::cluster_merger(
 
   get_all_daughter_ids(cluster_indexes, primary_node);
 
-
+  // std::cout << "Clusters.size() " << clusters.as_vector().size() << std::endl;
   for (auto id : cluster_indexes) {
     auto& input_cluster = clusters.voxel_set(id);
     // std::cout << "Cluster index " << id << ", number of voxels: " << input_cluster.as_vector().size() << std::endl;
