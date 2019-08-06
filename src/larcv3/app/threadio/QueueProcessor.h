@@ -43,10 +43,10 @@ namespace larcv3 {
     void reset();
 
     // configure the processor from a file on disk
-    void configure(const std::string config_file);
+    void configure(const std::string config_file, int color=0);
 
     // configure the processor from a PSet object    
-    void configure(const PSet& cfg);
+    void configure(const PSet& cfg, int color=0);
 
     // Check if the processor is configured
     inline bool configured() const { return _configured;}

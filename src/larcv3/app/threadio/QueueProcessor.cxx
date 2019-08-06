@@ -10,6 +10,10 @@
 #include <mutex>
 #include <chrono>
 
+#ifdef LARCV_OPENMP
+#include <omp.h>
+#endif
+
 namespace larcv3 {
   QueueProcessor::QueueProcessor(std::string name)
     : larcv_base(name)
@@ -92,7 +96,7 @@ namespace larcv3 {
     _batch_global_counter = 0;
   }
 
-  void QueueProcessor::configure(const std::string config_file)
+  void QueueProcessor::configure(const std::string config_file, int color)
   {
     LARCV_DEBUG() << "Called" << std::endl;
     // check state
@@ -179,7 +183,7 @@ namespace larcv3 {
     _current_batch_entries_v = std::move(_next_batch_entries_v);
   }
 
-  void QueueProcessor::configure(const PSet& orig_cfg)
+  void QueueProcessor::configure(const PSet& orig_cfg, int color)
   {
     reset();
 
@@ -263,7 +267,7 @@ namespace larcv3 {
 
         LARCV_INFO() << "Process " << process_name << " ... ID=" << id << "... BatchFiller? : " << ptr->is("BatchFiller") << std::endl;
       }
-      _driver.initialize();
+      _driver.initialize(color);
 
       // only-once-operation among all queueus: initialize storage
       _batch_filler_id_v.clear();
@@ -333,17 +337,30 @@ namespace larcv3 {
     size_t i = 0;
     auto start = std::chrono::steady_clock::now();
 
-    #pragma omp parallel for
-    for(size_t i_entry =0; i_entry < _next_index_v.size(); ++ i_entry){
-      auto & entry = _next_index_v[i_entry];
-      LARCV_INFO() << "Processing entry: " << entry << std::endl;
+#ifdef LARCV_OPENMP
+    std::cout << "Number of threads: " << omp_get_thread_num() << std::endl;
+#endif
 
-      bool good_status = _driver.process_entry(entry, true);
-      LARCV_INFO() << "Finished processing event id: " << _driver.event_id().event_key() << std::endl;
-      _next_batch_entries_v.at(i) = entry;
-      _next_batch_events_v.at(i) = _driver.event_id();
-      ++i;
+    #pragma omp parallel 
+    {
+      #pragma omp single
+      {
+        for(size_t i_entry =0; i_entry < _next_index_v.size(); ++ i_entry){
+          #pragma omp task
+          {
+            auto & entry = _next_index_v[i_entry];
+            LARCV_INFO() << "Processing entry: " << entry << std::endl;
+
+            bool good_status = _driver.process_entry(entry, true);
+            LARCV_INFO() << "Finished processing event id: " << _driver.event_id().event_key() << std::endl;
+            _next_batch_entries_v.at(i) = entry;
+            _next_batch_events_v.at(i) = _driver.event_id();
+            ++i;
+          }
+        }
+      }
     }
+    
 
     auto duration = std::chrono::duration_cast< std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
 

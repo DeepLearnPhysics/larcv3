@@ -10,13 +10,6 @@
 
 namespace larcv3 {
 
-void SetPyUtil() {
-  static bool once = false;
-  if (!once) {
-    _import_array();
-    once = true;
-  }
-}
 
 PyObject *as_ndarray(const Image2D &img) {
   SetPyUtil();

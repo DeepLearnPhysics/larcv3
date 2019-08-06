@@ -5,7 +5,7 @@
  *
  * \brief Class def header for a class larcv3::ProcessDriver
  *
- * @author drinkingkazu
+ * @author drinkingkazu, cadams
  */
 
 /** \addtogroup core_Processor
@@ -57,7 +57,7 @@ namespace larcv3 {
     /// Resets the states & all variables. Attached process modules would be removed.
     void reset();
     /// Must be called after configure. This initializes larcv3::IOManager (open files) and initialize attached process modules.
-    void initialize();
+    void initialize(int color=0);
     /// Processes the "next entry" automatically (you don't have to control the counter to specify which entry)
     bool process_entry();
     /// Processes multiple entries (specified in the 2nd argument) from a specified entry (1st argument)
