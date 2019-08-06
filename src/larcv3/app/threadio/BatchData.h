@@ -17,6 +17,7 @@
 #include <iostream>
 #include <vector>
 #include "ThreadIOTypes.h"
+#include "larcv3/core/pyutil/PyUtils.h"
 
 namespace larcv3 {
   /**
@@ -39,6 +40,8 @@ namespace larcv3 {
     ~BatchData() {}
 
     const std::vector<T>& data() const;
+
+    PyObject * pydata() const;
 
     inline const std::vector<int>& dim() const { return _dim; }
 

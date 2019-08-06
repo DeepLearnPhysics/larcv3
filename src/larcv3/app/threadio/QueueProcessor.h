@@ -51,16 +51,8 @@ namespace larcv3 {
     // Check if the processor is configured
     inline bool configured() const { return _configured;}
 
-    // void release_data(size_t storage_id);
-
+    // Go through all factories and pop the data
     void pop_current_data();
-
-    // void release_data();
-
-    // inline const std::vector<larcv3::BatchDataState_t>& storage_status_array() const
-    // { return _batch_state_v; }
-
-    // inline size_t num_threads() const { return _num_threads; }
 
     // Set the next index to read/
     // This will just set the index_v object
@@ -69,45 +61,20 @@ namespace larcv3 {
     // Set the next set of indexes to read:
     void set_next_batch(const std::vector<size_t>& index_v);
 
-    // / Sets the first entry the IOManager should look at 
-    // void set_start_entry(size_t entry);
-
-    // /// Sets the number of entries that should be skipped between batches 
-    // void set_entries_skip(size_t nskip);
-
-    // bool thread_running(size_t thread_id) const;
-
-    // bool thread_running() const;
-
+    // Return true only if the fillers are preparing the next batch
     bool is_reading() const {return _processing;}
-
-    // size_t num_thread_running() const;
-
-    void status_dump() const;
-
-    // size_t process_counter(size_t thread_id) const;
-
-    // size_t process_counter() const;
-
-    // inline const std::vector<larcv3::ThreadFillerState_t>& thread_status() const
-    // { return _thread_state_v; }
 
     // Get number of entries possible to read
     size_t get_n_entries() const;
 
-        
-    // size_t batch_id(size_t storage_id) const;
-
-    // inline const std::vector<size_t>& thread_exec_counters() const
-    // { return _thread_exec_ctr_v; }
-    
     // Return the list of processed entries for current data
     const std::vector<size_t>& processed_entries() const;
 
     // Return the list of processed eventIDs for current data
     const std::vector<larcv3::EventID>& processed_events() const;
 
-    const ProcessDriver & pd();
+    // Read access to the process driver:
+    const ProcessDriver & pd() const;
 
     const std::string& storage_name(size_t process_id) const;
 
@@ -119,26 +86,11 @@ namespace larcv3 {
     inline const std::vector<larcv3::BatchDataType_t>& batch_types() const
     { return _batch_data_type_v; }
 
-    // inline size_t num_batch_storage() const
-    // { return _num_batch_storage; }
-
-    void wait(std::chrono::microseconds duration);
-
   private:
-
-    // enum TPRandomAccessMode_t { kTPRandomNo, kTPRandomEntry, kTPRandomBatch, kTPRandomUnknown};
-
-    // int random_number(int range_min, int range_max);
-
-    // void terminate_threads();
 
     bool set_batch_storage();
     bool begin_batch();
     bool end_batch();
-
-    void manager_batch_process();
-
-    bool _batch_process_(std::vector< size_t>  start_entry, size_t local_batch_entry);
 
     bool _processing;
     bool _configured;
@@ -155,24 +107,15 @@ namespace larcv3 {
     // We assume that the batch_process call can be parallelized with OpenMP
     larcv3::ProcessDriver _driver;
     
-    // main thread
-    // thread-wise variables
-    // std::vector<size_t> _current_storage_id;
-    // std::vector<size_t> _thread_exec_ctr_v;
-    // std::vector<size_t> _batch_size_v;
-    // std::vector<size_t> _valid_counter_v;
-    // std::vector<size_t> _lifetime_valid_counter_v;
-    // process-wise variables
+    // List of processes for fillers:
     std::vector<std::string> _process_name_v;
 
-    // storage-wise variables
-    // std::vector<larcv3::BatchDataState_t> _batch_state_v;
+    // Meta data about read entries variables
     std::vector<size_t> _current_batch_entries_v;
     std::vector<larcv3::EventID> _current_batch_events_v;
     std::vector<size_t> _next_batch_entries_v;
     std::vector<larcv3::EventID> _next_batch_events_v;
 
-    // std::vector<size_t> _batch_global_id;
   };
 
 }

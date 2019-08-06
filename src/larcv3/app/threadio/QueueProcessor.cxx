@@ -21,15 +21,6 @@ namespace larcv3 {
   QueueProcessor::~QueueProcessor()
   { reset(); }
 
-  void QueueProcessor::wait(std::chrono::microseconds duration)
-  {
-    auto t_start = std::chrono::high_resolution_clock::now();
-    auto wait = t_start + duration;
-    while (std::chrono::high_resolution_clock::now() < wait) {}
-    return;
-  }
-
-
   const std::string& QueueProcessor::storage_name(size_t process_id) const
   {
     if (process_id > _process_name_v.size()) {
@@ -47,17 +38,6 @@ namespace larcv3 {
     return kINVALID_SIZE;
   }
 
-  void QueueProcessor::status_dump() const
-  {
-    std::stringstream ss;
-    // for (size_t id = 0; id < _num_threads; ++id) {
-    //   ss << "    Thread ID " << id
-    //      << " # call " << _thread_exec_ctr_v[id]
-    //      << " Current batch " << _valid_counter_v[id] << "/" << _batch_size_v[id] << " entries"
-    //      << " Total processed " << _lifetime_valid_counter_v[id] << " entries" << std::endl;
-    // }
-    LARCV_NORMAL() << "Status Summary: " << std::endl << ss.str();
-  }
 
   const std::vector<size_t>& QueueProcessor::processed_entries() const
   {
@@ -74,7 +54,7 @@ namespace larcv3 {
     return _driver.io().get_n_entries();
   }
 
-  const ProcessDriver & QueueProcessor::pd()
+  const ProcessDriver & QueueProcessor::pd() const
   {
     return _driver;
   }
@@ -91,25 +71,11 @@ namespace larcv3 {
     _next_index_v = index_v;
   }
 
-  // size_t QueueProcessor::batch_id(size_t storage_id) const
-  // {
-  //   if (storage_id > _num_batch_storage) {
-  //     LARCV_ERROR() << "Storage id " << storage_id << " is invalid" << std::endl;
-  //     return kINVALID_SIZE;
-  //   }
-  //   return _batch_global_id[storage_id];
-  // }
-
   void QueueProcessor::reset()
   {
     // per-thread variables
     _driver.reset();
-    // _current_storage_id.clear();
-    // _batch_size_v.clear();
-    // _valid_counter_v.clear();
-    // _lifetime_valid_counter_v.clear();
-    // per-storage variables
-    // _batch_state_v.clear();
+
     _current_batch_entries_v.clear();
     _current_batch_events_v.clear();
     _next_batch_entries_v.clear();
@@ -155,21 +121,14 @@ namespace larcv3 {
   void QueueProcessor::pop_current_data()
   {
 
-    // This is removed because data is only filled in the "next" state, not the current state
-    // if (_batch_state_v[storage_id] == BatchDataState_t::kBatchStateFilling) {
-    //   LARCV_ERROR() << "Cannot release storage data " << storage_id
-    //                 << " while it is being filled!" << std::endl;
-    //   throw larbys();
-    //   return;
-    // }
     bool ready = true;
 
     for (size_t pid = 0; pid < _process_name_v.size(); ++pid) {
       auto const& name = _process_name_v[pid];
       auto const& datatype = _batch_data_type_v[pid];
       switch ( datatype ) {
-      case BatchDataType_t::kBatchDataChar:
-        ready = ready && BatchDataQueueFactory<char>::get().get_queue(name).is_next_ready(); break;
+      // case BatchDataType_t::kBatchDataChar:
+      //   ready = ready && BatchDataQueueFactory<char>::get().get_queue(name).is_next_ready(); break;
       case BatchDataType_t::kBatchDataShort:
         ready = ready && BatchDataQueueFactory<short>::get().get_queue(name).is_next_ready(); break;
       case BatchDataType_t::kBatchDataInt:
@@ -178,8 +137,8 @@ namespace larcv3 {
         ready = ready && BatchDataQueueFactory<float>::get().get_queue(name).is_next_ready(); break;
       case BatchDataType_t::kBatchDataDouble:
         ready = ready && BatchDataQueueFactory<double>::get().get_queue(name).is_next_ready(); break;
-      case BatchDataType_t::kBatchDataString:
-        ready = ready && BatchDataQueueFactory<std::string>::get().get_queue(name).is_next_ready(); break;
+      // case BatchDataType_t::kBatchDataString:
+      //   ready = ready && BatchDataQueueFactory<std::string>::get().get_queue(name).is_next_ready(); break;
       default:
         LARCV_CRITICAL() << "Process name " << name
                          << " encountered none-supported BatchDataType_t: " << int(datatype) << std::endl;
@@ -195,8 +154,8 @@ namespace larcv3 {
       auto const& name = _process_name_v[pid];
       auto const& datatype = _batch_data_type_v[pid];
       switch ( datatype ) {
-      case BatchDataType_t::kBatchDataChar:
-        BatchDataQueueFactory<char>::get_writeable().get_queue_writeable(name).pop(); break;
+      // case BatchDataType_t::kBatchDataChar:
+        // BatchDataQueueFactory<char>::get_writeable().get_queue_writeable(name).pop(); break;
       case BatchDataType_t::kBatchDataShort:
         BatchDataQueueFactory<short>::get_writeable().get_queue_writeable(name).pop(); break;
       case BatchDataType_t::kBatchDataInt:
@@ -205,8 +164,8 @@ namespace larcv3 {
         BatchDataQueueFactory<float>::get_writeable().get_queue_writeable(name).pop(); break;
       case BatchDataType_t::kBatchDataDouble:
         BatchDataQueueFactory<double>::get_writeable().get_queue_writeable(name).pop(); break;
-      case BatchDataType_t::kBatchDataString:
-        BatchDataQueueFactory<std::string>::get_writeable().get_queue_writeable(name).pop(); break;
+      // case BatchDataType_t::kBatchDataString:
+        // BatchDataQueueFactory<std::string>::get_writeable().get_queue_writeable(name).pop(); break;
       default:
         LARCV_CRITICAL() << "Process name " << name
                          << " encountered none-supported BatchDataType_t: " << int(datatype) << std::endl;
@@ -223,41 +182,13 @@ namespace larcv3 {
   void QueueProcessor::configure(const PSet& orig_cfg)
   {
     reset();
-    /*
-    PSet cfg(name());
-    for (auto const& value_key : orig_cfg.value_keys())
-      cfg.add_value(value_key, orig_cfg.get<std::string>(value_key));
-    */
+
     std::cout << "\033[93m setting verbosity \033[00m" << orig_cfg.get<unsigned short>("Verbosity", 2) << std::endl;
     set_verbosity( (msg::Level_t)(orig_cfg.get<unsigned short>("Verbosity", 2)) );
 
     _input_fname_v = orig_cfg.get<std::vector<std::string> >("InputFiles");
 
-    // // Initialize NumStorages related variables
-    // _batch_entries_v.clear();
-    // _batch_entries_v.resize(_num_batch_storage);
-    // _batch_events_v.clear();
-    // _batch_events_v.resize(_num_batch_storage);
-    // _batch_state_v.clear();
-    // _batch_state_v.resize(_num_batch_storage, BatchDataState_t::kBatchStateEmpty);
-    // _batch_global_id.clear();
-    // _batch_global_id.resize(_num_batch_storage, kINVALID_SIZE);
-    // // Initialize NumThreads related variables
-    // _driver_v.clear();
     _process_name_v.clear();
-    // _thread_state_v.clear();
-    // _thread_state_v.resize(_num_threads, kThreadStateIdle);
-    // _current_storage_id.clear();
-    // _current_storage_id.resize(_num_threads, kINVALID_SIZE);
-    // _batch_size_v.clear();
-    // _batch_size_v.resize(_num_threads, 0);
-    // _thread_exec_ctr_v.clear();
-    // _thread_exec_ctr_v.resize(_num_threads, 0);
-    // _valid_counter_v.clear();
-    // _valid_counter_v.resize(_num_threads, 0);
-    // _lifetime_valid_counter_v.clear();
-    // _lifetime_valid_counter_v.resize(_num_threads, 0);
-
 
     // Initialize the ProcessDriver:
 
@@ -272,22 +203,10 @@ namespace larcv3 {
     PSet proc_cfg(proc_name);
     for (auto const& value_key : orig_cfg.value_keys()) {
       if (value_key == "ProcessName") {
-      //   std::stringstream ss_tmp2;
-      //   // bool first = true;
         for (auto const& unit_name : orig_cfg.get<std::vector<std::string> >("ProcessName")) {
-      //     if (first) {
-      //       ss_tmp2 << "[\"" << unit_name << "\"";
-      //       first = false;
-      //     }
-      //     else ss_tmp2 << ",\"" <<  unit_name << "\"";
-      //     if (thread_id == 0) 
-      //     ss_tmp2 << unit_name;
           _process_name_v.push_back(unit_name);
         }
-      //   // ss_tmp2 << "]";
-      //   proc_cfg.add_value(value_key, ss_tmp2.str());
       }
-      // else
       if (value_key == "RandomAccess"){
         continue;
       }
@@ -314,17 +233,6 @@ namespace larcv3 {
       }
       else if (pset_key == "ProcessList") {
         auto const& orig_thread_plist = orig_cfg.get<larcv3::PSet>(pset_key);
-        // PSet thread_plist("ProcessList");
-        // for (auto const& plist_value_key : orig_thread_plist.value_keys())
-        //   thread_plist.add_value(plist_value_key, orig_thread_plist.get<std::string>(plist_value_key));
-        // for (auto const& plist_pset_key : orig_thread_plist.pset_keys()) {
-        //   std::stringstream ss_tmp3;
-        //   ss_tmp3 << plist_pset_key << "_t" << thread_id;
-        //   PSet thread_pcfg(orig_thread_plist.get<larcv3::PSet>(plist_pset_key));
-        //   thread_pcfg.rename(ss_tmp3.str());
-        //   thread_plist.add_pset(thread_pcfg);
-        // }
-
         proc_cfg.add_pset(orig_thread_plist);
       }
       else
@@ -339,12 +247,9 @@ namespace larcv3 {
 
       LARCV_INFO() << proc_cfg.dump() << std::endl;
 
-      //throw larbys();
       // configure the driver
       _driver.reset();
       _driver.configure(proc_cfg);
-      // auto _driver = ProcessDriver(proc_name);
-      // _driver->configure(proc_cfg);
       _driver.override_input_file(_input_fname_v);
 
 
@@ -359,7 +264,6 @@ namespace larcv3 {
         LARCV_INFO() << "Process " << process_name << " ... ID=" << id << "... BatchFiller? : " << ptr->is("BatchFiller") << std::endl;
       }
       _driver.initialize();
-      // _driver_v.emplace_back(driver);
 
       // only-once-operation among all queueus: initialize storage
       _batch_filler_id_v.clear();
@@ -372,8 +276,8 @@ namespace larcv3 {
         _batch_data_type_v.push_back( ((BatchHolder*)(proc_ptr))->data_type() );
         auto const& name = _process_name_v[pid];
         switch ( _batch_data_type_v.back() ) {
-        case BatchDataType_t::kBatchDataChar:
-          BatchDataQueueFactory<char>::get_writeable().make_queue(name); break;
+        // case BatchDataType_t::kBatchDataChar:
+          // BatchDataQueueFactory<char>::get_writeable().make_queue(name); break;
         case BatchDataType_t::kBatchDataShort:
           BatchDataQueueFactory<short>::get_writeable().make_queue(name); break;
         case BatchDataType_t::kBatchDataInt:
@@ -382,8 +286,8 @@ namespace larcv3 {
           BatchDataQueueFactory<float>::get_writeable().make_queue(name); break;
         case BatchDataType_t::kBatchDataDouble:
           BatchDataQueueFactory<double>::get_writeable().make_queue(name); break;
-        case BatchDataType_t::kBatchDataString:
-          BatchDataQueueFactory<std::string>::get_writeable().make_queue(name); break;
+        // case BatchDataType_t::kBatchDataString:
+          // BatchDataQueueFactory<std::string>::get_writeable().make_queue(name); break;
         default:
           LARCV_CRITICAL() << "Process name " << name
                            << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(proc_ptr))->data_type()) << std::endl;
@@ -410,46 +314,6 @@ namespace larcv3 {
       return false;
     }
 
-
-    // for (auto datatype : _batch_data_type_v) {
-    //   int state;
-    //   switch ( datatype ) {
-    //   case BatchDataType_t::kBatchDataChar:
-    //     state = BatchDataQueueFactory<char>::get().get_queue("data").next_state();
-    //   case BatchDataType_t::kBatchDataShort:
-    //     state = BatchDataQueueFactory<short>::get().get_queue("data").next_state();
-    //   case BatchDataType_t::kBatchDataInt:
-    //     state = BatchDataQueueFactory<int>::get().get_queue("data").next_state();
-    //   case BatchDataType_t::kBatchDataFloat:
-    //     state = BatchDataQueueFactory<float>::get().get_queue("data").next_state();
-    //   case BatchDataType_t::kBatchDataDouble:
-    //     state = BatchDataQueueFactory<double>::get().get_queue("data").next_state();
-    //   case BatchDataType_t::kBatchDataString:
-    //     state = BatchDataQueueFactory<std::string>::get().get_queue("data").next_state();
-    //   default:
-    //     LARCV_CRITICAL() << "Data type  " << int(datatype)
-    //                      << " encountered non-supported BatchDataQueueFactory: " << std::endl;
-    //     throw larbys();
-    //   }
-
-    //   std::cout << "State of the next batch is: " << state << std::endl;
-    // }
-
-
-    // // check if the storage is ready-to-be-used
-    // if (_batch_state_v[storage_id] != BatchDataState_t::kBatchStateEmpty &&
-    //     _batch_state_v[storage_id] != BatchDataState_t::kBatchStateReleased) {
-    //   LARCV_INFO() << "Target storage id " << storage_id
-    //                << " / " << _batch_global_counter
-    //                << " status " << (int)(_batch_state_v[storage_id])
-    //                << " ... not ready (must be kBatchStateEmpty="
-    //                << (int)(BatchDataState_t::kBatchStateEmpty)
-    //                << " or kBatchStateReleased="
-    //                << (int)(BatchDataState_t::kBatchStateReleased) << ")" << std::endl;
-    //   return false;
-    // }
-
-
     //
     // execute
     //
@@ -458,12 +322,7 @@ namespace larcv3 {
     set_batch_storage();
 
     begin_batch();
-// _batch_entries_v
-// _batch_events_v
 
-    
-
-    // size_t next_entry = entry;
 
     _next_batch_entries_v.clear();
     _next_batch_entries_v.resize(_next_index_v.size());
@@ -472,8 +331,11 @@ namespace larcv3 {
 
     LARCV_INFO() << "Entering process loop" << std::endl;
     size_t i = 0;
+    auto start = std::chrono::steady_clock::now();
+
     #pragma omp parallel for
-    for(auto & entry : _next_index_v ){
+    for(size_t i_entry =0; i_entry < _next_index_v.size(); ++ i_entry){
+      auto & entry = _next_index_v[i_entry];
       LARCV_INFO() << "Processing entry: " << entry << std::endl;
 
       bool good_status = _driver.process_entry(entry, true);
@@ -483,34 +345,17 @@ namespace larcv3 {
       ++i;
     }
 
-    
-    // _thread_state_v[thread_id] = kThreadStateIdle;
-    // _batch_state_v[storage_id] = BatchDataState_t::kBatchStateFilled;
-    // _optional_next_index = kINVALID_SIZE;
+    auto duration = std::chrono::duration_cast< std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
+
+
+    std::cout << "Duration of omp loop: " << duration.count() << std::endl;
     LARCV_DEBUG() << " end" << std::endl;
 
-    //LARCV_NORMAL() << "Thread " << thread_id << " finished filling storage " << storage_id << std::endl;
     end_batch();
     
     _processing = false;
     return true;
 
-    // _batch_process_(_next_index_v);
-
-    // // // set storage status to filling
-    // // _batch_state_v[storage_id]  = BatchDataState_t::kBatchStateFilling;
-
-    // // _thread_state_v[thread_id] = kThreadStateStarting;
-    // // _batch_size_v[thread_id] = nentries;
-    // // _thread_exec_ctr_v[thread_id] += 1;
-    // // std::thread t(&QueueProcessor::_batch_process_, this, start_entry, nentries, thread_id);
-    // // if (_thread_v.size() <= thread_id) _thread_v.resize(thread_id + 1);
-    // // //_thread_v[thread_id] = std::move(t);
-    // // std::swap(_thread_v[thread_id], t);
-    // // this->wait(std::chrono::microseconds(100));
-    // // while (_thread_state_v[thread_id] == kThreadStateStarting) this->wait(std::chrono::microseconds(100));
-
-    // return true;
   }
 
   bool QueueProcessor::set_batch_storage(){
@@ -522,11 +367,11 @@ namespace larcv3 {
       auto const& name = _process_name_v[pid];
       BatchDataState_t batch_state = BatchDataState_t::kBatchStateUnknown;
       switch ( ((BatchHolder*)(proc_ptr))->data_type() ) {
-      case BatchDataType_t::kBatchDataChar:
-        ((BatchFillerTemplate<char>*)proc_ptr)->_batch_data_ptr
-          = &(BatchDataQueueFactory<char>::get_writeable().get_queue_writeable(name).get_next_writeable());
-        batch_state = ((BatchFillerTemplate<char>*)proc_ptr)->_batch_data_ptr->state();
-        break;
+      // case BatchDataType_t::kBatchDataChar:
+      //   ((BatchFillerTemplate<char>*)proc_ptr)->_batch_data_ptr
+      //     = &(BatchDataQueueFactory<char>::get_writeable().get_queue_writeable(name).get_next_writeable());
+      //   batch_state = ((BatchFillerTemplate<char>*)proc_ptr)->_batch_data_ptr->state();
+      //   break;
       case BatchDataType_t::kBatchDataShort:
         ((BatchFillerTemplate<short>*)proc_ptr)->_batch_data_ptr
           = &(BatchDataQueueFactory<short>::get_writeable().get_queue_writeable(name).get_next_writeable());
@@ -547,11 +392,11 @@ namespace larcv3 {
           = &(BatchDataQueueFactory<double>::get_writeable().get_queue_writeable(name).get_next_writeable());
         batch_state = ((BatchFillerTemplate<double>*)proc_ptr)->_batch_data_ptr->state();
         break;
-      case BatchDataType_t::kBatchDataString:
-        ((BatchFillerTemplate<std::string>*)proc_ptr)->_batch_data_ptr
-          = &(BatchDataQueueFactory<std::string>::get_writeable().get_queue_writeable(name).get_next_writeable());
-        batch_state = ((BatchFillerTemplate<std::string>*)proc_ptr)->_batch_data_ptr->state();
-        break;
+      // case BatchDataType_t::kBatchDataString:
+      //   ((BatchFillerTemplate<std::string>*)proc_ptr)->_batch_data_ptr
+      //     = &(BatchDataQueueFactory<std::string>::get_writeable().get_queue_writeable(name).get_next_writeable());
+      //   batch_state = ((BatchFillerTemplate<std::string>*)proc_ptr)->_batch_data_ptr->state();
+      //   break;
       default:
         LARCV_CRITICAL() << "Process name " << name
                          << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(proc_ptr))->data_type()) << std::endl;
@@ -581,8 +426,8 @@ namespace larcv3 {
       LARCV_INFO() << "Executing " << process_name << "::batch_begin()" << std::endl;
       ((BatchHolder*)(ptr))->_batch_size = _next_index_v.size();
       switch ( ((BatchHolder*)(ptr))->data_type() ) {
-      case BatchDataType_t::kBatchDataChar:
-        ((BatchFillerTemplate<char>*)ptr)->batch_begin(); break;
+      // case BatchDataType_t::kBatchDataChar:
+      //  ((BatchFillerTemplate<char>*)ptr)->batch_begin(); break;
       case BatchDataType_t::kBatchDataShort:
         ((BatchFillerTemplate<short>*)ptr)->batch_begin(); break;
       case BatchDataType_t::kBatchDataInt:
@@ -591,8 +436,8 @@ namespace larcv3 {
         ((BatchFillerTemplate<float>*)ptr)->batch_begin(); break;
       case BatchDataType_t::kBatchDataDouble:
         ((BatchFillerTemplate<double>*)ptr)->batch_begin(); break;
-      case BatchDataType_t::kBatchDataString:
-        ((BatchFillerTemplate<std::string>*)ptr)->batch_begin(); break;
+      // case BatchDataType_t::kBatchDataString:
+      //   ((BatchFillerTemplate<std::string>*)ptr)->batch_begin(); break;
       default:
         LARCV_CRITICAL() << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(ptr))->data_type()) << std::endl;
         throw larbys();
@@ -607,8 +452,8 @@ namespace larcv3 {
       if (!(ptr->is("BatchFiller"))) continue;
 
       switch ( ((BatchHolder*)(ptr))->data_type() ) {
-      case BatchDataType_t::kBatchDataChar:
-        ((BatchFillerTemplate<char>*)ptr)->batch_end(); break;
+      // case BatchDataType_t::kBatchDataChar:
+      //   ((BatchFillerTemplate<char>*)ptr)->batch_end(); break;
       case BatchDataType_t::kBatchDataShort:
         ((BatchFillerTemplate<short>*)ptr)->batch_end(); break;
       case BatchDataType_t::kBatchDataInt:
@@ -617,8 +462,8 @@ namespace larcv3 {
         ((BatchFillerTemplate<float>*)ptr)->batch_end(); break;
       case BatchDataType_t::kBatchDataDouble:
         ((BatchFillerTemplate<double>*)ptr)->batch_end(); break;
-      case BatchDataType_t::kBatchDataString:
-        ((BatchFillerTemplate<std::string>*)ptr)->batch_end(); break;
+      // case BatchDataType_t::kBatchDataString:
+        // ((BatchFillerTemplate<std::string>*)ptr)->batch_end(); break;
       default:
         LARCV_CRITICAL() << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(ptr))->data_type()) << std::endl;
         throw larbys();

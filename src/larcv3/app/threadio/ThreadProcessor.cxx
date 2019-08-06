@@ -319,8 +319,8 @@ namespace larcv3 {
       if (!(proc_ptr->is("BatchFiller"))) continue;
       auto const& name = _process_name_v[pid];
       switch ( ((BatchHolder*)(proc_ptr))->data_type() ) {
-      case BatchDataType_t::kBatchDataChar:
-        BatchDataStorageFactory<char>::get_writeable().get_storage_writeable(name).reset_batch(storage_id); break;
+      // case BatchDataType_t::kBatchDataChar:
+      //   BatchDataStorageFactory<char>::get_writeable().get_storage_writeable(name).reset_batch(storage_id); break;
       case BatchDataType_t::kBatchDataShort:
         BatchDataStorageFactory<short>::get_writeable().get_storage_writeable(name).reset_batch(storage_id); break;
       case BatchDataType_t::kBatchDataInt:
@@ -329,8 +329,8 @@ namespace larcv3 {
         BatchDataStorageFactory<float>::get_writeable().get_storage_writeable(name).reset_batch(storage_id); break;
       case BatchDataType_t::kBatchDataDouble:
         BatchDataStorageFactory<double>::get_writeable().get_storage_writeable(name).reset_batch(storage_id); break;
-      case BatchDataType_t::kBatchDataString:
-        BatchDataStorageFactory<std::string>::get_writeable().get_storage_writeable(name).reset_batch(storage_id); break;
+      // case BatchDataType_t::kBatchDataString:
+        // BatchDataStorageFactory<std::string>::get_writeable().get_storage_writeable(name).reset_batch(storage_id); break;
       default:
         LARCV_CRITICAL() << "Process name " << name
                          << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(proc_ptr))->data_type()) << std::endl;
@@ -520,8 +520,8 @@ namespace larcv3 {
         _batch_data_type_v.push_back( ((BatchHolder*)(proc_ptr))->data_type() );
         auto const& name = _process_name_v[pid];
         switch ( _batch_data_type_v.back() ) {
-        case BatchDataType_t::kBatchDataChar:
-          BatchDataStorageFactory<char>::get_writeable().make_storage(name, _num_batch_storage); break;
+        // case BatchDataType_t::kBatchDataChar:
+        //   BatchDataStorageFactory<char>::get_writeable().make_storage(name, _num_batch_storage); break;
         case BatchDataType_t::kBatchDataShort:
           BatchDataStorageFactory<short>::get_writeable().make_storage(name, _num_batch_storage); break;
         case BatchDataType_t::kBatchDataInt:
@@ -530,8 +530,8 @@ namespace larcv3 {
           BatchDataStorageFactory<float>::get_writeable().make_storage(name, _num_batch_storage); break;
         case BatchDataType_t::kBatchDataDouble:
           BatchDataStorageFactory<double>::get_writeable().make_storage(name, _num_batch_storage); break;
-        case BatchDataType_t::kBatchDataString:
-          BatchDataStorageFactory<std::string>::get_writeable().make_storage(name, _num_batch_storage); break;
+        // case BatchDataType_t::kBatchDataString:
+        //   BatchDataStorageFactory<std::string>::get_writeable().make_storage(name, _num_batch_storage); break;
         default:
           LARCV_CRITICAL() << "Process name " << name
                            << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(proc_ptr))->data_type()) << std::endl;
@@ -641,10 +641,10 @@ namespace larcv3 {
       BatchDataState_t batch_state = BatchDataState_t::kBatchStateUnknown;
       switch ( ((BatchHolder*)(proc_ptr))->data_type() ) {
       case BatchDataType_t::kBatchDataChar:
-        ((BatchFillerTemplate<char>*)proc_ptr)->_batch_data_ptr
-          = &(BatchDataStorageFactory<char>::get_writeable().get_storage_writeable(name).get_batch_writeable(storage_id));
-        batch_state = ((BatchFillerTemplate<char>*)proc_ptr)->_batch_data_ptr->state();
-        break;
+      //   ((BatchFillerTemplate<char>*)proc_ptr)->_batch_data_ptr
+      //     = &(BatchDataStorageFactory<char>::get_writeable().get_storage_writeable(name).get_batch_writeable(storage_id));
+      //   batch_state = ((BatchFillerTemplate<char>*)proc_ptr)->_batch_data_ptr->state();
+      //   break;
       case BatchDataType_t::kBatchDataShort:
         ((BatchFillerTemplate<short>*)proc_ptr)->_batch_data_ptr
           = &(BatchDataStorageFactory<short>::get_writeable().get_storage_writeable(name).get_batch_writeable(storage_id));
@@ -665,11 +665,11 @@ namespace larcv3 {
           = &(BatchDataStorageFactory<double>::get_writeable().get_storage_writeable(name).get_batch_writeable(storage_id));
         batch_state = ((BatchFillerTemplate<double>*)proc_ptr)->_batch_data_ptr->state();
         break;
-      case BatchDataType_t::kBatchDataString:
-        ((BatchFillerTemplate<std::string>*)proc_ptr)->_batch_data_ptr
-          = &(BatchDataStorageFactory<std::string>::get_writeable().get_storage_writeable(name).get_batch_writeable(storage_id));
-        batch_state = ((BatchFillerTemplate<std::string>*)proc_ptr)->_batch_data_ptr->state();
-        break;
+      // case BatchDataType_t::kBatchDataString:
+      //   ((BatchFillerTemplate<std::string>*)proc_ptr)->_batch_data_ptr
+      //     = &(BatchDataStorageFactory<std::string>::get_writeable().get_storage_writeable(name).get_batch_writeable(storage_id));
+      //   batch_state = ((BatchFillerTemplate<std::string>*)proc_ptr)->_batch_data_ptr->state();
+      //   break;
       default:
         LARCV_CRITICAL() << "Process name " << name
                          << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(proc_ptr))->data_type()) << std::endl;
@@ -732,8 +732,8 @@ namespace larcv3 {
       LARCV_INFO() << "Executing " << process_name << "::batch_begin()" << std::endl;
       ((BatchHolder*)(ptr))->_batch_size = nentries;
       switch ( ((BatchHolder*)(ptr))->data_type() ) {
-      case BatchDataType_t::kBatchDataChar:
-        ((BatchFillerTemplate<char>*)ptr)->batch_begin(); break;
+      // case BatchDataType_t::kBatchDataChar:
+        // ((BatchFillerTemplate<char>*)ptr)->batch_begin(); break;
       case BatchDataType_t::kBatchDataShort:
         ((BatchFillerTemplate<short>*)ptr)->batch_begin(); break;
       case BatchDataType_t::kBatchDataInt:
@@ -742,8 +742,8 @@ namespace larcv3 {
         ((BatchFillerTemplate<float>*)ptr)->batch_begin(); break;
       case BatchDataType_t::kBatchDataDouble:
         ((BatchFillerTemplate<double>*)ptr)->batch_begin(); break;
-      case BatchDataType_t::kBatchDataString:
-        ((BatchFillerTemplate<std::string>*)ptr)->batch_begin(); break;
+      // case BatchDataType_t::kBatchDataString:
+        // ((BatchFillerTemplate<std::string>*)ptr)->batch_begin(); break;
       default:
         LARCV_CRITICAL() << "Thread ID " << thread_id
                          << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(ptr))->data_type()) << std::endl;
@@ -801,8 +801,8 @@ namespace larcv3 {
       if (!(ptr->is("BatchFiller"))) continue;
 
       switch ( ((BatchHolder*)(ptr))->data_type() ) {
-      case BatchDataType_t::kBatchDataChar:
-        ((BatchFillerTemplate<char>*)ptr)->batch_end(); break;
+      // case BatchDataType_t::kBatchDataChar:
+      //   ((BatchFillerTemplate<char>*)ptr)->batch_end(); break;
       case BatchDataType_t::kBatchDataShort:
         ((BatchFillerTemplate<short>*)ptr)->batch_end(); break;
       case BatchDataType_t::kBatchDataInt:
@@ -811,8 +811,8 @@ namespace larcv3 {
         ((BatchFillerTemplate<float>*)ptr)->batch_end(); break;
       case BatchDataType_t::kBatchDataDouble:
         ((BatchFillerTemplate<double>*)ptr)->batch_end(); break;
-      case BatchDataType_t::kBatchDataString:
-        ((BatchFillerTemplate<std::string>*)ptr)->batch_end(); break;
+      // case BatchDataType_t::kBatchDataString:
+        // ((BatchFillerTemplate<std::string>*)ptr)->batch_end(); break;
       default:
         LARCV_CRITICAL() << "Thread ID " << thread_id
                          << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(ptr))->data_type()) << std::endl;

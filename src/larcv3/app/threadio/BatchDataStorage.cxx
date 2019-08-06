@@ -98,11 +98,11 @@ namespace larcv3 {
 
 }
 
-template class larcv3::BatchDataStorage<char>;
+// template class larcv3::BatchDataStorage<char>;
 template class larcv3::BatchDataStorage<short>;
 template class larcv3::BatchDataStorage<int>;
 template class larcv3::BatchDataStorage<float>;
 template class larcv3::BatchDataStorage<double>;
-template class larcv3::BatchDataStorage<std::string>;
+// template class larcv3::BatchDataStorage<std::string>;
 
 #endif

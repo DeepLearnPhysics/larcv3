@@ -40,18 +40,18 @@ namespace larcv3 {
     return (*_me);
   }
 }
-template<> larcv3::BatchDataStorageFactory<char>*   larcv3::BatchDataStorageFactory<char>::_me   = nullptr;
+// template<> larcv3::BatchDataStorageFactory<char>*   larcv3::BatchDataStorageFactory<char>::_me   = nullptr;
 template<> larcv3::BatchDataStorageFactory<short>*  larcv3::BatchDataStorageFactory<short>::_me  = nullptr;
 template<> larcv3::BatchDataStorageFactory<int>*    larcv3::BatchDataStorageFactory<int>::_me    = nullptr;
 template<> larcv3::BatchDataStorageFactory<float>*  larcv3::BatchDataStorageFactory<float>::_me  = nullptr;
 template<> larcv3::BatchDataStorageFactory<double>* larcv3::BatchDataStorageFactory<double>::_me = nullptr;
-template<> larcv3::BatchDataStorageFactory<std::string>* larcv3::BatchDataStorageFactory<std::string>::_me = nullptr;
+// template<> larcv3::BatchDataStorageFactory<std::string>* larcv3::BatchDataStorageFactory<std::string>::_me = nullptr;
 
-template class larcv3::BatchDataStorageFactory<char>;
+// template class larcv3::BatchDataStorageFactory<char>;
 template class larcv3::BatchDataStorageFactory<short>;
 template class larcv3::BatchDataStorageFactory<int>;
 template class larcv3::BatchDataStorageFactory<float>;
 template class larcv3::BatchDataStorageFactory<double>;
-template class larcv3::BatchDataStorageFactory<std::string>;
+// template class larcv3::BatchDataStorageFactory<std::string>;
 
 #endif
