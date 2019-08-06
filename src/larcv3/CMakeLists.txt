@@ -15,6 +15,9 @@ add_library(larcv3 SHARED
     $<TARGET_OBJECTS:sbnd_imagemod> 
     )
 
+if (OpenMP_CXX_FOUND)
+    target_link_libraries(larcv3 ${OpenMP_CXX_LIBRARY} ${OpenMP_C_LIBRARY})
+endif()
 
 # Link against hdf5:
 target_link_libraries(larcv3 ${HDF5_CXX_LIBRARIES})

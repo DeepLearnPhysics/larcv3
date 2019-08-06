@@ -48,7 +48,6 @@ include_directories(${PYTHON_INCLUDE_DIRS})
 
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
-    target_link_libraries(larcv3 PUBLIC OpenMP::OpenMP_CXX)
     add_definitions(-DLARCV_OMP)
 endif()
 
