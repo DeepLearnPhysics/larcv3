@@ -887,13 +887,7 @@ PyObject* as_ndarray(const std::vector< unsigned int       >& vec) { return _as_
 PyObject* as_ndarray(const std::vector< long long          >& vec) { return _as_ndarray< long long          >(vec); }
 PyObject* as_ndarray(const std::vector< size_t >& vec) { return _as_ndarray< size_t >(vec); }
 PyObject* as_ndarray(const std::vector< unsigned long long >& vec) { return _as_ndarray< unsigned long long >(vec); }
-PyObject* as_ndarray(const std::vector< float              >& vec) {
-  auto start = std::chrono::steady_clock::now();
- PyObject *  ret = _as_ndarray< float              >(vec); 
-  auto duration = std::chrono::duration_cast< std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
-  std::cout << "Duration of numpy wrapper creation: " << duration.count() << std::endl;
-  return ret;
-}
+PyObject* as_ndarray(const std::vector< float              >& vec) { return _as_ndarray< float              >(vec); }
 PyObject* as_ndarray(const std::vector< double             >& vec) { return _as_ndarray< double             >(vec); }
 
 template<class T>
