@@ -31,7 +31,6 @@ class batch_pydata(object):
    def time_copy(self): return self._time_copy
    def time_reshape(self): return self._time_reshape
 
-
    def set_data(self,storage_id,larcv_batchdata):
       self._storage_id = storage_id
       dim = larcv_batchdata.dim()
@@ -58,19 +57,22 @@ class batch_pydata(object):
             # Create an array to hold the data if it does not exits:
             self._npy_data = np.ndarray(shape=(larcv_batchdata.data_size()), dtype=self._dtype)
          self._npy_data = self._npy_data.reshape(self.batch_data_size())
-         if self._dtype == "float32":
-            larcv.copy_array_float(self._npy_data,larcv_batchdata.data())
-         elif self._dtype == "float64":
-            larcv.copy_array_double(self._npy_data,larcv_batchdata.data())
+         self._npy_data = np.copy(larcv_batchdata.pydata())
+         # if self._dtype == "float32":
+         #    larcv.copy_array_float(self._npy_data,larcv_batchdata.data())
+         # elif self._dtype == "float64":
+         #    larcv.copy_array_double(self._npy_data,larcv_batchdata.data())
       else:
-         if self._dtype == "int":
-            self._npy_data = larcv.as_ndarray_int(larcv_batchdata.data())
-         elif self._dtype == "uint":
-            self._npy_data = larcv.as_ndarray_uint(larcv_batchdata.data())
-         elif self._dtype == "float32":
-            self._npy_data = larcv.as_ndarray_float(larcv_batchdata.data())
-         elif self._dtype == "float64":
-            self._npy_data = larcv.as_ndarray_double(larcv_batchdata.data())
+         self._npy_data = larcv_batchdata.pydata()
+         # if self._dtype == "int":
+         #    self._npy_data = larcv_batchdata.pydata()
+         # elif self._dtype == "uint":
+         #    self._npy_data = larcv_batchdata.pydata()
+         # elif self._dtype == "float32":
+         #    self._npy_data = larcv_batchdata.pydata()
+         #    # self._npy_data = larcv.as_ndarray_float(data)
+         # elif self._dtype == "float64":
+         #    self._npy_data = larcv_batchdata.pydata()
       self._time_copy = time.time() - ctime
 
 
