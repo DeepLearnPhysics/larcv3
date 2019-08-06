@@ -34,8 +34,6 @@ def test_sparsetensor2d_threadio(batch_size, n_reads=10):
     for i in range(n_reads):
         li.next("primary")
         data = li.fetch_minibatch_data('primary')
-        print(data['label'].shape)
-        print(data.keys())
         assert(data['label'].shape[0] == batch_size)
         end = time.time()
         print("Time to get a batch of size {}: ".format(batch_size), end-start)
@@ -44,5 +42,5 @@ def test_sparsetensor2d_threadio(batch_size, n_reads=10):
     print("Time to read {} batches of size {}".format(n_reads, batch_size), end - global_start)
     
 if __name__ == "__main__":
-    test_sparsetensor2d_threadio(batch_size=20, n_reads=10)
+    test_sparsetensor2d_threadio(batch_size=100, n_reads=10)
     print("Success")
