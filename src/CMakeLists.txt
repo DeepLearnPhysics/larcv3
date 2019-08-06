@@ -4,7 +4,8 @@ cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 # general configuration for compilation:
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3 -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Wall -O3 -g")
+
 
 if(MPI)
     # set(MPI_ASSUME_NO_BUILTIN_MPI True)
@@ -44,6 +45,12 @@ include_directories(${HDF5_INCLUDE_DIR})
 find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 
+
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(larcv3 PUBLIC OpenMP::OpenMP_CXX)
+    add_definitions(-DLARCV_OMP)
+endif()
 
 # This package needs numpy::
 
