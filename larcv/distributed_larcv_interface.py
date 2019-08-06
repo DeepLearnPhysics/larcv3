@@ -9,12 +9,7 @@ import numpy
 from mpi4py import MPI
 
 from .dataloader2 import larcv_threadio
-
-from enum import Enum
-class ReadOption(Enum):
-    read_from_single_rank = 0           # Use only the specified root rank to read the data, and the distribute to all other ranks
-    read_from_all_ranks = 1             # Use all ranks to read the data, no distribution is needed
-    read_from_single_local_rank = 2     # Use only one local rank to read the data, and the distribute to all other ranks in subgroup
+from . larcv_io_enums import ReadOption
 
 class larcv_interface(object):
 
