@@ -486,6 +486,7 @@ namespace larcv3 {
         throw larbys();
       }
     }
+    return true;
   }
 
 
