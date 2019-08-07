@@ -280,7 +280,7 @@ class larcv_queueio (object):
         # configure thread processor
         self._proc = larcv.QueueProcessor(self._name)
 
-        self._proc.configure(self._cfg_file, color = 0)
+        self._proc.configure(self._cfg_file, color)
 
         # fetch batch filler info
         self._storage = {}
