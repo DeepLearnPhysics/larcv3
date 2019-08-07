@@ -16,7 +16,10 @@ add_library(larcv3 SHARED
     )
 
 if (OpenMP_CXX_FOUND)
-    target_link_libraries(larcv3 ${OpenMP_CXX_LIBRARY} ${OpenMP_C_LIBRARY})
+    message("Linking against openmp")
+    message("OpenMP_CXX_LIBRARY: " ${OpenMP_CXX_LIBRARIES})
+    message("OpenMP_C_LIBRARY: " ${OpenMP_C_LIBRARIES})
+    target_link_libraries(larcv3 ${OpenMP_CXX_LIBRARIES} ${OpenMP_C_LIBRARIES})
 endif()
 
 # Link against hdf5:

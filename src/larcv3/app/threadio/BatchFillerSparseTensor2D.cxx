@@ -168,7 +168,6 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
     }
     if (!found) continue;
     size_t i = 0;
-    #pragma omp parallel for
     for (size_t i_voxel = 0; i_voxel < voxel_set.size(); i_voxel ++) {
     // for (auto const& voxel : voxel_set.as_vector()) {
       auto const & voxel = voxel_set.as_vector()[i_voxel];

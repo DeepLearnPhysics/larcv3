@@ -15,6 +15,14 @@
 #endif
 
 namespace larcv3 {
+int omp_thread_count() {
+    int n = 0;
+    #pragma omp parallel reduction(+:n)
+    n += 1;
+    return n;
+}
+
+  
   QueueProcessor::QueueProcessor(std::string name)
     : larcv_base(name)
     , _processing(false)
@@ -338,7 +346,7 @@ namespace larcv3 {
     auto start = std::chrono::steady_clock::now();
 
 #ifdef LARCV_OPENMP
-    std::cout << "Number of threads: " << omp_get_thread_num() << std::endl;
+    std::cout << "Number of threads: " << omp_thread_count() << std::endl;
 #endif
 
     #pragma omp parallel 
