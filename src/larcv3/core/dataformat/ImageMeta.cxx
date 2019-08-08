@@ -247,20 +247,16 @@ void ImageMeta<dimension>::coordinates( const std::vector<size_t> & index,  std:
 
   if (_valid ){
 
-    if (index.size() != dimension){
-      LARCV_CRITICAL() << "Incomplete index submitted for conversion to coordinates, abort." << std::endl;
-      throw larbys();
-    }
-
     output_coordinates.resize(index.size() * dimension);
 
-    #pragma omp parallel for
-    for (size_t i_index = 0; i_index < index.size(); ++ i_index){
-      size_t index_copy = index.at(i_index);
+    size_t i_index(0), axis, stride, index_copy, i;
+    #pragma omp parallel for private(axis, stride, index_copy)
+    for (i_index = 0; i_index < index.size(); ++ i_index){
+      index_copy = index.at(i_index);
 
-      for (size_t i = 0; i < dimension; i ++ ){
-        size_t axis = dimension - i - 1;
-        size_t stride = _number_of_voxels[axis];
+      for (i = 0; i < dimension; i ++ ){
+        axis = dimension - i - 1;
+        stride = _number_of_voxels[axis];
         output_coordinates.at(i_index*dimension + axis) = index_copy % stride;
         index_copy = index_copy / stride;
       }

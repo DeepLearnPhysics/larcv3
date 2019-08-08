@@ -349,13 +349,13 @@ int omp_thread_count() {
     std::cout << "Number of threads: " << omp_thread_count() << std::endl;
 #endif
 
-    #pragma omp parallel 
-    {
-      #pragma omp single
-      {
+    // #pragma omp parallel 
+    // {
+    //   #pragma omp single
+    //   {
         for(size_t i_entry =0; i_entry < _next_index_v.size(); ++ i_entry){
-          #pragma omp task
-          {
+          // #pragma omp task
+          // {
             auto & entry = _next_index_v[i_entry];
             LARCV_INFO() << "Processing entry: " << entry << std::endl;
 
@@ -364,10 +364,10 @@ int omp_thread_count() {
             _next_batch_entries_v.at(i) = entry;
             _next_batch_events_v.at(i) = _driver.event_id();
             ++i;
-          }
+          // }
         }
-      }
-    }
+    //   }
+    // }
     
 
     auto duration = std::chrono::duration_cast< std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
