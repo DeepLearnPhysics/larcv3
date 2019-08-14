@@ -117,6 +117,7 @@ class queue_interface(object):
 
         # Then, we promote those entries to the "current" batch:
         io.pop_current_data()
+        io.next(store_entries=True,store_event_ids=True)
 
         # Note that there is no "next" data pipelined yet.
 
@@ -127,6 +128,7 @@ class queue_interface(object):
         self._dims[mode] = {}
         for key in self._data_keys[mode]:
             self._dims[mode][key] = self._queueloaders[mode].fetch_data(self._data_keys[mode][key]).dim()
+
 
         end = time.time()
 
