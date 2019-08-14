@@ -329,19 +329,19 @@ int omp_thread_count() {
     _next_batch_events_v.clear();
     _next_batch_events_v.resize(_next_index_v.size());
 
-    LARCV_INFO() << "Entering process loop" << std::endl;
-    size_t i = 0;
-    auto start = std::chrono::steady_clock::now();
+    // LARCV_INFO() << "Entering process loop" << std::endl;
+    // auto start = std::chrono::steady_clock::now();
 
 #ifdef LARCV_OPENMP
     std::cout << "Number of threads: " << omp_thread_count() << std::endl;
 #endif
+    size_t i(0), i_entry(0);
 
     // #pragma omp parallel 
     // {
     //   #pragma omp single
     //   {
-        for(size_t i_entry =0; i_entry < _next_index_v.size(); ++ i_entry){
+        for(i_entry =0; i_entry < _next_index_v.size(); ++ i_entry){
           // #pragma omp task
           // {
             auto & entry = _next_index_v[i_entry];
@@ -349,20 +349,19 @@ int omp_thread_count() {
 
             bool good_status = _driver.process_entry(entry, true);
             LARCV_INFO() << "Finished processing event id: " << _driver.event_id().event_key() << std::endl;
-            _next_batch_entries_v.at(i) = entry;
-            _next_batch_events_v.at(i) = _driver.event_id();
-            ++i;
+            _next_batch_entries_v.at(i_entry) = entry;
+            _next_batch_events_v.at(i_entry) = _driver.event_id();
           // }
         }
     //   }
     // }
     
 
-    auto duration = std::chrono::duration_cast< std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
+    // auto duration = std::chrono::duration_cast< std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
 
 
-    std::cout << "Duration of omp loop: " << duration.count() << std::endl;
-    LARCV_DEBUG() << " end" << std::endl;
+    // std::cout << "Duration of omp loop: " << duration.count() << std::endl;
+    // LARCV_DEBUG() << " end" << std::endl;
 
     end_batch();
     
