@@ -110,7 +110,7 @@ class larcv_interface(object):
         self._data_keys[mode] = data_keys
 
         if ((self._rank == self._root and self._read_option is ReadOption['read_from_single_rank']) 
-          or (self._read_option is ReadOption['read_from_all_ranks'])
+          or (self._read_option is ReadOption['read_from_all_ranks_copy'])
           or (self._local_rank == self._root and self._read_option is ReadOption['read_from_single_local_rank'])):
         
             if mode in self._dataloaders:
@@ -128,7 +128,7 @@ class larcv_interface(object):
             # Initialize and configure a manager:
             io = larcv_threadio()
 
-            if (self._read_option is ReadOption['read_from_all_ranks']):
+            if (self._read_option is ReadOption['read_from_all_ranks_copy']):
                 io.set_start_entry(self._rank * minibatch_size)
                 io.set_entry_skip(self._size * minibatch_size)
             if (self._read_option is ReadOption['read_from_single_local_rank']):
@@ -175,7 +175,7 @@ class larcv_interface(object):
         do not call it yourself.
         '''
 
-        if (self._read_option is ReadOption['read_from_all_ranks']):
+        if (self._read_option is ReadOption['read_from_all_ranks_copy']):
             self._dims[mode] = self._raw_dims[mode]
             self._datasize[mode] = self._dataloaders[mode].fetch_n_entries()
             self._dtypes[mode] = self._raw_dtypes[mode]
@@ -378,7 +378,7 @@ class larcv_interface(object):
 
         # If this is the root node, read the data from disk:
         if ((self._rank == self._root and self._read_option is ReadOption['read_from_single_rank']) 
-          or (self._read_option is ReadOption['read_from_all_ranks'])
+          or (self._read_option is ReadOption['read_from_all_ranks_copy'])
           or (self._local_rank == self._root and self._read_option is ReadOption['read_from_single_local_rank'])):
             unscattered_data = {}
             for key in self._data_keys[mode]:
@@ -389,7 +389,7 @@ class larcv_interface(object):
                 unscattered_data[key]  = None
 
         this_data = {}
-        if (self._read_option is not ReadOption['read_from_all_ranks']):
+        if (self._read_option is not ReadOption['read_from_all_ranks_copy']):
             this_data = self.read_and_distribute_data(mode, unscattered_data)
         else:
             for key in self._data_keys[mode]:
@@ -397,7 +397,7 @@ class larcv_interface(object):
                 this_data[key] = numpy.reshape(unscattered_data[key], self._dims[mode][key])
 
         if ((self._rank == self._root and self._read_option is ReadOption['read_from_single_rank'])
-          or (self._read_option is ReadOption['read_from_all_ranks'])
+          or (self._read_option is ReadOption['read_from_all_ranks_copy'])
           or (self._local_rank == self._root and self._read_option is ReadOption['read_from_single_local_rank'])):
             self._dataloaders[mode].next()
 
