@@ -1,16 +1,26 @@
-import sys,time,os,signal
-import numpy
-import threading
+import sys
+import os
+import time
+import copy
+from collections import OrderedDict
+import socket, zlib
 import random
 
+import numpy
+from mpi4py import MPI
 
-from . import larcv
-from . batch_pydata import batch_pydata
-from . larcv_io_enums import RandomAccess
+from larcv            import larcv
+from . queueloader    import larcv_queueio
+from . larcv_io_enums import ReadOption, RandomAccess
 
 class queue_interface(object):
 
-    def __init__(self, verbose=False, random_access_mode="random_blocks"):
+    def __init__(self, 
+            verbose             = False, 
+            random_access_mode  = "random_blocks",
+            entry_comm          = MPI.COMM_WORLD,
+            io_comm             = MPI.COMM_WORLD):
+
         '''init function
         
         Not much to store here, just a dict of dataloaders and the keys to access their data.
@@ -24,6 +34,9 @@ class queue_interface(object):
         self._verbose       = verbose
         self._random_access = RandomAccess[random_access_mode]
         self._minibatch_size = {}
+
+        self._entry_comm = entry_comm
+        self._io_comm    = io_comm
 
         self._queue_prev_entries = {}
         self._queue_next_entries = {}
@@ -62,12 +75,52 @@ class queue_interface(object):
             n_entries = self._queueloaders[mode].fetch_n_entries()
             next_entries = random.sample(range(n_entries), minibatch_size)
         
-
+        next_entries = numpy.asarray(next_entries, dtype=numpy.int32)
         self._queue_next_entries[mode] = next_entries
+
 
         return next_entries
 
-    def prepare_manager(self, mode, io_config, minibatch_size, data_keys):
+    def coordinate_next_batch_indexes(self, mode, comm, root_rank = 0):
+        ''' 
+        This function is a little naieve (sp?).  But it will take the root rank, 
+        use it to determine the next batch indexes, then scatter those indexes.
+
+        It will scatter it evenly to the entire comm that is passed in.
+        '''
+
+        comm_size = comm.Get_size()
+
+        if comm.Get_rank() == root_rank:
+            set_entries = self.get_next_batch_indexes(mode, self._minibatch_size[mode])
+
+
+        # Create a buffer for the data to scatter
+        # Which is just a reference to the numpy array
+        sendbuff = None
+        if comm.Get_rank() == root_rank:
+            sendbuff = set_entries
+            
+        local_size = int(self._minibatch_size[mode] / comm_size)
+
+        # The recvbuff must be properly sized:
+        recvbuff = numpy.empty((local_size), dtype=numpy.int32)
+
+        # Scatterv will scatter numpy arrays, and note the automatic lookup of 
+        # dtypes from numpy to MPI.  If you are getting crazy, undefined or NaN values,
+        # the dtype is a good start for investigating.
+        comm.Scatter(sendbuff,
+                     recvbuff,
+                     root=root_rank)
+
+        #print (self._rank, self._local_rank, 'done Scatterv!')
+
+
+
+        return recvbuff
+
+
+    def prepare_manager(self, mode, io_config, minibatch_size, data_keys, color):
         '''Prepare a manager for io
         
         Creates an instance of larcv_threadio for a particular file to read.
@@ -95,15 +148,14 @@ class queue_interface(object):
 
         # Initialize and configure a manager:
         io = larcv_queueio()
-        io.configure(io_config)
+        io.configure(io_config, color)
         self._queueloaders.update({mode : io})
         self._minibatch_size[mode] = minibatch_size
 
         # Queue loaders are manually triggered IO, not always running, so
         # there is no "start_manager" function.  Everything is manual.
         # First, tell it what the entries for the first batch to read:
-
-        set_entries = self.get_next_batch_indexes(mode, minibatch_size)
+        set_entries = self.coordinate_next_batch_indexes(mode, comm=self._entry_comm)
 
 
         io.set_next_batch(set_entries)
@@ -134,7 +186,7 @@ class queue_interface(object):
 
         return
 
-    def prepare_next(self, mode, set_enties = None):
+    def prepare_next(self, mode, set_entries = None):
         '''Set in motion the processing of the next batch of data.
         
         Triggers the queue loader to start reading the next set of data
@@ -143,13 +195,13 @@ class queue_interface(object):
         '''
         # Which events should we read?
         if set_entries is None:
-            set_entries = self.get_next_batch_indexes(mode, self._minibatch_size[mode])
-
+            set_entries = self.coordinate_next_batch_indexes(mode, comm=self._entry_comm)
+            # set_entries = self.get_next_batch_indexes(mode, self._minibatch_size[mode])
+            
         self._queueloaders[mode].set_next_batch(set_entries)
-        t = threading.Thread(target=self._queueloaders[mode].batch_process, daemon=True)
+        target=self._queueloaders[mode].batch_process()
         # t.daemon = True
-        t.start()
-        return t
+        return 
         # return threading.Thread(target=self._queueloaders[mode].batch_process).start()
 
         # self._queueloaders[mode].next(store_event_ids=True, store_entries=True)
@@ -207,174 +259,4 @@ class queue_interface(object):
 
     def ready(self, mode):
         return self._queueloaders[mode].ready()
-
-
-    # def write_output(self, data, datatype, producer, entries, event_ids):
-    #     if self._writer is None:
-    #         raise Exception("Trying to write data with no writer configured.  Abort!")
-
-
-    #     self._writer.write(data=data, datatype=datatype, producer=producer, entries=entries, event_ids=event_ids)
-
-    #     return
-
-class larcv_queueio (object):
-
-    _instance_m={}
-
-    @classmethod
-    def exist(cls,name):
-        name = str(name)
-        return name in cls._instance_m
-
-    @classmethod
-    def instance_by_name(cls,name):
-        return cls._instance_m[name]
-
-    def __init__(self):
-        self._proc = None
-        self._name = ''
-        self._verbose = False
-        self._read_start_time = None
-        self._read_end_time = None
-        self._cfg_file = None
-        self._storage = {}
-        self._event_entries = None
-        self._event_ids = None
-
-    def reset(self):
-        if self._proc: self._proc.reset()
-
-    def __del__(self):
-        try:
-            self.reset()
-        except AttrbuteError:
-            pass
-
-    def configure(self,cfg, color=0):
-        # if "this" was configured before, reset it
-        if self._name: self.reset()
-         
-        # get name
-        if not cfg['filler_name']:
-            sys.stderr.write('filler_name is empty!\n')
-            raise ValueError
-
-        # ensure unique name
-        if self.__class__.exist(cfg['filler_name']) and not self.__class__.instance_by_name(cfg['filler_name']) == self:
-            sys.stderr.write('filler_name %s already running!' % cfg['filler_name'])
-            return
-        self._name = cfg['filler_name']         
-
-        # get QueueProcessor config file
-        self._cfg_file = cfg['filler_cfg']
-        if not self._cfg_file or not os.path.isfile(self._cfg_file):
-            sys.stderr.write('filler_cfg file does not exist: %s\n' % self._cfg_file)
-            raise ValueError
-     
-        # set verbosity
-        if 'verbosity' in cfg:
-            self._verbose = bool(cfg['verbosity'])
-  
-        # configure thread processor
-        self._proc = larcv.QueueProcessor(self._name)
-
-        self._proc.configure(self._cfg_file, color)
-
-        # fetch batch filler info
-        self._storage = {}
-        for i in range(len(self._proc.batch_fillers())):
-            pid = self._proc.batch_fillers()[i]
-            name = self._proc.storage_name(pid)
-            dtype = larcv.BatchDataTypeName(self._proc.batch_types()[i])
-            self._storage[name]=batch_pydata(dtype)
-            if 'make_copy' in cfg and cfg['make_copy']:
-                self._storage[name]._make_copy = True
-
-        # all success?
-        # register *this* instance
-        self.__class__._instance_m[self._name] = self
-
-    def set_next_batch(self, batch_indexes):
-        if type(batch_indexes) != larcv.VectorOfSizet:
-            indexes = larcv.VectorOfSizet()
-            indexes.resize(len(batch_indexes))
-            for i, val in enumerate(batch_indexes):
-                indexes[i] = int(val)
-            batch_indexes = indexes
-        self._proc.set_next_batch(batch_indexes)
-
-    def batch_process(self):
-        while self.is_reading():
-            time.sleep(0.01)
-        self._proc.batch_process()
-
-
-    def is_reading(self,storage_id=None):
-        return self._proc.is_reading()
-        
-    def pop_current_data(self):
-        # Promote the "next" data to current in C++ and release current
-        self._proc.pop_current_data()
-
-    def next(self,store_entries=False,store_event_ids=False):
-
-        # Calling next will load the next set of data into batch_pydata.  It does not do any 
-        # automatic data loading or steping, you must do this manually.
-
-        for name,storage in self._storage.items():
-            dtype = storage.dtype()
-            if dtype == "float32":
-                factory = larcv.BatchDataQueueFactoryFloat.get()
-            elif dtype == "float64":
-                factory = larcv.BatchDataQueueFactoryDouble.get()
-            elif dtype == "int":
-                factory = larcv.BatchDataQueueFactoryInt.get()
-            # These here below are NOT yet wrapped with swig.  Submit a ticket if you need them!
-            # elif dtype == "char":
-            #    factory = larcv.BatchDataQueueFactoryDouble.get()
-            # elif dtype == "short":
-            #    factory = larcv.BatchDataQueueFactoryDouble.get()
-            # elif dtype == "string":
-            #    factory = larcv.BatchDataQueueFactoryDouble.get()
-            else:
-                factory = None
-            batch_storage = factory.get_queue(name)
-
-            batch_data = factory.get_queue(name).get_batch()
-            storage.set_data(storage_id=name, larcv_batchdata=batch_data)
-
-        if not store_entries: self._event_entries = None
-        else: self._event_entries = self._proc.processed_entries()
-
-        if not store_event_ids: self._event_ids = None
-        else: self._event_ids = self._proc.processed_events()
-
-        return 
-
-    def fetch_data(self,key):
-        try:
-            return self._storage[key]
-        except KeyError:
-            sys.stderr.write('Cannot fetch data w/ key %s (unknown)\n' % key)
-            return
-
-    def fetch_event_ids(self):
-        return self._event_ids
-
-    def fetch_entries(self):
-        return self._event_entries
-
-    def fetch_n_entries(self):
-        return self._proc.get_n_entries()
-
-def sig_kill(signal,frame):
-    print('\033[95mSIGINT detected.\033[00m Finishing the program gracefully.')
-    for name,ptr in larcv_threadio._instance_m.items():
-        print('Terminating filler: %s' % name)
-        ptr.reset()
- 
-signal.signal(signal.SIGINT,  sig_kill)
-
-
 

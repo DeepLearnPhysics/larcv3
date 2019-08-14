@@ -8,12 +8,21 @@ import socket, zlib
 import numpy
 from mpi4py import MPI
 
-from .dataloader2 import larcv_threadio
+from . threadloader   import larcv_threadio
 from . larcv_io_enums import ReadOption
 
-class larcv_interface(object):
+class thread_interface(object):
 
-    def __init__(self, verbose=False, root=0, comm=MPI.COMM_WORLD, distribute_to_root=True, read_option=None, local_rank=None, local_size=None):
+    def __init__(self, 
+                verbose             = False, 
+                root                = 0, 
+                comm                = MPI.COMM_WORLD, 
+                distribute_to_root  = True, 
+                read_option         = None, 
+                local_rank          = None, 
+                local_size          = None,
+                backend             = "queue"):
+
         object.__init__(self)
 
         if read_option is None:
@@ -91,7 +100,6 @@ class larcv_interface(object):
         self._datasize    = {}
 
         return
-
 
     def prepare_manager(self, mode, io_config, minibatch_size, data_keys):
         '''
