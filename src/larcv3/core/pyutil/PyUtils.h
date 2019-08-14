@@ -24,7 +24,7 @@ namespace larcv3 {
 inline int SetPyUtil() {
   static bool once = false;
   if (!once) {
-    import_array();
+    _import_array();
     once = true;
   }
   return 0;
