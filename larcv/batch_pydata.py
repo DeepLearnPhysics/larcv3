@@ -58,21 +58,10 @@ class batch_pydata(object):
             self._npy_data = np.ndarray(shape=(larcv_batchdata.data_size()), dtype=self._dtype)
          self._npy_data = self._npy_data.reshape(self.batch_data_size())
          self._npy_data = np.copy(larcv_batchdata.pydata())
-         # if self._dtype == "float32":
-         #    larcv.copy_array_float(self._npy_data,larcv_batchdata.data())
-         # elif self._dtype == "float64":
-         #    larcv.copy_array_double(self._npy_data,larcv_batchdata.data())
+
       else:
          self._npy_data = larcv_batchdata.pydata()
-         # if self._dtype == "int":
-         #    self._npy_data = larcv_batchdata.pydata()
-         # elif self._dtype == "uint":
-         #    self._npy_data = larcv_batchdata.pydata()
-         # elif self._dtype == "float32":
-         #    self._npy_data = larcv_batchdata.pydata()
-         #    # self._npy_data = larcv.as_ndarray_float(data)
-         # elif self._dtype == "float64":
-         #    self._npy_data = larcv_batchdata.pydata()
+
       self._time_copy = time.time() - ctime
 
 
