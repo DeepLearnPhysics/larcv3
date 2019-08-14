@@ -187,7 +187,8 @@ int omp_thread_count() {
   {
     reset();
 
-    std::cout << "\033[93m setting verbosity \033[00m" << orig_cfg.get<unsigned short>("Verbosity", 2) << std::endl;
+    
+    // std::cout << "\033[93m setting verbosity \033[00m" << orig_cfg.get<unsigned short>("Verbosity", 2) << std::endl;
     set_verbosity( (msg::Level_t)(orig_cfg.get<unsigned short>("Verbosity", 2)) );
 
     _input_fname_v = orig_cfg.get<std::vector<std::string> >("InputFiles");
@@ -217,7 +218,6 @@ int omp_thread_count() {
       proc_cfg.add_value(value_key, orig_cfg.get<std::string>(value_key));
     }
     proc_cfg.add_value("RandomAccess", "false");
-    std::cout << "Configuring IO " << std::endl;
 
     // Brew read-only configuration
     PSet io_cfg(io_cfg_name);
@@ -272,7 +272,6 @@ int omp_thread_count() {
       // only-once-operation among all queueus: initialize storage
       _batch_filler_id_v.clear();
       _batch_data_type_v.clear();
-      std::cout << "_process_name_v.size(): " << _process_name_v.size() << std::endl;
       for (size_t pid = 0; pid < _process_name_v.size(); ++pid) {
         auto proc_ptr = _driver.process_ptr(pid);
         if (!(proc_ptr->is("BatchFiller"))) continue;
