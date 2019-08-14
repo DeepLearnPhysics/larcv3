@@ -29,6 +29,7 @@ IOManager::IOManager(IOMode_t mode, std::string name)
       _in_file_v(),
       _in_dir_v(),
       _key_list(),
+      _fapl(H5::FileAccPropList::DEFAULT),
       _product_ctr(0),
       _product_ptr_v(),
       _product_type_v(),
@@ -101,6 +102,12 @@ void IOManager::configure(const PSet& cfg) {
   _compression_override = cfg.get<uint>("Compression", _compression_override);
 
   _h5_core_driver = cfg.get<bool>("UseH5CoreDriver", false);
+  if (_h5_core_driver) {
+    LARCV_INFO() << "File will be stored entirely on memory." << std::endl;
+    // 1024 is number of bytes to increment each time more memory is needed;
+    //'false': do not write contents to disk when the file is closed
+    _fapl.setCore(1024, false);
+  }
 
   // Figure out input files
   _in_file_v.clear();
@@ -155,8 +162,48 @@ void IOManager::configure(const PSet& cfg) {
   }
 }
 
-bool IOManager::initialize() {
+bool IOManager::initialize(int color) {
   LARCV_DEBUG() << "start" << std::endl;
+
+#ifdef LARCV_MPI
+
+  int mpi_initialized;
+  MPI_Initialized(&mpi_initialized);
+
+  if (!mpi_initialized){
+    int ierr = MPI_Init(NULL, NULL) ;  
+  }
+
+  // Get the number of processes
+  int world_size;
+  MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+
+  // Get the rank of the process
+  int world_rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+
+
+  // The first step for this communicator is to divide COMM_WORLD
+  // based on the initialize parameter.  If color is not passed,
+  // This duplicates COMM_WORLD
+  MPI_Comm_split(
+    MPI_COMM_WORLD,
+    color,
+    world_rank,
+    &_private_comm);
+
+  // Get the number of processes
+  MPI_Comm_size(_private_comm, &_private_size);
+
+  // Get the rank of the process
+  MPI_Comm_rank(_private_comm, &_private_rank);
+
+  if (_io_mode != kREAD && _private_size != 1){
+    LARCV_CRITICAL() << "Only read only mode is compatible with MPI with more than one rank!" << std::endl;
+    throw larbys();
+  }
+
+#endif
 
   // Lock:
   __ioman_mtx.lock();
@@ -227,7 +274,7 @@ bool IOManager::initialize() {
         // Else:
         // Add it to the store only list:
         else{
-          store_only_id.push_back(id);          
+          store_only_id.push_back(id);
         }
       }
     }
@@ -313,9 +360,9 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
     // But we can't create and output group if we are not storing that product.
 
     // Check _store_only instead:
-    
+
     bool storing(false);
-    
+
     if (_store_only.empty()){
       storing = true;
     }
@@ -327,7 +374,7 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
 
 
 
-    if (storing){ 
+    if (storing){
       LARCV_INFO() << "kWRITE/kBOTH mode: creating an output group" << std::endl;
       LARCV_INFO() << "Data pointer: " << _product_ptr_v[id] << "(" << id << "/"
                     << _product_ptr_v.size() << ")" << std::endl;
@@ -341,7 +388,7 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
     else{
       LARCV_DEBUG() << "kWRITE/kBOTH mode is on, but skipping storage for output group " << group_name << std::endl;
     }
-  
+
   }
 
   return id;
@@ -431,12 +478,12 @@ void IOManager::prepare_input() {
     _in_entries_v.push_back(dims_current[0]);
     _in_entries_total += dims_current[0];
 
-    
+
     // Next, visit the available groups and see what producers are available.
     std::set<std::string> processed_object;
     for (size_t i_obj = 0; i_obj < data.getNumObjs(); ++i_obj) {
       char temp_name[128];
-      // std::string obj_name = 
+      // std::string obj_name =
       int real_size = data.getObjnameByIdx(i_obj, temp_name, 128);
       std::string obj_name(temp_name);
       processed_object.insert(obj_name);
@@ -504,23 +551,19 @@ void IOManager::prepare_input() {
   }
 
   // Make sure the first file is open:
-  open_new_input_file(_in_file_v[0]);
+  if (_in_file_v.size() > 0) 
+    open_new_input_file(_in_file_v[0]);
 
 
 }
 
-void IOManager::open_new_input_file(std::string filename){
-  
-  H5::FileAccPropList  fapl(H5::FileAccPropList::DEFAULT);
 
-  if (_h5_core_driver) {
-    LARCV_INFO() << "File will be stored entirely on memory." << std::endl;
-    // 1024 is number of bytes to increment each time more memory is needed; 
-    //'false': do not write contents to disk when the file is closed
-    fapl.setCore(1024, false);
-  } 
+
+void IOManager::open_new_input_file(std::string filename){
+
+
   try{
-    _in_open_file = H5::H5File(filename.c_str(), H5F_ACC_RDONLY, H5::FileCreatPropList::DEFAULT, fapl);
+    _in_open_file = H5::H5File(filename.c_str(), H5F_ACC_RDONLY, H5::FileCreatPropList::DEFAULT, _fapl);
   }
   catch ( ... ) {
     LARCV_CRITICAL() << "Open attempt failed for a file: " << filename
@@ -534,7 +577,7 @@ void IOManager::open_new_input_file(std::string filename){
 }
 
 bool IOManager::read_entry(const size_t index, bool force_reload) {
-  
+
   __ioman_mtx.lock();
 
   // Don't reopen groups unless absolutely necessary:
@@ -686,9 +729,9 @@ bool IOManager::save_entry() {
   // in kBOTH mode make sure all Group entries are read-in
   if (_io_mode == kBOTH) {
     for (size_t id = 0; id < _out_group_v.size(); ++id) {
-      if ( _store_id_bool.size() && 
-           (id >= _store_id_bool.size() || !_store_id_bool[id]) 
-          ) continue; 
+      if ( _store_id_bool.size() &&
+           (id >= _store_id_bool.size() || !_store_id_bool[id])
+          ) continue;
       if (_product_status_v[id] == kInputFileUnread){
         get_data(id);
         _product_status_v[id] = kInputFileRead;
@@ -915,7 +958,9 @@ EventBase* IOManager::get_data(const size_t id) {
     }
 
     try {
+      LARCV_DEBUG() << "Calling deserialize for " << group_name << std::endl;
       _product_ptr_v[id]->deserialize(&group, _in_index - _current_offset, _force_reopen_groups);
+      LARCV_DEBUG() << "Done deserialize for " << group_name << std::endl;
       _product_status_v[id] = kInputFileRead;
     }
     catch (...){

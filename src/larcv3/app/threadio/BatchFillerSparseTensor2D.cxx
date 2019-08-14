@@ -167,34 +167,77 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
       count ++;
     }
     if (!found) continue;
-    size_t i = 0;
-    for (auto const& voxel : voxel_set.as_vector()) {
-      int row = meta.coordinate(voxel.id(),0);
-      int col = meta.coordinate(voxel.id(),1);
+    size_t max_voxel(voxel_set.size());
+    if (max_voxel > _max_voxels) {
+      max_voxel = _max_voxels;
+      LARCV_INFO() << "Truncating the number of voxels!" << std::endl;
+    }
 
-      if (flip_cols) col = meta.cols() - (col + 1);
-      if (flip_rows) row = meta.rows() - (row + 1);
+    size_t index;
+    int row(0), col(0);
+    int row_mult(1), row_add(0);
+    int col_mult(1), col_add(0);
+
+    if (flip_rows){
+      row_mult = -1;
+      row_add = meta.rows() - 1;
+    }
+    if (flip_cols){
+      col_mult = -1;
+      col_add = meta.cols() - 1;
+    }
+
+    // Get all of the indexes:
+    std::vector<size_t> indexes = voxel_set.indexes();
+
+    // Convert them all to coordinates:
+    std::vector<size_t> coordinates;
+    meta.coordinates(indexes, coordinates);
 
 
-      size_t index = count*(_max_voxels*point_dim) + i*point_dim;
-      _entry_data.at(index) = row;
-      _entry_data.at(index + 1) = col;
-      if (_include_values){
-        _entry_data.at(index + 2) = voxel.value();
-      }
-      i++;
+    if (_include_values){
+      std::vector<float>  values  = voxel_set.values(); 
+      #pragma omp parallel private(row, col, index) shared(_entry_data, row_mult, row_add, col_mult, col_add)
+      for (size_t i_voxel = 0; i_voxel < max_voxel; i_voxel ++) {
+      // for (auto const& voxel : voxel_set.as_vector()) {
+        row = coordinates[i_voxel*2];
+        col = coordinates[i_voxel*2 + 1];
 
-      if (i == _max_voxels) {
-        LARCV_INFO() << "Truncating the number of voxels!" << std::endl;
-        break;
+        col = col_mult*col + col_add;
+        row = row_mult*row + row_add;
+
+
+        index = count*(_max_voxels*point_dim) + i_voxel*point_dim;
+        _entry_data.at(index) = row;
+        _entry_data.at(index + 1) = col;
+        _entry_data.at(index + 2) = values[i_voxel];
       }
     }
+    else{
+      #pragma omp parallel private(row, col, index) shared(_entry_data, row_mult, row_add, col_mult, col_add)
+      for (size_t i_voxel = 0; i_voxel < max_voxel; i_voxel ++) {
+      // for (auto const& voxel : voxel_set.as_vector()) {
+        row = coordinates[i_voxel*2];
+        col = coordinates[i_voxel*2 + 1];
+
+        col = col_mult*col + col_add;
+        row = row_mult*row + row_add;
+
+        index = count*(_max_voxels*point_dim) + i_voxel*point_dim;
+        _entry_data.at(index) = row;
+        _entry_data.at(index + 1) = col;
+      }
+    }
+   
+
+    
 
   }
 
   // record the entry data
   LARCV_INFO() << "Inserting entry data of size " << _entry_data.size()
                << std::endl;
+
   set_entry_data(_entry_data);
 
   return true;

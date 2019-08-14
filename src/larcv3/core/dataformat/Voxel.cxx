@@ -135,7 +135,7 @@ namespace larcv3 {
     return;
   }
 
-  std::vector<float> VoxelSet::values(){
+  std::vector<float> VoxelSet::values() const {
     std::vector<float> ret;
     ret.resize(_voxel_v.size());
     size_t i = 0;
@@ -146,7 +146,7 @@ namespace larcv3 {
     return ret;
   }
 
-  std::vector<size_t> VoxelSet::indexes(){
+  std::vector<size_t> VoxelSet::indexes() const {
     std::vector<size_t> ret;
     ret.resize(_voxel_v.size());
     size_t i = 0;

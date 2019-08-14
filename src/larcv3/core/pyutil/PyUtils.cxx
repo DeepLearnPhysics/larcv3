@@ -10,13 +10,6 @@
 
 namespace larcv3 {
 
-void SetPyUtil() {
-  static bool once = false;
-  if (!once) {
-    _import_array();
-    once = true;
-  }
-}
 
 PyObject *as_ndarray(const Image2D &img) {
   SetPyUtil();
@@ -871,6 +864,9 @@ PyObject *_as_ndarray(const std::vector<T> &vec) {
   dims[0] = (int)vec.size();
   PyArrayObject *array = (PyArrayObject *)PyArray_SimpleNewFromData(
       nd, dims, ctype_to_numpy<T>(), (char *)&(vec[0]));
+
+
+
   return PyArray_Return(array);
 }
 

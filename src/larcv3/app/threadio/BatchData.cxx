@@ -20,6 +20,33 @@ namespace larcv3 {
   }
 
   template<class T>
+  PyObject * BatchData<T>::pydata() const
+  {
+    if (_state != BatchDataState_t::kBatchStateFilled) {
+      LARCV_SCRITICAL() << "Current batch state: " << (int)_state
+                        << " not ready to expose data!" << std::endl;
+      throw larbys();
+    }
+
+    return larcv3::_as_ndarray(_data);
+  // if (vec.size() >= INT_MAX) {
+  //   LARCV_CRITICAL() << "Length of data vector too long to specify ndarray. "
+  //                       "Use by batch call."
+  //                    << std::endl;
+  //   throw larbys();
+  // }
+  // int nd = 1;
+  // npy_intp dims[1];
+  // dims[0] = (int)vec.size();
+  // PyArrayObject *array = (PyArrayObject *)PyArray_SimpleNewFromData(
+  //     nd, dims, ctype_to_numpy<T>(), (char *)&(vec[0]));
+
+
+
+  // return PyArray_Return(array);
+  }
+
+  template<class T>
   size_t BatchData<T>::data_size(bool calculate) const
   {
     if (_dim.empty()) return 0;
@@ -94,9 +121,11 @@ namespace larcv3 {
       ++entry_idx;
       ++_current_size;
     }
-
-    if (_current_size == _data.size())
+    // _data = std::move(entry_data);
+    // _current_size = entry_data.size();
+    if (_current_size == _data.size()){
       _state = BatchDataState_t::kBatchStateFilled;
+    }
   }
 
   template <class T>
@@ -123,10 +152,10 @@ namespace larcv3 {
 
 }
 
-template class larcv3::BatchData<char>;
+// template class larcv3::BatchData<char>;
 template class larcv3::BatchData<short>;
 template class larcv3::BatchData<int>;
 template class larcv3::BatchData<float>;
 template class larcv3::BatchData<double>;
-template class larcv3::BatchData<std::string>;
+// template class larcv3::BatchData<std::string>;
 #endif

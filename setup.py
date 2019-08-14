@@ -15,9 +15,10 @@ setup(
     cmake_source_dir='src/',
     cmake_args=[
         '-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.9',
-        '-DCMAKE_NO_SWIG=False'
+        '-DCMAKE_NO_SWIG=False',
+        '-DMPI:BOOL=OFF',
+        '-DOPENMP:BOOL=OFF',
     ],
-    # extra_link_args=["-stdlib=libc++", "-mmacosx-version-min=10.9"],
     include_package_data=True,
     author=['Corey Adams', 'Kazuhiro Terao', 'Taritree Wongjirad', 'Marco del Tutto'],
     description='C++ IO and Preprocessing package for sparse neutrino data, with H5 for IO and python bindings.',

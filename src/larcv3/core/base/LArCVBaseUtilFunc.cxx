@@ -35,6 +35,14 @@ namespace larcv3 {
     return res;
   }
 
+  bool mpi_enabled(){
+#ifdef LARCV_MPI
+    return true;
+#else
+    return false;
+#endif
+  }
+
 }
 
 #endif

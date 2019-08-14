@@ -2,10 +2,10 @@
  * \file ProcessDriver.h
  *
  * \ingroup core_Processor
- * 
+ *
  * \brief Class def header for a class larcv3::ProcessDriver
  *
- * @author drinkingkazu
+ * @author drinkingkazu, cadams
  */
 
 /** \addtogroup core_Processor
@@ -27,9 +27,9 @@ namespace larcv3 {
      The configuration of larcv3::ProcessDriver itself can contain larcv3::IOManager configuration.
   */
   class ProcessDriver : public larcv_base {
-    
+
   public:
-    
+
     /// Default constructor
     ProcessDriver(std::string name="ProcessDriver");
     /// Default destructor
@@ -57,7 +57,7 @@ namespace larcv3 {
     /// Resets the states & all variables. Attached process modules would be removed.
     void reset();
     /// Must be called after configure. This initializes larcv3::IOManager (open files) and initialize attached process modules.
-    void initialize();
+    void initialize(int color=0);
     /// Processes the "next entry" automatically (you don't have to control the counter to specify which entry)
     bool process_entry();
     /// Processes multiple entries (specified in the 2nd argument) from a specified entry (1st argument)
@@ -82,7 +82,7 @@ namespace larcv3 {
     // Information access methods
     //
     /// Returns larcv3::EventBase object that contains an "ID" (run/event integers)
-    inline const EventID& event_id() const 
+    inline const EventID& event_id() const
     { return ( _io.io_mode() == larcv3::IOManager::kREAD ? _io.event_id() : _io.last_event_id()); }
     /// Returns a unique ID (integer) assigned for a process module (provide the module's name in argument)
     ProcessID_t process_id(std::string name) const;
@@ -94,12 +94,12 @@ namespace larcv3 {
     const ProcessBase* process_ptr(ProcessID_t id) const;
     /// Returns read-only larcv3::IOManager instance
     const IOManager& io() const { return _io; }
-    /// When run in random-access IO mode, returns original event entry number for a randomized index number 
+    /// When run in random-access IO mode, returns original event entry number for a randomized index number
     size_t get_tree_index( size_t entry ) const;
     /// Returns true if after any entry is processed (process_entry/batch_process) but not yet finalized
     inline bool processing() const { return _processing; }
 
-  private:
+  protected:
 
     bool _process_entry_();
     size_t _batch_start_entry;
@@ -117,5 +117,4 @@ namespace larcv3 {
 }
 
 #endif
-/** @} */ // end of doxygen group 
-
+/** @} */ // end of doxygen group

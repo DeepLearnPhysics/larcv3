@@ -26,6 +26,8 @@ namespace larcv3 {
   /// Given a configuration file (full path), create and return larcv3::PSet
   PSet CreatePSetFromFile(std::string fname,std::string cfg_name="cfg");
 
+  bool mpi_enabled();
+
 }
 
 #endif

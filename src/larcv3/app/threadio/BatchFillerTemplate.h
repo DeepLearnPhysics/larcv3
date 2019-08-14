@@ -18,7 +18,8 @@
 #include "BatchData.h"
 
 namespace larcv3 {
-  class ThreadProcessor;
+  class ThreadProcessor; 
+  class QueueProcessor;
   /**
      \class ProcessBase
      User defined class BatchFillerTemplate ... these comments are used to generate
@@ -27,6 +28,7 @@ namespace larcv3 {
   template <class T>
   class BatchFillerTemplate : public BatchHolder {
     friend ThreadProcessor;
+    friend QueueProcessor;
   public:
 
     /// Default constructor

@@ -18,6 +18,7 @@
 #include "ThreadIOTypes.h"
 namespace larcv3 {
   class ThreadProcessor;
+  class QueueProcessor;
 
   /**
      \class ProcessBase
@@ -26,6 +27,7 @@ namespace larcv3 {
   */
   class BatchHolder : public ProcessBase{
     friend class ThreadProcessor;
+    friend class QueueProcessor;
   public:
     
     /// Default constructor

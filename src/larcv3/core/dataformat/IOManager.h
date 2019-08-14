@@ -21,6 +21,10 @@
 
 #include "H5Cpp.h"
 
+#ifdef LARCV_MPI
+#include <mpi.h>
+#endif
+
 #include "larcv3/core/base/larcv_base.h"
 #include "larcv3/core/base/larbys.h"
 #include "larcv3/core/base/PSet.h"
@@ -63,7 +67,7 @@ namespace larcv3 {
     ProducerID_t producer_id(const ProducerName_t& name) const;
     std::string product_type(const size_t id) const;
     void configure(const PSet& cfg);
-    bool initialize();
+    bool initialize(int color=0);
     bool read_entry(const size_t index, bool force_reload = false);
     bool save_entry();
     void finalize();
@@ -86,11 +90,11 @@ namespace larcv3 {
     // Some template class getter for auto-cast
     //
 
-    template <class T> 
+    template <class T>
     inline T& get_data(const std::string& producer)
     { return *((T*)(this->get_data(product_unique_name<T>(), producer))); }
 
-    template <class T> 
+    template <class T>
     inline T& get_data(const ProducerID_t id)
     {
       if (id >= _product_type_v.size()) {
@@ -135,7 +139,7 @@ namespace larcv3 {
 
 
 
-  private:
+  protected:
     void   set_id();
     void   prepare_input();
     size_t register_producer(const ProducerName_t& name);
@@ -162,10 +166,10 @@ namespace larcv3 {
 
     // Parameters controlling output file large scale tracking:
     // Name of the output file
-    H5::H5File  _out_file; 
+    H5::H5File  _out_file;
     // Current output index
     size_t      _out_index;
-    // Total output entries 
+    // Total output entries
     size_t      _out_entries;
     // Output file name:
     std::string _out_file_name;
@@ -187,7 +191,7 @@ namespace larcv3 {
     // List of total entries in input files
     std::vector<size_t>             _in_entries_v;
 
-    // Parameters for the event ID management:     
+    // Parameters for the event ID management:
     EventID   _event_id;
     EventID   _set_event_id;
     EventID   _last_event_id;
@@ -208,9 +212,10 @@ namespace larcv3 {
     std::map<larcv3::ProducerName_t, larcv3::ProducerID_t> _key_list;
     // This is the key list for all producers in the input file only:
     std::map<larcv3::ProducerName_t, larcv3::ProducerID_t> _in_key_list;
-   
 
 
+    // Hold a copy of the file access property list:
+    H5::FileAccPropList _fapl;
 
     std::map<std::string, H5::Group> _groups;
 
@@ -236,6 +241,15 @@ namespace larcv3 {
 
     // Internal bookkeeping for when the input file switches:
     bool _force_reopen_groups;
+
+    // MPI Variables:
+#ifdef LARCV_MPI
+
+    MPI_Comm _private_comm;
+    int _private_rank;
+    int _private_size;
+
+#endif
 
   };
 

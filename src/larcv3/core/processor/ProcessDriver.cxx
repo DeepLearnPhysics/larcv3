@@ -16,7 +16,8 @@ ProcessDriver::ProcessDriver(std::string name)
       _enable_filter(false),
       _random_access(0),
       _proc_v(),
-      _processing(false) {}
+      _processing(false) {
+      }
 
 void ProcessDriver::reset() {
   LARCV_DEBUG() << "Called" << std::endl;
@@ -99,7 +100,6 @@ void ProcessDriver::configure(const std::string config_file) {
     LARCV_CRITICAL() << "Config file not set!" << std::endl;
     throw larbys();
   }
-
   // check cfg content top level
   auto main_cfg = CreatePSetFromFile(config_file);
   if (!main_cfg.contains_pset(name())) {
@@ -109,12 +109,17 @@ void ProcessDriver::configure(const std::string config_file) {
                      << main_cfg.dump() << std::endl;
     throw larbys();
   }
+
   auto const cfg = main_cfg.get<larcv3::PSet>(name());
   configure(cfg);
 }
 
 void ProcessDriver::configure(const PSet& cfg) {
   reset();
+  // Set the verbosity up front: 
+  set_verbosity(
+      (msg::Level_t)(cfg.get<unsigned short>("Verbosity", logger().level())));
+  larcv3::logger::get_shared().set(logger().level());
 
   // check io config exists
   LARCV_INFO() << "Retrieving IO config" << std::endl;
@@ -140,14 +145,14 @@ void ProcessDriver::configure(const PSet& cfg) {
 
   // Prepare IO manager
   LARCV_INFO() << "Configuring IO" << std::endl;
-  _io = IOManager(io_config);
+  _io.configure(io_config);
   // Set ProcessDriver
   LARCV_INFO() << "Retrieving self (ProcessDriver) config" << std::endl;
-  set_verbosity(
-      (msg::Level_t)(cfg.get<unsigned short>("Verbosity", logger().level())));
-  larcv3::logger::get_shared().set(logger().level());
+  
   _enable_filter = cfg.get<bool>("EnableFilter", false);
+  LARCV_INFO() << "Enable Filter is :  " << _enable_filter << std::endl;
   auto random_access_bool = cfg.get<bool>("RandomAccess");
+  LARCV_INFO() << "RandomAccess is :  " << random_access_bool << std::endl;
   if (!random_access_bool)
     _random_access = 0;
   else
@@ -222,7 +227,7 @@ void ProcessDriver::configure(const PSet& cfg) {
   }
 }
 
-void ProcessDriver::initialize() {
+void ProcessDriver::initialize(int color) {
   LARCV_DEBUG() << "Called" << std::endl;
   // check state
   if (_processing) {
@@ -234,7 +239,7 @@ void ProcessDriver::initialize() {
 
   // Initialize IO
   LARCV_INFO() << "Initializing IO " << std::endl;
-  _io.initialize();
+  _io.initialize(color);
 
   // Handle invalid cases
   auto const nentries = _io.get_n_entries();

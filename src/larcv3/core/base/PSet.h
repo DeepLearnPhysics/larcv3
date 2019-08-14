@@ -106,6 +106,7 @@ namespace larcv3 {
         std::string msg;
         msg = "Key does not exist: \"" + key + "\"";
         std::cout<<dump()<<std::endl;
+        LARCV_CRITICAL() << msg << std::endl;
         throw larbys(msg);
       }
       return parser::FromString<T>((*iter).second);
