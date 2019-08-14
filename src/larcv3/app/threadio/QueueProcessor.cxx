@@ -139,8 +139,6 @@ int omp_thread_count() {
       auto const& name = _process_name_v[pid];
       auto const& datatype = _batch_data_type_v[pid];
       switch ( datatype ) {
-      // case BatchDataType_t::kBatchDataChar:
-      //   ready = ready && BatchDataQueueFactory<char>::get().get_queue(name).is_next_ready(); break;
       case BatchDataType_t::kBatchDataShort:
         ready = ready && BatchDataQueueFactory<short>::get().get_queue(name).is_next_ready(); break;
       case BatchDataType_t::kBatchDataInt:
@@ -149,8 +147,6 @@ int omp_thread_count() {
         ready = ready && BatchDataQueueFactory<float>::get().get_queue(name).is_next_ready(); break;
       case BatchDataType_t::kBatchDataDouble:
         ready = ready && BatchDataQueueFactory<double>::get().get_queue(name).is_next_ready(); break;
-      // case BatchDataType_t::kBatchDataString:
-      //   ready = ready && BatchDataQueueFactory<std::string>::get().get_queue(name).is_next_ready(); break;
       default:
         LARCV_CRITICAL() << "Process name " << name
                          << " encountered none-supported BatchDataType_t: " << int(datatype) << std::endl;
@@ -166,8 +162,6 @@ int omp_thread_count() {
       auto const& name = _process_name_v[pid];
       auto const& datatype = _batch_data_type_v[pid];
       switch ( datatype ) {
-      // case BatchDataType_t::kBatchDataChar:
-        // BatchDataQueueFactory<char>::get_writeable().get_queue_writeable(name).pop(); break;
       case BatchDataType_t::kBatchDataShort:
         BatchDataQueueFactory<short>::get_writeable().get_queue_writeable(name).pop(); break;
       case BatchDataType_t::kBatchDataInt:
@@ -176,8 +170,6 @@ int omp_thread_count() {
         BatchDataQueueFactory<float>::get_writeable().get_queue_writeable(name).pop(); break;
       case BatchDataType_t::kBatchDataDouble:
         BatchDataQueueFactory<double>::get_writeable().get_queue_writeable(name).pop(); break;
-      // case BatchDataType_t::kBatchDataString:
-        // BatchDataQueueFactory<std::string>::get_writeable().get_queue_writeable(name).pop(); break;
       default:
         LARCV_CRITICAL() << "Process name " << name
                          << " encountered none-supported BatchDataType_t: " << int(datatype) << std::endl;
@@ -288,8 +280,6 @@ int omp_thread_count() {
         _batch_data_type_v.push_back( ((BatchHolder*)(proc_ptr))->data_type() );
         auto const& name = _process_name_v[pid];
         switch ( _batch_data_type_v.back() ) {
-        // case BatchDataType_t::kBatchDataChar:
-          // BatchDataQueueFactory<char>::get_writeable().make_queue(name); break;
         case BatchDataType_t::kBatchDataShort:
           BatchDataQueueFactory<short>::get_writeable().make_queue(name); break;
         case BatchDataType_t::kBatchDataInt:
@@ -298,8 +288,6 @@ int omp_thread_count() {
           BatchDataQueueFactory<float>::get_writeable().make_queue(name); break;
         case BatchDataType_t::kBatchDataDouble:
           BatchDataQueueFactory<double>::get_writeable().make_queue(name); break;
-        // case BatchDataType_t::kBatchDataString:
-          // BatchDataQueueFactory<std::string>::get_writeable().make_queue(name); break;
         default:
           LARCV_CRITICAL() << "Process name " << name
                            << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(proc_ptr))->data_type()) << std::endl;
@@ -392,11 +380,6 @@ int omp_thread_count() {
       auto const& name = _process_name_v[pid];
       BatchDataState_t batch_state = BatchDataState_t::kBatchStateUnknown;
       switch ( ((BatchHolder*)(proc_ptr))->data_type() ) {
-      // case BatchDataType_t::kBatchDataChar:
-      //   ((BatchFillerTemplate<char>*)proc_ptr)->_batch_data_ptr
-      //     = &(BatchDataQueueFactory<char>::get_writeable().get_queue_writeable(name).get_next_writeable());
-      //   batch_state = ((BatchFillerTemplate<char>*)proc_ptr)->_batch_data_ptr->state();
-      //   break;
       case BatchDataType_t::kBatchDataShort:
         ((BatchFillerTemplate<short>*)proc_ptr)->_batch_data_ptr
           = &(BatchDataQueueFactory<short>::get_writeable().get_queue_writeable(name).get_next_writeable());
@@ -417,11 +400,6 @@ int omp_thread_count() {
           = &(BatchDataQueueFactory<double>::get_writeable().get_queue_writeable(name).get_next_writeable());
         batch_state = ((BatchFillerTemplate<double>*)proc_ptr)->_batch_data_ptr->state();
         break;
-      // case BatchDataType_t::kBatchDataString:
-      //   ((BatchFillerTemplate<std::string>*)proc_ptr)->_batch_data_ptr
-      //     = &(BatchDataQueueFactory<std::string>::get_writeable().get_queue_writeable(name).get_next_writeable());
-      //   batch_state = ((BatchFillerTemplate<std::string>*)proc_ptr)->_batch_data_ptr->state();
-      //   break;
       default:
         LARCV_CRITICAL() << "Process name " << name
                          << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(proc_ptr))->data_type()) << std::endl;
@@ -451,8 +429,6 @@ int omp_thread_count() {
       LARCV_INFO() << "Executing " << process_name << "::batch_begin()" << std::endl;
       ((BatchHolder*)(ptr))->_batch_size = _next_index_v.size();
       switch ( ((BatchHolder*)(ptr))->data_type() ) {
-      // case BatchDataType_t::kBatchDataChar:
-      //  ((BatchFillerTemplate<char>*)ptr)->batch_begin(); break;
       case BatchDataType_t::kBatchDataShort:
         ((BatchFillerTemplate<short>*)ptr)->batch_begin(); break;
       case BatchDataType_t::kBatchDataInt:
@@ -461,8 +437,6 @@ int omp_thread_count() {
         ((BatchFillerTemplate<float>*)ptr)->batch_begin(); break;
       case BatchDataType_t::kBatchDataDouble:
         ((BatchFillerTemplate<double>*)ptr)->batch_begin(); break;
-      // case BatchDataType_t::kBatchDataString:
-      //   ((BatchFillerTemplate<std::string>*)ptr)->batch_begin(); break;
       default:
         LARCV_CRITICAL() << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(ptr))->data_type()) << std::endl;
         throw larbys();
@@ -477,8 +451,6 @@ int omp_thread_count() {
       if (!(ptr->is("BatchFiller"))) continue;
 
       switch ( ((BatchHolder*)(ptr))->data_type() ) {
-      // case BatchDataType_t::kBatchDataChar:
-      //   ((BatchFillerTemplate<char>*)ptr)->batch_end(); break;
       case BatchDataType_t::kBatchDataShort:
         ((BatchFillerTemplate<short>*)ptr)->batch_end(); break;
       case BatchDataType_t::kBatchDataInt:
@@ -487,8 +459,6 @@ int omp_thread_count() {
         ((BatchFillerTemplate<float>*)ptr)->batch_end(); break;
       case BatchDataType_t::kBatchDataDouble:
         ((BatchFillerTemplate<double>*)ptr)->batch_end(); break;
-      // case BatchDataType_t::kBatchDataString:
-        // ((BatchFillerTemplate<std::string>*)ptr)->batch_end(); break;
       default:
         LARCV_CRITICAL() << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(ptr))->data_type()) << std::endl;
         throw larbys();

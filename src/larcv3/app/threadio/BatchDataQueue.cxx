@@ -58,11 +58,9 @@ namespace larcv3 {
 
 }
 
-// template class larcv3::BatchDataQueue<char>;
 template class larcv3::BatchDataQueue<short>;
 template class larcv3::BatchDataQueue<int>;
 template class larcv3::BatchDataQueue<float>;
 template class larcv3::BatchDataQueue<double>;
-// template class larcv3::BatchDataQueue<std::string>;
 
 #endif
