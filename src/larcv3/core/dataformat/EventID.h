@@ -35,7 +35,7 @@ class EventID {
 
   /// Default destructor
   ~EventID() = default;
-  /// Set all run/subrun/event to kINVALID_SIZE
+  /// Set all run/subrun/event to kINVALID_LONG
   void clear();
   /// Run number getter
   long run() const { return _run; }
@@ -52,8 +52,8 @@ class EventID {
 
   /// Make sure run/subrun/event ID is set
   bool valid() const {
-    return !(_run == kINVALID_SIZE || _subrun == kINVALID_SIZE ||
-             _event == kINVALID_SIZE);
+    return !(_run == kINVALID_LONG || _subrun == kINVALID_LONG ||
+             _event == kINVALID_LONG);
   }
   /// Comparison opearator for run/subrun/event id
   inline bool operator==(const EventID& rhs) const {

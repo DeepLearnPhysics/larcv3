@@ -46,10 +46,12 @@ namespace larcv3 {
   const short              kINVALID_SHORT     = std::numeric_limits< short              >::max();
   /// Used as an invalid value identifier for unsigned unsigned short
   const unsigned short     kINVALID_USHORT    = std::numeric_limits< unsigned short     >::max();
-  /// Used as an invalid value idnetifier for single-point precision  
+  /// Used as an invalid value identifier for single-point precision  
   const float              kINVALID_FLOAT     = std::numeric_limits< float              >::max();
-  /// Used as an invalid value idnetifier for double-point precision
+  /// Used as an invalid value identifier for double-point precision
   const double             kINVALID_DOUBLE    = std::numeric_limits< double             >::max();
+  /// Used as an invalid value identifier for signed long precision
+  const double             kINVALID_LONG      = std::numeric_limits< long               >::max();
 
   /// Namespace for larcv3 message related types
   namespace msg {

@@ -212,7 +212,7 @@ class larcv_threadio (object):
       except AttrbuteError:
          pass
 
-   def configure(self,cfg):
+   def configure(self,cfg,color=0):
       # if "this" was configured before, reset it
       if self._name: self.reset()
          
@@ -240,6 +240,7 @@ class larcv_threadio (object):
       # configure thread processor
       self._proc = larcv.ThreadProcessor(self._name)
 
+      # We have to pass a color here.  Otherwise, if we use this and larcv is built with mpi, it will hang
       self._proc.configure(self._cfg_file)
 
       # Set the start entry
