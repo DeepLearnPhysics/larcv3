@@ -368,13 +368,5 @@ class larcv_queueio (object):
     def fetch_n_entries(self):
         return self._proc.get_n_entries()
 
-def sig_kill(signal,frame):
-    print('\033[95mSIGINT detected.\033[00m Finishing the program gracefully.')
-    for name,ptr in larcv_threadio._instance_m.items():
-        print('Terminating filler: %s' % name)
-        ptr.reset()
- 
-signal.signal(signal.SIGINT,  sig_kill)
-
 
 
