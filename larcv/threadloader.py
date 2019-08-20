@@ -128,7 +128,7 @@ class thread_interface(object):
         this_data = {}
         for key in self._data_keys[mode]:
             this_data[key] = self._dataloaders[mode].fetch_data(self._data_keys[mode][key]).data()
-            this_data[key] = numpy.reshape(this_data[key], self._dims[mode][key])
+            this_data[key] = np.reshape(this_data[key], self._dims[mode][key])
 
         if fetch_meta_data:
             this_data['entries'] = self._dataloaders[mode].fetch_entries()

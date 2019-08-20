@@ -55,6 +55,8 @@ class queue_interface(object):
             # The number of available choices is the number of entries - minibatch_size - 1:
             n_choices = n_entries - minibatch_size - 1
             start_entry = numpy.random.randint(low=0, high=n_choices, size=1)
+            print('n_choices: ', n_choices)
+            print('start_entry: ', start_entry)
             next_entries = numpy.arange(minibatch_size) + start_entry
        
         else:  # self._random_access == RandomAccess.random_events
@@ -134,7 +136,7 @@ class queue_interface(object):
 
         return
 
-    def prepare_next(self, mode, set_enties = None):
+    def prepare_next(self, mode, set_entries = None):
         '''Set in motion the processing of the next batch of data.
         
         Triggers the queue loader to start reading the next set of data
