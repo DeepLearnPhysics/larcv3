@@ -12,6 +12,11 @@
 
 #include <mutex>
 std::mutex __ioman_mtx;
+
+#ifdef LARCV_OPENMP
+omp_lock_t __ioman_omp_lock;
+#endif
+
 namespace larcv3 {
 
 IOManager::IOManager(IOMode_t mode, std::string name)
@@ -164,8 +169,17 @@ void IOManager::configure(const PSet& cfg) {
 
 bool IOManager::initialize(int color) {
   LARCV_DEBUG() << "start" << std::endl;
+  // Lock:
+  __ioman_mtx.lock();
+  
+// If openmp, always intialize the lock:
+#ifdef LARCV_OPENMP
+  omp_init_lock(&__ioman_omp_lock);
+#endif
 
 #ifdef LARCV_MPI
+//Only one thread calls MPI
+#pragma omp critical
 
   int mpi_initialized;
   MPI_Initialized(&mpi_initialized);
@@ -205,8 +219,7 @@ bool IOManager::initialize(int color) {
 
 #endif
 
-  // Lock:
-  __ioman_mtx.lock();
+
 
 
   if (_io_mode != kREAD) {

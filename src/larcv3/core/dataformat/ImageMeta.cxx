@@ -422,7 +422,7 @@ std::vector<size_t> ImageMeta<dimension>::position_to_coordinate(const std::vect
         coordinates.at(axis) = kINVALID_INDEX;
       }
       else
-        coordinates.at(axis) = (size_t) relative_position / dims.at(axis);
+        coordinates.at(axis) = (size_t) (relative_position / dims.at(axis));
     }
     return coordinates;
   }
@@ -445,7 +445,7 @@ size_t ImageMeta<dimension>::position_to_coordinate(double position, size_t axis
     }
     else{ 
       double voxel_dim = voxel_dimensions(axis);
-      return  (size_t) relative_position / voxel_dim;
+      return  (size_t) (relative_position / voxel_dim);
     }
     
   }

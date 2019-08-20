@@ -3,7 +3,8 @@ import unittest
 import random
 import uuid
 
-from larcv import larcv, data_generator, larcv_interface
+from larcv import larcv, data_generator
+from larcv import threadloader
 
 from collections import OrderedDict
 
@@ -83,7 +84,7 @@ def test_sparsetensor2d_threadio(tmpdir, num_threads, num_storage, make_copy, ba
 
 
 
-    li = larcv_interface.larcv_interface()
+    li = threadloader.thread_interface()
     li.prepare_manager('primary', io_config, batch_size, data_keys)
 
 

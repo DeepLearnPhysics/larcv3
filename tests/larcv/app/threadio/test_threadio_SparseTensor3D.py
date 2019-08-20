@@ -3,7 +3,9 @@ import unittest
 import random
 import uuid
 
-from larcv import larcv, data_generator, larcv_interface
+from larcv import larcv, data_generator
+
+from larcv import threadloader
 
 from collections import OrderedDict
 
@@ -82,7 +84,7 @@ def test_sparsetensor3d_threadio(tmpdir, num_threads, num_storage, make_copy, ba
 
 
 
-    li = larcv_interface.larcv_interface()
+    li = threadloader.thread_interface()
     li.prepare_manager('primary', io_config, batch_size, data_keys)
 
 
@@ -96,7 +98,7 @@ def test_sparsetensor3d_threadio(tmpdir, num_threads, num_storage, make_copy, ba
 @pytest.mark.parametrize('num_threads', [1,2])
 @pytest.mark.parametrize('make_copy', [True, False])
 @pytest.mark.parametrize('local_batch_size', [2])
-@pytest.mark.parametrize('read_option', ['read_from_single_rank', 'read_from_all_ranks'])
+@pytest.mark.parametrize('read_option', ['read_from_single_rank', 'read_from_all_ranks_copy'])
 def test_sparsetensor3d_threadio_distributed(tmpdir, num_threads, num_storage, make_copy, local_batch_size, read_option, n_reads=10):
 
     from larcv import distributed_larcv_interface
@@ -115,7 +117,7 @@ def test_sparsetensor3d_threadio_distributed(tmpdir, num_threads, num_storage, m
     # Next, write some sparsetensor3ds to that file:
     if (comm.Get_rank() == root_rank and read_option == 'read_from_single_rank'):
         create_sparsetensor3d_file(file_name, rand_num_events=25)
-    if (read_option == 'read_from_all_ranks'):
+    if (read_option == 'read_from_all_ranks_copy'):
         create_sparsetensor3d_file(file_name, rand_num_events=25)
 
 
@@ -147,7 +149,7 @@ def test_sparsetensor3d_threadio_distributed(tmpdir, num_threads, num_storage, m
 
 
 
-    li = distributed_larcv_interface.larcv_interface(root=root_rank, read_option=read_option)
+    li = distributed_larcv_interface.thread_interface(root=root_rank, read_option=read_option)
     # Scale the number of images to the mpi comm size:
     li.prepare_manager('primary', io_config, comm_size * local_batch_size, data_keys)
 
@@ -155,7 +157,7 @@ def test_sparsetensor3d_threadio_distributed(tmpdir, num_threads, num_storage, m
     for i in range(n_reads):
         data = li.fetch_minibatch_data('primary')
         bs = local_batch_size
-        if read_option == 'read_from_all_ranks':
+        if read_option == 'read_from_all_ranks_copy':
             bs *= comm.Get_size()
         assert(data['label'].shape[0] == bs)
 

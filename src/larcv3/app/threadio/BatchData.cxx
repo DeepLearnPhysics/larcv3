@@ -29,21 +29,6 @@ namespace larcv3 {
     }
 
     return larcv3::_as_ndarray(_data);
-  // if (vec.size() >= INT_MAX) {
-  //   LARCV_CRITICAL() << "Length of data vector too long to specify ndarray. "
-  //                       "Use by batch call."
-  //                    << std::endl;
-  //   throw larbys();
-  // }
-  // int nd = 1;
-  // npy_intp dims[1];
-  // dims[0] = (int)vec.size();
-  // PyArrayObject *array = (PyArrayObject *)PyArray_SimpleNewFromData(
-  //     nd, dims, ctype_to_numpy<T>(), (char *)&(vec[0]));
-
-
-
-  // return PyArray_Return(array);
   }
 
   template<class T>
@@ -152,10 +137,8 @@ namespace larcv3 {
 
 }
 
-// template class larcv3::BatchData<char>;
 template class larcv3::BatchData<short>;
 template class larcv3::BatchData<int>;
 template class larcv3::BatchData<float>;
 template class larcv3::BatchData<double>;
-// template class larcv3::BatchData<std::string>;
 #endif
