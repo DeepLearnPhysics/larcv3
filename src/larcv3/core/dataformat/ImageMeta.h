@@ -137,6 +137,10 @@ class ImageMeta {
   size_t position_to_coordinate(double position, size_t axis) const;
 
   // This function is useful to interactively build up a meta object
+  // Each dimension ImageMeta is meant to store the number of voxels as well as the physical space those voxels represent
+  // image_size is the physical length of the dimension, regardless of voxel size
+  // number_of_voxels is the total number of voxels used along the full image_size
+  // origin is the lowest value in physical space of this dimension.  Typically this is 0 but doesn't need to be.
   void set_dimension(size_t axis, double image_size, size_t number_of_voxels, double origin = 0);
 
   inline void set_projection_id(size_t projection_id){_projection_id = projection_id;}
