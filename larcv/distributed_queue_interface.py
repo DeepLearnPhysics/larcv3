@@ -9,7 +9,6 @@ import random
 import numpy
 from mpi4py import MPI
 
-from larcv            import larcv
 from . queueloader    import larcv_queueio
 from . larcv_io_enums import ReadOption, RandomAccess
 
@@ -199,7 +198,8 @@ class queue_interface(object):
             # set_entries = self.get_next_batch_indexes(mode, self._minibatch_size[mode])
             
         self._queueloaders[mode].set_next_batch(set_entries)
-        target=self._queueloaders[mode].batch_process()
+        self._queueloaders[mode].batch_process()
+        
         # t.daemon = True
         return 
         # return threading.Thread(target=self._queueloaders[mode].batch_process).start()

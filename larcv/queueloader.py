@@ -28,6 +28,7 @@ class queue_interface(object):
         self._queue_prev_entries = {}
         self._queue_next_entries = {}
 
+        self._writer = None
     def get_next_batch_indexes(self, mode, minibatch_size):
 
         # Using the random_access parameter, determine which entries to read:
@@ -55,8 +56,6 @@ class queue_interface(object):
             # The number of available choices is the number of entries - minibatch_size - 1:
             n_choices = n_entries - minibatch_size - 1
             start_entry = numpy.random.randint(low=0, high=n_choices, size=1)
-            print('n_choices: ', n_choices)
-            print('start_entry: ', start_entry)
             next_entries = numpy.arange(minibatch_size) + start_entry
        
         else:  # self._random_access == RandomAccess.random_events
@@ -69,7 +68,7 @@ class queue_interface(object):
 
         return next_entries
 
-    def prepare_manager(self, mode, io_config, minibatch_size, data_keys):
+    def prepare_manager(self, mode, io_config, minibatch_size, data_keys, color=None):
         '''Prepare a manager for io
         
         Creates an instance of larcv_threadio for a particular file to read.
@@ -193,11 +192,6 @@ class queue_interface(object):
     #         _is_active = _is_active and self._queueloaders[mode].
 
     def stop(self):
-
-        for mode in self._queueloaders:
-            while self._queueloaders[mode].is_reading():
-                time.sleep(0.01)
-            self._queueloaders[mode].stop_manager()
 
         if self._writer is not None:
             self._writer.finalize()
