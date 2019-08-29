@@ -158,8 +158,14 @@ namespace larcv3 {
           auto const& original_rows = img.meta().rows();
           auto const& original_cols = img.meta().cols();
 
-          auto const& offset_rows = 0.5*(output_rows - (original_rows / row_compression));
-          auto const& offset_cols = 0.5*(output_cols - (original_cols / col_compression));
+          size_t offset_rows = 0.5*(output_rows - (original_rows / row_compression));
+          size_t offset_cols = 0.5*(output_cols - (original_cols / col_compression));
+
+          std::cout << "Offset rows: " << offset_rows << std::endl;
+          std::cout << "Offset cols: " << offset_cols << std::endl;
+
+          std::cout << "original_rows: " << original_rows << std::endl;
+          std::cout << "original_cols: " << original_cols << std::endl;
 
           auto output_meta = img.meta();
           output_meta.set_dimension(0, output_cols, output_cols);
@@ -169,8 +175,16 @@ namespace larcv3 {
           std::vector<size_t> coords1; coords1.resize(2);
           std::vector<size_t> coords2; coords2.resize(2);
 
-          for ( size_t col = offset_cols; col < output_cols - offset_cols; col ++ ){
-            for (size_t row = offset_rows; row < output_rows - offset_rows; row ++ ){
+          int skip_row = 0;
+          int skip_col = 0;
+          if ( (original_rows / row_compression)  % 2 == 1 ){
+            skip_row = 1;
+          }
+          if ( (original_cols / col_compression)  % 2 == 1 ){
+            skip_col = 1;
+          }
+          for ( size_t col = offset_cols; col < output_cols - offset_cols - skip_col; col ++ ){
+            for (size_t row = offset_rows; row < output_rows - offset_rows - skip_row; row ++ ){
               float value = 0;
               float count = 0;
               for (size_t orig_col = (col - offset_cols)*col_compression;
