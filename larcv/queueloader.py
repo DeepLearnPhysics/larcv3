@@ -28,6 +28,7 @@ class queue_interface(object):
         self._queue_prev_entries = {}
         self._queue_next_entries = {}
 
+        self._writer = None
     def get_next_batch_indexes(self, mode, minibatch_size):
 
         # Using the random_access parameter, determine which entries to read:
@@ -191,11 +192,6 @@ class queue_interface(object):
     #         _is_active = _is_active and self._queueloaders[mode].
 
     def stop(self):
-
-        for mode in self._queueloaders:
-            while self._queueloaders[mode].is_reading():
-                time.sleep(0.01)
-            self._queueloaders[mode].stop_manager()
 
         if self._writer is not None:
             self._writer.finalize()
