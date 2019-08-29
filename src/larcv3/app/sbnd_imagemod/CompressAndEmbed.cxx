@@ -161,12 +161,6 @@ namespace larcv3 {
           size_t offset_rows = 0.5*(output_rows - (original_rows / row_compression));
           size_t offset_cols = 0.5*(output_cols - (original_cols / col_compression));
 
-          std::cout << "Offset rows: " << offset_rows << std::endl;
-          std::cout << "Offset cols: " << offset_cols << std::endl;
-
-          std::cout << "original_rows: " << original_rows << std::endl;
-          std::cout << "original_cols: " << original_cols << std::endl;
-
           auto output_meta = img.meta();
           output_meta.set_dimension(0, output_cols, output_cols);
           output_meta.set_dimension(1, output_rows, output_rows);
