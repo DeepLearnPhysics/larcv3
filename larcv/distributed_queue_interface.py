@@ -59,7 +59,20 @@ class queue_interface(object):
                     last_entry = -1
             else:
                 last_entry = -1
-            next_entries = numpy.arange(minibatch_size, dtype=numpy.int32) + last_entry + 1
+
+            next_last_entry = minibatch_size + last_entry + 1
+
+            n_entries = self._queueloaders[mode].fetch_n_entries()
+
+            if next_last_entry < n_entries:
+                next_entries = numpy.arange(minibatch_size, dtype=numpy.int32) + last_entry + 1
+            else:
+                # Create an array to cover the entries till the last one ...
+                next_entries_a = numpy.arange(n_entries - 1 - last_entry, dtype=numpy.int32) + last_entry + 1
+                # ... and one array for the leftover entries, starting back from zero
+                next_entries_b = numpy.arange((last_entry + 1 + minibatch_size) % n_entries, dtype=numpy.int32)
+                # Finally concatenate the two arrays
+                next_entries = numpy.concatenate((next_entries_a, next_entries_b))
 
         elif self._random_access == RandomAccess.random_blocks:
             # How many entries are there?
