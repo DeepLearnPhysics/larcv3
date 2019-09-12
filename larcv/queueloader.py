@@ -27,8 +27,16 @@ class queue_interface(object):
 
         self._queue_prev_entries = {}
         self._queue_next_entries = {}
+        self._count = {}
+
+
+        self._warning = True
 
         self._writer = None
+
+    def no_warnings(self):
+        self._warning = False
+
     def get_next_batch_indexes(self, mode, minibatch_size):
 
         # Using the random_access parameter, determine which entries to read:
@@ -104,12 +112,7 @@ class queue_interface(object):
         # there is no "start_manager" function.  Everything is manual.
         # First, tell it what the entries for the first batch to read:
 
-        set_entries = self.get_next_batch_indexes(mode, minibatch_size)
-
-
-        io.set_next_batch(set_entries)
-        # This will wait to return until things have processed:
-        io.batch_process()
+        self.prepare_next(mode)
 
         # Then, we promote those entries to the "current" batch:
         io.pop_current_data()
@@ -147,10 +150,11 @@ class queue_interface(object):
             set_entries = self.get_next_batch_indexes(mode, self._minibatch_size[mode])
 
         self._queueloaders[mode].set_next_batch(set_entries)
-        t = threading.Thread(target=self._queueloaders[mode].batch_process, daemon=True)
-        # t.daemon = True
-        t.start()
-        return t
+        self._queueloaders[mode].batch_process()
+
+        self._count[mode] = 0
+
+        return
         # return threading.Thread(target=self._queueloaders[mode].batch_process).start()
 
         # self._queueloaders[mode].next(store_event_ids=True, store_entries=True)
@@ -161,11 +165,20 @@ class queue_interface(object):
         # Return a dictionary object with keys 'image', 'label', and others as needed
         # self._queueloaders['train'].fetch_data(keyword_label).dim() as an example
         
+        if self._count[mode] != 0:
+            if self._warning:
+                print("Calling fetch_minibatch_data without calling prepare_next. This will not give new data.")
+                print("To quiet this wanring, call prepare_next before fetch_minibatch_data or call queueloader.no_warnings()")
+
         if pop:
             # This function will pop the data
             while self._queueloaders[mode].is_reading():
                 time.sleep(0.001)
             self._queueloaders[mode].pop_current_data()
+        else:
+            if self._warning:
+                print("Calling fetch_minibatch_data with pop = False.  This will give you the same data as last time.")
+                print("To quiet this warning, call queueloader.no_warnings()")
 
         self._queueloaders[mode].next(store_entries=fetch_meta_data, store_event_ids=fetch_meta_data)
         this_data = {}
@@ -178,7 +191,8 @@ class queue_interface(object):
             this_data['entries'] = self._queueloaders[mode].fetch_entries()
             this_data['event_ids'] = self._queueloaders[mode].fetch_event_ids()
         
-
+        self._count[mode] += 1
+        
         return this_data
 
     def fetch_minibatch_dims(self, mode):
