@@ -32,8 +32,8 @@ class larcv_writer(object):
         self._io.initialize()
 
         self._write_workers = {
-            'meta' : self._write_meta,
             'sparse2d' : self._write_sparse2d,
+            'image2d'   : self._write_image2d,
         }
 
         pass
@@ -53,22 +53,6 @@ class larcv_writer(object):
         '''
         self._io.save_entry()
         self._io.read_entry(entry)
-
-        return
-
-    def _write_meta(self, data, producer):
-        '''Write data of type 'meta'
-        
-        '''
-
-        # Get the data object from the file:
-        _writable_data = self._io.get_data("meta", producer)
-
-        _writable_array = _writable_data.writeable_darray("meta")
-        _writable_array.reserve(len(data))
-
-        for i in data:
-            _writable_array.push_back(i)
 
         return
 
@@ -101,6 +85,28 @@ class larcv_writer(object):
 
         return
 
+    def _write_image2d(self, data, producer):
+        ''' Write image2d data to file
+
+        Data is written under the provided producer name.  This function takes a list of data
+        that it can iterate through, where each list element is a projection ID.
+        '''
+
+
+        ev_image2d = larcv.EventImage2D.to_image2d(self._io.get_data("image2d", producer))
+
+        for projection_id, image in enumerate(data):
+            meta = larcv.ImageMeta2D()
+            print(type(image))
+            print(image.shape)
+            meta.set_dimension(0, image.shape[0], image.shape[0])
+            meta.set_dimension(1, image.shape[1], image.shape[1])
+            meta.set_projection_id(projection_id)
+            img = larcv.as_image2d_meta(image, meta)
+            ev_image2d.emplace(img)
+            # print(img)
+
+        return
 
 
     def write(self, data, datatype, producer, entries, event_ids):
@@ -115,8 +121,8 @@ class larcv_writer(object):
             data {numpy} -- Data to write, must meet certain formatting depending on datatype
             datatype {str} -- larcv2 datatype descriptor
             producer {srt} -- producer key underwhich to store this data
-            entries {ROOT.vector<int>} -- vector of file entries, size 1 for now
-            event_ids {ROOT.vector<larcv::EventBase>} -- vector of larcv EventBase objects, size 1 for now
+            entries {vector<int>} -- vector of file entries, size 1 for now
+            event_ids {vector<larcv::EventBase>} -- vector of larcv EventBase objects, size 1 for now
         '''
 
         # First, check if the entries recieved for the data match the current entry
