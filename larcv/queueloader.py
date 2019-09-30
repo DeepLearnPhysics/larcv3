@@ -5,8 +5,9 @@ import random
 
 
 from . import larcv
-from . batch_pydata import batch_pydata
+from . batch_pydata   import batch_pydata
 from . larcv_io_enums import RandomAccess
+from . larcv_writer   import larcv_writer
 
 class queue_interface(object):
 
@@ -138,6 +139,28 @@ class queue_interface(object):
 
         return
 
+
+    def prepare_writer(self, io_config, output_file=None):
+
+        if self._writer is not None:
+            raise Exception("queue_interface doesn't yet support multiple writers.")
+
+        # This only supports batch datasize of 1.  We can check that the reading instance
+        # Has only size 1 by looking at the dims.
+
+        key =list(self._data_keys['primary'].items())[0][0]
+        if self._dims['primary'][key][0] != 1:
+            raise Exception("To use the writing interface, please set batch size to 1.")
+
+        # The writer is not an instance of queueIO but rather an instance of larcv_writer.
+
+        # It configures a process to copy input to output and add more information as well.
+
+        self._writer = larcv_writer(io_config, output_file)
+
+        pass
+
+
     def prepare_next(self, mode, set_entries = None):
         '''Set in motion the processing of the next batch of data.
         
@@ -219,14 +242,15 @@ class queue_interface(object):
         return self._queueloaders[mode].ready()
 
 
-    # def write_output(self, data, datatype, producer, entries, event_ids):
-    #     if self._writer is None:
-    #         raise Exception("Trying to write data with no writer configured.  Abort!")
+    def write_output(self, data, datatype, producer, entries, event_ids):
+        if self._writer is None:
+            raise Exception("Trying to write data with no writer configured.  Abort!")
 
 
-    #     self._writer.write(data=data, datatype=datatype, producer=producer, entries=entries, event_ids=event_ids)
+        self._writer.write(data=data, datatype=datatype, producer=producer, entries=entries, event_ids=event_ids)
 
-    #     return
+        return
+
 
 class larcv_queueio (object):
 
