@@ -3,7 +3,7 @@
 
 #include "Image2DFromTensor2D.h"
 #include "larcv3/core/dataformat/EventSparseTensor.h"
-#include "larcv3/core/dataformat/EventImage2D.h"
+#include "larcv3/core/dataformat/EventTensor.h"
 namespace larcv3 {
 
   static Image2DFromTensor2DProcessFactory __global_Image2DFromTensor2DProcessFactory__;

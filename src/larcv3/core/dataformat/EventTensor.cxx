@@ -1,7 +1,7 @@
-#ifndef __LARCV3DATAFORMAT_EVENTIMAGE2D_CXX
-#define __LARCV3DATAFORMAT_EVENTIMAGE2D_CXX
+#ifndef __LARCV3DATAFORMAT_EVENTTENSOR_CXX
+#define __LARCV3DATAFORMAT_EVENTTENSOR_CXX
 
-#include "larcv3/core/dataformat/EventImage2D.h"
+#include "larcv3/core/dataformat/EventTensor.h"
 // #include "larcv3/core/Base/larbys.h"
 
 #define IMAGE_EXTENTS_CHUNK_SIZE 1
@@ -17,44 +17,53 @@
 namespace larcv3 {
 
   /// Global larcv3::SBClusterFactory to register ClusterAlgoFactory
-  static EventImage2DFactory __global_EventImage2DFactory__;
+  static EventTensor1DFactory __global_EventTensor1DFactory__;
+  static EventImage2DFactory  __global_EventImage2DFactory__;
+  static EventTensor3DFactory __global_EventTensor3DFactory__;
+  static EventTensor4DFactory __global_EventTensor4DFactory__;
 
-  EventImage2D::EventImage2D(){
+  template<size_t dimension> 
+  EventTensor<dimension>::EventTensor(){
 
 
     _data_types.resize(N_DATASETS);
 
     _data_types[EXTENTS_DATASET] = new H5::DataType(larcv3::get_datatype<Extents_t>());
     _data_types[IMAGE_EXTENTS_DATASET] = new H5::DataType(larcv3::get_datatype<IDExtents_t>());
-    _data_types[IMAGE_META_DATASET] = new H5::DataType(larcv3::ImageMeta<2>::get_datatype());
+    _data_types[IMAGE_META_DATASET] = new H5::DataType(larcv3::ImageMeta<dimension>::get_datatype());
     _data_types[IMAGES_DATASET] = new H5::DataType(larcv3::get_datatype<float>());
 
 
   }
 
-  void EventImage2D::clear()
+  template<size_t dimension> 
+  void EventTensor<dimension>::clear()
   {
     _image_v.clear();
   }
 
 
-  void EventImage2D::append(const Image2D& img)
+  template<size_t dimension> 
+  void EventTensor<dimension>::append(const Tensor<dimension>& img)
   {
     _image_v.push_back(img);
   }
 
-  void EventImage2D::emplace(Image2D&& img)
+  template<size_t dimension> 
+  void EventTensor<dimension>::emplace(Tensor<dimension>&& img)
   {
     _image_v.emplace_back(std::move(img));
   }
 
-  void EventImage2D::emplace(std::vector<larcv3::Image2D>&& image_v)
+  template<size_t dimension> 
+  void EventTensor<dimension>::emplace(std::vector<larcv3::Tensor<dimension>>&& image_v)
   {
     _image_v = std::move(image_v);
   }
 
 
-  void EventImage2D::open_in_datasets(H5::Group * group){
+  template<size_t dimension> 
+  void EventTensor<dimension>::open_in_datasets(H5::Group * group){
 
     if (_open_in_datasets.size() < N_DATASETS ){
        _open_in_datasets.resize(N_DATASETS);
@@ -77,7 +86,8 @@ namespace larcv3 {
     return;
   }
 
-  void EventImage2D::open_out_datasets(H5::Group * group){
+  template<size_t dimension> 
+  void EventTensor<dimension>::open_out_datasets(H5::Group * group){
 
     if (_open_out_datasets.size() < N_DATASETS ){
        _open_out_datasets.resize(N_DATASETS);
@@ -101,7 +111,8 @@ namespace larcv3 {
     return;
   }
 
-  void EventImage2D::initialize (H5::Group * group, uint compression){
+  template<size_t dimension> 
+  void EventTensor<dimension>::initialize (H5::Group * group, uint compression){
 
     // Image2D creates a set of tables:
     // 1) extents: indicates which entries in the image_extents table correspond to the entry
@@ -205,7 +216,8 @@ namespace larcv3 {
     _compression = compression;
     return;
   }
-  void EventImage2D::serialize  (H5::Group * group){
+  template<size_t dimension> 
+  void EventTensor<dimension>::serialize  (H5::Group * group){
 
     // This is something of an optimization trickery.
     // The dataset for storing images is not created until an image is written.
@@ -327,7 +339,7 @@ namespace larcv3 {
     /////////////////////////////////////////////////////////
     // Step 3: Build the image_meta object
     /////////////////////////////////////////////////////////
-    std::vector<ImageMeta2D> image_meta;
+    std::vector<ImageMeta<dimension>> image_meta;
     image_meta.resize(n_new_images);
     for (size_t image_id = 0; image_id < _image_v.size(); image_id ++){
       image_meta.at(image_id) = _image_v.at(image_id).meta();
@@ -516,7 +528,8 @@ namespace larcv3 {
 
     return;
   }
-  void EventImage2D::deserialize(H5::Group * group, size_t entry, bool reopen_groups){
+  template<size_t dimension> 
+  void EventTensor<dimension>::deserialize(H5::Group * group, size_t entry, bool reopen_groups){
    
     // This function reads in a set of images
     // The function implementation is:
@@ -632,7 +645,7 @@ namespace larcv3 {
 
     H5::DataSpace image_meta_memspace(1, image_meta_slab_dims);
 
-    std::vector<ImageMeta2D> image_meta;
+    std::vector<ImageMeta<dimension>> image_meta;
 
     // Reserve space for reading in image_meta:
     image_meta.resize(input_extents.n);
@@ -650,7 +663,7 @@ namespace larcv3 {
 
     _image_v.clear();
     for (size_t image_index = 0; image_index < image_meta.size(); image_index ++){
-      _image_v.push_back(Image2D(image_meta.at(image_index)));
+      _image_v.push_back(Tensor<dimension>(image_meta.at(image_index)));
     }
 
     /////////////////////////////////////////////////////////
@@ -700,7 +713,10 @@ namespace larcv3 {
     return;
   }
 
-
+  template class EventTensor<1>;
+  template class EventTensor<2>;
+  template class EventTensor<3>;
+  template class EventTensor<4>;
 
 }
 

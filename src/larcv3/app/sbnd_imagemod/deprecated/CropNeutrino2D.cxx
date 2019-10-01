@@ -2,7 +2,7 @@
 #define __CROPNEUTRINO2D_CXX__
 
 #include "CropNeutrino2D.h"
-#include "larcv3/core/dataformat/EventImage2D.h"
+#include "larcv3/core/dataformat/EventTensor.h"
 #include "larcv3/core/dataformat/EventSparseCluster.h"
 
 namespace larcv3 {

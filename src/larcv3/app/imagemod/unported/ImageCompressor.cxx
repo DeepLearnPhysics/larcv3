@@ -2,7 +2,7 @@
 #define __IMAGECOMPRESSOR_CXX__
 
 #include "ImageCompressor.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
+#include "larcv/core/DataFormat/EventTensor.h"
 
 namespace larcv {
 

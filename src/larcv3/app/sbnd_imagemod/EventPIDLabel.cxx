@@ -2,7 +2,7 @@
 #define __EVENTPIDLABEL_CXX__
 
 #include "EventPIDLabel.h"
-#include "larcv3/core/dataformat/EventImage2D.h"
+#include "larcv3/core/dataformat/EventTensor.h"
 #include "larcv3/core/dataformat/EventParticle.h"
 
 namespace larcv3 {

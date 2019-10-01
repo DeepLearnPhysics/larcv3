@@ -2,7 +2,7 @@
 #define __WIREMASK_CXX__
 
 #include "WireMask.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
+#include "larcv/core/DataFormat/EventTensor.h"
 #include "larcv/core/DataFormat/EventChStatus.h"
 namespace larcv {
 

@@ -2,7 +2,7 @@
 #define __ADCSCALE_CXX__
 
 #include "ADCScale.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
+#include "larcv/core/DataFormat/EventTensor.h"
 
 namespace larcv {
 

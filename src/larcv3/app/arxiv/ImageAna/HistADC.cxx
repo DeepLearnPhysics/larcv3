@@ -2,7 +2,7 @@
 #define __HISTADC_CXX__
 
 #include "HistADC.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
+#include "larcv/core/DataFormat/EventTensor.h"
 #include "larcv/core/DataFormat/EventParticle.h"
 
 namespace larcv {

@@ -2,7 +2,7 @@
 #define __PARENTPARTICLESEG_CXX__
 
 #include "ParentParticleSeg.h"
-#include "larcv3/core/dataformat/EventImage2D.h"
+#include "larcv3/core/dataformat/EventTensor.h"
 #include "larcv3/core/dataformat/EventParticle.h"
 #include "larcv3/core/dataformat/EventSparseCluster.h"
 

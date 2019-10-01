@@ -2,7 +2,7 @@
 #define __MULTIPARTSEGFROMCLUSTER2DPARTICLE_CXX__
 
 #include "MultiPartSegFromCluster2dParticle.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
+#include "larcv/core/DataFormat/EventTensor.h"
 #include "larcv/core/DataFormat/EventParticle.h"
 #include "larcv/core/DataFormat/EventVoxel2D.h"
 

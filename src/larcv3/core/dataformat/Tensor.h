@@ -28,7 +28,7 @@ namespace larcv3 {
   */
   template<size_t dimension>
   class Tensor {
-    friend class EventImage2D;
+    template<size_t> friend class EventTensor;
     
   public:
 
@@ -38,9 +38,9 @@ namespace larcv3 {
     /// ctor by dimensions
     Tensor(const std::vector<size_t> & dims);
     /// ctor from ImageMeta
-    Tensor(const ImageMeta2D&);
+    Tensor(const ImageMeta<dimension>&);
     /// ctor from ImageMeta and 1D array data
-    Tensor(const ImageMeta2D&, const std::vector<float>&);
+    Tensor(const ImageMeta<dimension>&, const std::vector<float>&);
     /// copy ctor
     Tensor(const Tensor&);
     
@@ -49,7 +49,7 @@ namespace larcv3 {
     virtual ~Tensor(){}
 
     /// Reset contents w/ new larcv3::ImageMeta
-    void reset(const ImageMeta2D&);
+    void reset(const ImageMeta<dimension>&);
     /// Various modes used to combine pixels
     enum CompressionModes_t { kSum, kAverage, kMaxPool, kOverWrite};
 
@@ -60,7 +60,7 @@ namespace larcv3 {
     /// Specific pixel value getter
     float pixel(size_t index) const;
     /// larcv3::ImageMeta const reference getter
-    const ImageMeta2D& meta() const { return _meta; }
+    const ImageMeta<dimension>& meta() const { return _meta; }
 
     /// Mem-copy: insert num_pixel many data from src 1D array @ data index starting from (row,col)
     void copy(const std::vector<size_t> & coords, const float* src, size_t num_pixel);
@@ -163,7 +163,7 @@ namespace larcv3 {
     */
   private:
     std::vector<float> _img;
-    ImageMeta2D _meta ;
+    ImageMeta<dimension> _meta;
     void clear();
   };
 

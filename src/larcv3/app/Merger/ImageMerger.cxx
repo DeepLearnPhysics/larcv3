@@ -2,7 +2,7 @@
 #define __IMAGEMERGER_CXX__
 
 #include "ImageMerger.h"
-#include "DataFormat/EventImage2D.h"
+#include "DataFormat/EventTensor.h"
 #include "DataFormat/EventROI.h"
 #include "DataFormat/EventChStatus.h"
 

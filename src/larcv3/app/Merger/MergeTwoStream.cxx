@@ -3,7 +3,7 @@
 
 #include "MergeTwoStream.h"
 #include "Base/LArCVBaseUtilFunc.h"
-#include "DataFormat/EventImage2D.h"
+#include "DataFormat/EventTensor.h"
 #include "DataFormat/EventROI.h"
 #include "DataFormat/EventChStatus.h"
 

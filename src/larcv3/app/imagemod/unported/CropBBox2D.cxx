@@ -3,7 +3,7 @@
 
 #include "CropBBox2D.h"
 #include "larcv/core/DataFormat/EventBBox.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
+#include "larcv/core/DataFormat/EventTensor.h"
 namespace larcv {
 
   static CropBBox2DProcessFactory __global_CropBBox2DProcessFactory__;

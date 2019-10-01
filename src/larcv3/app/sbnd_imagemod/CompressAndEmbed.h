@@ -16,7 +16,7 @@
 
 #include "larcv3/core/processor/ProcessBase.h"
 #include "larcv3/core/processor/ProcessFactory.h"
-#include "larcv3/core/dataformat/Tensor.h"
+// #include "larcv3/core/dataformat/Tensor.h"
 namespace larcv3 {
 
   /**

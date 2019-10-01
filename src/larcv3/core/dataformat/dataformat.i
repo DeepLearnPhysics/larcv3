@@ -13,7 +13,7 @@
 #include "larcv3/core/dataformat/DataProductFactory.h"
 #include "larcv3/core/dataformat/EventBase.h"
 #include "larcv3/core/dataformat/EventParticle.h"
-#include "larcv3/core/dataformat/EventImage2D.h"
+#include "larcv3/core/dataformat/EventTensor.h"
 #include "larcv3/core/dataformat/IOManager.h"
 #include "larcv3/core/dataformat/EventSparseTensor.h"
 #include "larcv3/core/dataformat/EventSparseCluster.h"

@@ -18,13 +18,13 @@ namespace larcv3 {
   }
 
   template<size_t dimension>
-  Tensor<dimension>::Tensor(const ImageMeta2D& meta)
+  Tensor<dimension>::Tensor(const ImageMeta<dimension>& meta)
     : _img(meta.total_voxels(), 0.)
     , _meta(meta)
   {}
 
   template<size_t dimension>
-  Tensor<dimension>::Tensor(const ImageMeta2D& meta, const std::vector<float>& img)
+  Tensor<dimension>::Tensor(const ImageMeta<dimension>& meta, const std::vector<float>& img)
     : _img(img)
     , _meta(meta)
   { if (img.size() != meta.total_voxels()) throw larbys("Inconsistent dimensions!"); }
@@ -36,7 +36,7 @@ namespace larcv3 {
   {}
 
   template<size_t dimension>
-  void Tensor<dimension>::reset(const ImageMeta2D& meta)
+  void Tensor<dimension>::reset(const ImageMeta<dimension>& meta)
   {
     _meta = meta;
     if (_img.size() != _meta.total_voxels()) _img.resize(_meta.total_voxels());
@@ -65,7 +65,7 @@ namespace larcv3 {
   void Tensor<dimension>::clear() {
     _img.clear();
     _img.resize(1, 0);
-    _meta = ImageMeta2D();
+    _meta = ImageMeta<dimension>();
     //std::cout << "[Image2D (" << this << ")] Cleared image2D memory " << std::endl;
   }
 
