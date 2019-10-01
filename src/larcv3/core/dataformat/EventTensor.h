@@ -55,9 +55,15 @@ namespace larcv3 {
     void serialize  (H5::Group * group);
     void deserialize(H5::Group * group, size_t entry, bool reopen_groups=false);
 
+    /// For backward compatibility
     static EventTensor * to_image2d(EventBase * e){
+      return to_tensor(e);
+    }
+
+    static EventTensor * to_tensor(EventBase * e){
       return (EventTensor *) e;
     }
+    
   private:
     void open_in_datasets(H5::Group * group);
     void open_out_datasets(H5::Group * group);
