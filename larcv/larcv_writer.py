@@ -33,7 +33,8 @@ class larcv_writer(object):
 
         self._write_workers = {
             'sparse2d' : self._write_sparse2d,
-            'image2d'   : self._write_image2d,
+            'image2d'  : self._write_image2d,
+            'particle' : self._write_particle
         }
 
         pass
@@ -107,6 +108,21 @@ class larcv_writer(object):
             # print(img)
 
         return
+
+    def _write_particle(self, data, producer):
+      '''
+      Write particle data to file
+
+      ...
+      '''
+
+      ev_particle = larcv.EventParticle.to_particle(self._io.get_data("particle", producer))
+      particle = larcv.Particle()
+      particle.pdg_code(data)
+      ev_particle.emplace_back(particle)
+
+
+
 
 
     def write(self, data, datatype, producer, entries, event_ids):

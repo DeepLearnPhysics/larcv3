@@ -7,7 +7,9 @@ from larcv import data_generator
 from random import Random
 random = Random()
 
-
+# 
+# For backward compatibility, otherwise see test_write_tensor.py
+# 
 
 @pytest.fixture()
 def rand_num_events():

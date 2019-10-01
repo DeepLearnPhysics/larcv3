@@ -87,7 +87,95 @@ def build_image2d(rand_num_events, n_projections, shape=None):
 
     return event_image_list
 
+def write_tensor(file_name, event_image_list, dimension): 
 
+    io_manager = larcv.IOManager(larcv.IOManager.kWRITE)
+    io_manager.set_out_file(file_name)
+    io_manager.initialize()
+
+    for event in range(len(event_image_list)):
+        io_manager.set_id(1001, 0, event)
+        images = event_image_list[event]
+
+        if dimension == 1:
+            ev_tensor = larcv.EventTensor1D.to_tensor(io_manager.get_data("tensor1d","test"))
+        if dimension == 2:
+            ev_tensor = larcv.EventImage2D.to_tensor(io_manager.get_data("image2d","test"))
+        if dimension == 3:
+            ev_tensor = larcv.EventTensor3D.to_tensor(io_manager.get_data("tensor3d","test"))
+        if dimension == 4:
+            ev_tensor = larcv.EventTensor4D.to_tensor(io_manager.get_data("tensor4d","test"))
+
+        for projection in range(len(images)):
+
+            if dimension == 1: tensor = larcv.as_tensor1d(images[projection])
+            if dimension == 2: tensor = larcv.as_image2d(images[projection])
+            if dimension == 3: tensor = larcv.as_tensor3d(images[projection])
+            if dimension == 4: tensor = larcv.as_tensor4d(images[projection])
+
+            ev_tensor.append(tensor)
+
+        io_manager.save_entry()
+
+    io_manager.finalize()
+
+    return
+
+def read_tensor(file_name, dimensions):
+
+    
+    from copy import copy
+
+    io_manager = larcv.IOManager(larcv.IOManager.kREAD)
+    io_manager.add_in_file(file_name)
+    io_manager.initialize()
+
+    event_image_list = []
+     
+    for i in range(io_manager.get_n_entries()):
+        event_image_list.append([])
+
+        io_manager.read_entry(i)
+        
+        # Get a piece of data, sparse tensor:
+        if dimensions == 1:
+            ev_tensor = larcv.EventTensor1D.to_tensor(io_manager.get_data("tensor1d","test"))
+        if dimensions == 2:
+            ev_tensor = larcv.EventImage2D.to_tensor(io_manager.get_data("image2d","test"))
+        if dimensions == 3:
+            ev_tensor = larcv.EventTensor3D.to_tensor(io_manager.get_data("tensor3d","test"))
+        if dimensions == 4:
+            ev_tensor = larcv.EventTensor4D.to_tensor(io_manager.get_data("tensor4d","test"))
+
+        print("Number of images read: ", ev_tensor.as_vector().size())
+        for projection in range(ev_tensor.as_vector().size()):
+            image = larcv.as_ndarray(ev_tensor.as_vector()[projection])
+            event_image_list[i].append(copy(image))
+
+    return event_image_list
+
+def build_tensor(rand_num_events, n_projections, dimension=2, shape=None):
+    import numpy
+
+    event_image_list = []
+
+    for i in range(rand_num_events):
+        event_image_list.append([])
+
+        # Get a piece of data, image2d:
+        for projection in range(n_projections):
+            if shape is None:
+                shape = []
+                for dim in range(dimension):
+                    if dimension < 3:
+                        shape.append(random.randint(1, 1e3))
+                    else:
+                        shape.append(random.randint(1, 20))
+                    
+            raw_image = numpy.random.random(shape).astype("float32")
+            event_image_list[i].append(raw_image)
+
+    return event_image_list
 
 def write_sparse_clusters(file_name, voxel_set_array_list, dimension=2, n_projections=3):
 
