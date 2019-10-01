@@ -34,7 +34,7 @@ class larcv_writer(object):
         self._write_workers = {
             'sparse2d' : self._write_sparse2d,
             'image2d'  : self._write_image2d,
-            'particle' : self._write_particle
+            'tensor1d' : self._write_tensor1d
         }
 
         pass
@@ -109,19 +109,27 @@ class larcv_writer(object):
 
         return
 
-    def _write_particle(self, data, producer):
-      '''
-      Write particle data to file
 
-      ...
-      '''
+    def _write_tensor1d(self, data, producer):
+        '''
+        Write tensor1d data to file
 
-      ev_particle = larcv.EventParticle.to_particle(self._io.get_data("particle", producer))
-      particle = larcv.Particle()
-      particle.pdg_code(data)
-      ev_particle.emplace_back(particle)
+        This can be used to save the softmax output for different categories
+        Arguments:
+            data {numpy} -- Data to write, a list of values
+            producer {str} -- Producer key underwhich to store this data
 
+        '''
 
+        n_classes = len(data)
+
+        ev_tensor = larcv.EventTensor1D.to_tensor(self._io.get_data("tensor1d", producer))
+
+        tensor = larcv.as_tensor1d(data)
+
+        ev_tensor.append(tensor)
+
+        return
 
 
 
