@@ -557,7 +557,7 @@ void IOManager::prepare_input() {
     // After looping over all the objects, make sure there are none missing.
     // We've made sure every one found is supposed to be there, so it suffices
     // to make sure we have the same amount:
-    if (processed_object.size() != _in_key_list.size()) {
+    if (_key_list.size() != _in_key_list.size()) {
       LARCV_CRITICAL() << "Group number mismatch across files!" << std::endl;
       throw larbys();
     }
