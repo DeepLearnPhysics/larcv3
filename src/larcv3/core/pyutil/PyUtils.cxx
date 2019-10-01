@@ -21,6 +21,38 @@ PyObject *as_ndarray(const Image2D &img) {
   //return PyArray_FromDimsAndData(2, dim_data, NPY_FLOAT, (char *)&(vec[0]));
 }
 
+PyObject *as_ndarray(const Tensor1D &img) {
+  SetPyUtil();
+  npy_intp dim_data[1];
+  dim_data[0] = img.meta().number_of_voxels(0);
+  auto const &vec = img.as_vector();
+  return ((PyObject*)(PyArray_SimpleNewFromData(1, dim_data, NPY_FLOAT, (char *)&(vec[0]))));
+  //return PyArray_FromDimsAndData(2, dim_data, NPY_FLOAT, (char *)&(vec[0]));
+}
+
+PyObject *as_ndarray(const Tensor3D &img) {
+  SetPyUtil();
+  npy_intp dim_data[3];
+  dim_data[0] = img.meta().number_of_voxels(0);
+  dim_data[1] = img.meta().number_of_voxels(1);
+  dim_data[2] = img.meta().number_of_voxels(2);
+  auto const &vec = img.as_vector();
+  return ((PyObject*)(PyArray_SimpleNewFromData(3, dim_data, NPY_FLOAT, (char *)&(vec[0]))));
+  //return PyArray_FromDimsAndData(2, dim_data, NPY_FLOAT, (char *)&(vec[0]));
+}
+
+PyObject *as_ndarray(const Tensor4D &img) {
+  SetPyUtil();
+  npy_intp dim_data[4];
+  dim_data[0] = img.meta().number_of_voxels(0);
+  dim_data[1] = img.meta().number_of_voxels(1);
+  dim_data[2] = img.meta().number_of_voxels(2);
+  dim_data[3] = img.meta().number_of_voxels(3);
+  auto const &vec = img.as_vector();
+  return ((PyObject*)(PyArray_SimpleNewFromData(4, dim_data, NPY_FLOAT, (char *)&(vec[0]))));
+  //return PyArray_FromDimsAndData(2, dim_data, NPY_FLOAT, (char *)&(vec[0]));
+}
+
 PyObject *as_ndarray(const SparseTensor3D& data, bool clear_mem) {
   SetPyUtil();
   npy_intp dim_data[3];
@@ -585,6 +617,124 @@ larcv3::Image2D as_image2d(PyObject *pyarray) {
   return res;
 }
 
+larcv3::Tensor1D as_tensor1d(PyObject *pyarray) {
+  SetPyUtil();
+  float *carray;
+  // Create C arrays from numpy objects:
+  const int dtype = NPY_FLOAT;
+  PyArray_Descr *descr = PyArray_DescrFromType(dtype);
+  npy_intp dims[1];
+  if (PyArray_AsCArray(&pyarray, (void *)&carray, dims, 1, descr) < 0) {
+    logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__, std::to_string(dims[0]) + "\n");
+    logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
+                               "ERROR: cannot convert to 1D C-array\n");
+    throw larbys();
+  }
+
+  std::vector<float> res_data(dims[0], 0.);
+  for (int i = 0; i < dims[0]; ++i) {
+    res_data[i] = (float)(carray[i]);
+  }
+  PyArray_Free(pyarray, (void *)carray);
+
+  ImageMeta1D meta;
+  meta.set_dimension(0, (double)(dims[0]), (double)(dims[0]));
+
+  // ImageMeta2D meta(0., 0., (double)(dims[0]), (double)(dims[1]),
+  //                (size_t)(dims[0]),
+  //                (size_t)(dims[1]),
+  //                larcv3::kINVALID_PROJECTIONID);
+
+  Tensor1D res(std::move(meta), std::move(res_data));
+  return res;
+}
+
+larcv3::Tensor3D as_tensor3d(PyObject *pyarray) {
+  SetPyUtil();
+  float ***carray;
+  // Create C arrays from numpy objects:
+  const int dtype = NPY_FLOAT;
+  PyArray_Descr *descr = PyArray_DescrFromType(dtype);
+  npy_intp dims[3];
+  if (PyArray_AsCArray(&pyarray, (void ***)&carray, dims, 3, descr) < 0) {
+    logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__, std::to_string(dims[0]) + "\n");
+    logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__, std::to_string(dims[1]) + "\n");
+    logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__, std::to_string(dims[2]) + "\n");
+    logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
+                               "ERROR: cannot convert to 3D C-array\n");
+    throw larbys();
+  }
+
+  // std::cout << "dims: " << dims[0] << ", " << dims[1] << ", " << dims[2] << ", " << std::endl;
+
+  std::vector<float> res_data(dims[0] * dims[1] * dims[2], 0.);
+  for (int i = 0; i < dims[0]; ++i) {
+    for (int j = 0; j < dims[1]; ++j) {
+      for (int k = 0; k < dims[2]; ++k) {
+        res_data[i * dims[1] * dims[2] + j * dims[2] + k] = (float)(carray[i][j][k]);
+        // std::cout << "dims: " << i << ", " << j << ", " << k << " => " << res_data[i * dims[1] * dims[2] + j * dims[2] + k] << std::endl;
+      }
+    }
+  }
+  PyArray_Free(pyarray, (void *)carray);
+
+  ImageMeta3D meta;
+  meta.set_dimension(0, (double)(dims[0]), (double)(dims[0]));
+  meta.set_dimension(1, (double)(dims[1]), (double)(dims[1]));
+  meta.set_dimension(2, (double)(dims[2]), (double)(dims[2]));
+
+  // ImageMeta2D meta(0., 0., (double)(dims[0]), (double)(dims[1]),
+  //                (size_t)(dims[0]),
+  //                (size_t)(dims[1]),
+  //                larcv3::kINVALID_PROJECTIONID);
+
+  Tensor3D res(std::move(meta), std::move(res_data));
+  return res;
+}
+
+larcv3::Tensor4D as_tensor4d(PyObject *pyarray) {
+  SetPyUtil();
+  float ****carray;
+  // Create C arrays from numpy objects:
+  const int dtype = NPY_FLOAT;
+  PyArray_Descr *descr = PyArray_DescrFromType(dtype);
+  npy_intp dims[4];
+  if (PyArray_AsCArray(&pyarray, (void ****)&carray, dims, 4, descr) < 0) {
+    logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__, std::to_string(dims[0]) + "\n");
+    logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__, std::to_string(dims[1]) + "\n");
+    logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__, std::to_string(dims[2]) + "\n");
+    logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__, std::to_string(dims[3]) + "\n");
+    logger::get("PyUtil").send(larcv3::msg::kCRITICAL, __FUNCTION__, __LINE__,
+                               "ERROR: cannot convert to 4D C-array\n");
+    throw larbys();
+  }
+
+  std::vector<float> res_data(dims[0] * dims[1] * dims[2] * dims[3], 0.);
+  for (int i = 0; i < dims[0]; ++i) {
+    for (int j = 0; j < dims[1]; ++j) {
+      for (int k = 0; k < dims[2]; ++k) {
+        for (int m = 0; m < dims[3]; ++m) {
+          res_data[i * dims[1] * dims[2] * dims[3] + j * dims[2] * dims[3] + k * dims[3] + m] = (float)(carray[i][j][k][m]);
+        }
+      }
+    }
+  }
+  PyArray_Free(pyarray, (void *)carray);
+
+  ImageMeta4D meta;
+  meta.set_dimension(0, (double)(dims[0]), (double)(dims[0]));
+  meta.set_dimension(1, (double)(dims[1]), (double)(dims[1]));
+  meta.set_dimension(2, (double)(dims[2]), (double)(dims[2]));
+  meta.set_dimension(3, (double)(dims[3]), (double)(dims[3]));
+
+  // ImageMeta2D meta(0., 0., (double)(dims[0]), (double)(dims[1]),
+  //                (size_t)(dims[0]),
+  //                (size_t)(dims[1]),
+  //                larcv3::kINVALID_PROJECTIONID);
+
+  Tensor4D res(std::move(meta), std::move(res_data));
+  return res;
+}
 
 // larcv3::VoxelSet as_tensor2d(PyObject * values_in, PyObject * indexes_in) {
 //   SetPyUtil();
