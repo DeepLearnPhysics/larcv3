@@ -1,9 +1,9 @@
 /**
- * \file Image2D.h
+ * \file Tensor.h
  *
  * \ingroup core_DataFormat
  * 
- * \brief Class def header for an image2D data holder larcv3::Image2D
+ * \brief Class def header for an tensor data holder larcv3::Tensor (was Image2D)
  *
  * @author tmw, kazu, cadams
  */
@@ -12,8 +12,8 @@
 
     @{*/
 
-#ifndef __LARCV3DATAFORMAT_IMAGE_H__
-#define __LARCV3DATAFORMAT_IMAGE_H__
+#ifndef __LARCV3DATAFORMAT_TENSOR_H__
+#define __LARCV3DATAFORMAT_TENSOR_H__
 
 #include <vector>
 #include <cstdlib>
@@ -23,29 +23,30 @@ namespace larcv3 {
 
   /**
     \TODO Need to  work on implementations for overlay, resize, crop
-    \class Image2D
+    \class Tensor
     Meant to be a storage class for an image2D into a ROOT file. Ultimately data is 1D array.
   */
-  class Image2D {
+  template<size_t dimension>
+  class Tensor {
     friend class EventImage2D;
     
   public:
 
     /// Default Constructor:
-    Image2D(){}
+    Tensor(){}
 
     /// ctor by dimensions
-    Image2D(const std::vector<size_t> & dims);
+    Tensor(const std::vector<size_t> & dims);
     /// ctor from ImageMeta
-    Image2D(const ImageMeta2D&);
+    Tensor(const ImageMeta2D&);
     /// ctor from ImageMeta and 1D array data
-    Image2D(const ImageMeta2D&, const std::vector<float>&);
+    Tensor(const ImageMeta2D&, const std::vector<float>&);
     /// copy ctor
-    Image2D(const Image2D&);
+    Tensor(const Tensor&);
     
 
     /// dtor
-    virtual ~Image2D(){}
+    virtual ~Tensor(){}
 
     /// Reset contents w/ new larcv3::ImageMeta
     void reset(const ImageMeta2D&);
@@ -100,31 +101,31 @@ namespace larcv3 {
     /// Move data contents in
     void move(std::vector<float>&&);
 
-    inline Image2D& operator+=(const float val)
+    inline Tensor& operator+=(const float val)
     { for(auto& v : _img) v+= val; return (*this);}
-    inline Image2D operator+(const float val) const
-    { Image2D res = (*this); res+=val; return res; }
-    inline Image2D& operator-=(const float val)
+    inline Tensor operator+(const float val) const
+    { Tensor res = (*this); res+=val; return res; }
+    inline Tensor& operator-=(const float val)
     { for(auto& v : _img) v-= val; return (*this);}
-    inline Image2D operator-(const float val) const
-    { Image2D res = (*this); res-=val; return res; }
-    inline Image2D& operator*=(const float val)
+    inline Tensor operator-(const float val) const
+    { Tensor res = (*this); res-=val; return res; }
+    inline Tensor& operator*=(const float val)
     { for(auto& v : _img) v*= val; return (*this);}
-    inline Image2D operator*(const float val) const
-    { Image2D res = (*this); res*=val; return res; }
-    inline Image2D& operator/=(const float val)
+    inline Tensor operator*(const float val) const
+    { Tensor res = (*this); res*=val; return res; }
+    inline Tensor& operator/=(const float val)
     { for(auto& v : _img) v/= val; return (*this);}
-    inline Image2D operator/(const float val) const
-    { Image2D res = (*this); res/=val; return res; }
+    inline Tensor operator/(const float val) const
+    { Tensor res = (*this); res/=val; return res; }
 
-    Image2D& operator +=(const std::vector<float>& rhs);
-    Image2D& operator -=(const std::vector<float>& rhs);
-    Image2D& operator +=(const larcv3::Image2D& rhs);
+    Tensor& operator +=(const std::vector<float>& rhs);
+    Tensor& operator -=(const std::vector<float>& rhs);
+    Tensor& operator +=(const larcv3::Tensor<dimension>& rhs);
 
 
 
     /// Element-wise pixel value multiplication
-    void eltwise( const Image2D& rhs );
+    void eltwise( const Tensor& rhs );
     /// Element-wise multiplication w/ 1D array data
     void eltwise(const std::vector<float>& arr,bool allow_longer=false);
     
@@ -165,6 +166,11 @@ namespace larcv3 {
     ImageMeta2D _meta ;
     void clear();
   };
+
+  typedef Tensor<1> Tensor1D;
+  typedef Tensor<2> Image2D;
+  typedef Tensor<3> Tensor3D;
+  typedef Tensor<4> Tensor4D;
 
 }
 

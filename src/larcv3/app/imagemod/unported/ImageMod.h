@@ -1,7 +1,7 @@
 #ifndef __LARCV_IMAGEMOD_H__
 #define __LARCV_IMAGEMOD_H__
 
-#include "larcv/core/DataFormat/Image2D.h"
+#include "larcv/core/DataFormat/Tensor.h"
 #include "larcv/core/DataFormat/Voxel2D.h"
 #include "larcv/core/DataFormat/Particle.h"
 

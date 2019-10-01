@@ -13,7 +13,7 @@ typedef _object PyObject;
 //#endif
 //#endif
 
-#include "larcv3/core/dataformat/Image2D.h"
+#include "larcv3/core/dataformat/Tensor.h"
 #include "larcv3/core/dataformat/Voxel.h"
 // #include "larcv3/core/dataformat/Voxel2D.h"
 // #include "larcv3/core/dataformat/Voxel3DMeta.h"

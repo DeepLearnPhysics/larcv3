@@ -16,7 +16,7 @@
 
 #include "Processor/ProcessBase.h"
 #include "DataFormat/ChStatus.h"
-#include "DataFormat/Image2D.h"
+#include "DataFormat/Tensor.h"
 #include "DataFormat/ROI.h"
 #include <map>
 namespace larcv {

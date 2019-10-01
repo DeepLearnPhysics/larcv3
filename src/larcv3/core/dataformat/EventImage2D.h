@@ -17,7 +17,7 @@
 
 #include <iostream>
 #include "larcv3/core/dataformat/EventBase.h"
-#include "larcv3/core/dataformat/Image2D.h"
+#include "larcv3/core/dataformat/Tensor.h"
 #include "larcv3/core/dataformat/DataProductFactory.h"
 
 namespace larcv3 {

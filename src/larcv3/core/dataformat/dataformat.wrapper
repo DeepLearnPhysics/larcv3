@@ -7,7 +7,7 @@
 %include "larcv3/core/dataformat/Vertex.h"
 %include "larcv3/core/dataformat/Particle.h"
 %include "larcv3/core/dataformat/ImageMeta.h"
-%include "larcv3/core/dataformat/Image2D.h"
+%include "larcv3/core/dataformat/Tensor.h"
 %include "larcv3/core/dataformat/Voxel.h"
 
 // IO Interface classes:
@@ -27,6 +27,10 @@
 %template(BBox3D) larcv3::BBox<3>;
 %template(ImageMeta2D) larcv3::ImageMeta<2>;
 %template(ImageMeta3D) larcv3::ImageMeta<3>;
+%template(Tensor1D) larcv3::Tensor<1>;
+%template(Image2D) larcv3::Tensor<2>;
+%template(Tensor3D) larcv3::Tensor<3>;
+%template(Tensor4D) larcv3::Tensor<4>;
 %template(SparseTensor2D) larcv3::SparseTensor<2>;
 %template(SparseTensor3D) larcv3::SparseTensor<3>;
 %template(EventSparseTensor2D) larcv3::EventSparseTensor<2>;

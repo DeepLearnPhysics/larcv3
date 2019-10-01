@@ -1,37 +1,42 @@
-#ifndef __LARCV3DATAFORMAT_VOXEL_CXX__
-#define __LARCV3DATAFORMAT_VOXEL_CXX__
+#ifndef __LARCV3DATAFORMAT_TENSOR_CXX__
+#define __LARCV3DATAFORMAT_TENSOR_CXX__
 
 
 #include "larcv3/core/base/larbys.h"
-#include "larcv3/core/dataformat/Image2D.h"
+#include "larcv3/core/dataformat/Tensor.h"
 #include <iostream>
 #include <string.h>
 #include <stdio.h>
 namespace larcv3 {
 
-  Image2D::Image2D(const std::vector<size_t> & dims)
+  template<size_t dimension>
+  Tensor<dimension>::Tensor(const std::vector<size_t> & dims)
    : _meta()
   {
     for(size_t i = 0; i < dims.size(); i ++) _meta.set_dimension(i, 1.0, dims[i]);
     _img.resize(_meta.total_voxels());
   }
 
-  Image2D::Image2D(const ImageMeta2D& meta)
+  template<size_t dimension>
+  Tensor<dimension>::Tensor(const ImageMeta2D& meta)
     : _img(meta.total_voxels(), 0.)
     , _meta(meta)
   {}
 
-  Image2D::Image2D(const ImageMeta2D& meta, const std::vector<float>& img)
+  template<size_t dimension>
+  Tensor<dimension>::Tensor(const ImageMeta2D& meta, const std::vector<float>& img)
     : _img(img)
     , _meta(meta)
   { if (img.size() != meta.total_voxels()) throw larbys("Inconsistent dimensions!"); }
 
-  Image2D::Image2D(const Image2D& rhs)
+  template<size_t dimension>
+  Tensor<dimension>::Tensor(const Tensor& rhs)
     : _img(rhs._img)
     , _meta(rhs._meta)
   {}
 
-  void Image2D::reset(const ImageMeta2D& meta)
+  template<size_t dimension>
+  void Tensor<dimension>::reset(const ImageMeta2D& meta)
   {
     _meta = meta;
     if (_img.size() != _meta.total_voxels()) _img.resize(_meta.total_voxels());
@@ -56,53 +61,64 @@ namespace larcv3 {
   //   _img = std::move(img);
   // }
 
-  void Image2D::clear() {
+  template<size_t dimension>
+  void Tensor<dimension>::clear() {
     _img.clear();
     _img.resize(1, 0);
     _meta = ImageMeta2D();
     //std::cout << "[Image2D (" << this << ")] Cleared image2D memory " << std::endl;
   }
 
-  void Image2D::clear_data() { for (auto& v : _img) v = 0.; }
+  template<size_t dimension>
+  void Tensor<dimension>::clear_data() { for (auto& v : _img) v = 0.; }
 
-  void Image2D::set_pixel( size_t index, float value ) {
+  template<size_t dimension>
+  void Tensor<dimension>::set_pixel( size_t index, float value ) {
     if ( index >= _img.size() ) throw larbys("Out-of-bound pixel set request!");
     _img[ index ] = value;
   }
 
-  void Image2D::set_pixel( const std::vector<size_t> & coords, float value ) {
+  template<size_t dimension>
+  void Tensor<dimension>::set_pixel( const std::vector<size_t> & coords, float value ) {
     size_t idx = _meta.index(coords);
     if ( idx >= _meta.total_voxels() )
       throw larbys("Out-of-bound pixel set request!");
     _img[ idx ] = value;
   }
 
-  void Image2D::paint(float value)
+  template<size_t dimension>
+  void Tensor<dimension>::paint(float value)
   { for (auto& v : _img) v = value; }
 
-  void Image2D::threshold(float thresh, bool lower)
+  template<size_t dimension>
+  void Tensor<dimension>::threshold(float thresh, bool lower)
   { for (auto& v : _img) if ( (lower && v < thresh) || (!lower && v > thresh ) ) v = thresh; }
 
-  void Image2D::binarize(float thresh, float lower_overwrite, float upper_overwrite)
+  template<size_t dimension>
+  void Tensor<dimension>::binarize(float thresh, float lower_overwrite, float upper_overwrite)
   { for (auto& v : _img) v = (v <= thresh ? lower_overwrite : upper_overwrite); }
 
-  float Image2D::pixel(const std::vector<size_t> & coords) const{
+  template<size_t dimension>
+  float Tensor<dimension>::pixel(const std::vector<size_t> & coords) const{
     // Get the access index:
     return _img[_meta.index(coords)]; 
   }
-  float Image2D::pixel(size_t index) const{
+  template<size_t dimension>
+  float Tensor<dimension>::pixel(size_t index) const{
     return _img.at(index); 
 
   }
 
-  void Image2D::copy(const std::vector<size_t> & coords, const float* src, size_t num_pixel)
+  template<size_t dimension>
+  void Tensor<dimension>::copy(const std::vector<size_t> & coords, const float* src, size_t num_pixel)
   {
     const size_t idx = _meta.index(coords);
     if (idx + num_pixel - 1 >= _img.size()) throw larbys("memcpy size exceeds allocated memory!");
     memcpy(&(_img[idx]), src, num_pixel * sizeof(float));
   }
 
-  void Image2D::copy(const std::vector<size_t> & coords, const std::vector<float>& src, size_t num_pixel)
+  template<size_t dimension>
+  void Tensor<dimension>::copy(const std::vector<size_t> & coords, const std::vector<float>& src, size_t num_pixel)
   {
     if (!num_pixel)
       this->copy(coords, (float*)(&(src[0])), src.size());
@@ -112,14 +128,16 @@ namespace larcv3 {
       throw larbys("Not enough pixel in source!");
   }
 
-  void Image2D::copy(const std::vector<size_t> & coords, const short* src, size_t num_pixel)
+  template<size_t dimension>
+  void Tensor<dimension>::copy(const std::vector<size_t> & coords, const short* src, size_t num_pixel)
   {
     const size_t idx = _meta.index(coords);
     if (idx + num_pixel - 1 >= _img.size()) throw larbys("memcpy size exceeds allocated memory!");
     for (size_t i = 0; i < num_pixel; ++i) _img[idx + i] = src[idx];
   }
 
-  void Image2D::copy(const std::vector<size_t> & coords, const std::vector<short>& src, size_t num_pixel)
+  template<size_t dimension>
+  void Tensor<dimension>::copy(const std::vector<size_t> & coords, const std::vector<short>& src, size_t num_pixel)
   {
     if (!num_pixel)
       this->copy(coords, (short*)(&(src[0])), src.size());
@@ -129,15 +147,16 @@ namespace larcv3 {
       throw larbys("Not enough pixel in source!");
   }
 
-  void Image2D::reverse_copy(const std::vector<size_t> & coords, const std::vector<float>& src, size_t nskip, size_t num_pixel)
+  template<size_t dimension>
+  void Tensor<dimension>::reverse_copy(const std::vector<size_t> & coords, const std::vector<float>& src, size_t nskip, size_t num_pixel)
   {
     size_t idx = 0;
     try {
       idx = _meta.index(coords);
     } catch (const larbys& err) {
       std::cout << "Exception caught @ " << __FUNCTION__ << std::endl
-                << "Image2D ... fill coords[0]: " << coords[0] << " => " << (coords[0] + num_pixel - 1) << std::endl
-                << "Image2D ... orig idx: " << nskip << " => " << nskip + num_pixel - 1 << std::endl
+                << "Image2Tensor<dimension>D ... fill coords[0]: " << coords[0] << " => " << (coords[0] + num_pixel - 1) << std::endl
+                << "Tensor<dimension> ... orig idx: " << nskip << " => " << nskip + num_pixel - 1 << std::endl
                 << "Re-throwing exception..." << std::endl;
       throw err;
     }
@@ -146,15 +165,16 @@ namespace larcv3 {
     for (size_t i = 0; i < num_pixel; ++i) { _img[idx + i] = src[nskip + num_pixel - i - 1]; }
   }
 
-  void Image2D::reverse_copy(const std::vector<size_t> & coords, const std::vector<short>& src, size_t nskip, size_t num_pixel)
+  template<size_t dimension>
+  void Tensor<dimension>::reverse_copy(const std::vector<size_t> & coords, const std::vector<short>& src, size_t nskip, size_t num_pixel)
   {
     size_t idx = 0;
     try {
       idx = _meta.index(coords);
     } catch (const larbys& err) {
       std::cout << "Exception caught @ " << __FUNCTION__ << std::endl
-                << "Image2D ... fill coords[0]: " << coords[0] << " => " << (coords[0] + num_pixel - 1) << std::endl
-                << "Image2D ... orig idx: " << nskip << " => " << nskip + num_pixel - 1 << std::endl
+                << "Tensor<dimension> ... fill coords[0]: " << coords[0] << " => " << (coords[0] + num_pixel - 1) << std::endl
+                << "Tensor<dimension> ... orig idx: " << nskip << " => " << nskip + num_pixel - 1 << std::endl
                 << "Re-throwing exception..." << std::endl;
       throw err;
     }
@@ -165,7 +185,8 @@ namespace larcv3 {
 
   
 
-//  Image2D Image2D::crop(const ImageMeta& crop_meta) const
+//  template<size_t dimension>
+//  Tensor<dimension> Tensor<dimension>::crop(const ImageMeta& crop_meta) const
 //  {
 //    // Croppin region must be within the image2D
 //    if ( crop_meta.min_x() < _meta.min_x() || crop_meta.min_y() < _meta.min_y() ||
@@ -204,7 +225,7 @@ namespace larcv3 {
 //
 //    //std::cout<<"Cropped:" << std::endl << res_meta.dump()<<std::endl;
 //
-//    return Image2D(std::move(res_meta), std::move(img));
+//    return Tensor<dimansion>(std::move(res_meta), std::move(img));
 //  }
 
 
@@ -278,20 +299,24 @@ namespace larcv3 {
   //   }
   // }
 
-  std::vector<float>&& Image2D::move()
+  template<size_t dimension>
+  std::vector<float>&& Tensor<dimension>::move()
   { return std::move(_img); }
 
-  void Image2D::move(std::vector<float>&& data)
+  template<size_t dimension>
+  void Tensor<dimension>::move(std::vector<float>&& data)
   { _img = std::move(data); }
 
-  Image2D& Image2D::operator+=(const std::vector<float>& rhs)
+  template<size_t dimension>
+  Tensor<dimension>& Tensor<dimension>::operator+=(const std::vector<float>& rhs)
   {
     if (rhs.size() != _img.size()) throw larbys("Cannot call += uniry operator w/ incompatible size!");
     for (size_t i = 0; i < _img.size(); ++i) _img[i] += rhs[i];
     return (*this);
   }
 
-  Image2D& Image2D::operator+=(const larcv3::Image2D& rhs)
+  template<size_t dimension>
+  Tensor<dimension>& Tensor<dimension>::operator+=(const larcv3::Tensor<dimension>& rhs)
   {
     if (rhs.size() != _img.size()) throw larbys("Cannot call += uniry operator w/ incompatible size!");
     for(size_t index = 0; index < meta().total_voxels(); index ++ ){
@@ -300,7 +325,8 @@ namespace larcv3 {
     return (*this);
   }
 
-  Image2D& Image2D::operator-=(const std::vector<float>& rhs)
+  template<size_t dimension>
+  Tensor<dimension>& Tensor<dimension>::operator-=(const std::vector<float>& rhs)
   {
     if (rhs.size() != _img.size()) throw larbys("Cannot call += uniry operator w/ incompatible size!");
     for (size_t i = 0; i < _img.size(); ++i) _img[i] -= rhs[i];
@@ -309,7 +335,8 @@ namespace larcv3 {
 
 
 
-  void Image2D::eltwise(const std::vector<float>& arr, bool allow_longer) {
+  template<size_t dimension>
+  void Tensor<dimension>::eltwise(const std::vector<float>& arr, bool allow_longer) {
     // check multiplication is valid
     if ( !( (allow_longer && _img.size() <= arr.size()) || arr.size() == _img.size() ) ) {
       char oops[500];
@@ -322,18 +349,26 @@ namespace larcv3 {
       _img[i] *= arr[i];
   }
 
-  void Image2D::eltwise( const Image2D& rhs ) {
+  template<size_t dimension>
+  void Tensor<dimension>::eltwise( const Tensor<dimension>& rhs ) {
     // check multiplication is valid
     auto const& meta = rhs.meta();
     if (meta.total_voxels() != _meta.total_voxels() ) {
       char oops[500];
-      sprintf( oops, "Image2D element-wise multiplication not valid. LHS n_voxels (%zu) != RHS n_voxels (%zu)",
+      sprintf( oops, "Tensor<dimension> element-wise multiplication not valid. LHS n_voxels (%zu) != RHS n_voxels (%zu)",
                _meta.total_voxels(), meta.total_voxels());
       throw larbys(oops);
     }
 
     eltwise(rhs.as_vector(), false);
   }
+
+
+template class Tensor<1>;
+template class Tensor<2>;
+template class Tensor<3>;
+template class Tensor<4>;
+
 
 }
 
