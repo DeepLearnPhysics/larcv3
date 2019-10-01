@@ -526,8 +526,10 @@ std::string ImageMeta<dimension>::dump() const
 
 
 
+template class ImageMeta<1>;
 template class ImageMeta<2>;
 template class ImageMeta<3>;
+template class ImageMeta<4>;
 
 
 
