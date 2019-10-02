@@ -77,6 +77,27 @@ class queue_interface(object):
 
         return next_entries
 
+
+    def set_next_index(self, mode, entry):
+        '''
+        Set the next entry to be read. Only works in serial_access mode.
+
+        Argumements:
+            mode {str} -- The mode of training to store this threadio under (typically "train" or "TEST" or similar)
+            entry {int} -- The next entry to be read
+        '''
+
+        if mode not in self._queue_prev_entries:
+            throw('Need to call prepare_manager first.')
+
+        if self._random_access != RandomAccess.serial_access:
+            throw('set_next_entry can only be called in serial_access mode.')
+
+        self._queue_next_entries[mode] = [entry - 1.]
+        return
+
+
+
     def prepare_manager(self, mode, io_config, minibatch_size, data_keys, color=None):
         '''Prepare a manager for io
         
@@ -191,7 +212,7 @@ class queue_interface(object):
         if self._count[mode] != 0:
             if self._warning:
                 print("Calling fetch_minibatch_data without calling prepare_next. This will not give new data.")
-                print("To quiet this wanring, call prepare_next before fetch_minibatch_data or call queueloader.no_warnings()")
+                print("To quiet this warning, call prepare_next before fetch_minibatch_data or call queueloader.no_warnings()")
 
         if pop:
             # This function will pop the data
