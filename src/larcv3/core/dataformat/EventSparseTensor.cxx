@@ -19,8 +19,8 @@
 namespace larcv3 {
 
   /// Global larcv3::EventSparseTensorFactory to register EventSparseTensor
-  static EventSparseTensor2DFactory __global_EventSparseTensor2DFactory__;
-  static EventSparseTensor3DFactory __global_EventSparseTensor3DFactory__;
+  static EventSparseTensorFactory<2> __global_EventSparseTensor2DFactory__;
+  static EventSparseTensorFactory<3> __global_EventSparseTensor3DFactory__;
 
   
   template<size_t dimension> 

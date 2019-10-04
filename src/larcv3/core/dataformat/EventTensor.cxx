@@ -17,10 +17,10 @@
 namespace larcv3 {
 
   /// Global larcv3::SBClusterFactory to register ClusterAlgoFactory
-  static EventTensor1DFactory __global_EventTensor1DFactory__;
-  static EventImage2DFactory  __global_EventImage2DFactory__;
-  static EventTensor3DFactory __global_EventTensor3DFactory__;
-  static EventTensor4DFactory __global_EventTensor4DFactory__;
+  static EventTensorFactory<1> __global_EventTensor1DFactory__;
+  static EventTensorFactory<2> __global_EventTensor2DFactory__;
+  static EventTensorFactory<3> __global_EventTensor3DFactory__;
+  static EventTensorFactory<4> __global_EventTensor4DFactory__;
 
   template<size_t dimension> 
   EventTensor<dimension>::EventTensor(){

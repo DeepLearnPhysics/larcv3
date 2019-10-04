@@ -90,53 +90,22 @@ namespace larcv3 {
   template<> inline std::string product_unique_name<larcv3::EventTensor3D>() { return "tensor3d"; }
   template<> inline std::string product_unique_name<larcv3::EventTensor4D>() { return "tensor4d"; }
 
+
   /**
      \class larcv3::EventTensor
      \brief A concrete factory class for larcv3::EventTensor
   */
 
-  class EventTensor1DFactory : public DataProductFactoryBase {
+  template<size_t dimension>
+  class EventTensorFactory : public DataProductFactoryBase {
   public:
     /// ctor
-    EventTensor1DFactory()
-    { DataProductFactory::get().add_factory(product_unique_name<larcv3::EventTensor1D>(),this); }
+    EventTensorFactory()
+    { DataProductFactory::get().add_factory(product_unique_name<larcv3::EventTensor<dimension>>(),this); }
     /// dtor
-    ~EventTensor1DFactory() {}
+    ~EventTensorFactory() {}
     /// create method
-    EventBase* create() { return new EventTensor1D; }
-  };
-
-  class EventImage2DFactory : public DataProductFactoryBase {
-  public:
-    /// ctor
-    EventImage2DFactory()
-    { DataProductFactory::get().add_factory(product_unique_name<larcv3::EventImage2D>(),this); }
-    /// dtor
-    ~EventImage2DFactory() {}
-    /// create method
-    EventBase* create() { return new EventImage2D; }
-  };
-
-  class EventTensor3DFactory : public DataProductFactoryBase {
-  public:
-    /// ctor
-    EventTensor3DFactory()
-    { DataProductFactory::get().add_factory(product_unique_name<larcv3::EventTensor3D>(),this); }
-    /// dtor
-    ~EventTensor3DFactory() {}
-    /// create method
-    EventBase* create() { return new EventTensor3D; }
-  };
-
-  class EventTensor4DFactory : public DataProductFactoryBase {
-  public:
-    /// ctor
-    EventTensor4DFactory()
-    { DataProductFactory::get().add_factory(product_unique_name<larcv3::EventTensor4D>(),this); }
-    /// dtor
-    ~EventTensor4DFactory() {}
-    /// create method
-    EventBase* create() { return new EventTensor4D; }
+    EventBase* create() { return new EventTensor<dimension>; }
   };
 
 }
