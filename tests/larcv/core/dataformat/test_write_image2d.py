@@ -130,8 +130,8 @@ def test_write_read_image2d(tmpdir, rand_num_events, n_projections):
             input_image = event_image_list[event][projection]
             read_image = read_event_image_list[event][projection]
 
-            assert(numpy.sum(input_image) - numpy.sum(input_image) < 1e-3)
-            assert(numpy.sum(numpy.fabs(input_image)) - numpy.sum(numpy.fabs(input_image)) < 1e-3)
+            assert(numpy.sum(input_image) - numpy.sum(read_image) < 1e-3)
+            assert(numpy.sum(numpy.fabs(input_image)) - numpy.sum(numpy.fabs(read_image)) < 1e-3)
 
             assert(input_image.shape == read_image.shape)
 
