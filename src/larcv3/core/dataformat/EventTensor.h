@@ -3,7 +3,7 @@
  *
  * \ingroup DataFormat
  * 
- * \brief Class def header for a class EventTensor
+ * \brief Class def header for a class EventTensor (was EventImage2D)
  *
  * @author kazuhiro
  * @author cadams
@@ -24,7 +24,7 @@ namespace larcv3 {
   
   /**
     \class EventTensor
-    Event-wise class to store a collection of larcv3::Image
+    Event-wise class to store a collection of larcv3::Tensor
   */
   template<size_t dimension>
   class EventTensor : public EventBase {

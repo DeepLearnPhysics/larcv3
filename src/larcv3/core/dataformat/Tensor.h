@@ -24,7 +24,7 @@ namespace larcv3 {
   /**
     \TODO Need to  work on implementations for overlay, resize, crop
     \class Tensor
-    Meant to be a storage class for an image2D into a ROOT file. Ultimately data is 1D array.
+    Meant to be a storage class for a tensor of arbitrary dimension (originally a 2D image). Ultimately data is 1D array.
   */
   template<size_t dimension>
   class Tensor {
