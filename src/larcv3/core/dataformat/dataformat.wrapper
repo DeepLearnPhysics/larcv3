@@ -7,14 +7,14 @@
 %include "larcv3/core/dataformat/Vertex.h"
 %include "larcv3/core/dataformat/Particle.h"
 %include "larcv3/core/dataformat/ImageMeta.h"
-%include "larcv3/core/dataformat/Image2D.h"
+%include "larcv3/core/dataformat/Tensor.h"
 %include "larcv3/core/dataformat/Voxel.h"
 
 // IO Interface classes:
 %include "larcv3/core/dataformat/DataProductFactory.h"
 %include "larcv3/core/dataformat/EventBase.h"
 %include "larcv3/core/dataformat/EventParticle.h"
-%include "larcv3/core/dataformat/EventImage2D.h"
+%include "larcv3/core/dataformat/EventTensor.h"
 %include "larcv3/core/dataformat/IOManager.h"
 %include "larcv3/core/dataformat/EventSparseTensor.h"
 %include "larcv3/core/dataformat/EventSparseCluster.h"
@@ -27,6 +27,14 @@
 %template(BBox3D) larcv3::BBox<3>;
 %template(ImageMeta2D) larcv3::ImageMeta<2>;
 %template(ImageMeta3D) larcv3::ImageMeta<3>;
+%template(Tensor1D) larcv3::Tensor<1>;
+%template(Image2D) larcv3::Tensor<2>;
+%template(Tensor3D) larcv3::Tensor<3>;
+%template(Tensor4D) larcv3::Tensor<4>;
+%template(EventTensor1D) larcv3::EventTensor<1>;
+%template(EventImage2D) larcv3::EventTensor<2>;
+%template(EventTensor3D) larcv3::EventTensor<3>;
+%template(EventTensor4D) larcv3::EventTensor<4>;
 %template(SparseTensor2D) larcv3::SparseTensor<2>;
 %template(SparseTensor3D) larcv3::SparseTensor<3>;
 %template(EventSparseTensor2D) larcv3::EventSparseTensor<2>;
@@ -51,7 +59,10 @@
 %template(VectorOfCluster2D) std::vector<larcv3::SparseCluster2D>;
 %template(VectorOfCluster3D) std::vector<larcv3::SparseCluster3D>;
 %template(VectorOfParticle) std::vector<larcv3::Particle>;
+%template(VectorOfTensor1D) std::vector<larcv3::Tensor1D>;
 %template(VectorOfImage2D) std::vector<larcv3::Image2D>;
+%template(VectorOfTensor3D) std::vector<larcv3::Tensor3D>;
+%template(VectorOfTensor4D) std::vector<larcv3::Tensor4D>;
 %template(VectorOfImageMeta2D) std::vector<larcv3::ImageMeta2D>;
 %template(VectorOfImageMeta3D) std::vector<larcv3::ImageMeta3D>;
 

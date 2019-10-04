@@ -2,7 +2,7 @@
 #define __SEGIMAGEANA_CXX__
 
 #include "SegImageAna.h"
-#include "DataFormat/EventImage2D.h"
+#include "DataFormat/EventTensor.h"
 #include "DataFormat/EventROI.h"
 
 namespace larcv {

@@ -207,8 +207,10 @@ class ImageMeta {
   DistanceUnit_t _unit;  ///< length unit
 };
 
+typedef ImageMeta<1> ImageMeta1D;
 typedef ImageMeta<2> ImageMeta2D;
 typedef ImageMeta<3> ImageMeta3D;
+typedef ImageMeta<4> ImageMeta4D;
 
 
 }  // namespace larcv3

@@ -9,7 +9,6 @@
  * @author kazuhiro
  * @author cadams
  
-
  * \addtogroup core_DataFormat
 */
 
@@ -107,31 +106,19 @@ namespace larcv3 {
   */
 
 
-
-  class EventSparseTensor2DFactory : public DataProductFactoryBase {
+  template<size_t dimension>
+  class EventSparseTensorFactory : public DataProductFactoryBase {
   public:
     /// ctor
-    EventSparseTensor2DFactory()
-    { DataProductFactory::get().add_factory(product_unique_name<larcv3::EventSparseTensor2D>(), this); }
+    EventSparseTensorFactory()
+    { DataProductFactory::get().add_factory(product_unique_name<larcv3::EventSparseTensor<dimension>>(), this); }
     /// dtor
-    ~EventSparseTensor2DFactory() {}
+    ~EventSparseTensorFactory() {}
     /// create method
-    EventBase* create() { return new EventSparseTensor2D; }
-  };
-
-  class EventSparseTensor3DFactory : public DataProductFactoryBase {
-  public:
-    /// ctor
-    EventSparseTensor3DFactory()
-    { DataProductFactory::get().add_factory(product_unique_name<larcv3::EventSparseTensor3D>(), this); }
-    /// dtor
-    ~EventSparseTensor3DFactory() {}
-    /// create method
-    EventBase* create() { return new EventSparseTensor3D; }
+    EventBase* create() { return new EventSparseTensor<dimension>; }
   };
 
 }
 
 #endif
 /** @} */ // end of doxygen group
-

@@ -3,7 +3,7 @@
 
 #include "SparcifyImage2D.h"
 #include "larcv/core/DataFormat/EventVoxel2D.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
+#include "larcv/core/DataFormat/EventTensor.h"
 
 namespace larcv {
 

@@ -2,7 +2,7 @@
 #define __SEGMENT2DFROMPDG_CXX__
 
 #include "larcv/core/DataFormat/EventVoxel2D.h"
-#include "larcv/core/DataFormat/EventImage2D.h"
+#include "larcv/core/DataFormat/EventTensor.h"
 #include "larcv/core/DataFormat/EventParticle.h"
 #include "Segment2DFromPDG.h"
 #include "ImageMod.h"

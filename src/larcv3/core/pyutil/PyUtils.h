@@ -13,7 +13,7 @@ typedef _object PyObject;
 //#endif
 //#endif
 
-#include "larcv3/core/dataformat/Image2D.h"
+#include "larcv3/core/dataformat/Tensor.h"
 #include "larcv3/core/dataformat/Voxel.h"
 // #include "larcv3/core/dataformat/Voxel2D.h"
 // #include "larcv3/core/dataformat/Voxel3DMeta.h"
@@ -43,6 +43,9 @@ PyObject* as_ndarray(const std::vector< float              > &data);
 PyObject* as_ndarray(const std::vector< double             > &data);
 /// larcv3::Image2D to numpy array converter
 PyObject* as_ndarray(const larcv3::Image2D &img);
+PyObject* as_ndarray(const larcv3::Tensor1D &img);
+PyObject* as_ndarray(const larcv3::Tensor3D &img);
+PyObject* as_ndarray(const larcv3::Tensor4D &img);
 // /// larcv3::Image2D to numpy array converter
 // PyObject* as_caffe_ndarray(const Image2D &img);
 // /// larcv3::VoxelSet to numpy (dense array) array converter
@@ -86,6 +89,12 @@ void copy_array(PyObject *arrayin, const std::vector< double         > &cvec);
 larcv3::Image2D as_image2d_meta(PyObject *, larcv3::ImageMeta2D meta);
 
 larcv3::Image2D as_image2d(PyObject *);
+
+larcv3::Tensor1D as_tensor1d(PyObject *);
+
+larcv3::Tensor3D as_tensor3d(PyObject *);
+
+larcv3::Tensor4D as_tensor4d(PyObject *);
 
 // VoxelSet as_tensor2d(PyObject * values, PyObject * indexes);
 

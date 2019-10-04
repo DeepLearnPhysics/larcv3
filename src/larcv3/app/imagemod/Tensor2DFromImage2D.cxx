@@ -3,7 +3,7 @@
 
 #include "Tensor2DFromImage2D.h"
 #include "larcv3/core/dataformat/EventSparseTensor.h"
-#include "larcv3/core/dataformat/EventImage2D.h"
+#include "larcv3/core/dataformat/EventTensor.h"
 
 #include <math.h>
 

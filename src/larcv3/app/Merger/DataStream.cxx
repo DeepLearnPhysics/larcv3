@@ -2,7 +2,7 @@
 #define __DATASTREAM_CXX__
 
 #include "DataStream.h"
-#include "DataFormat/EventImage2D.h"
+#include "DataFormat/EventTensor.h"
 #include "DataFormat/EventChStatus.h"
 #include "DataFormat/EventROI.h"
 
