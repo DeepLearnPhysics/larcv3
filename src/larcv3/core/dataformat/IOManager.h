@@ -19,7 +19,7 @@
 #include <map>
 #include <set>
 
-#include "H5Cpp.h"
+#include "hdf5.h"
 
 #ifdef LARCV_MPI
 #include <mpi.h>
@@ -165,13 +165,13 @@ namespace larcv3 {
 
 
     // Parameters controlling output file large scale tracking:
-    // Name of the output file
-    H5::H5File  _out_file;
+    // ID of the output file:
+    hid_t  _out_file;
     // Current output index
     size_t      _out_index;
     // Total output entries
     size_t      _out_entries;
-    // Output file name:
+    // Name of the output file
     std::string _out_file_name;
 
     // Parameters controllign input file large scale tracking:
@@ -187,7 +187,7 @@ namespace larcv3 {
     // List of input directory names:
     std::vector<std::string>        _in_dir_v;
     // Currently open file:
-    H5::H5File  _in_open_file;
+    hid_t       _in_open_file;
     // List of total entries in input files
     std::vector<size_t>             _in_entries_v;
 
@@ -196,8 +196,8 @@ namespace larcv3 {
     EventID   _set_event_id;
     EventID   _last_event_id;
 
-    H5::DataSet    _active_in_event_id_dataset;
-    H5::DataSpace  _active_in_event_id_dataspace;
+    hid_t     _active_in_event_id_dataset;
+    hid_t     _active_in_event_id_dataspace;
 
 
     // Parameters controlling the internals of an event.
@@ -205,7 +205,7 @@ namespace larcv3 {
 
 
     // Output groups.  Since these are stored and need to be initialized, this is a member:
-    std::vector<H5::Group> _out_group_v;
+    std::vector<hid_t> _out_group_v;
 
 
     // Key list keeps track of the mapping from producer/product to an id:
@@ -215,9 +215,9 @@ namespace larcv3 {
 
 
     // Hold a copy of the file access property list:
-    H5::FileAccPropList _fapl;
+    hid_t  _fapl; //FileAccPropList 
 
-    std::map<std::string, H5::Group> _groups;
+    std::map<std::string, hid_t> _groups;
 
 
     // Keeping track of products and producers:
@@ -236,8 +236,9 @@ namespace larcv3 {
 
 
     // IOManager has to control the EventID dataset it's self for the output file.
-    H5::DataSet  _out_event_id_ds;
-    H5::DataType _event_id_datatype;
+    hid_t  _out_event_id_ds;  // dataset
+    hid_t _event_id_datatype; // datatype
+    hid_t xfer_plist_id;
 
     // Internal bookkeeping for when the input file switches:
     bool _force_reopen_groups;
@@ -257,3 +258,4 @@ namespace larcv3 {
 
 #endif
 /** @} */ // end of doxygen group
+    

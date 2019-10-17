@@ -15,6 +15,7 @@
 #define __LARCV3DATAFORMAT_EVENTID_H
 
 #include <iostream>
+#include "hdf5.h"
 #include "larcv3/core/dataformat/DataFormatTypes.h"
 
 namespace larcv3 {
@@ -88,11 +89,16 @@ class EventID {
 
 #ifndef SWIG
   public: 
-    static H5::CompType get_datatype() {
-      H5::CompType datatype(sizeof(EventID));
-      datatype.insertMember(H5std_string("run"),    offsetof(EventID, _run),    larcv3::get_datatype<long>());
-      datatype.insertMember(H5std_string("subrun"), offsetof(EventID, _subrun), larcv3::get_datatype<long>());
-      datatype.insertMember(H5std_string("event"),  offsetof(EventID, _event),  larcv3::get_datatype<long>());
+    static hid_t get_datatype() {
+      hid_t datatype;
+      herr_t status;
+      datatype = H5Tcreate (H5T_COMPOUND, sizeof (EventID));
+      status = H5Tinsert (datatype, "run",
+                  HOFFSET (EventID, _run), larcv3::get_datatype<long>());
+      status = H5Tinsert (datatype, "subrun", 
+                  HOFFSET (EventID, _subrun), larcv3::get_datatype<long>());
+      status = H5Tinsert (datatype, "event",
+                  HOFFSET (EventID, _event), larcv3::get_datatype<long>());
       return datatype;
     }
 #endif

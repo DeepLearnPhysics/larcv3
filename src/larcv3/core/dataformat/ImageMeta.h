@@ -172,21 +172,28 @@ class ImageMeta {
 
 #ifndef SWIG
   public: 
-    static H5::CompType get_datatype() {
-      H5::CompType datatype(sizeof(ImageMeta));
+    static hid_t get_datatype() {
+      hid_t datatype;
+      herr_t status;
+      datatype = H5Tcreate (H5T_COMPOUND, sizeof (ImageMeta));
 
       hsize_t array_dimensions[1];
       array_dimensions[0] = dimension;
 
-      H5::ArrayType double_type(larcv3::get_datatype<double>(), 1, array_dimensions);
-      H5::ArrayType size_t_type(larcv3::get_datatype<size_t>(), 1, array_dimensions);
 
-      datatype.insertMember(H5std_string("valid"),            offsetof(ImageMeta, _valid),            larcv3::get_datatype<bool>());
-      datatype.insertMember(H5std_string("projection_id"),    offsetof(ImageMeta, _projection_id),    larcv3::get_datatype<size_t>());
-      datatype.insertMember(H5std_string("image_sizes"),      offsetof(ImageMeta, _image_sizes),      double_type);
-      datatype.insertMember(H5std_string("number_of_voxels"), offsetof(ImageMeta, _number_of_voxels), size_t_type);
-      datatype.insertMember(H5std_string("origin"),           offsetof(ImageMeta, _origin),           double_type);
+      hid_t double_type = H5Tarray_create(larcv3::get_datatype<double>(), 1, array_dimensions);
+      hid_t size_t_type = H5Tarray_create(larcv3::get_datatype<size_t>(), 1, array_dimensions);
 
+      status = H5Tinsert (datatype, "valid",
+                  HOFFSET (ImageMeta, _valid),            larcv3::get_datatype<bool>());
+      status = H5Tinsert (datatype, "projection_id",
+                  HOFFSET (ImageMeta, _projection_id),    larcv3::get_datatype<size_t>());
+      status = H5Tinsert (datatype, "image_sizes",
+                  HOFFSET (ImageMeta, _image_sizes),      double_type);
+      status = H5Tinsert (datatype, "number_of_voxels",
+                  HOFFSET (ImageMeta, _number_of_voxels), size_t_type);
+      status = H5Tinsert (datatype, "origin", 
+                  HOFFSET (ImageMeta, _origin),           double_type);
       return datatype;
     }
 #endif

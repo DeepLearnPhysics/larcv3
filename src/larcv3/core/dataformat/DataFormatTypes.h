@@ -2,7 +2,7 @@
 #define __LARCV3DATAFORMAT_DATAFORMATTYPES_H__
 
 #include "larcv3/core/base/LArCVTypes.h"
-#include "H5Cpp.h"
+#include "hdf5.h"
 #include <vector>
 #include <set>
 
@@ -109,7 +109,7 @@ namespace larcv3 {
 #ifndef SWIG
 
   template <typename T>
-  H5::DataType get_datatype();
+  hid_t get_datatype();
 
 
 #endif

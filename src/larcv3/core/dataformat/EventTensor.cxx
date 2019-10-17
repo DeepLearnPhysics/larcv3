@@ -28,10 +28,10 @@ namespace larcv3 {
 
     _data_types.resize(N_DATASETS);
 
-    _data_types[EXTENTS_DATASET] = new H5::DataType(larcv3::get_datatype<Extents_t>());
-    _data_types[IMAGE_EXTENTS_DATASET] = new H5::DataType(larcv3::get_datatype<IDExtents_t>());
-    _data_types[IMAGE_META_DATASET] = new H5::DataType(larcv3::ImageMeta<dimension>::get_datatype());
-    _data_types[IMAGES_DATASET] = new H5::DataType(larcv3::get_datatype<float>());
+    _data_types[EXTENTS_DATASET]       = larcv3::get_datatype<Extents_t>();
+    _data_types[IMAGE_EXTENTS_DATASET] = larcv3::get_datatype<IDExtents_t>();
+    _data_types[IMAGE_META_DATASET]    = larcv3::ImageMeta<dimension>::get_datatype();
+    _data_types[IMAGES_DATASET]        = larcv3::get_datatype<float>();
 
 
   }
@@ -63,23 +63,23 @@ namespace larcv3 {
 
 
   template<size_t dimension> 
-  void EventTensor<dimension>::open_in_datasets(H5::Group * group){
+  void EventTensor<dimension>::open_in_datasets(hid_t group){
 
     if (_open_in_datasets.size() < N_DATASETS ){
        _open_in_datasets.resize(N_DATASETS);
        _open_in_dataspaces.resize(N_DATASETS);
        
-       _open_in_datasets[IMAGES_DATASET]          = group->openDataSet("images");
-       _open_in_dataspaces[IMAGES_DATASET]        = _open_in_datasets[IMAGES_DATASET].getSpace();
+       _open_in_datasets[IMAGES_DATASET]          = H5Dopen(group,"images", H5P_DEFAULT);
+       _open_in_dataspaces[IMAGES_DATASET]        = H5Dget_space(_open_in_datasets[IMAGES_DATASET]);
 
-       _open_in_datasets[EXTENTS_DATASET]         = group->openDataSet("extents");
-       _open_in_dataspaces[EXTENTS_DATASET]       = _open_in_datasets[EXTENTS_DATASET].getSpace();
+       _open_in_datasets[EXTENTS_DATASET]         = H5Dopen(group,"extents", H5P_DEFAULT);
+       _open_in_dataspaces[EXTENTS_DATASET]       = H5Dget_space(_open_in_datasets[EXTENTS_DATASET]);
 
-       _open_in_datasets[IMAGE_META_DATASET]      = group->openDataSet("image_meta");
-       _open_in_dataspaces[IMAGE_META_DATASET]    = _open_in_datasets[IMAGE_META_DATASET].getSpace();
+       _open_in_datasets[IMAGE_META_DATASET]      = H5Dopen(group,"image_meta", H5P_DEFAULT);
+       _open_in_dataspaces[IMAGE_META_DATASET]    = H5Dget_space(_open_in_datasets[IMAGE_META_DATASET]);
 
-       _open_in_datasets[IMAGE_EXTENTS_DATASET]   = group->openDataSet("image_extents");
-       _open_in_dataspaces[IMAGE_EXTENTS_DATASET] = _open_in_datasets[IMAGE_EXTENTS_DATASET].getSpace();
+       _open_in_datasets[IMAGE_EXTENTS_DATASET]   = H5Dopen(group,"image_extents", H5P_DEFAULT);
+       _open_in_dataspaces[IMAGE_EXTENTS_DATASET] = H5Dget_space(_open_in_datasets[IMAGE_EXTENTS_DATASET]);
 
     }
 
@@ -87,32 +87,44 @@ namespace larcv3 {
   }
 
   template<size_t dimension> 
-  void EventTensor<dimension>::open_out_datasets(H5::Group * group){
+  void EventTensor<dimension>::open_out_datasets(hid_t group){
 
     if (_open_out_datasets.size() < N_DATASETS ){
        _open_out_datasets.resize(N_DATASETS);
        _open_out_dataspaces.resize(N_DATASETS);
        
-       _open_out_datasets[IMAGES_DATASET]          = group->openDataSet("images");
-       _open_out_dataspaces[IMAGES_DATASET]        = _open_out_datasets[IMAGES_DATASET].getSpace();
+       _open_out_datasets[IMAGES_DATASET]          = H5Dopen(group,"images", H5P_DEFAULT);
+       _open_out_dataspaces[IMAGES_DATASET]        = H5Dget_space(_open_out_datasets[IMAGES_DATASET]);
 
-       _open_out_datasets[EXTENTS_DATASET]         = group->openDataSet("extents");
-       _open_out_dataspaces[EXTENTS_DATASET]       = _open_out_datasets[EXTENTS_DATASET].getSpace();
+       _open_out_datasets[EXTENTS_DATASET]         = H5Dopen(group,"extents", H5P_DEFAULT);
+       _open_out_dataspaces[EXTENTS_DATASET]       = H5Dget_space(_open_out_datasets[EXTENTS_DATASET]);
 
 
-       _open_out_datasets[IMAGE_META_DATASET]      = group->openDataSet("image_meta");
-       _open_out_dataspaces[IMAGE_META_DATASET]    = _open_out_datasets[IMAGE_META_DATASET].getSpace();
+       _open_out_datasets[IMAGE_META_DATASET]      = H5Dopen(group,"image_meta", H5P_DEFAULT);
+       _open_out_dataspaces[IMAGE_META_DATASET]    = H5Dget_space(_open_out_datasets[IMAGE_META_DATASET]);
 
-       _open_out_datasets[IMAGE_EXTENTS_DATASET]   = group->openDataSet("image_extents");
-       _open_out_dataspaces[IMAGE_EXTENTS_DATASET] = _open_out_datasets[IMAGE_EXTENTS_DATASET].getSpace();
+       _open_out_datasets[IMAGE_EXTENTS_DATASET]   = H5Dopen(group,"image_extents", H5P_DEFAULT);
+       _open_out_dataspaces[IMAGE_EXTENTS_DATASET] = H5Dget_space(_open_out_datasets[IMAGE_EXTENTS_DATASET]);
 
     }
 
     return;
   }
 
+  template<size_t dimension>
+  void EventTensor<dimension>::finalize(){
+    for (size_t i = 0; i < _open_in_datasets.size(); i ++){
+      H5Sclose(_open_in_dataspaces[i]);
+      H5Dclose(_open_in_datasets[i]);
+    } 
+    for (size_t i = 0; i < _open_out_datasets.size(); i ++){
+      H5Sclose(_open_in_dataspaces[i]);
+      H5Dclose(_open_out_datasets[i]);
+    } 
+  }
+
   template<size_t dimension> 
-  void EventTensor<dimension>::initialize (H5::Group * group, uint compression){
+  void EventTensor<dimension>::initialize (hid_t group, uint compression){
 
     // Image2D creates a set of tables:
     // 1) extents: indicates which entries in the image_extents table correspond to the entry
@@ -124,8 +136,10 @@ namespace larcv3 {
        // Initialize is ONLY meant to be called on an empty group.  So, verify this group 
     // is empty:
 
-    if (group -> getNumObjs() != 0){
-      LARCV_CRITICAL() << "Attempt to initialize non empty image2d group " << group->fromClass() << std::endl;
+    // hsize_t  num_objects[1] = {9999};
+    // H5Gget_num_objs(group, num_objects);
+    if (get_num_objects(group) != 0){
+      LARCV_CRITICAL() << "Attempt to initialize non empty particle group " << group << std::endl;
       throw larbys();
     }
 
@@ -141,23 +155,30 @@ namespace larcv3 {
     hsize_t extents_maxsize_dim[]  = {H5S_UNLIMITED};
 
     // Create a dataspace 
-    H5::DataSpace extents_dataspace(1, extents_starting_dim, extents_maxsize_dim);
+    hid_t extents_dataspace = H5Screate_simple(1, extents_starting_dim, extents_maxsize_dim);
 
     /*
      * Modify dataset creation properties, i.e. enable chunking.
      */
-    H5::DSetCreatPropList extents_cparms;
+    hid_t extents_cparms = H5Pcreate( H5P_DATASET_CREATE );
     hsize_t      extents_chunk_dims[1] ={IMAGE_EXTENTS_CHUNK_SIZE};
-    extents_cparms.setChunk( 1, extents_chunk_dims );
+    H5Pset_chunk(extents_cparms, 1, extents_chunk_dims );
     if (compression){
-        extents_cparms.setDeflate(compression);
+      H5Pset_deflate(extents_cparms, compression);
     }
-    
+
     // Create the extents dataset:
-    H5::DataSet extents_ds = group->createDataSet("extents", 
-        *_data_types[EXTENTS_DATASET], extents_dataspace, extents_cparms);
+    H5Dcreate(
+      group,                        // hid_t loc_id  IN: Location identifier
+      "extents",                    // const char *name      IN: Dataset name
+      _data_types[EXTENTS_DATASET], // hid_t dtype_id  IN: Datatype identifier
+      extents_dataspace,            // hid_t space_id  IN: Dataspace identifier
+      NULL,                         // hid_t lcpl_id IN: Link creation property list
+      extents_cparms,               // hid_t dcpl_id IN: Dataset creation property list
+      NULL                          // hid_t dapl_id IN: Dataset access property list
+    );
 
-
+    std::cout << "Created extents " << std::endl;
     /////////////////////////////////////////////////////////
     // Create the image_extents dataset
     /////////////////////////////////////////////////////////
@@ -167,22 +188,29 @@ namespace larcv3 {
     hsize_t image_extents_maxsize_dim[]  = {H5S_UNLIMITED};
 
     // Create a dataspace 
-    H5::DataSpace image_extents_dataspace(1, image_extents_starting_dim, image_extents_maxsize_dim);
+    hid_t image_extents_dataspace = H5Screate_simple(1, image_extents_starting_dim, image_extents_maxsize_dim);
 
     /*
      * Modify dataset creation properties, i.e. enable chunking.
      */
-    H5::DSetCreatPropList image_extents_cparms;
+    hid_t image_extents_cparms = H5Pcreate( H5P_DATASET_CREATE );
     hsize_t      image_extents_chunk_dims[1] ={IMAGE_IDEXTENTS_CHUNK_SIZE};
-    image_extents_cparms.setChunk( 1, image_extents_chunk_dims );
+    H5Pset_chunk(image_extents_cparms, 1, image_extents_chunk_dims );
     if (compression){
-        image_extents_cparms.setDeflate(compression);
+      H5Pset_deflate(image_extents_cparms, compression);
     }
-    
-    // Create the extents dataset:
-    H5::DataSet image_extents_ds = group->createDataSet("image_extents", 
-      *_data_types[IMAGE_EXTENTS_DATASET], image_extents_dataspace, image_extents_cparms);
 
+    // Create the extents dataset:
+    H5Dcreate(
+      group,                              // hid_t loc_id  IN: Location identifier
+      "image_extents",                    // const char *name      IN: Dataset name
+      _data_types[IMAGE_EXTENTS_DATASET], // hid_t dtype_id  IN: Datatype identifier
+      image_extents_dataspace,            // hid_t space_id  IN: Dataspace identifier
+      NULL,                               // hid_t lcpl_id IN: Link creation property list
+      image_extents_cparms,               // hid_t dcpl_id IN: Dataset creation property list
+      NULL                                // hid_t dapl_id IN: Dataset access property list
+    );
+    std::cout << "Created image extents " << std::endl;
 
     /////////////////////////////////////////////////////////
     // Create the image_meta dataset
@@ -196,28 +224,37 @@ namespace larcv3 {
     hsize_t image_meta_maxsize_dim[]  = {H5S_UNLIMITED};
 
     // Create a dataspace 
-    H5::DataSpace image_meta_dataspace(1, image_meta_starting_dim, image_meta_maxsize_dim);
+    hid_t image_meta_dataspace = H5Screate_simple(1, image_meta_starting_dim, image_meta_maxsize_dim);
 
     /*
      * Modify dataset creation properties, i.e. enable chunking.
      */
-    H5::DSetCreatPropList image_meta_cparms;
+    hid_t image_meta_cparms = H5Pcreate( H5P_DATASET_CREATE );
     hsize_t      image_meta_chunk_dims[1] ={IMAGE_META_CHUNK_SIZE};
-    image_meta_cparms.setChunk( 1, image_meta_chunk_dims );
+    H5Pset_chunk(image_meta_cparms, 1, image_meta_chunk_dims );
     if (compression){
-        image_meta_cparms.setDeflate(compression);
+      H5Pset_deflate(image_meta_cparms, compression);
     }
 
     // Create the extents dataset:
-    H5::DataSet image_meta_ds = group->createDataSet("image_meta", 
-      *_data_types[IMAGE_META_DATASET], image_meta_dataspace, image_meta_cparms);
-
+    H5Dcreate(
+      group,                           // hid_t loc_id  IN: Location identifier
+      "image_meta",                    // const char *name      IN: Dataset name
+      _data_types[IMAGE_META_DATASET], // hid_t dtype_id  IN: Datatype identifier
+      image_meta_dataspace,            // hid_t space_id  IN: Dataspace identifier
+      NULL,                            // hid_t lcpl_id IN: Link creation property list
+      image_meta_cparms,               // hid_t dcpl_id IN: Dataset creation property list
+      NULL                             // hid_t dapl_id IN: Dataset access property list
+    );
 
     _compression = compression;
+
+    std::cout << "Initialized" << std::endl;
+
     return;
   }
   template<size_t dimension> 
-  void EventTensor<dimension>::serialize  (H5::Group * group){
+  void EventTensor<dimension>::serialize  (hid_t group){
 
     // This is something of an optimization trickery.
     // The dataset for storing images is not created until an image is written.
@@ -227,7 +264,7 @@ namespace larcv3 {
     // Create the Image dataset
     /////////////////////////////////////////////////////////
     // if ( ! group -> nameExists("images")){
-    if (  group -> getNumObjs() != 4){
+    if (  get_num_objects(group) != 4){
         // std::cout << "Images dataset does not yet exist, creating it." << std::endl;
         // An image is stored as a flat vector, so it's type is float.
         // The image ID is store in the image_extents table, and the meta in the image_meta table
@@ -238,7 +275,7 @@ namespace larcv3 {
         hsize_t image_maxsize_dim[]  = {H5S_UNLIMITED};
 
         // Create a dataspace 
-        H5::DataSpace image_dataspace(1, image_starting_dim, image_maxsize_dim);
+        hid_t image_dataspace = H5Screate_simple(1, image_starting_dim, image_maxsize_dim);
 
         // Figure out the chunk size dynamically:
         size_t chunk_size = 0;
@@ -249,16 +286,22 @@ namespace larcv3 {
         /*
          * Modify dataset creation properties, i.e. enable chunking.
          */
-        H5::DSetCreatPropList image_cparms;
+        hid_t image_cparms = H5Pcreate( H5P_DATASET_CREATE );
         hsize_t      image_chunk_dims[1] ={chunk_size};
-        image_cparms.setChunk( 1, image_chunk_dims );
+        H5Pset_chunk(image_cparms, 1, image_chunk_dims );
         if (_compression){
-            image_cparms.setDeflate(_compression);
+          H5Pset_deflate(image_cparms, _compression);
         }
         // Create the extents dataset:
-        H5::DataSet image_ds = group->createDataSet("images", 
-            *_data_types[IMAGES_DATASET], image_dataspace, image_cparms);
-
+        H5Dcreate(
+          group,                           // hid_t loc_id  IN: Location identifier
+          "images",                    // const char *name      IN: Dataset name
+          _data_types[IMAGES_DATASET], // hid_t dtype_id  IN: Datatype identifier
+          image_dataspace,            // hid_t space_id  IN: Dataspace identifier
+          NULL,                            // hid_t lcpl_id IN: Link creation property list
+          image_cparms,               // hid_t dcpl_id IN: Dataset creation property list
+          NULL                             // hid_t dapl_id IN: Dataset access property list
+        );
 
 
     }
@@ -278,36 +321,31 @@ namespace larcv3 {
 
 
 
+    // Transfer property list, default:
+    hid_t xfer_plist_id = H5Pcreate(H5P_DATASET_XFER);
+
 
     /////////////////////////////////////////////////////////
     // Step 1: Get the current dataset dimensions
     /////////////////////////////////////////////////////////
 
-    // H5::DataSet extents_dataset = group->openDataSet("extents");
-    // H5::DataSpace extents_dataspace = extents_dataset.getSpace();
     // Get the dataset current size
     hsize_t extents_dims_current[1];
-    _open_out_dataspaces[EXTENTS_DATASET].getSimpleExtentDims(extents_dims_current, NULL);
+    H5Sget_simple_extent_dims(_open_out_dataspaces[EXTENTS_DATASET], extents_dims_current, NULL);
 
 
-    // H5::DataSet image_extents_dataset = group->openDataSet("image_extents");
-    // H5::DataSpace image_extents_dataspace = image_extents_dataset.getSpace();
     // Get the dataset current size
     hsize_t image_extents_dims_current[1];
-    _open_out_dataspaces[IMAGE_EXTENTS_DATASET].getSimpleExtentDims(image_extents_dims_current, NULL);
+    H5Sget_simple_extent_dims(_open_out_dataspaces[IMAGE_EXTENTS_DATASET], image_extents_dims_current, NULL);
 
-    // H5::DataSet image_meta_dataset = group->openDataSet("image_meta");
-    // H5::DataSpace image_meta_dataspace = image_meta_dataset.getSpace();
         // Get the dataset current size
     hsize_t image_meta_dims_current[1];
-    _open_out_dataspaces[IMAGE_META_DATASET].getSimpleExtentDims(image_meta_dims_current, NULL);
+    H5Sget_simple_extent_dims(_open_out_dataspaces[IMAGE_META_DATASET], image_meta_dims_current, NULL);
 
 
-    // H5::DataSet images_dataset = group->openDataSet("images");
-    // H5::DataSpace images_dataspace = images_dataset.getSpace();
     // Get the dataset current size
     hsize_t images_dims_current[1];
-    _open_out_dataspaces[IMAGES_DATASET].getSimpleExtentDims(images_dims_current, NULL);
+    H5Sget_simple_extent_dims(_open_out_dataspaces[IMAGES_DATASET], images_dims_current, NULL);
 
 
     /////////////////////////////////////////////////////////
@@ -359,7 +397,7 @@ namespace larcv3 {
     extents_size[0] = extents_dims_current[0] + extents_slab_dims[0];
 
     // Extend the dataset to accomodate the new data
-    _open_out_datasets[EXTENTS_DATASET].extend(extents_size);
+    H5Dset_extent(_open_out_datasets[EXTENTS_DATASET], extents_size);
 
 
     // Create an extents object to go into the extents table:
@@ -373,19 +411,28 @@ namespace larcv3 {
     /////////////////////////////////////////////////////////
 
     // Now, select as a hyperslab the last section of data for writing:
-    _open_out_dataspaces[EXTENTS_DATASET] = _open_out_datasets[EXTENTS_DATASET].getSpace();
-    _open_out_dataspaces[EXTENTS_DATASET].selectHyperslab(H5S_SELECT_SET, extents_slab_dims, extents_dims_current);
+    _open_out_dataspaces[EXTENTS_DATASET] = H5Dget_space(_open_out_datasets[EXTENTS_DATASET]);
+
+    H5Sselect_hyperslab(_open_out_dataspaces[EXTENTS_DATASET], 
+      H5S_SELECT_SET, 
+      extents_dims_current, // start
+      NULL ,                // stride
+      extents_slab_dims,    // count 
+      NULL                  // block
+      );
 
     // Define memory space:
-    H5::DataSpace extents_memspace(1, extents_slab_dims);
+    hid_t extents_memspace = H5Screate_simple(1, extents_slab_dims, NULL);
 
 
     // Write the new data
-    _open_out_datasets[EXTENTS_DATASET].write(&(next_extents), 
-        *_data_types[EXTENTS_DATASET], 
-        extents_memspace, 
-        _open_out_dataspaces[EXTENTS_DATASET]);
-
+    H5Dwrite(_open_out_datasets[EXTENTS_DATASET],   // dataset_id,
+             _data_types[EXTENTS_DATASET],          // hit_t mem_type_id, 
+             extents_memspace,                      // hid_t mem_space_id, 
+             _open_out_dataspaces[EXTENTS_DATASET], //hid_t file_space_id, 
+             xfer_plist_id,                         //hid_t xfer_plist_id, 
+             &(next_extents)                        // const void * buf 
+           );
 
 
     /////////////////////////////////////////////////////////
@@ -403,7 +450,8 @@ namespace larcv3 {
     image_extents_size[0] = image_extents_dims_current[0] + image_extents_slab_dims[0];
 
     // Extend the dataset to accomodate the new data
-    _open_out_datasets[IMAGE_EXTENTS_DATASET].extend(image_extents_size);
+    H5Dset_extent(_open_out_datasets[IMAGE_EXTENTS_DATASET], image_extents_size);
+
 
 
     /////////////////////////////////////////////////////////
@@ -411,21 +459,27 @@ namespace larcv3 {
     /////////////////////////////////////////////////////////
 
     // Select as a hyperslab the last section of data for writing:
-    _open_out_dataspaces[IMAGE_EXTENTS_DATASET] = _open_out_datasets[IMAGE_EXTENTS_DATASET].getSpace();
-    _open_out_dataspaces[IMAGE_EXTENTS_DATASET].selectHyperslab(H5S_SELECT_SET, 
-        image_extents_slab_dims, 
-        image_extents_dims_current);
+    _open_out_dataspaces[IMAGE_EXTENTS_DATASET] = H5Dget_space(_open_out_datasets[IMAGE_EXTENTS_DATASET]);
 
+    H5Sselect_hyperslab(_open_out_dataspaces[IMAGE_EXTENTS_DATASET], 
+      H5S_SELECT_SET, 
+      image_extents_dims_current, // start
+      NULL ,                      // stride
+      image_extents_slab_dims,    // count 
+      NULL                        // block
+      );
     // Define memory space:
-    H5::DataSpace image_extents_memspace(1, image_extents_slab_dims);
+    hid_t image_extents_memspace = H5Screate_simple(1, image_extents_slab_dims, NULL);
 
 
     // Write the new data
-    _open_out_datasets[IMAGE_EXTENTS_DATASET].write(&(image_extents[0]), 
-        *_data_types[IMAGE_EXTENTS_DATASET], 
-        image_extents_memspace, 
-        _open_out_dataspaces[IMAGE_EXTENTS_DATASET]);
-
+    H5Dwrite(_open_out_datasets[IMAGE_EXTENTS_DATASET],   // dataset_id,
+             _data_types[IMAGE_EXTENTS_DATASET],          // hit_t mem_type_id, 
+             image_extents_memspace,                      // hid_t mem_space_id, 
+             _open_out_dataspaces[IMAGE_EXTENTS_DATASET], //hid_t file_space_id, 
+             xfer_plist_id,                               //hid_t xfer_plist_id, 
+             &(image_extents[0])                          // const void * buf 
+           );
 
     /////////////////////////////////////////////////////////
     // Step 6: Update the image meta table
@@ -442,7 +496,8 @@ namespace larcv3 {
     image_meta_size[0] = image_meta_dims_current[0] + image_meta_slab_dims[0];
 
     // Extend the dataset to accomodate the new data
-    _open_out_datasets[IMAGE_META_DATASET].extend(image_meta_size);
+    H5Dset_extent(_open_out_datasets[IMAGE_META_DATASET], image_meta_size);
+
 
 
     /////////////////////////////////////////////////////////
@@ -450,19 +505,27 @@ namespace larcv3 {
     /////////////////////////////////////////////////////////
 
     // Select as a hyperslab the last section of data for writing:
-    _open_out_dataspaces[IMAGE_META_DATASET] = _open_out_datasets[IMAGE_META_DATASET].getSpace();
-    _open_out_dataspaces[IMAGE_META_DATASET].selectHyperslab(H5S_SELECT_SET, 
-        image_meta_slab_dims, image_meta_dims_current);
+    _open_out_dataspaces[IMAGE_META_DATASET] = H5Dget_space(_open_out_datasets[IMAGE_META_DATASET]);
 
+    H5Sselect_hyperslab(_open_out_dataspaces[IMAGE_META_DATASET], 
+      H5S_SELECT_SET, 
+      image_meta_dims_current, // start
+      NULL ,                   // stride
+      image_meta_slab_dims,    // count 
+      NULL                     // block
+    );
     // Define memory space:
-    H5::DataSpace image_meta_memspace(1, image_meta_slab_dims);
+    hid_t image_meta_memspace = H5Screate_simple(1, image_meta_slab_dims, NULL);
 
 
     // Write the new data
-    _open_out_datasets[IMAGE_META_DATASET].write(&(image_meta[0]), *_data_types[IMAGE_META_DATASET], 
-      image_meta_memspace, _open_out_dataspaces[IMAGE_META_DATASET]);
-
-
+    H5Dwrite(_open_out_datasets[IMAGE_META_DATASET],   // dataset_id,
+             _data_types[IMAGE_META_DATASET],          // hit_t mem_type_id, 
+             image_meta_memspace,                      // hid_t mem_space_id, 
+             _open_out_dataspaces[IMAGE_META_DATASET], //hid_t file_space_id, 
+             xfer_plist_id,                            //hid_t xfer_plist_id, 
+             &(image_meta[0])                          // const void * buf 
+           );
 
 
     /////////////////////////////////////////////////////////
@@ -482,8 +545,10 @@ namespace larcv3 {
     images_size[0] = images_dims_current[0] + images_slab_dims[0];
 
     // Extend the dataset to accomodate the new data
-    _open_out_datasets[IMAGES_DATASET].extend(images_size);
-    _open_out_dataspaces[IMAGES_DATASET] = _open_out_datasets[IMAGES_DATASET].getSpace();
+    H5Dset_extent(_open_out_datasets[IMAGES_DATASET], images_size);
+
+    _open_out_dataspaces[IMAGES_DATASET] = H5Dget_space(_open_out_datasets[IMAGES_DATASET]);
+
 
     // Write all of the images to file:
 
@@ -506,17 +571,26 @@ namespace larcv3 {
         //           << std::endl;
 
         // Select as a hyperslab the last section of data for writing:
-        _open_out_dataspaces[IMAGES_DATASET].selectHyperslab(H5S_SELECT_SET, 
-            new_images_slab_dims, offset_images_slab_dims);
+        H5Sselect_hyperslab(_open_out_dataspaces[IMAGES_DATASET], 
+              H5S_SELECT_SET, 
+              offset_images_slab_dims, // start
+              NULL ,                   // stride
+              new_images_slab_dims,    // count 
+              NULL                     // block
+            );
 
         // Define memory space:
-        H5::DataSpace images_memspace(1, new_images_slab_dims);
+        hid_t images_memspace = H5Screate_simple(1, new_images_slab_dims, NULL);
 
 
         // Write the new data
-        _open_out_datasets[IMAGES_DATASET].write(&(_image_v.at(image_id).as_vector()[0]), 
-            *_data_types[IMAGES_DATASET], images_memspace, _open_out_dataspaces[IMAGES_DATASET]);
-
+        H5Dwrite(_open_out_datasets[IMAGES_DATASET],   // dataset_id,
+                 _data_types[IMAGES_DATASET],          // hit_t mem_type_id, 
+                 images_memspace,                      // hid_t mem_space_id, 
+                 _open_out_dataspaces[IMAGES_DATASET], //hid_t file_space_id, 
+                 xfer_plist_id,                            //hid_t xfer_plist_id, 
+                 &(_image_v.at(image_id).as_vector()[0])                          // const void * buf 
+               );
         starting_index += new_images_slab_dims[0];
     }
 
@@ -529,7 +603,7 @@ namespace larcv3 {
     return;
   }
   template<size_t dimension> 
-  void EventTensor<dimension>::deserialize(H5::Group * group, size_t entry, bool reopen_groups){
+  void EventTensor<dimension>::deserialize(hid_t group, size_t entry, bool reopen_groups){
    
     // This function reads in a set of images
     // The function implementation is:
@@ -546,6 +620,10 @@ namespace larcv3 {
     }
     
     open_in_datasets(group);
+
+
+    // Transfer property list, default
+    hid_t xfer_plist_id = H5Pcreate(H5P_DATASET_XFER);
 
     /////////////////////////////////////////////////////////
     // Step 1: Get the extents information from extents dataset
@@ -570,16 +648,27 @@ namespace larcv3 {
 
     // Now, select as a hyperslab the last section of data for writing:
     // extents_dataspace = extents_dataset.getSpace();
-    _open_in_dataspaces[EXTENTS_DATASET].selectHyperslab(H5S_SELECT_SET, extents_slab_dims, extents_offset);
+    H5Sselect_hyperslab(_open_in_dataspaces[EXTENTS_DATASET], 
+      H5S_SELECT_SET, 
+      extents_offset,     // start
+      NULL ,              // stride
+      extents_slab_dims,  // count 
+      NULL                // block
+    );
 
     // Define memory space:
-    H5::DataSpace extents_memspace(1, extents_slab_dims);
+    hid_t extents_memspace = H5Screate_simple(1, extents_slab_dims, NULL);
 
     Extents_t input_extents;
     // Read the data
-    _open_in_datasets[EXTENTS_DATASET].read(&(input_extents), 
-        *_data_types[EXTENTS_DATASET], extents_memspace, _open_in_dataspaces[EXTENTS_DATASET]);
-
+    H5Dread(
+      _open_in_datasets[EXTENTS_DATASET],    // hid_t dataset_id  IN: Identifier of the dataset read from.
+      _data_types[EXTENTS_DATASET],          // hid_t mem_type_id IN: Identifier of the memory datatype.
+      extents_memspace,                      // hid_t mem_space_id  IN: Identifier of the memory dataspace.
+      _open_in_dataspaces[EXTENTS_DATASET],  // hid_t file_space_id IN: Identifier of the dataset's dataspace in the file.
+      xfer_plist_id,                         // hid_t xfer_plist_id     IN: Identifier of a transfer property list for this I/O operation.
+      &(input_extents)                       // void * buf  OUT: Buffer to receive data read from file.
+    );
     /////////////////////////////////////////////////////////
     // Step 2: Get the image_extents information
     /////////////////////////////////////////////////////////
@@ -606,19 +695,29 @@ namespace larcv3 {
 
     // Now, select as a hyperslab the last section of data for writing:
     // extents_dataspace = extents_dataset.getSpace();
-    _open_in_dataspaces[IMAGE_EXTENTS_DATASET].selectHyperslab(H5S_SELECT_SET, image_extents_slab_dims, image_extents_offset);
+    H5Sselect_hyperslab(_open_in_dataspaces[IMAGE_EXTENTS_DATASET], 
+      H5S_SELECT_SET, 
+      image_extents_offset, // start
+      NULL ,  // stride
+      image_extents_slab_dims, //count 
+      NULL // block
+    );
+  
 
-
-    H5::DataSpace image_extents_memspace(1, image_extents_slab_dims);
+    hid_t image_extents_memspace = H5Screate_simple(1, image_extents_slab_dims, NULL);
 
     std::vector<IDExtents_t> image_extents;
 
     // Reserve space for reading in image_extents:
     image_extents.resize(input_extents.n);
-
-    _open_in_datasets[IMAGE_EXTENTS_DATASET].read(&(image_extents[0]), *_data_types[IMAGE_EXTENTS_DATASET], 
-      image_extents_memspace, _open_in_dataspaces[IMAGE_EXTENTS_DATASET]);
-
+    H5Dread(
+      _open_in_datasets[IMAGE_EXTENTS_DATASET],    // hid_t dataset_id  IN: Identifier of the dataset read from.
+      _data_types[IMAGE_EXTENTS_DATASET],          // hid_t mem_type_id IN: Identifier of the memory datatype.
+      image_extents_memspace,                      // hid_t mem_space_id  IN: Identifier of the memory dataspace.
+      _open_in_dataspaces[IMAGE_EXTENTS_DATASET],  // hid_t file_space_id IN: Identifier of the dataset's dataspace in the file.
+      xfer_plist_id,                               // hid_t xfer_plist_id     IN: Identifier of a transfer property list for this I/O operation.
+      &(image_extents[0])                          // void * buf  OUT: Buffer to receive data read from file.
+    );
 
 
     /////////////////////////////////////////////////////////
@@ -640,19 +739,29 @@ namespace larcv3 {
 
     // Now, select as a hyperslab the last section of data for writing:
     // extents_dataspace = extents_dataset.getSpace();
-    _open_in_dataspaces[IMAGE_META_DATASET].selectHyperslab(H5S_SELECT_SET, image_meta_slab_dims, image_meta_offset);
+    H5Sselect_hyperslab(_open_in_dataspaces[IMAGE_META_DATASET], 
+      H5S_SELECT_SET, 
+      image_meta_offset, // start
+      NULL ,  // stride
+      image_meta_slab_dims, //count 
+      NULL // block
+    );
 
-
-    H5::DataSpace image_meta_memspace(1, image_meta_slab_dims);
+    hid_t image_meta_memspace = H5Screate_simple(1, image_meta_slab_dims, NULL);
 
     std::vector<ImageMeta<dimension>> image_meta;
 
     // Reserve space for reading in image_meta:
     image_meta.resize(input_extents.n);
 
-    _open_in_datasets[IMAGE_META_DATASET].read(&(image_meta[0]), *_data_types[IMAGE_META_DATASET], 
-      image_meta_memspace, _open_in_dataspaces[IMAGE_META_DATASET]);
-
+    H5Dread(
+      _open_in_datasets[IMAGE_META_DATASET],    // hid_t dataset_id  IN: Identifier of the dataset read from.
+      _data_types[IMAGE_META_DATASET],          // hid_t mem_type_id IN: Identifier of the memory datatype.
+      image_meta_memspace,                      // hid_t mem_space_id  IN: Identifier of the memory dataspace.
+      _open_in_dataspaces[IMAGE_META_DATASET],  // hid_t file_space_id IN: Identifier of the dataset's dataspace in the file.
+      xfer_plist_id,                            // hid_t xfer_plist_id     IN: Identifier of a transfer property list for this I/O operation.
+      &(image_meta[0])                          // void * buf  OUT: Buffer to receive data read from file.
+    );
       
 
 
@@ -693,21 +802,29 @@ namespace larcv3 {
       //           << "offset: " << images_offset[0] << "\n"
       //           << std::endl;
       // Now, select as a hyperslab the last section of data for readomg:
-      _open_in_dataspaces[IMAGES_DATASET].selectHyperslab(H5S_SELECT_SET, images_slab_dims, images_offset);
+      H5Sselect_hyperslab(_open_in_dataspaces[IMAGES_DATASET], 
+        H5S_SELECT_SET, 
+        images_offset, // start
+        NULL ,  // stride
+        images_slab_dims, //count 
+        NULL // block
+      );
+
+      hid_t images_memspace = H5Screate_simple(1, images_slab_dims, NULL);
 
 
-      H5::DataSpace images_memspace(1, images_slab_dims);
-
-
-      _open_in_datasets[IMAGES_DATASET].read(&(_image_v[image_index]._img[0]), 
-        *_data_types[IMAGES_DATASET], images_memspace, _open_in_dataspaces[IMAGES_DATASET]);
-
+      H5Dread(
+        _open_in_datasets[IMAGES_DATASET],    // hid_t dataset_id  IN: Identifier of the dataset read from.
+        _data_types[IMAGES_DATASET],          // hid_t mem_type_id IN: Identifier of the memory datatype.
+        images_memspace,                      // hid_t mem_space_id  IN: Identifier of the memory dataspace.
+        _open_in_dataspaces[IMAGES_DATASET],  // hid_t file_space_id IN: Identifier of the dataset's dataspace in the file.
+        xfer_plist_id,                            // hid_t xfer_plist_id     IN: Identifier of a transfer property list for this I/O operation.
+        &(_image_v[image_index]._img[0])                          // void * buf  OUT: Buffer to receive data read from file.
+      );
 
 
       offset += images_slab_dims[0];
     }
-
-
 
 
     return;

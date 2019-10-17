@@ -87,10 +87,15 @@ namespace larcv3 {
 
 #ifndef SWIG
   public: 
-    static H5::CompType get_datatype() {
-      H5::CompType datatype(sizeof(Voxel));
-      datatype.insertMember(H5std_string("id"), offsetof(Voxel, _id), H5::PredType::NATIVE_ULLONG);
-      datatype.insertMember(H5std_string("value"), offsetof(Voxel, _value), H5::PredType::NATIVE_FLOAT);
+    static hid_t get_datatype() {
+
+      hid_t datatype;
+      herr_t status;
+      datatype = H5Tcreate (H5T_COMPOUND, sizeof (Voxel));
+      status = H5Tinsert (datatype, "id",
+                  HOFFSET (Voxel, _id), larcv3::get_datatype<unsigned long>());
+      status = H5Tinsert (datatype, "value", 
+                  HOFFSET (Voxel, _value), larcv3::get_datatype<float>());
       return datatype;
     }
 #endif

@@ -35,18 +35,21 @@ namespace larcv3 {
     virtual ~EventBase() = 0;
 
     virtual void clear() = 0;
-    virtual void initialize(H5::Group *, uint compression) = 0;
-    virtual void serialize(H5::Group * group) = 0;
-    virtual void deserialize(H5::Group * group, size_t entry, bool reopen_groups) = 0;
+    virtual void initialize (hid_t group, uint compression) = 0;
+    virtual void serialize  (hid_t group) = 0;
+    virtual void deserialize(hid_t group, size_t entry, bool reopen_groups) = 0;
+    virtual void finalize() = 0;
 
-    virtual void open_in_datasets(H5::Group * group ) = 0;
-    virtual void open_out_datasets(H5::Group * group ) = 0;
+    virtual void open_in_datasets(hid_t group ) = 0;
+    virtual void open_out_datasets(hid_t group ) = 0;
 
-    std::vector<H5::DataSet>   _open_in_datasets;
-    std::vector<H5::DataSpace> _open_in_dataspaces;
-    std::vector<H5::DataSet>   _open_out_datasets;
-    std::vector<H5::DataSpace> _open_out_dataspaces;
-    std::vector<H5::DataType*> _data_types;
+    std::vector<hid_t> _open_in_datasets;
+    std::vector<hid_t> _open_in_dataspaces;
+    std::vector<hid_t> _open_out_datasets;
+    std::vector<hid_t> _open_out_dataspaces;
+    std::vector<hid_t> _data_types;
+
+    int get_num_objects(hid_t group);
 
 // #endif
   };

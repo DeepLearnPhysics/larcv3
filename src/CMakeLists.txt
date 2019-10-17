@@ -39,7 +39,7 @@ set(PROJECT_SOURCE_DIR "./")
 include_directories("./")
 
 # IO needs HDF5:
-find_package(HDF5 REQUIRED COMPONENTS C CXX)
+find_package(HDF5 REQUIRED COMPONENTS C)
 include_directories(${HDF5_INCLUDE_DIR})
 
 # Many packages need python:

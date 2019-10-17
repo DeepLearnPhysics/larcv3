@@ -51,10 +51,11 @@ namespace larcv3 {
     void move(std::vector<larcv3::Tensor<dimension>>& image_v)
     { image_v = std::move(_image_v); }
     
-    void initialize (H5::Group * group, uint compression);
-    void serialize  (H5::Group * group);
-    void deserialize(H5::Group * group, size_t entry, bool reopen_groups=false);
-
+    void initialize (hid_t group, uint compression);
+    void serialize  (hid_t group);
+    void deserialize(hid_t group, size_t entry, bool reopen_groups=false);
+    void finalize   ();
+    
     /// For backward compatibility
     static EventTensor * to_image2d(EventBase * e){
       return to_tensor(e);
@@ -65,8 +66,8 @@ namespace larcv3 {
     }
     
   private:
-    void open_in_datasets(H5::Group * group);
-    void open_out_datasets(H5::Group * group);
+    void open_in_datasets(hid_t group);
+    void open_out_datasets(hid_t group);
 
     std::vector<larcv3::Tensor<dimension>> _image_v;
 
