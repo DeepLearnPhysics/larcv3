@@ -491,8 +491,8 @@ void IOManager::prepare_input() {
     // Each file has (or should have) two groups: "Data" and "Events"
 
     try {
-      hid_t data_group = H5Gopen(_in_open_file, "/Data", H5P_DEFAULT);
-      hid_t events_group = H5Gopen(_in_open_file, "/Events", H5P_DEFAULT);
+      H5Gopen(_in_open_file, "/Data", H5P_DEFAULT);
+      H5Gopen(_in_open_file, "/Events", H5P_DEFAULT);
     } catch (...) {
       LARCV_CRITICAL() << "File " << fname
                        << " does not appear to be a larcv3 file, exiting."
@@ -501,8 +501,8 @@ void IOManager::prepare_input() {
     }
 
     // Re-open those groups after the check
-    hid_t data_group = H5Gopen(_in_open_file, "/Data", H5P_DEFAULT);
-    hid_t events_group = H5Gopen(_in_open_file, "/Events", H5P_DEFAULT);
+    data_group = H5Gopen(_in_open_file, "/Data", H5P_DEFAULT);
+    events_group = H5Gopen(_in_open_file, "/Events", H5P_DEFAULT);
 
     // Vist the extents group and determine how many events are present:
 
@@ -1059,8 +1059,66 @@ void IOManager::set_id() {
   // }
 }
 
+int IOManager::what_is_open(hid_t fid) {
+  ssize_t cnt;
+  int howmany;
+  H5I_type_t ot;
+  hid_t anobj, *objs;
+  char name[1024];
+  herr_t status;
+
+  cnt = H5Fget_obj_count(fid, H5F_OBJ_ALL);
+
+  if (cnt <= 0) return cnt;
+
+  LARCV_DEBUG() << cnt << "object(s) are open." << std::endl;
+
+  objs = (hid_t *) malloc(cnt * sizeof(hid_t));
+
+  howmany = H5Fget_obj_ids(fid, H5F_OBJ_ALL, cnt, objs);
+
+  printf("open objects:\n");
+
+  for (int i = 0; i < howmany; i++ ) {
+    anobj = *objs++;
+    ot = H5Iget_type(anobj);
+    status = H5Iget_name(anobj, name, 1024);
+    LARCV_DEBUG() << "Open object: " << i << " type " << ot << ", name " << name << std::endl;;
+  }
+         
+  return howmany;
+}
+
+int IOManager::close_all_objects(hid_t fid) {
+  ssize_t cnt;
+  int howmany;
+  H5I_type_t ot;
+  hid_t anobj, *objs;
+  char name[1024];
+  herr_t status;
+
+  cnt = H5Fget_obj_count(fid, H5F_OBJ_ALL);
+
+  if (cnt <= 0) return cnt;
+
+  objs = (hid_t *) malloc(cnt * sizeof(hid_t));
+
+  howmany = H5Fget_obj_ids(fid, H5F_OBJ_ALL, cnt, objs);
+
+  for (int i = 0; i < howmany; i++ ) {
+    anobj = *objs++;
+    ot = H5Iget_type(anobj);
+    status = H5Iget_name(anobj, name, 1024);
+    LARCV_INFO() << "Closing: " << i << " type " << ot << ", name " << name << std::endl;;
+    if (ot == H5I_GROUP) H5Gclose(anobj);
+    if (ot == H5I_DATASET) H5Dclose(anobj);
+  }
+         
+  return howmany;
+}
+
 void IOManager::finalize() {
-  LARCV_DEBUG() << "start" << std::endl;
+
   if (_io_mode != kREAD) {
     // _out_file->cd();
     // if (_store_id_bool.empty()) {
@@ -1079,9 +1137,14 @@ void IOManager::finalize() {
     //                    << std::endl;
     //   }
     // }
+
+    what_is_open (_out_file);
+    close_all_objects(_out_file);
+
     LARCV_NORMAL() << "Closing output file" << std::endl;
     H5Fclose(_out_file);
   }
+
 
   LARCV_INFO() << "Deleting data pointers" << std::endl;
   for (auto& p : _product_ptr_v) {

@@ -149,7 +149,11 @@ namespace larcv3 {
 
     void append_event_id();
 
+    // Returns the number of open objects in file with id fid
+    int what_is_open(hid_t fid);
 
+    // Closes the objects currently open in file with id fid
+    int close_all_objects(hid_t fid);
 
     // The hdf5 model enforces the same number of entries per group,
     // since the entry list is defined per file.
@@ -198,6 +202,9 @@ namespace larcv3 {
 
     hid_t     _active_in_event_id_dataset;
     hid_t     _active_in_event_id_dataspace;
+
+    hid_t data_group;
+    hid_t events_group;
 
 
     // Parameters controlling the internals of an event.
