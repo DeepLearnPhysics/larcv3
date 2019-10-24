@@ -1059,41 +1059,44 @@ void IOManager::set_id() {
   // }
 }
 
-int IOManager::what_is_open(hid_t fid) {
-  ssize_t cnt;
-  int howmany;
-  H5I_type_t ot;
-  hid_t anobj, *objs;
-  char name[1024];
-  herr_t status;
+// int IOManager::what_is_open(hid_t fid) {
+//   ssize_t cnt;
+//   int howmany;
+//   H5I_type_t ot;
+//   hid_t anobj;
+//   std::vector<hid_t> objs;
+//   char name[1024];
+//   herr_t status;
 
-  cnt = H5Fget_obj_count(fid, H5F_OBJ_ALL);
+//   cnt = H5Fget_obj_count(fid, H5F_OBJ_ALL);
 
-  if (cnt <= 0) return cnt;
+//   if (cnt <= 0) return cnt;
 
-  LARCV_DEBUG() << cnt << "object(s) are open." << std::endl;
+//   LARCV_DEBUG() << cnt << "object(s) are open." << std::endl;
 
-  objs = (hid_t *) malloc(cnt * sizeof(hid_t));
+//   objs.resize(cnt);
+//   // objs = (hid_t *) malloc(cnt * sizeof(hid_t));
 
-  howmany = H5Fget_obj_ids(fid, H5F_OBJ_ALL, cnt, objs);
+//   howmany = H5Fget_obj_ids(fid, H5F_OBJ_ALL, cnt, &(objs[0]));
 
-  printf("open objects:\n");
+//   printf("open objects:\n");
 
-  for (int i = 0; i < howmany; i++ ) {
-    anobj = *objs++;
-    ot = H5Iget_type(anobj);
-    status = H5Iget_name(anobj, name, 1024);
-    LARCV_DEBUG() << "Open object: " << i << " type " << ot << ", name " << name << std::endl;;
-  }
+//   for (int i = 0; i < howmany; i++ ) {
+//     anobj = objs[i];
+//     ot = H5Iget_type(anobj);
+//     status = H5Iget_name(anobj, name, 1024);
+//     LARCV_DEBUG() << "Open object: " << i << " type " << ot << ", name " << name << std::endl;;
+//   }
          
-  return howmany;
-}
+//   return howmany;
+// }
 
 int IOManager::close_all_objects(hid_t fid) {
   ssize_t cnt;
   int howmany;
   H5I_type_t ot;
-  hid_t anobj, *objs;
+  hid_t anobj;
+  std::vector<hid_t> objs;
   char name[1024];
   herr_t status;
 
@@ -1101,12 +1104,14 @@ int IOManager::close_all_objects(hid_t fid) {
 
   if (cnt <= 0) return cnt;
 
-  objs = (hid_t *) malloc(cnt * sizeof(hid_t));
+  objs.resize(cnt);
+  // objs = (hid_t *) malloc(cnt * sizeof(hid_t));
 
-  howmany = H5Fget_obj_ids(fid, H5F_OBJ_ALL, cnt, objs);
+  // howmany = H5Fget_obj_ids(fid, H5F_OBJ_ALL, cnt, objs);
+  howmany = H5Fget_obj_ids(fid, H5F_OBJ_ALL, cnt, &(objs[0]));
 
   for (int i = 0; i < howmany; i++ ) {
-    anobj = *objs++;
+    anobj = objs[i];
     ot = H5Iget_type(anobj);
     status = H5Iget_name(anobj, name, 1024);
     LARCV_INFO() << "Closing: " << i << " type " << ot << ", name " << name << std::endl;;
@@ -1138,7 +1143,7 @@ void IOManager::finalize() {
     //   }
     // }
 
-    what_is_open (_out_file);
+    // what_is_open (_out_file);
     close_all_objects(_out_file);
 
     LARCV_NORMAL() << "Closing output file" << std::endl;
