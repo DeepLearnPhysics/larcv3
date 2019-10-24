@@ -23,7 +23,7 @@ if (OpenMP_CXX_FOUND)
 endif()
 
 # Link against hdf5:
-target_link_libraries(larcv3 ${HDF5_CXX_LIBRARIES})
+target_link_libraries(larcv3 ${HDF5_C_LIBRARIES})
 
 # Link against python:
 target_link_libraries(larcv3 ${PYTHON_LIBRARIES})

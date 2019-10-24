@@ -10,74 +10,85 @@ namespace larcv3{
 
 
   template<>
-  H5::DataType get_datatype<int>()                {
-    H5::DataType _copied_type(H5::PredType::NATIVE_INT);
+  hid_t get_datatype<int>()                {
+    hid_t _copied_type(H5T_NATIVE_INT);
     return _copied_type;}
 
   template<>
-  H5::DataType get_datatype<bool>()               {
-    H5::DataType _copied_type(H5::PredType::NATIVE_HBOOL);
+  hid_t get_datatype<bool>()               {
+    hid_t _copied_type(H5T_NATIVE_HBOOL);
     return _copied_type;}
 
   template<>
-  H5::DataType get_datatype<float>()              {
-    H5::DataType _copied_type(H5::PredType::NATIVE_FLOAT);
+  hid_t get_datatype<float>()              {
+    hid_t _copied_type(H5T_NATIVE_FLOAT);
     return _copied_type;}
 
   template<>
-  H5::DataType get_datatype<double>()             {
-    H5::DataType _copied_type(H5::PredType::NATIVE_DOUBLE);
+  hid_t get_datatype<double>()             {
+    hid_t _copied_type(H5T_NATIVE_DOUBLE);
     return _copied_type;}
 
   template<>
-  H5::DataType get_datatype<unsigned short>()     {
-    H5::DataType _copied_type(H5::PredType::NATIVE_USHORT);
+  hid_t get_datatype<unsigned short>()     {
+    hid_t _copied_type(H5T_NATIVE_USHORT);
     return _copied_type;}
 
   template<>
-  H5::DataType get_datatype<unsigned int>()       {
-    H5::DataType _copied_type(H5::PredType::NATIVE_UINT);
+  hid_t get_datatype<unsigned int>()       {
+    hid_t _copied_type(H5T_NATIVE_UINT);
     return _copied_type;}
 
   template<>
-  H5::DataType get_datatype<short>()              {
-    H5::DataType _copied_type(H5::PredType::NATIVE_SHORT);
+  hid_t get_datatype<short>()              {
+    hid_t _copied_type(H5T_NATIVE_SHORT);
     return _copied_type;}
 
   template<>
-  H5::DataType get_datatype<unsigned long long>() {
-    H5::DataType _copied_type(H5::PredType::NATIVE_ULLONG);
+  hid_t get_datatype<unsigned long long>() {
+    hid_t _copied_type(H5T_NATIVE_ULLONG);
     return _copied_type;}
   
   template<>
-  H5::DataType get_datatype<size_t>()             {
-    H5::DataType _copied_type(H5::PredType::NATIVE_HSIZE);
+  hid_t get_datatype<size_t>()             {
+    hid_t _copied_type(H5T_NATIVE_HSIZE);
     return _copied_type;}
 
   template<>
-  H5::DataType get_datatype<ShapeType_t>()        {return get_datatype<int>();}
+  hid_t get_datatype<ShapeType_t>()        {return get_datatype<int>();}
 
   template<>
-  H5::DataType get_datatype<long>()               {
-    H5::DataType _long_copy(H5::PredType::NATIVE_LONG);
+  hid_t get_datatype<long>()               {
+    hid_t _long_copy(H5T_NATIVE_LONG);
     return _long_copy;
   }
 
 
   template<>
-  H5::DataType get_datatype<Extents_t>()          {
-    H5::CompType datatype(sizeof(Extents_t));
-    datatype.insertMember(H5std_string("first"), offsetof(struct Extents_t, first), get_datatype<unsigned int>());
-    datatype.insertMember(H5std_string("N"),     offsetof(struct Extents_t, n),     get_datatype<unsigned int>());
+  hid_t get_datatype<Extents_t>()          {
+
+    hid_t datatype;
+    herr_t status;
+    datatype = H5Tcreate (H5T_COMPOUND, sizeof (Extents_t));
+    status = H5Tinsert (datatype, "first",
+                HOFFSET (Extents_t, first), larcv3::get_datatype<unsigned int>());
+    status = H5Tinsert (datatype, "N", 
+                HOFFSET (Extents_t, n),     larcv3::get_datatype<unsigned int>());
     return datatype;
+
   }
 
   template<>
-  H5::DataType get_datatype<IDExtents_t>()          {
-    H5::CompType datatype(sizeof(IDExtents_t));
-    datatype.insertMember(H5std_string("first"), offsetof(struct IDExtents_t, first), get_datatype<unsigned int>());
-    datatype.insertMember(H5std_string("ID"),    offsetof(struct IDExtents_t, id),    get_datatype<unsigned int>());
-    datatype.insertMember(H5std_string("N"),     offsetof(struct IDExtents_t, n),     get_datatype<unsigned int>());
+  hid_t get_datatype<IDExtents_t>()          {
+    hid_t datatype;
+    herr_t status;
+    datatype = H5Tcreate (H5T_COMPOUND, sizeof (IDExtents_t));
+    status = H5Tinsert (datatype, "first",
+                HOFFSET (IDExtents_t, first), larcv3::get_datatype<unsigned int>());
+    status = H5Tinsert (datatype, "N", 
+                HOFFSET (IDExtents_t, n),     larcv3::get_datatype<unsigned int>());
+    status = H5Tinsert (datatype, "ID",    
+                HOFFSET (IDExtents_t, id),    larcv3::get_datatype<unsigned int>());
     return datatype;
   }
 

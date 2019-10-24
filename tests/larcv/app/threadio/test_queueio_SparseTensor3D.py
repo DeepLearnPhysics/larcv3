@@ -111,16 +111,12 @@ def test_sparsetensor3d_queueio_distributed(tmpdir, make_copy, local_batch_size,
         # Next, write some sparsetensor3ds to that file:
         create_sparsetensor3d_file(file_name, rand_num_events=25)
 
-
-
         # Generate a config for this 
         config_contents = queue_io_sparsetensor3d_cfg_template.format(
             name        = queueio_name,
             input_files = file_name,
-            producer    = "test",
+            producer    = "test", #"sbndvoxels",
             )
-
-
 
         with open(str(config_file), 'w') as _f:
             _f.write(config_contents)
@@ -144,12 +140,10 @@ def test_sparsetensor3d_queueio_distributed(tmpdir, make_copy, local_batch_size,
         'label': 'test_{}'.format(queueio_name), 
         })
 
-
-
     li = distributed_queue_interface.queue_interface()
+
     # Scale the number of images to the mpi comm size:
     li.prepare_manager('primary', io_config, comm_size * local_batch_size, data_keys, color=0)
-
 
     for i in range(n_reads):
         data = li.fetch_minibatch_data('primary')

@@ -67,12 +67,18 @@ namespace larcv3 {
 
 #ifndef SWIG
   public: 
-    static H5::CompType get_datatype() {
-      H5::CompType datatype(sizeof(Vertex));
-      datatype.insertMember(H5std_string("x"), offsetof(Vertex, _x), larcv3::get_datatype<double>());
-      datatype.insertMember(H5std_string("y"), offsetof(Vertex, _y), larcv3::get_datatype<double>());
-      datatype.insertMember(H5std_string("z"), offsetof(Vertex, _z), larcv3::get_datatype<double>());
-      datatype.insertMember(H5std_string("t"), offsetof(Vertex, _t), larcv3::get_datatype<double>());
+    static hid_t get_datatype() {
+      hid_t datatype;
+      herr_t status;
+      datatype = H5Tcreate (H5T_COMPOUND, sizeof (Vertex));
+      status = H5Tinsert (datatype, "x",
+                  HOFFSET (Vertex, _x), larcv3::get_datatype<double>());
+      status = H5Tinsert (datatype, "y",
+                  HOFFSET (Vertex, _y), larcv3::get_datatype<double>());
+      status = H5Tinsert (datatype, "z",
+                  HOFFSET (Vertex, _z), larcv3::get_datatype<double>());
+      status = H5Tinsert (datatype, "t", 
+                  HOFFSET (Vertex, _t), larcv3::get_datatype<double>());
       return datatype;
     }
 #endif

@@ -34,7 +34,6 @@ IOManager::IOManager(IOMode_t mode, std::string name)
       _in_file_v(),
       _in_dir_v(),
       _key_list(),
-      _fapl(H5::FileAccPropList::DEFAULT),
       _product_ctr(0),
       _product_ptr_v(),
       _product_type_v(),
@@ -42,6 +41,8 @@ IOManager::IOManager(IOMode_t mode, std::string name)
       _h5_core_driver(false),
       _force_reopen_groups(false) {
   reset();
+  _fapl = H5Pcreate(H5P_FILE_ACCESS);
+  xfer_plist_id = H5Pcreate(H5P_DATASET_XFER);
   _event_id_datatype = larcv3::EventID::get_datatype();
 }
 
@@ -111,7 +112,7 @@ void IOManager::configure(const PSet& cfg) {
     LARCV_INFO() << "File will be stored entirely on memory." << std::endl;
     // 1024 is number of bytes to increment each time more memory is needed;
     //'false': do not write contents to disk when the file is closed
-    _fapl.setCore(1024, false);
+    H5Pset_fapl_core(_fapl, 1024, false);
   }
 
   // Figure out input files
@@ -226,11 +227,27 @@ bool IOManager::initialize(int color) {
     if (_out_file_name.empty()) throw larbys("Must set output file name!");
     LARCV_INFO() << "Opening an output file: " << _out_file_name << std::endl;
 
-    _out_file = H5::H5File(_out_file_name.c_str(), H5F_ACC_TRUNC);
+    // Using default file creation properties, default file access properties
+    _out_file = H5Fcreate(_out_file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     // Create the top level groups in the output file.
-    _out_file.createGroup("/Events");
-    _out_file.createGroup("/Data");
+    H5Gcreate(
+      _out_file,   // hid_t loc_id  IN: File or group identifier
+      "/Events",   // const char *name      IN: Absolute or relative name of the link to the new group
+      H5P_DEFAULT, // hid_t lcpl_id IN: Link creation property list identifier
+      H5P_DEFAULT, // hid_t gcpl_id IN: Group creation property list identifier
+      H5P_DEFAULT  // hid_t gapl_id IN: Group access property list identifier 
+                      // (No group access properties have been implemented at this time; use H5P_DEFAULT.)
+    );
+    H5Gcreate(
+      _out_file,   // hid_t loc_id  IN: File or group identifier
+      "/Data",     // const char *name      IN: Absolute or relative name of the link to the new group
+      H5P_DEFAULT, // hid_t lcpl_id IN: Link creation property list identifier
+      H5P_DEFAULT, // hid_t gcpl_id IN: Group creation property list identifier
+      H5P_DEFAULT  // hid_t gapl_id IN: Group access property list identifier 
+                      // (No group access properties have been implemented at this time; use H5P_DEFAULT.)
+    );
+
 
     // Create the output EventID dataset:
     hsize_t starting_dim[] = {0};
@@ -238,18 +255,25 @@ bool IOManager::initialize(int color) {
 
     // Create a dataspace of rank 1, starting with 0 entries as above, growing
     // to unlimited entries.
-    H5::DataSpace dataspace(1, starting_dim, maxsize_dim);
+    hid_t dataspace = H5Screate_simple(1, starting_dim, maxsize_dim);
     LARCV_DEBUG() << "EventID Dataspace Created for new file" << std::endl;
     /*
      * Modify dataset creation properties, i.e. enable chunking.
      */
-    H5::DSetCreatPropList cparams;
-    hsize_t chunk_dims[1] = {EVENT_ID_CHUNK_SIZE};
-    cparams.setChunk(1, chunk_dims);
-    cparams.setDeflate(_compression_override);
+    hid_t cparams = H5Pcreate( H5P_DATASET_CREATE );
+    hsize_t      extents_chunk_dims[1] ={EVENT_ID_CHUNK_SIZE};
+    H5Pset_chunk(cparams, 1, extents_chunk_dims );
+    H5Pset_deflate(cparams, _compression_override);
 
-    _out_event_id_ds = _out_file.createDataSet(
-        "Events/event_id", larcv3::EventID::get_datatype(), dataspace, cparams);
+    _out_event_id_ds = H5Dcreate(
+        _out_file,                       // hid_t loc_id  IN: Location identifier
+        "Events/event_id",               // const char *name      IN: Dataset name
+        larcv3::EventID::get_datatype(), // hid_t dtype_id  IN: Datatype identifier
+        dataspace,                       // hid_t space_id  IN: Dataspace identifier
+        H5P_DEFAULT,                     // hid_t lcpl_id IN: Link creation property list
+        cparams,                         // hid_t dcpl_id IN: Dataset creation property list
+        H5P_DEFAULT                      // hid_t dapl_id IN: Dataset access property list
+      );
 
   }
 
@@ -304,6 +328,7 @@ bool IOManager::initialize(int color) {
   _out_index = 0;
   _prepared = true;
   __ioman_mtx.unlock();
+
 
   return true;
 }
@@ -394,8 +419,15 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
       if (_out_group_v.size() <= id){
         _out_group_v.resize(id + 1);
       }
-      _out_group_v[id] = _out_file.createGroup(group_loc.c_str());
-      _product_ptr_v[id]->initialize(&_out_group_v[id], _compression_override);
+      _out_group_v[id] = H5Gcreate(      
+        _out_file,           // hid_t loc_id  IN: File or group identifier
+        group_loc.c_str(),   // const char *name      IN: Absolute or relative name of the link to the new group
+        H5P_DEFAULT,         // hid_t lcpl_id IN: Link creation property list identifier
+        H5P_DEFAULT,         // hid_t gcpl_id IN: Group creation property list identifier
+        H5P_DEFAULT          // hid_t gapl_id IN: Group access property list identifier 
+                               // (No group access properties have been implemented at this time; use H5P_DEFAULT.));
+      );
+      _product_ptr_v[id]->initialize(_out_group_v[id], _compression_override);
       LARCV_DEBUG() << "Created Group " << group_loc << " @ " << &_out_group_v[id] << std::endl;
     }
     else{
@@ -438,8 +470,6 @@ void IOManager::prepare_input() {
   _in_entries_total = 0;
   // Index of currently active file - start at file 0
   _in_active_file_index = 0;
-  // Currently open file:
-  // H5::H5File  _in_open_file;
   // the file is opened at the end of this function
 
   // List of total entries in input files?
@@ -454,8 +484,6 @@ void IOManager::prepare_input() {
     auto const& fname = _in_file_v[i_file];
     // auto const& dname = _in_dir_v[i_file];
 
-    // H5::H5File* fin;
-
     LARCV_NORMAL() << "Opening a file in READ mode: " << fname << std::endl;
     open_new_input_file(fname);
     read_current_event_id();
@@ -463,8 +491,8 @@ void IOManager::prepare_input() {
     // Each file has (or should have) two groups: "Data" and "Events"
 
     try {
-      H5::Group data = _in_open_file.openGroup("/Data");
-      H5::Group events = _in_open_file.openGroup("/Events");
+      H5Gopen(_in_open_file, "/Data", H5P_DEFAULT);
+      H5Gopen(_in_open_file, "/Events", H5P_DEFAULT);
     } catch (...) {
       LARCV_CRITICAL() << "File " << fname
                        << " does not appear to be a larcv3 file, exiting."
@@ -473,18 +501,21 @@ void IOManager::prepare_input() {
     }
 
     // Re-open those groups after the check
-    H5::Group data = _in_open_file.openGroup("/Data");
-    H5::Group events = _in_open_file.openGroup("/Events");
+    data_group = H5Gopen(_in_open_file, "/Data", H5P_DEFAULT);
+    events_group = H5Gopen(_in_open_file, "/Events", H5P_DEFAULT);
 
     // Vist the extents group and determine how many events are present:
 
-    H5::DataSet extents = events.openDataSet("event_id");
+    hid_t dapl = H5Pcreate(H5P_DATASET_ACCESS);
+
+    hid_t extents_dataset = H5Dopen(events_group, "event_id", dapl);
     // Number of objects:
     hsize_t dims_current[1];
-    extents.getSpace().getSimpleExtentDims(dims_current, NULL);
+    hid_t extents_space = H5Dget_space(extents_dataset);
+    H5Sget_simple_extent_dims(extents_space, dims_current, NULL );
     // Number of entries is:
 
-    LARCV_INFO() << "File " << fname << " has " << dims_current[0] << " entries"
+    LARCV_NORMAL() << "File " << fname << " has " << dims_current[0] << " entries"
                  << std::endl;
 
     // Append the number of events:
@@ -494,10 +525,15 @@ void IOManager::prepare_input() {
 
     // Next, visit the available groups and see what producers are available.
     std::set<std::string> processed_object;
-    for (size_t i_obj = 0; i_obj < data.getNumObjs(); ++i_obj) {
+
+    hsize_t  num_objects[1] = {0};
+    H5Gget_num_objs(data_group, num_objects);
+
+    for (size_t i_obj = 0; i_obj < num_objects[0]; ++i_obj) {
       char temp_name[128];
       // std::string obj_name =
-      int real_size = data.getObjnameByIdx(i_obj, temp_name, 128);
+      H5Gget_objname_by_idx(data_group, i_obj, temp_name,128); 
+      // int real_size = data_group.getObjnameByIdx(i_obj, temp_name, 128);
       std::string obj_name(temp_name);
       processed_object.insert(obj_name);
       char c[2] = "_";
@@ -574,9 +610,11 @@ void IOManager::prepare_input() {
 
 void IOManager::open_new_input_file(std::string filename){
 
+  // Close the currently open file if it is open:
+  // H5Fclose(_in_open_file);
 
   try{
-    _in_open_file = H5::H5File(filename.c_str(), H5F_ACC_RDONLY, H5::FileCreatPropList::DEFAULT, _fapl);
+    _in_open_file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, _fapl);
   }
   catch ( ... ) {
     LARCV_CRITICAL() << "Open attempt failed for a file: " << filename
@@ -584,8 +622,11 @@ void IOManager::open_new_input_file(std::string filename){
     throw larbys();
   }
 
-  _active_in_event_id_dataset   = _in_open_file.openGroup("Events").openDataSet("event_id");
-  _active_in_event_id_dataspace = _active_in_event_id_dataset.getSpace();
+  hid_t group = H5Gopen(_in_open_file, "Events", H5P_DEFAULT);
+  
+  hid_t dapl = H5Pcreate(H5P_DATASET_ACCESS);
+  _active_in_event_id_dataset   = H5Dopen(group, "event_id", dapl);
+  _active_in_event_id_dataspace = H5Dget_space(_active_in_event_id_dataset);
 
 }
 
@@ -637,12 +678,7 @@ bool IOManager::read_entry(const size_t index, bool force_reload) {
     if (_this_file_index != _in_active_file_index) {
       // Open a new file for reading:
       _in_active_file_index = _this_file_index;
-      _in_open_file =
-          H5::H5File(_in_file_v[_in_active_file_index].c_str(), H5F_ACC_RDONLY);
-
-      _active_in_event_id_dataset   = _in_open_file.openGroup("Events").openDataSet("event_id");
-      _active_in_event_id_dataspace = _active_in_event_id_dataset.getSpace();
-
+      open_new_input_file(_in_file_v[_in_active_file_index]);
 
       LARCV_INFO() << "Opening new file for continued event reading"
                      << std::endl;
@@ -663,34 +699,6 @@ bool IOManager::read_entry(const size_t index, bool force_reload) {
       }
     }
 
-    // // Now, we can open the events folder and figure out what's what.
-    // // H5::DataSet events_dataset =
-    //     // _in_open_file.openGroup("Events").openDataSet("event_id");
-    // // H5::DataSpace events_dataspace = events_dataset.getSpace();
-
-    // hsize_t events_slab_dims[1];
-    // events_slab_dims[0] = 1;
-
-    // hsize_t events_offset[1];
-    // // Calculate the _current_offset based on requested index + _current_offset
-    // // for this file
-    // events_offset[0] = _in_index - _current_offset;
-
-    // _active_in_event_id_dataspace.selectHyperslab(H5S_SELECT_SET, events_slab_dims,
-    //                                  events_offset);
-
-    // // Define memory space:
-    // H5::DataSpace events_memspace(1, events_slab_dims);
-
-    // EventID input_event_id;
-    // // Write the new data
-    // _active_in_event_id_dataset.read(&(input_event_id), _event_id_datatype,
-    //                     events_memspace, _active_in_event_id_dataspace);
-    // std::cout << "Active in event id for index " << index << ": " << input_event_id.event_key() << std::endl;
-    // _event_id = input_event_id;
-
-    // _in_open_file
-    // Open the right file, if necessary
   }
   LARCV_DEBUG() << "Current input group index: " << _in_index << std::endl;
 
@@ -701,9 +709,6 @@ bool IOManager::read_entry(const size_t index, bool force_reload) {
 
 void IOManager::read_current_event_id(){
       // Now, we can open the events folder and figure out what's what.
-    // H5::DataSet events_dataset =
-        // _in_open_file.openGroup("Events").openDataSet("event_id");
-    // H5::DataSpace events_dataspace = events_dataset.getSpace();
 
     hsize_t events_slab_dims[1];
     events_slab_dims[0] = 1;
@@ -713,16 +718,28 @@ void IOManager::read_current_event_id(){
     // for this file
     events_offset[0] = _in_index - _current_offset;
 
-    _active_in_event_id_dataspace.selectHyperslab(H5S_SELECT_SET, events_slab_dims,
-                                     events_offset);
+    H5Sselect_hyperslab(_active_in_event_id_dataspace, 
+      H5S_SELECT_SET, 
+      events_offset,    // start
+      NULL ,            // stride
+      events_slab_dims, //count 
+      NULL              // block
+      );
 
+    
     // Define memory space:
-    H5::DataSpace events_memspace(1, events_slab_dims);
+    hid_t events_memspace = H5Screate_simple(1, events_slab_dims, NULL);
 
     EventID input_event_id;
-    // Write the new data
-    _active_in_event_id_dataset.read(&(input_event_id), _event_id_datatype,
-                        events_memspace, _active_in_event_id_dataspace);
+    // Read the  data
+    H5Dread(
+      _active_in_event_id_dataset,   // hid_t dataset_id  IN: Identifier of the dataset read from.
+      _event_id_datatype,            // hid_t mem_type_id IN: Identifier of the memory datatype.
+      events_memspace,               // hid_t mem_space_id  IN: Identifier of the memory dataspace.
+      _active_in_event_id_dataspace, // hid_t file_space_id IN: Identifier of the dataset's dataspace in the file.
+      xfer_plist_id,                 // hid_t xfer_plist_id     IN: Identifier of a transfer property list for this I/O operation.
+      &(input_event_id)              // void * buf  OUT: Buffer to receive data read from file.
+    );
     _event_id = input_event_id;
 }
 
@@ -772,10 +789,8 @@ bool IOManager::save_entry() {
     }
 
     for (size_t i = 0; i < _out_group_v.size(); ++i) {
-      auto t = &_out_group_v[i];
+      auto t = _out_group_v[i];
       auto& p = _product_ptr_v[i];
-
-      if (!t) break;
 
       p->serialize(t);
       p->clear();
@@ -806,7 +821,7 @@ bool IOManager::save_entry() {
 
     for (size_t i = 0; i < _store_id_bool.size(); ++i) {
       if (!_store_id_bool[i]) continue;
-      auto t = &_out_group_v[i];
+      auto  t = _out_group_v[i];
       auto& p = _product_ptr_v[i];
       LARCV_DEBUG() << "Saving id " << i << ": "
                     << _product_type_v[i] << " by "
@@ -831,13 +846,13 @@ void IOManager::append_event_id() {
   // First, we get information about the current status of the dataset:
   //////////////////////////////////////////////////////////////////
   // Get the dataspace of the event ID dataset:
-  H5::DataSpace dataspace = _out_event_id_ds.getSpace();
+  hid_t dataspace = H5Dget_space(_out_event_id_ds);
 
   // Get the dataset current size
   // The eventID table is exclusively rank-1
   hsize_t dims_current[1];
   // hsize_t * dims_current = new hsize_t[rank];
-  dataspace.getSimpleExtentDims(dims_current, NULL);
+  H5Sget_simple_extent_dims(dataspace, dims_current, NULL);
 
   // Create a dimension for the data to add (which is the hyperslab data)
   hsize_t dims_of_slab[1];
@@ -853,18 +868,33 @@ void IOManager::append_event_id() {
   size[0] = dims_current[0] + dims_of_slab[0];
 
   // Extend the dataset to accomodate the new data
-  _out_event_id_ds.extend(size);
+  H5Dset_extent(_out_event_id_ds, size);
 
   // Now, select as a hyperslab the last section of data for writing:
-  dataspace = _out_event_id_ds.getSpace();
-  dataspace.selectHyperslab(H5S_SELECT_SET, dims_of_slab, dims_current);
+  dataspace = H5Dget_space(_out_event_id_ds);
+
+  H5Sselect_hyperslab(dataspace, 
+    H5S_SELECT_SET, 
+    dims_current, // start
+    NULL ,        // stride
+    dims_of_slab, // count 
+    NULL          // block
+  );
 
   // Define memory space:
-  H5::DataSpace memspace(1, dims_of_slab);
+  hid_t memspace = H5Screate_simple(1, dims_of_slab, NULL);
+
 
   // Write the new data
-  _out_event_id_ds.write(&_event_id, EventID::get_datatype(), memspace,
-                         dataspace);
+  H5Dwrite(_out_event_id_ds,        // dataset_id,
+           _event_id_datatype,      // hit_t mem_type_id, 
+           memspace,                // hid_t mem_space_id, 
+           dataspace,               //hid_t file_space_id, 
+           xfer_plist_id,           //hid_t xfer_plist_id, 
+           &_event_id               // const void * buf 
+         );
+
+
 }
 
 void IOManager::clear_entry() {
@@ -961,26 +991,26 @@ EventBase* IOManager::get_data(const size_t id) {
     group_name = "Data/" + group_name + "_" + _producer_name_v[id] + "_group";
 
 
-    H5::Group group;
+    hid_t group;
     auto iter = _groups.find(group_name);
     if (iter == _groups.end() || _force_reopen_groups) {
-      group = _in_open_file.openGroup(group_name.c_str());
+      group = H5Gopen(_in_open_file, group_name.c_str(), H5P_DEFAULT);
+      // _in_open_file.openGroup(group_name.c_str());
       _groups[group_name] = group;
     } else {
       group = iter->second;
     }
 
     try {
-      LARCV_DEBUG() << "Calling deserialize for " << group_name << std::endl;
-      _product_ptr_v[id]->deserialize(&group, _in_index - _current_offset, _force_reopen_groups);
-      LARCV_DEBUG() << "Done deserialize for " << group_name << std::endl;
+      _product_ptr_v[id]->deserialize(group, _in_index - _current_offset, _force_reopen_groups);
       _product_status_v[id] = kInputFileRead;
     }
     catch (...){
       // When there is an error in deserialization, close the open input file gracefully:
       if(_io_mode != kWRITE){
         LARCV_CRITICAL() << "Exception caught in deserialization, closing input file gracefully" << std::endl;
-        _in_open_file.close();
+        H5Fclose(_in_open_file);
+        // _in_open_file.close();
       }
     }
   }
@@ -1029,8 +1059,71 @@ void IOManager::set_id() {
   // }
 }
 
+// int IOManager::what_is_open(hid_t fid) {
+//   ssize_t cnt;
+//   int howmany;
+//   H5I_type_t ot;
+//   hid_t anobj;
+//   std::vector<hid_t> objs;
+//   char name[1024];
+//   herr_t status;
+
+//   cnt = H5Fget_obj_count(fid, H5F_OBJ_ALL);
+
+//   if (cnt <= 0) return cnt;
+
+//   LARCV_DEBUG() << cnt << "object(s) are open." << std::endl;
+
+//   objs.resize(cnt);
+//   // objs = (hid_t *) malloc(cnt * sizeof(hid_t));
+
+//   howmany = H5Fget_obj_ids(fid, H5F_OBJ_ALL, cnt, &(objs[0]));
+
+//   printf("open objects:\n");
+
+//   for (int i = 0; i < howmany; i++ ) {
+//     anobj = objs[i];
+//     ot = H5Iget_type(anobj);
+//     status = H5Iget_name(anobj, name, 1024);
+//     LARCV_DEBUG() << "Open object: " << i << " type " << ot << ", name " << name << std::endl;;
+//   }
+         
+//   return howmany;
+// }
+
+int IOManager::close_all_objects(hid_t fid) {
+  ssize_t cnt;
+  int howmany;
+  H5I_type_t ot;
+  hid_t anobj;
+  std::vector<hid_t> objs;
+  char name[1024];
+  herr_t status;
+
+  cnt = H5Fget_obj_count(fid, H5F_OBJ_ALL);
+
+  if (cnt <= 0) return cnt;
+
+  objs.resize(cnt);
+  // objs = (hid_t *) malloc(cnt * sizeof(hid_t));
+
+  // howmany = H5Fget_obj_ids(fid, H5F_OBJ_ALL, cnt, objs);
+  howmany = H5Fget_obj_ids(fid, H5F_OBJ_ALL, cnt, &(objs[0]));
+
+  for (int i = 0; i < howmany; i++ ) {
+    anobj = objs[i];
+    ot = H5Iget_type(anobj);
+    status = H5Iget_name(anobj, name, 1024);
+    LARCV_INFO() << "Closing: " << i << " type " << ot << ", name " << name << std::endl;;
+    if (ot == H5I_GROUP) H5Gclose(anobj);
+    if (ot == H5I_DATASET) H5Dclose(anobj);
+  }
+         
+  return howmany;
+}
+
 void IOManager::finalize() {
-  LARCV_DEBUG() << "start" << std::endl;
+
   if (_io_mode != kREAD) {
     // _out_file->cd();
     // if (_store_id_bool.empty()) {
@@ -1049,9 +1142,14 @@ void IOManager::finalize() {
     //                    << std::endl;
     //   }
     // }
+
+    // what_is_open (_out_file);
+    close_all_objects(_out_file);
+
     LARCV_NORMAL() << "Closing output file" << std::endl;
-    _out_file.close();
+    H5Fclose(_out_file);
   }
+
 
   LARCV_INFO() << "Deleting data pointers" << std::endl;
   for (auto& p : _product_ptr_v) {

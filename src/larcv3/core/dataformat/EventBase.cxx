@@ -7,9 +7,15 @@
 
 namespace larcv3{
     EventBase::~EventBase(){
-        for (auto & p : _data_types){
-            delete p;
-        }
+        // for (auto & p : _data_types){
+        //     delete p;
+        // }
+    }
+
+    int EventBase::get_num_objects(hid_t group){
+        hsize_t  num_objects[1] = {0};
+        H5Gget_num_objs(group, num_objects);
+        return num_objects[0];
     }
 }
 #endif
