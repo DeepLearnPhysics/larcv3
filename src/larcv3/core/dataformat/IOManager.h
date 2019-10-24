@@ -149,9 +149,6 @@ namespace larcv3 {
 
     void append_event_id();
 
-    // // Returns the number of open objects in file with id fid
-    // int what_is_open(hid_t fid);
-
     // Closes the objects currently open in file with id fid
     int close_all_objects(hid_t fid);
 

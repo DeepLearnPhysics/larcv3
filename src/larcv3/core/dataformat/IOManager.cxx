@@ -1053,43 +1053,8 @@ void IOManager::set_id() {
   LARCV_INFO() << "Setting event id for output groups: "
                << _event_id.event_key() << std::endl;
 
-  // for (size_t i = 0; i < _product_ptr_v.size(); ++i) {
-  //   auto& p = _product_ptr_v[i];
-  //   if (!p) break;
-  // }
+
 }
-
-// int IOManager::what_is_open(hid_t fid) {
-//   ssize_t cnt;
-//   int howmany;
-//   H5I_type_t ot;
-//   hid_t anobj;
-//   std::vector<hid_t> objs;
-//   char name[1024];
-//   herr_t status;
-
-//   cnt = H5Fget_obj_count(fid, H5F_OBJ_ALL);
-
-//   if (cnt <= 0) return cnt;
-
-//   LARCV_DEBUG() << cnt << "object(s) are open." << std::endl;
-
-//   objs.resize(cnt);
-//   // objs = (hid_t *) malloc(cnt * sizeof(hid_t));
-
-//   howmany = H5Fget_obj_ids(fid, H5F_OBJ_ALL, cnt, &(objs[0]));
-
-//   printf("open objects:\n");
-
-//   for (int i = 0; i < howmany; i++ ) {
-//     anobj = objs[i];
-//     ot = H5Iget_type(anobj);
-//     status = H5Iget_name(anobj, name, 1024);
-//     LARCV_DEBUG() << "Open object: " << i << " type " << ot << ", name " << name << std::endl;;
-//   }
-         
-//   return howmany;
-// }
 
 int IOManager::close_all_objects(hid_t fid) {
   ssize_t cnt;
@@ -1125,25 +1090,8 @@ int IOManager::close_all_objects(hid_t fid) {
 void IOManager::finalize() {
 
   if (_io_mode != kREAD) {
-    // _out_file->cd();
-    // if (_store_id_bool.empty()) {
-    //   for (auto& t : _out_group_v) {
-    //     // if (!t) break;
-    //     LARCV_NORMAL() << "Writing "
-    //                    << t.fromClass()
-    //                    << std::endl;
-    //   }
-    // } else {
-    //   for (size_t i = 0; i < _store_id_bool.size(); ++i) {
-    //     if (!_store_id_bool[i]) continue;
-    //     auto t = &_out_group_v[i];
-    //     LARCV_NORMAL() << "Writing "
-    //                    << t->fromClass()
-    //                    << std::endl;
-    //   }
-    // }
 
-    // what_is_open (_out_file);
+
     close_all_objects(_out_file);
 
     LARCV_NORMAL() << "Closing output file" << std::endl;
