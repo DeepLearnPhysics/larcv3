@@ -99,6 +99,8 @@ bool EventPIDLabel::process(IOManager& mgr) {
     auto & particle = ev_particle.as_vector().at(i);
     // std::cout << "Particle with pdg " << particle.pdg_code()
     //           << " and energy " << particle.energy_init() << std::endl;
+    if (particle.creation_process() != "primary") continue;
+    
     switch (particle.pdg_code() ){
       case 2212: // proton
         if (particle.energy_init() - 0.93827231 > _proton_threshold)
