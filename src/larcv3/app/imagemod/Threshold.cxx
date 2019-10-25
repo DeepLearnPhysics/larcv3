@@ -186,7 +186,7 @@ bool Threshold::process(IOManager& mgr) {
 
       }
     }
-    if (product == "sparse3d"){
+    if (product == "cluster3d"){
       auto const & ev_input  = mgr.get_data<larcv3::EventSparseCluster3D>(producer);
       auto       & ev_output = mgr.get_data<larcv3::EventSparseCluster3D>(output_producer);
 
