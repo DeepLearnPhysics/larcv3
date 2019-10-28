@@ -67,13 +67,13 @@ bool ParentParticleSeg::process(IOManager& mgr) {
 
   for (auto& particle : ev_particle.as_vector()) {
     if (debug){
-      std::cout << "Ancestor track ID, ancestor PDG, id, parent ID, PDG, track id: ("
-                << particle.ancestor_track_id() << ", "
-                << particle.ancestor_pdg_code() << ", "
-                << particle.id() << ", "
-                << particle.parent_track_id() << ", "
-                << particle.pdg_code() << ", "
-                << particle.track_id() << ")" << std::endl;
+      std::cout << "Particle: "
+                << "ancestor track ID " << particle.ancestor_track_id() << ", "
+                << "ancestor PDG " << particle.ancestor_pdg_code() << ", "
+                << "ID " << particle.id() << ", "
+                << "parent ID " << particle.parent_track_id() << ", "
+                << "PDG " << particle.pdg_code() << ", "
+                << "track ID " << particle.track_id() << "." << std::endl;
     }
 
     // Particles are top level if their ancestor ID == their own track ID
@@ -87,13 +87,13 @@ bool ParentParticleSeg::process(IOManager& mgr) {
     node->ancestorID = particle.ancestor_track_id();
 
     // Primary?
-    if (particle.ancestor_track_id() == particle.track_id() ||
-        particle.ancestor_pdg_code() == 111 ||  // neutral particles make new primaries
-        particle.ancestor_pdg_code() == 2112
-      ){
+    // if (particle.ancestor_track_id() == particle.track_id() ||
+    //     particle.ancestor_pdg_code() == 111 ||  // neutral particles make new primaries
+    //     particle.ancestor_pdg_code() == 2112)
+    if (particle.creation_process() == "primary")
+    {
       // Yes, it's a primary
-      // std::cout << "primary " << particle.track_id() << std::endl;
-      // std::cout << "Address: " << node << std::endl;
+      if (debug) std::cout << "-> Primary " << particle.track_id() << " - address: " << node << std::endl;
       node->primary = true;
       node->parent = NULL;
       primary_nodes.push_back(node);
@@ -207,6 +207,7 @@ bool ParentParticleSeg::process(IOManager& mgr) {
   // Make the appropriate list of new particles:
   for (auto node : primary_nodes){
     if (node -> reference != NULL){
+      if (debug) std::cout << "Appending particle " << std::endl;
       ev_particle_output.append(*(node->reference));
     }
     else{
