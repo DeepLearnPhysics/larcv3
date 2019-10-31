@@ -96,7 +96,7 @@ larcv3::Tensor3D as_tensor3d(PyObject *);
 
 larcv3::Tensor4D as_tensor4d(PyObject *);
 
-// VoxelSet as_tensor2d(PyObject * values, PyObject * indexes);
+larcv3::VoxelSet as_voxelset(PyObject * values, PyObject * indexes);
 
 // VoxelSet as_tensor3d(PyObject *, float min_threshold=0);
  

@@ -72,17 +72,22 @@ class larcv_writer(object):
             data {list} -- list (by projection ID) of dict objects.  dict must have the keys 'index', 'value' and 'meta'
             producer {[type]} -- [description]
         '''
-        # _writable_data = self._io.get_data("sparse2d", producer)
+        _writable_data = larcv.EventSparseTensor2D.to_sparse_tensor(self._io.get_data("sparse2d", producer))
 
-        # for projection in range(len(data)):
-        #     value = data[projection]['value']
-        #     index = data[projection]['index']
-        #     meta  = data[projection]['meta']
 
-        #     # First, copy all of the values into a VoxelSet object:
-        #     voxel_set = larcv.as_tensor2d(value.astype(numpy.float32), index.astype(numpy.uint64))
-        #     voxel_meta = larcv.ImageMeta(meta[0], meta[1], meta[2],meta[3], meta[4], meta[5],meta[6])
-        #     _writable_data.set(voxel_set, voxel_meta)
+        for projection in range(len(data)):
+            value = data[projection]['values']
+            index = data[projection]['index']
+            shape = data[projection]['shape']
+            meta = larcv.ImageMeta2D()
+            meta.set_projection_id(projection)
+            meta.set_dimension(0, shape[0], int(shape[0]))
+            meta.set_dimension(1, shape[1], int(shape[1]))
+
+            # First, copy all of the values into a VoxelSet object:
+            voxel_set = larcv.as_voxelset(value.astype(numpy.float32), index.astype(numpy.uint64))
+            # Add the voxel set:
+            _writable_data.set(voxel_set, meta)
 
         return
 
@@ -98,8 +103,6 @@ class larcv_writer(object):
 
         for projection_id, image in enumerate(data):
             meta = larcv.ImageMeta2D()
-            print(type(image))
-            print(image.shape)
             meta.set_dimension(0, image.shape[0], image.shape[0])
             meta.set_dimension(1, image.shape[1], image.shape[1])
             meta.set_projection_id(projection_id)
