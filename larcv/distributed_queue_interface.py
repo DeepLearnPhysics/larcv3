@@ -182,6 +182,7 @@ class queue_interface(object):
         # Then, we promote those entries to the "current" batch:
         io.pop_current_data()
         io.next(store_entries=True,store_event_ids=True)
+        self.prepare_next(mode)
 
         # Note that there is no "next" data pipelined yet.
 
@@ -216,7 +217,7 @@ class queue_interface(object):
             # set_entries = self.get_next_batch_indexes(mode, self._minibatch_size[mode])
             
         self._queueloaders[mode].set_next_batch(set_entries)
-        self._queueloaders[mode].batch_process()
+        self._queueloaders[mode].prepare_next()
         
         self._count[mode] = 0
 

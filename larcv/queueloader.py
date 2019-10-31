@@ -147,11 +147,20 @@ class queue_interface(object):
         # there is no "start_manager" function.  Everything is manual.
         # First, tell it what the entries for the first batch to read:
 
+        # start = time.time()
+        # print(self._queueloaders[mode].is_reading())
         self.prepare_next(mode)
+        # print(self._queueloaders[mode].is_reading())
+        # end = time.time()
 
+        # print(end - start)
         # Then, we promote those entries to the "current" batch:
+        while self._queueloaders[mode].is_reading():
+            print(self._queueloaders[mode].is_reading())
+            time.sleep(0.01)
+
         io.pop_current_data()
-        io.next(store_entries=True,store_event_ids=True)
+        self.prepare_next(mode)
 
         # Note that there is no "next" data pipelined yet.
 
@@ -207,7 +216,7 @@ class queue_interface(object):
             set_entries = self.get_next_batch_indexes(mode, self._minibatch_size[mode])
 
         self._queueloaders[mode].set_next_batch(set_entries)
-        self._queueloaders[mode].batch_process()
+        self._queueloaders[mode].prepare_next()
 
         self._count[mode] = 0
 
@@ -272,8 +281,8 @@ class queue_interface(object):
         return self._queueloaders[mode].fetch_n_entries()
 
 
-    def ready(self, mode):
-        return self._queueloaders[mode].ready()
+    def is_reading(self, mode):
+        return self._queueloaders[mode].is_reading()
 
 
     def write_output(self, data, datatype, producer, entries, event_ids):
@@ -377,6 +386,9 @@ class larcv_queueio (object):
             time.sleep(0.01)
         self._proc.batch_process()
 
+
+    def prepare_next(self):
+        self._proc.prepare_next()
 
     def is_reading(self,storage_id=None):
         return self._proc.is_reading()

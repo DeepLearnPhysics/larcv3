@@ -17,6 +17,7 @@
 #include "larcv3/core/processor/ProcessDriver.h"
 #include "ThreadIOTypes.h"
 #include <random>
+#include <future>
 
 namespace larcv3 {
   /**
@@ -37,7 +38,8 @@ namespace larcv3 {
     // Process a batch of entries, using _next_index_v to specify entries
     bool batch_process();
 
-
+    // Spawn a thread to batch process and return immediately
+    void prepare_next();
 
     // Reset the state
     void reset();
@@ -115,6 +117,8 @@ namespace larcv3 {
     std::vector<larcv3::EventID> _current_batch_events_v;
     std::vector<size_t> _next_batch_entries_v;
     std::vector<larcv3::EventID> _next_batch_events_v;
+
+    std::future<bool> _preparation_future;
 
   };
 

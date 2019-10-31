@@ -28,7 +28,11 @@ int omp_thread_count() {
     , _processing(false)
     , _configured(false)
     , _batch_global_counter(0)
-  {}
+  {
+    
+    std::future<bool> f = std::async(std::launch::deferred, [](){return true;});
+    _preparation_future = std::move(f);
+  }
 
   QueueProcessor::~QueueProcessor()
   { reset(); }
@@ -297,6 +301,20 @@ int omp_thread_count() {
     _configured = true;
   }
 
+  void QueueProcessor::prepare_next() {
+
+    _preparation_future.wait();
+
+
+    _processing = true;
+    std::future<bool> fut = std::async(std::launch::async,
+                                       &QueueProcessor::batch_process, this);
+
+    _preparation_future = std::move(fut);
+
+    return;
+
+  }
   
   bool QueueProcessor::batch_process() {
 
@@ -328,7 +346,7 @@ int omp_thread_count() {
     _next_batch_events_v.clear();
     _next_batch_events_v.resize(_next_index_v.size());
 
-    // LARCV_INFO() << "Entering process loop" << std::endl;
+    LARCV_INFO() << "Entering process loop" << std::endl;
     // auto start = std::chrono::steady_clock::now();
 
 #ifdef LARCV_OPENMP
@@ -365,6 +383,10 @@ int omp_thread_count() {
     end_batch();
     
     _processing = false;
+
+    // if (_preparation_thread.joinable()) {
+    //   _preparation_thread.join();
+    // }
     return true;
 
   }
