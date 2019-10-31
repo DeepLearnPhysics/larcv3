@@ -31,11 +31,10 @@ void EventPIDLabel::configure(const PSet& cfg) {
 void EventPIDLabel::initialize() {}
 
 bool EventPIDLabel::process(IOManager& mgr) {
-  // std::cout << "Enter EventPIDLabel::process " << std::endl;
 
-  // // Read in the particles that define the pdg types:
-  // auto const& ev_particle =
-  //     mgr.get_data<larcv3::EventParticle>(_particle_producer);
+  // Read in all the particles in the event (excludes the neutrino one):
+  auto const& ev_particle =
+      mgr.get_data<larcv3::EventParticle>(_particle_producer);
 
   // Read in the neutrino info:
   auto const& ev_neutrino =
@@ -75,6 +74,8 @@ bool EventPIDLabel::process(IOManager& mgr) {
   // Get the neutrino interaction information:
   auto neut = ev_neutrino.as_vector().front();
   interaction_type_t _int_type;
+  // std::cout << "Neutrino pdg: " << abs(neut.pdg_code()) << std::endl;
+  // std::cout << "Neutrino NC/CC: " << neut.nu_current_type() << std::endl;
 
   if (neut.nu_current_type() == 1){
     _int_type = kNC;
@@ -94,10 +95,12 @@ bool EventPIDLabel::process(IOManager& mgr) {
 
   // Loop over the final state particles to count the
   // occurences of each type:
-  for (size_t i = 1; i < ev_neutrino.as_vector().size(); i++ ){
-    auto & particle = ev_neutrino.as_vector().at(i);
+  for (size_t i = 0; i < ev_particle.as_vector().size(); i++ ){
+    auto & particle = ev_particle.as_vector().at(i);
     // std::cout << "Particle with pdg " << particle.pdg_code()
     //           << " and energy " << particle.energy_init() << std::endl;
+    if (particle.creation_process() != "primary") continue;
+    
     switch (particle.pdg_code() ){
       case 2212: // proton
         if (particle.energy_init() - 0.93827231 > _proton_threshold)
