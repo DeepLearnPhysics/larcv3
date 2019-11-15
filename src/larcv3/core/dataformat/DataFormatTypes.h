@@ -28,12 +28,12 @@ namespace larcv3 {
   static const ProjectionID_t kINVALID_PROJECTIONID = kINVALID_USHORT;
 
   struct Extents_t{
-    unsigned int first;
+    unsigned long long int first;
     unsigned int n;
   };
 
   struct IDExtents_t{
-    unsigned int first;
+    unsigned long long int first;
     unsigned int n;
     unsigned int id;
   };
