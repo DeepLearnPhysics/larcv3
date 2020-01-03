@@ -3,16 +3,16 @@ add_subdirectory(app)
 
 # This is admittedly pretty clunky, but it gets the job done to make one object file:
 
-add_library(larcv3 SHARED 
-    $<TARGET_OBJECTS:base> 
-    $<TARGET_OBJECTS:dataformat> 
-    $<TARGET_OBJECTS:processor> 
-    $<TARGET_OBJECTS:pyutil> 
-    $<TARGET_OBJECTS:cpputil> 
-    $<TARGET_OBJECTS:filter> 
-    $<TARGET_OBJECTS:threadio> 
-    $<TARGET_OBJECTS:imagemod> 
-    $<TARGET_OBJECTS:sbnd_imagemod> 
+add_library(larcv3 SHARED
+    $<TARGET_OBJECTS:base>
+    $<TARGET_OBJECTS:dataformat>
+    $<TARGET_OBJECTS:processor>
+    $<TARGET_OBJECTS:pyutil>
+    $<TARGET_OBJECTS:cpputil>
+    $<TARGET_OBJECTS:filter>
+    $<TARGET_OBJECTS:threadio>
+    $<TARGET_OBJECTS:imagemod>
+    $<TARGET_OBJECTS:sbnd_imagemod>
     )
 
 if (OpenMP_CXX_FOUND)
@@ -27,7 +27,7 @@ target_link_libraries(larcv3 ${HDF5_C_LIBRARIES})
 
 # Link against python:
 target_link_libraries(larcv3 ${PYTHON_LIBRARIES})
- 
+
 
 if (MPI)
     target_link_libraries(larcv3 ${MPI_LIBRARIES})
@@ -50,15 +50,15 @@ else ()
 
     # Add as a module ('.so' extension on mac)
     if (${CMAKE_MINOR_VERSION} GREATER 7)
-      swig_add_library(larcv 
+      swig_add_library(larcv
           TYPE MODULE
-          LANGUAGE python 
+          LANGUAGE python
           SOURCES ${SWIGSOURCES}
       )
     else ()
       swig_add_module(
           larcv
-          python 
+          python
           ${SWIGSOURCES}
       )
     endif()
@@ -70,7 +70,7 @@ else ()
     # I took this from a github:
     # https://github.com/pemsley/cmake-python-swig-rpath-example/blob/master/src/CMakeLists.txt
     # I DON'T KNOW WHY IT WORKS BUT IT WORKS ON MAC
-    if (APPLE) 
+    if (APPLE)
 
         # interesting reading: https://blog.kitware.com/upcoming-in-cmake-2-8-12-osx-rpath-support/
         # INSTALL_NAME_DIR overrides MACOSX_RPATH.  Try not to do that.
@@ -88,7 +88,9 @@ else ()
         set_target_properties(${SWIG_MODULE_larcv_REAL_NAME} PROPERTIES INSTALL_RPATH "@loader_path/lib/")
 
     else()
-        set_target_properties(${SWIG_MODULE_larcv_REAL_NAME} PROPERTIES LINK_FLAGS "-Wl,-rpath,$ORIGIN/lib/")
+
+        set_target_properties(${SWIG_MODULE_larcv_REAL_NAME} PROPERTIES LINK_FLAGS "-Wl,-rpath,'$ORIGIN/lib/'")
+        set_target_properties(${SWIG_MODULE_larcv_REAL_NAME} PROPERTIES CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
     endif()
 
@@ -97,11 +99,11 @@ else ()
         LIBRARY DESTINATION ${CMAKE_PACKAGE_DIR} )
 
     # Install swig python module
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/larcv.py 
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/larcv.py
         DESTINATION ${CMAKE_PACKAGE_DIR})
 
 endif(${CMAKE_NO_SWIG})
-    
+
 
 # Install larvc shared library
 install(TARGETS larcv3
