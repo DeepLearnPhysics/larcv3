@@ -57,7 +57,7 @@ namespace larcv3 {
     }
 
     std::string dump() const;
-    
+
   private:
 
     double _x, _y, _z, _t;
@@ -66,23 +66,22 @@ namespace larcv3 {
     // void approx();
 
 #ifndef SWIG
-  public: 
+  public:
     static hid_t get_datatype() {
       hid_t datatype;
-      herr_t status;
       datatype = H5Tcreate (H5T_COMPOUND, sizeof (Vertex));
-      status = H5Tinsert (datatype, "x",
+      H5Tinsert (datatype, "x",
                   HOFFSET (Vertex, _x), larcv3::get_datatype<double>());
-      status = H5Tinsert (datatype, "y",
+      H5Tinsert (datatype, "y",
                   HOFFSET (Vertex, _y), larcv3::get_datatype<double>());
-      status = H5Tinsert (datatype, "z",
+      H5Tinsert (datatype, "z",
                   HOFFSET (Vertex, _z), larcv3::get_datatype<double>());
-      status = H5Tinsert (datatype, "t", 
+      H5Tinsert (datatype, "t", 
                   HOFFSET (Vertex, _t), larcv3::get_datatype<double>());
       return datatype;
     }
 #endif
-    
+
 
   };
 }

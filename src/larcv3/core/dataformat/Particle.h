@@ -94,11 +94,11 @@ namespace larcv3 {
     inline double       energy_init     () const { return _energy_init;     }
     inline double       energy_deposit  () const { return _energy_deposit;  }
            std::string  creation_process() const;
-    
+
     // const BBox2D& boundingbox_2d(ProjectionID_t id) const;
     // inline const std::vector<larcv3::BBox2D>& boundingbox_2d() const { return _bb2d_v; }
     // inline const BBox3D& boundingbox_3d() const { return _bb3d; }
-    
+
     // inline int num_voxels() const { return _num_voxels; }
 
     // parent info getter
@@ -164,41 +164,90 @@ namespace larcv3 {
     std::string dump() const;
 
 #ifndef SWIG
-  public: 
+  public:
     static hid_t get_datatype() {
       hid_t datatype;
-      herr_t status;
       datatype = H5Tcreate (H5T_COMPOUND, sizeof (Particle));
-      
+
       // Get the compound types:
       hid_t string_type = H5Tcopy (H5T_C_S1);
       H5Tset_size(string_type, PARTICLE_PROCESS_STRLEN);
 
-      status = H5Tinsert(datatype, "id",               HOFFSET(Particle, _id),               larcv3::get_datatype<InstanceID_t>());
-      status = H5Tinsert(datatype, "mcst_index",       HOFFSET(Particle, _mcst_index),       larcv3::get_datatype<MCSTIndex_t>());
-      status = H5Tinsert(datatype, "mct_index",        HOFFSET(Particle, _mct_index),        larcv3::get_datatype<MCTIndex_t>());
-      status = H5Tinsert(datatype, "shape",            HOFFSET(Particle, _shape),            larcv3::get_datatype<ShapeType_t>());
-      status = H5Tinsert(datatype, "current_type",     HOFFSET(Particle, _current_type),     larcv3::get_datatype<short>());
-      status = H5Tinsert(datatype, "interaction_type", HOFFSET(Particle, _interaction_type), larcv3::get_datatype<short>());
-      status = H5Tinsert(datatype, "trackid",          HOFFSET(Particle, _trackid),          larcv3::get_datatype<unsigned int>());
-      status = H5Tinsert(datatype, "pdg",              HOFFSET(Particle, _pdg),              larcv3::get_datatype<int>());
-      status = H5Tinsert(datatype, "px",               HOFFSET(Particle, _px),               larcv3::get_datatype<double>());
-      status = H5Tinsert(datatype, "py",               HOFFSET(Particle, _py),               larcv3::get_datatype<double>());
-      status = H5Tinsert(datatype, "pz",               HOFFSET(Particle, _pz),               larcv3::get_datatype<double>());
-      status = H5Tinsert(datatype, "vtx",              HOFFSET(Particle, _vtx),              Vertex::get_datatype());
-      status = H5Tinsert(datatype, "end_pt",           HOFFSET(Particle, _end_pt),           Vertex::get_datatype());
-      status = H5Tinsert(datatype, "first_step",       HOFFSET(Particle, _first_step),       Vertex::get_datatype());
-      status = H5Tinsert(datatype, "last_step",        HOFFSET(Particle, _last_step),        Vertex::get_datatype());
-      status = H5Tinsert(datatype, "dist_travel",      HOFFSET(Particle, _dist_travel),      larcv3::get_datatype<double>());
-      status = H5Tinsert(datatype, "energy_init",      HOFFSET(Particle, _energy_init),      larcv3::get_datatype<double>());
-      status = H5Tinsert(datatype, "energy_deposit",   HOFFSET(Particle, _energy_deposit),   larcv3::get_datatype<double>());
-      status = H5Tinsert(datatype, "process",          HOFFSET(Particle, _process),          string_type);
-      status = H5Tinsert(datatype, "parent_trackid",   HOFFSET(Particle, _parent_trackid),   larcv3::get_datatype<unsigned int>());
-      status = H5Tinsert(datatype, "parent_pdg",       HOFFSET(Particle, _parent_pdg),       larcv3::get_datatype<int>());
-      status = H5Tinsert(datatype, "parent_vtx",       HOFFSET(Particle, _parent_vtx),       Vertex::get_datatype());
-      status = H5Tinsert(datatype, "ancestor_trackid", HOFFSET(Particle, _ancestor_trackid), larcv3::get_datatype<unsigned int>());
-      status = H5Tinsert(datatype, "ancestor_pdg",     HOFFSET(Particle, _ancestor_pdg),     larcv3::get_datatype<int>());
-      status = H5Tinsert(datatype, "ancestor_vtx",     HOFFSET(Particle, _ancestor_vtx),     Vertex::get_datatype());
+      H5Tinsert(datatype, "id",
+                HOFFSET(Particle, _id),
+                larcv3::get_datatype<InstanceID_t>());
+      H5Tinsert(datatype, "mcst_index",
+                HOFFSET(Particle, _mcst_index),
+                larcv3::get_datatype<MCSTIndex_t>());
+      H5Tinsert(datatype, "mct_index",
+                HOFFSET(Particle, _mct_index),
+                larcv3::get_datatype<MCTIndex_t>());
+      H5Tinsert(datatype, "shape",
+                HOFFSET(Particle, _shape),
+                larcv3::get_datatype<ShapeType_t>());
+      H5Tinsert(datatype, "current_type",
+                HOFFSET(Particle, _current_type),
+                larcv3::get_datatype<short>());
+      H5Tinsert(datatype, "interaction_type",
+                HOFFSET(Particle, _interaction_type),
+                larcv3::get_datatype<short>());
+      H5Tinsert(datatype, "trackid",
+                HOFFSET(Particle, _trackid),
+                larcv3::get_datatype<unsigned int>());
+      H5Tinsert(datatype, "pdg",
+                HOFFSET(Particle, _pdg),
+                larcv3::get_datatype<int>());
+      H5Tinsert(datatype, "px",
+                HOFFSET(Particle, _px),
+                larcv3::get_datatype<double>());
+      H5Tinsert(datatype, "py",
+                HOFFSET(Particle, _py),
+                larcv3::get_datatype<double>());
+      H5Tinsert(datatype, "pz",
+                HOFFSET(Particle, _pz),
+                larcv3::get_datatype<double>());
+      H5Tinsert(datatype, "vtx",
+                HOFFSET(Particle, _vtx),
+                Vertex::get_datatype());
+      H5Tinsert(datatype, "end_pt",
+                HOFFSET(Particle, _end_pt),
+                Vertex::get_datatype());
+      H5Tinsert(datatype, "first_step",
+                HOFFSET(Particle, _first_step),
+                Vertex::get_datatype());
+      H5Tinsert(datatype, "last_step",
+                HOFFSET(Particle, _last_step),
+                Vertex::get_datatype());
+      H5Tinsert(datatype, "dist_travel",
+                HOFFSET(Particle, _dist_travel),
+                larcv3::get_datatype<double>());
+      H5Tinsert(datatype, "energy_init",
+                HOFFSET(Particle, _energy_init),
+                larcv3::get_datatype<double>());
+      H5Tinsert(datatype, "energy_deposit",
+                HOFFSET(Particle, _energy_deposit),
+                larcv3::get_datatype<double>());
+      H5Tinsert(datatype, "process",
+                HOFFSET(Particle, _process),
+                string_type);
+      H5Tinsert(datatype, "parent_trackid",
+                HOFFSET(Particle, _parent_trackid),
+                larcv3::get_datatype<unsigned int>());
+      H5Tinsert(datatype, "parent_pdg",
+                HOFFSET(Particle, _parent_pdg),
+                larcv3::get_datatype<int>());
+      H5Tinsert(datatype, "parent_vtx",
+                HOFFSET(Particle, _parent_vtx),
+                Vertex::get_datatype());
+      H5Tinsert(datatype, "ancestor_trackid",
+                HOFFSET(Particle, _ancestor_trackid),
+                larcv3::get_datatype<unsigned int>());
+      H5Tinsert(datatype, "ancestor_pdg",
+                HOFFSET(Particle, _ancestor_pdg),
+                larcv3::get_datatype<int>());
+      H5Tinsert(datatype, "ancestor_vtx",
+                HOFFSET(Particle, _ancestor_vtx),
+                Vertex::get_datatype());
 
       return datatype;
     }
@@ -242,7 +291,7 @@ namespace larcv3 {
 
   };
 
-  
+
 }
 #endif
 /** @} */ // end of doxygen group

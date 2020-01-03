@@ -9,7 +9,7 @@ namespace larcv3 {
 
 /// Default constructor: Does nothing, valid defaults to false
 template<size_t dimension>
-ImageMeta<dimension>::ImageMeta() : 
+ImageMeta<dimension>::ImageMeta() :
  _valid(false)
 , _projection_id(0)
 , _unit(kUnitUnknown)
@@ -29,7 +29,7 @@ ImageMeta<dimension>::ImageMeta(size_t projection_id,
                      const std::vector<double>& image_sizes,
                      const std::vector<double>& origin,
                      DistanceUnit_t unit) {
-  if ( dimension != 0 && 
+  if ( dimension != 0 &&
        number_of_voxels.size() == dimension &&
        image_sizes.size() == dimension
      ){
@@ -64,7 +64,7 @@ template<size_t dimension>
 double ImageMeta<dimension>::image_size(size_t axis)       const{
   if (_valid && axis >= 0 && axis < dimension){
     return _image_sizes[axis];
-  } 
+  }
   else{
     LARCV_CRITICAL() << "Can't return image size of invalid meta." << std::endl;
     throw larbys();
@@ -75,7 +75,7 @@ template<size_t dimension>
 double ImageMeta<dimension>::origin(size_t axis)       const{
   if (_valid && axis >= 0 && axis < dimension){
     return _origin[axis];
-  } 
+  }
   else{
     LARCV_CRITICAL() << "Can't return origin of invalid meta." << std::endl;
     throw larbys();
@@ -86,7 +86,7 @@ template<size_t dimension>
 size_t ImageMeta<dimension>::number_of_voxels(size_t axis) const{
   if (_valid && axis >= 0 && axis < dimension){
     return _number_of_voxels[axis];
-  } 
+  }
   else{
     LARCV_CRITICAL() << "Can't return number_of_voxels of invalid meta." << std::endl;
     throw larbys();
@@ -192,7 +192,9 @@ void ImageMeta<dimension>::index( const std::vector<size_t> & coordinates, std::
     output_index.clear();
     output_index.resize(coordinates.size());
 
+#ifdef LARCV_OPENMP
     #pragma omp parallel for
+#endif
     for (size_t i = 0; i < coordinates.size(); i ++){
       // size_t index = 0;
       size_t stride = 1;
@@ -204,7 +206,7 @@ void ImageMeta<dimension>::index( const std::vector<size_t> & coordinates, std::
       }
     }
 
-    
+
     return;
   }
   else{
@@ -250,7 +252,9 @@ void ImageMeta<dimension>::coordinates( const std::vector<size_t> & index,  std:
     output_coordinates.resize(index.size() * dimension);
 
     size_t i_index(0), axis, stride, index_copy, i;
+#ifdef LARCV_OPENMP
     #pragma omp parallel for private(axis, stride, index_copy)
+#endif
     for (i_index = 0; i_index < index.size(); ++ i_index){
       index_copy = index.at(i_index);
 
@@ -262,7 +266,7 @@ void ImageMeta<dimension>::coordinates( const std::vector<size_t> & index,  std:
       }
 
     }
-    
+
     return;
   }
   else{
@@ -290,7 +294,7 @@ size_t ImageMeta<dimension>::coordinate(size_t index, size_t axis) const{
 
     }
     return kINVALID_INDEX;
-    
+
   }
   else{
     LARCV_CRITICAL() << "Can't return coordinates of invalid meta." << std::endl;
@@ -308,7 +312,7 @@ std::vector<double> ImageMeta<dimension>::position(size_t index) const{
   if (_valid ){
 
 
-    std::vector<size_t> coords = coordinates(index);    
+    std::vector<size_t> coords = coordinates(index);
     return position(coords);
   }
   else{
@@ -334,9 +338,9 @@ std::vector<double> ImageMeta<dimension>::position(const std::vector<size_t> & c
       double voxel_size = (_image_sizes[axis] / _number_of_voxels[axis] );
       positions.at(axis) = coordinates.at(axis) * voxel_size;
       /// Measure to the center of each voxel
-      positions.at(axis) += 0.5*voxel_size + _origin[axis]; 
+      positions.at(axis) += 0.5*voxel_size + _origin[axis];
     }
-    
+
     return positions;
   }
   else{
@@ -348,7 +352,7 @@ std::vector<double> ImageMeta<dimension>::position(const std::vector<size_t> & c
 /// Same as above, but restricted to a single axis
 template<size_t dimension>
 double ImageMeta<dimension>::position(size_t index, size_t axis) const{
-  std::vector<size_t> coords = coordinates(index);    
+  std::vector<size_t> coords = coordinates(index);
   return position(coords).at(axis);
 }
 
@@ -378,7 +382,7 @@ std::vector<double> ImageMeta<dimension>::max() const{
     max.resize(dimension);
     for (size_t axis = 0; axis < dimension; ++ axis){
       max.at(axis) = _origin[axis] + _image_sizes[axis];
-    } 
+    }
     return max;
   }
   else{
@@ -415,7 +419,7 @@ std::vector<size_t> ImageMeta<dimension>::position_to_coordinate(const std::vect
     coordinates.resize(dimension);
 
     std::vector<double> dims = voxel_dimensions();
-    
+
     for (size_t axis = 0; axis < dimension; axis ++){
       double relative_position = position.at(axis) - _origin[axis];
       if (relative_position < 0.0 || relative_position >= _image_sizes[axis]){
@@ -443,11 +447,11 @@ size_t ImageMeta<dimension>::position_to_coordinate(double position, size_t axis
     if (relative_position < 0.0 || relative_position >= _image_sizes[axis]){
       return kINVALID_INDEX;
     }
-    else{ 
+    else{
       double voxel_dim = voxel_dimensions(axis);
       return  (size_t) (relative_position / voxel_dim);
     }
-    
+
   }
   else{
     LARCV_CRITICAL() << "Can't return position from coordinate of invalid meta." << std::endl;
@@ -462,8 +466,8 @@ void ImageMeta<dimension>::set_dimension(size_t axis, double image_size, size_t 
     _image_sizes[axis] = image_size;
     _number_of_voxels[axis] = number_of_voxels;
     if (origin != 0){
-      _origin[axis] = origin;      
-    } 
+      _origin[axis] = origin;
+    }
   }
   // Update all of the values:
 

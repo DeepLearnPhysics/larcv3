@@ -20,7 +20,7 @@ namespace larcv3 {
     : _x(x), _y(y), _z(z), _t(t)
   // {approx();}
   {}
-  
+
   void Vertex::reset(){
     _x = _y = _z = _t = 0;
   }
@@ -35,8 +35,8 @@ namespace larcv3 {
   }
 
   const larcv3::Point2D Vertex::as_point2d(larcv3::PointType_t point_type) const
-  { 
-    double data[2];
+  {
+    double data[2] = {};
     switch(point_type) {
       case kPointXY:
         data[0] = _x; data[1] = _y;

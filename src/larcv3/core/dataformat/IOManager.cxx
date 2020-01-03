@@ -30,9 +30,9 @@ IOManager::IOManager(IOMode_t mode, std::string name)
       _in_index(0),
       _current_offset(0),
       _in_entries_total(0),
-      _out_group_v(),
       _in_file_v(),
       _in_dir_v(),
+      _out_group_v(),
       _key_list(),
       _product_ctr(0),
       _product_ptr_v(),
@@ -172,7 +172,7 @@ bool IOManager::initialize(int color) {
   LARCV_DEBUG() << "start" << std::endl;
   // Lock:
   __ioman_mtx.lock();
-  
+
 // If openmp, always intialize the lock:
 #ifdef LARCV_OPENMP
   omp_init_lock(&__ioman_omp_lock);
@@ -186,7 +186,7 @@ bool IOManager::initialize(int color) {
   MPI_Initialized(&mpi_initialized);
 
   if (!mpi_initialized){
-    int ierr = MPI_Init(NULL, NULL) ;  
+    int ierr = MPI_Init(NULL, NULL) ;
   }
 
   // Get the number of processes
@@ -236,7 +236,7 @@ bool IOManager::initialize(int color) {
       "/Events",   // const char *name      IN: Absolute or relative name of the link to the new group
       H5P_DEFAULT, // hid_t lcpl_id IN: Link creation property list identifier
       H5P_DEFAULT, // hid_t gcpl_id IN: Group creation property list identifier
-      H5P_DEFAULT  // hid_t gapl_id IN: Group access property list identifier 
+      H5P_DEFAULT  // hid_t gapl_id IN: Group access property list identifier
                       // (No group access properties have been implemented at this time; use H5P_DEFAULT.)
     );
     H5Gcreate(
@@ -244,7 +244,7 @@ bool IOManager::initialize(int color) {
       "/Data",     // const char *name      IN: Absolute or relative name of the link to the new group
       H5P_DEFAULT, // hid_t lcpl_id IN: Link creation property list identifier
       H5P_DEFAULT, // hid_t gcpl_id IN: Group creation property list identifier
-      H5P_DEFAULT  // hid_t gapl_id IN: Group access property list identifier 
+      H5P_DEFAULT  // hid_t gapl_id IN: Group access property list identifier
                       // (No group access properties have been implemented at this time; use H5P_DEFAULT.)
     );
 
@@ -419,12 +419,12 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
       if (_out_group_v.size() <= id){
         _out_group_v.resize(id + 1);
       }
-      _out_group_v[id] = H5Gcreate(      
+      _out_group_v[id] = H5Gcreate(
         _out_file,           // hid_t loc_id  IN: File or group identifier
         group_loc.c_str(),   // const char *name      IN: Absolute or relative name of the link to the new group
         H5P_DEFAULT,         // hid_t lcpl_id IN: Link creation property list identifier
         H5P_DEFAULT,         // hid_t gcpl_id IN: Group creation property list identifier
-        H5P_DEFAULT          // hid_t gapl_id IN: Group access property list identifier 
+        H5P_DEFAULT          // hid_t gapl_id IN: Group access property list identifier
                                // (No group access properties have been implemented at this time; use H5P_DEFAULT.));
       );
       _product_ptr_v[id]->initialize(_out_group_v[id], _compression_override);
@@ -532,7 +532,7 @@ void IOManager::prepare_input() {
     for (size_t i_obj = 0; i_obj < num_objects[0]; ++i_obj) {
       char temp_name[128];
       // std::string obj_name =
-      H5Gget_objname_by_idx(data_group, i_obj, temp_name,128); 
+      H5Gget_objname_by_idx(data_group, i_obj, temp_name,128);
       // int real_size = data_group.getObjnameByIdx(i_obj, temp_name, 128);
       std::string obj_name(temp_name);
       processed_object.insert(obj_name);
@@ -600,7 +600,7 @@ void IOManager::prepare_input() {
   }
 
   // Make sure the first file is open:
-  if (_in_file_v.size() > 0) 
+  if (_in_file_v.size() > 0)
     open_new_input_file(_in_file_v[0]);
 
 
@@ -623,7 +623,7 @@ void IOManager::open_new_input_file(std::string filename){
   }
 
   hid_t group = H5Gopen(_in_open_file, "Events", H5P_DEFAULT);
-  
+
   hid_t dapl = H5Pcreate(H5P_DATASET_ACCESS);
   _active_in_event_id_dataset   = H5Dopen(group, "event_id", dapl);
   _active_in_event_id_dataspace = H5Dget_space(_active_in_event_id_dataset);
@@ -718,15 +718,15 @@ void IOManager::read_current_event_id(){
     // for this file
     events_offset[0] = _in_index - _current_offset;
 
-    H5Sselect_hyperslab(_active_in_event_id_dataspace, 
-      H5S_SELECT_SET, 
+    H5Sselect_hyperslab(_active_in_event_id_dataspace,
+      H5S_SELECT_SET,
       events_offset,    // start
       NULL ,            // stride
-      events_slab_dims, //count 
+      events_slab_dims, //count
       NULL              // block
       );
 
-    
+
     // Define memory space:
     hid_t events_memspace = H5Screate_simple(1, events_slab_dims, NULL);
 
@@ -873,11 +873,11 @@ void IOManager::append_event_id() {
   // Now, select as a hyperslab the last section of data for writing:
   dataspace = H5Dget_space(_out_event_id_ds);
 
-  H5Sselect_hyperslab(dataspace, 
-    H5S_SELECT_SET, 
+  H5Sselect_hyperslab(dataspace,
+    H5S_SELECT_SET,
     dims_current, // start
     NULL ,        // stride
-    dims_of_slab, // count 
+    dims_of_slab, // count
     NULL          // block
   );
 
@@ -887,11 +887,11 @@ void IOManager::append_event_id() {
 
   // Write the new data
   H5Dwrite(_out_event_id_ds,        // dataset_id,
-           _event_id_datatype,      // hit_t mem_type_id, 
-           memspace,                // hid_t mem_space_id, 
-           dataspace,               //hid_t file_space_id, 
-           xfer_plist_id,           //hid_t xfer_plist_id, 
-           &_event_id               // const void * buf 
+           _event_id_datatype,      // hit_t mem_type_id,
+           memspace,                // hid_t mem_space_id,
+           dataspace,               //hid_t file_space_id,
+           xfer_plist_id,           //hid_t xfer_plist_id,
+           &_event_id               // const void * buf
          );
 
 
@@ -1063,7 +1063,6 @@ int IOManager::close_all_objects(hid_t fid) {
   hid_t anobj;
   std::vector<hid_t> objs;
   char name[1024];
-  herr_t status;
 
   cnt = H5Fget_obj_count(fid, H5F_OBJ_ALL);
 
@@ -1078,12 +1077,12 @@ int IOManager::close_all_objects(hid_t fid) {
   for (int i = 0; i < howmany; i++ ) {
     anobj = objs[i];
     ot = H5Iget_type(anobj);
-    status = H5Iget_name(anobj, name, 1024);
+    H5Iget_name(anobj, name, 1024);
     LARCV_INFO() << "Closing: " << i << " type " << ot << ", name " << name << std::endl;;
     if (ot == H5I_GROUP) H5Gclose(anobj);
     if (ot == H5I_DATASET) H5Dclose(anobj);
   }
-         
+
   return howmany;
 }
 

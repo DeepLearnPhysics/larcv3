@@ -48,7 +48,7 @@ namespace larcv3{
   hid_t get_datatype<unsigned long long>() {
     hid_t _copied_type(H5T_NATIVE_ULLONG);
     return _copied_type;}
-  
+
   template<>
   hid_t get_datatype<size_t>()             {
     hid_t _copied_type(H5T_NATIVE_HSIZE);
@@ -68,12 +68,13 @@ namespace larcv3{
   hid_t get_datatype<Extents_t>()          {
 
     hid_t datatype;
-    herr_t status;
     datatype = H5Tcreate (H5T_COMPOUND, sizeof (Extents_t));
-    status = H5Tinsert (datatype, "first",
-                HOFFSET (Extents_t, first), larcv3::get_datatype<unsigned long long int>());
-    status = H5Tinsert (datatype, "N", 
-                HOFFSET (Extents_t, n),     larcv3::get_datatype<unsigned int>());
+    H5Tinsert (datatype, "first",
+               HOFFSET (Extents_t, first),
+               larcv3::get_datatype<unsigned long long int>());
+    H5Tinsert (datatype, "N",
+               HOFFSET (Extents_t, n),
+               larcv3::get_datatype<unsigned int>());
     return datatype;
 
   }
@@ -81,14 +82,16 @@ namespace larcv3{
   template<>
   hid_t get_datatype<IDExtents_t>()          {
     hid_t datatype;
-    herr_t status;
     datatype = H5Tcreate (H5T_COMPOUND, sizeof (IDExtents_t));
-    status = H5Tinsert (datatype, "first",
-                HOFFSET (IDExtents_t, first), larcv3::get_datatype<unsigned long long int>());
-    status = H5Tinsert (datatype, "N", 
-                HOFFSET (IDExtents_t, n),     larcv3::get_datatype<unsigned int>());
-    status = H5Tinsert (datatype, "ID",    
-                HOFFSET (IDExtents_t, id),    larcv3::get_datatype<unsigned int>());
+    H5Tinsert (datatype, "first",
+               HOFFSET (IDExtents_t, first),
+               larcv3::get_datatype<unsigned long long int>());
+    H5Tinsert (datatype, "N",
+               HOFFSET (IDExtents_t, n),
+               larcv3::get_datatype<unsigned int>());
+    H5Tinsert (datatype, "ID",
+               HOFFSET (IDExtents_t, id),
+               larcv3::get_datatype<unsigned int>());
     return datatype;
   }
 

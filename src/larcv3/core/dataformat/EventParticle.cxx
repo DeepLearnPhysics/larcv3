@@ -52,7 +52,7 @@ namespace larcv3{
       _part_v[i].id(i);
   }
 
-  void EventParticle::clear(){ 
+  void EventParticle::clear(){
     _part_v.clear();
   }
 ////////Serialization is hidden from SWIG:
@@ -90,7 +90,7 @@ namespace larcv3{
     if (_open_out_datasets.size() < N_DATASETS ){
        _open_out_datasets.resize(N_DATASETS);
        _open_out_dataspaces.resize(N_DATASETS);
-       
+
        _open_out_datasets[EXTENTS_DATASET]         = H5Dopen(group, "extents", H5P_DEFAULT);
        _open_out_dataspaces[EXTENTS_DATASET]       = H5Dget_space(_open_out_datasets[EXTENTS_DATASET]);
 
@@ -105,7 +105,7 @@ namespace larcv3{
   void EventParticle::serialize(hid_t group){
 
 
-    // Serialization is a multi step process.  
+    // Serialization is a multi step process.
     // - First, we update the data table.
     //  - fetch the dataset from the group
     //  - Note the total size of the dataset as the 'first' extents object
@@ -170,11 +170,11 @@ namespace larcv3{
     // Need to reopen the dataspace after extension:
     _open_out_dataspaces[PARTICLES_DATASET] = H5Dget_space(_open_out_datasets[PARTICLES_DATASET]);
 
-    H5Sselect_hyperslab(_open_out_dataspaces[PARTICLES_DATASET], 
-      H5S_SELECT_SET, 
+    H5Sselect_hyperslab(_open_out_dataspaces[PARTICLES_DATASET],
+      H5S_SELECT_SET,
       particles_dims_current, // start
       NULL ,                  // stride
-      particles_slab_dims,    // count 
+      particles_slab_dims,    // count
       NULL                    // block
       );
 
@@ -187,15 +187,15 @@ namespace larcv3{
     hid_t xfer_plist_id = H5Pcreate(H5P_DATASET_XFER);
 
     // Write the new data
-    // _open_out_datasets[PARTICLES_DATASET].write(&(_part_v[0]), _data_types[PARTICLES_DATASET], 
+    // _open_out_datasets[PARTICLES_DATASET].write(&(_part_v[0]), _data_types[PARTICLES_DATASET],
         // particles_memspace, _open_out_dataspaces[PARTICLES_DATASET]);
 
     H5Dwrite(_open_out_datasets[PARTICLES_DATASET],   // dataset_id,
-             _data_types[PARTICLES_DATASET],          // hit_t mem_type_id, 
-             particles_memspace,                      // hid_t mem_space_id, 
-             _open_out_dataspaces[PARTICLES_DATASET], //hid_t file_space_id, 
-             xfer_plist_id,                           //hid_t xfer_plist_id, 
-             &(_part_v[0])                            // const void * buf 
+             _data_types[PARTICLES_DATASET],          // hit_t mem_type_id,
+             particles_memspace,                      // hid_t mem_space_id,
+             _open_out_dataspaces[PARTICLES_DATASET], //hid_t file_space_id,
+             xfer_plist_id,                           //hid_t xfer_plist_id,
+             &(_part_v[0])                            // const void * buf
            );
 
     /////////////////////////////////////////////////////////
@@ -235,11 +235,11 @@ namespace larcv3{
     // Need to reopen the dataspace after extension:
     _open_out_dataspaces[EXTENTS_DATASET] = H5Dget_space(_open_out_datasets[EXTENTS_DATASET]);
 
-    H5Sselect_hyperslab(_open_out_dataspaces[EXTENTS_DATASET], 
-      H5S_SELECT_SET, 
+    H5Sselect_hyperslab(_open_out_dataspaces[EXTENTS_DATASET],
+      H5S_SELECT_SET,
       extents_dims_current, // start
       NULL ,  // stride
-      extents_slab_dims, //count 
+      extents_slab_dims, //count
       NULL // block
       );
 
@@ -249,15 +249,15 @@ namespace larcv3{
     hid_t extents_memspace = H5Screate_simple(1, extents_slab_dims, NULL);
 
     // Write the new data
-    // _open_out_datasets[PARTICLES_DATASET].write(&(_part_v[0]), _data_types[PARTICLES_DATASET], 
+    // _open_out_datasets[PARTICLES_DATASET].write(&(_part_v[0]), _data_types[PARTICLES_DATASET],
         // extents_memspace, _open_out_dataspaces[PARTICLES_DATASET]);
 
     H5Dwrite(_open_out_datasets[EXTENTS_DATASET], // dataset_id,
-             _data_types[EXTENTS_DATASET], // hit_t mem_type_id, 
-             extents_memspace, // hid_t mem_space_id, 
-             _open_out_dataspaces[EXTENTS_DATASET], //hid_t file_space_id, 
-             xfer_plist_id, //hid_t xfer_plist_id, 
-             &(next_extents) // const void * buf 
+             _data_types[EXTENTS_DATASET], // hit_t mem_type_id,
+             extents_memspace, // hid_t mem_space_id,
+             _open_out_dataspaces[EXTENTS_DATASET], //hid_t file_space_id,
+             xfer_plist_id, //hid_t xfer_plist_id,
+             &(next_extents) // const void * buf
              );
 
 
@@ -271,7 +271,7 @@ namespace larcv3{
 
   void EventParticle::initialize(hid_t group, uint compression){
 
-    // Initialize is ONLY meant to be called on an empty group.  So, verify this group 
+    // Initialize is ONLY meant to be called on an empty group.  So, verify this group
     // is empty:
 
     if (get_num_objects(group) != 0){
@@ -295,7 +295,7 @@ namespace larcv3{
     hsize_t extents_starting_dim[] = {0};
     hsize_t extents_maxsize_dim[]  = {H5S_UNLIMITED};
 
-    // Create a dataspace 
+    // Create a dataspace
     hid_t extents_dataspace = H5Screate_simple(1, extents_starting_dim, extents_maxsize_dim);
     // H5::DataSpace extents_dataspace(1, extents_starting_dim, extents_maxsize_dim);
 
@@ -303,6 +303,8 @@ namespace larcv3{
      * Modify dataset creation properties, i.e. enable chunking.
      */
     hid_t extents_cparms = H5Pcreate( H5P_DATASET_CREATE );
+
+
     // H5::DSetCreatPropList extents_cparms;
     hsize_t      extents_chunk_dims[1] ={PARTICLE_EXTENTS_CHUNK_SIZE};
     H5Pset_chunk(extents_cparms, 1, extents_chunk_dims );
@@ -311,6 +313,9 @@ namespace larcv3{
       // extents_cparms.setDeflate(compression);
     }
 
+    hid_t lcpl = H5Pcreate(H5P_LINK_CREATE);
+    hid_t dapl = H5Pcreate(H5P_DATASET_ACCESS);
+
 
     // Create the extents dataset:
     H5Dcreate(
@@ -318,11 +323,11 @@ namespace larcv3{
       "extents",                    // const char *name      IN: Dataset name
       _data_types[EXTENTS_DATASET], // hid_t dtype_id  IN: Datatype identifier
       extents_dataspace,            // hid_t space_id  IN: Dataspace identifier
-      NULL,                         // hid_t lcpl_id IN: Link creation property list
+      lcpl,                         // hid_t lcpl_id IN: Link creation property list
       extents_cparms,               // hid_t dcpl_id IN: Dataset creation property list
-      NULL                          // hid_t dapl_id IN: Dataset access property list
+      dapl                          // hid_t dapl_id IN: Dataset access property list
     );
-    // H5::DataSet extents_ds = group->createDataSet("extents", 
+    // H5::DataSet extents_ds = group->createDataSet("extents",
         // *_data_types[EXTENTS_DATASET], extents_dataspace, extents_cparms);
 
 
@@ -337,7 +342,7 @@ namespace larcv3{
     hsize_t particle_starting_dim[] = {0};
     hsize_t particle_maxsize_dim[]  = {H5S_UNLIMITED};
 
-    // Create a dataspace 
+    // Create a dataspace
     hid_t particle_dataspace = H5Screate_simple(1, particle_starting_dim, particle_maxsize_dim);
     /*
      * Modify dataset creation properties, i.e. enable chunking.
@@ -345,7 +350,7 @@ namespace larcv3{
 
     hid_t   particle_cparms = H5Pcreate( H5P_DATASET_CREATE );
     hsize_t particle_chunk_dims[1] ={PARTICLE_DATA_CHUNK_SIZE};
-    
+
     H5Pset_chunk(particle_cparms, 1, particle_chunk_dims );
     if (compression){
       H5Pset_deflate(particle_cparms, compression);
@@ -357,15 +362,15 @@ namespace larcv3{
       "particles",                    // const char *name      IN: Dataset name
       _data_types[PARTICLES_DATASET], // hid_t dtype_id  IN: Datatype identifier
       particle_dataspace,             // hid_t space_id  IN: Dataspace identifier
-      NULL,                           // hid_t lcpl_id IN: Link creation property list
+      lcpl,                           // hid_t lcpl_id IN: Link creation property list
       particle_cparms,                // hid_t dcpl_id IN: Dataset creation property list
-      NULL                            // hid_t dapl_id IN: Dataset access property list
+      dapl                            // hid_t dapl_id IN: Dataset access property list
       );
 
   }
 
   void EventParticle::deserialize(hid_t group, size_t entry, bool reopen_groups){
-    
+
     // Deserialization is, in some ways, easier than serialization.
     // We just have to read data from the file, and wrap it into an std::vector.
 
@@ -374,7 +379,7 @@ namespace larcv3{
     /////////////////////////////////////////////////////////
     // Get the extents information from extents dataset
     /////////////////////////////////////////////////////////
-    
+
     if (reopen_groups){
       _open_in_dataspaces.clear();
       _open_in_datasets.clear();
@@ -413,12 +418,12 @@ namespace larcv3{
     /////////////////////////////////////////////////////////
 
     // Now, select as a hyperslab the last section of data for writing:
-    
-    H5Sselect_hyperslab(_open_in_dataspaces[EXTENTS_DATASET], 
-      H5S_SELECT_SET, 
+
+    H5Sselect_hyperslab(_open_in_dataspaces[EXTENTS_DATASET],
+      H5S_SELECT_SET,
       extents_offset, // start
       NULL ,  // stride
-      extents_slab_dims, //count 
+      extents_slab_dims, //count
       NULL // block
       );
 
@@ -429,7 +434,7 @@ namespace larcv3{
     // Write the new data
     // _open_in_datasets[EXTENTS_DATASET].read(&(input_extents), *_data_types[EXTENTS_DATASET],
       // extents_memspace, _open_in_dataspaces[EXTENTS_DATASET]);
-    
+
     // Transfer property list, default
     hid_t xfer_plist_id = H5Pcreate(H5P_DATASET_XFER);
 
@@ -446,7 +451,7 @@ namespace larcv3{
     //           << input_extents.first + input_extents.n << std::endl;
 
 
-    // Next, open the relevant sections of the data 
+    // Next, open the relevant sections of the data
 
     // If there are no particles, dont read anything:
     if ( input_extents.n == 0){
@@ -469,11 +474,11 @@ namespace larcv3{
     // extents_dataspace = extents_dataset.getSpace();
     // _open_in_dataspaces[PARTICLES_DATASET].selectHyperslab(H5S_SELECT_SET, particles_slab_dims, particles_offset);
 
-    H5Sselect_hyperslab(_open_in_dataspaces[PARTICLES_DATASET], 
-      H5S_SELECT_SET, 
+    H5Sselect_hyperslab(_open_in_dataspaces[PARTICLES_DATASET],
+      H5S_SELECT_SET,
       particles_offset,    // start
       NULL ,               // stride
-      particles_slab_dims, //count 
+      particles_slab_dims, //count
       NULL                 // block
       );
 
@@ -488,7 +493,7 @@ namespace larcv3{
     // _open_in_datasets[PARTICLES_DATASET].read(&(_part_v[0]), *_data_types[PARTICLES_DATASET],
     //     particles_memspace, _open_in_dataspaces[PARTICLES_DATASET]);
 
-    
+
     H5Dread(
       _open_in_datasets[PARTICLES_DATASET],    // hid_t dataset_id  IN: Identifier of the dataset read from.
       _data_types[PARTICLES_DATASET],          // hid_t mem_type_id IN: Identifier of the memory datatype.

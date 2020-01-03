@@ -71,21 +71,21 @@ void BatchFillerSparseTensor2D::assert_dimension(
 }
 
 bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
-  
+
   /*
 
   Filling a dense tensor of dimensions B, H, W, C produces, in the end,
   a 4D tensor.  Here, we want to produce a list of points in sparse format.
   SO, this will be a 3 dimensional tensor of dimensions B, N_max, dims_len
   Where dims_len is the number of values that represent a point.
-  In this 2D example, dims_len == 3 (H, W, Value) which are extracted from 
+  In this 2D example, dims_len == 3 (H, W, Value) which are extracted from
   the original image.
 
   In principle this can be bigger or smaller for different sized inputs:
   dims_len = 4 (H, W, D, Value) in 3D, for example
 
   The N_max value is a limit on how much memory is allocated for each event.
-  The empty values are all set to 0.0, which are easily ignored in the 
+  The empty values are all set to 0.0, which are easily ignored in the
   graph networks since the pooling layers are typically max reductions
 
   By convention, the Value component is always last in the network
@@ -196,8 +196,10 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
 
 
     if (_include_values){
-      std::vector<float>  values  = voxel_set.values(); 
+      std::vector<float>  values  = voxel_set.values();
+#ifdef LARCV_OPENMP
       #pragma omp parallel private(row, col, index) shared(_entry_data, row_mult, row_add, col_mult, col_add)
+#endif
       for (size_t i_voxel = 0; i_voxel < max_voxel; i_voxel ++) {
       // for (auto const& voxel : voxel_set.as_vector()) {
         row = coordinates[i_voxel*2];
@@ -214,7 +216,9 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
       }
     }
     else{
+#ifdef LARCV_OPENMP
       #pragma omp parallel private(row, col, index) shared(_entry_data, row_mult, row_add, col_mult, col_add)
+#endif
       for (size_t i_voxel = 0; i_voxel < max_voxel; i_voxel ++) {
       // for (auto const& voxel : voxel_set.as_vector()) {
         row = coordinates[i_voxel*2];
@@ -228,9 +232,9 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
         _entry_data.at(index + 1) = col;
       }
     }
-   
 
-    
+
+
 
   }
 
