@@ -1,52 +1,37 @@
 language: python
-
 os:
-  - linux
-#  - osx
-
+- linux
 compiler:
-  - clang
-  - gcc
-
+- clang
+- gcc
 python:
-  - 2.7
-  - 3.6
-
-#virtualenv:
-#  system_site_packages: true
-
+- 2.7
+- 3.6
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python swig cmake hdf5 openmpi; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install cmake libhdf5-serial-dev python-dev swig3.0 openmpi-bin libopenmpi-dev; fi
-
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python swig cmake hdf5 openmpi;
+  fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install cmake libhdf5-serial-dev
+  python-dev swig3.0 openmpi-bin libopenmpi-dev; fi
 install:
-  - pip install scikit-build
-  - pip install mpi4py
-  - pip install -e .
-  - echo $PYTHONPATH
-  - echo $LD_LIBRARY_PATH
-  # - python setup.py install
-
+- pip install scikit-build
+- pip install mpi4py
+- pip install -e .
+- echo $PYTHONPATH
+- echo $LD_LIBRARY_PATH
 branches:
   only:
-    - develop
-# services:
-# - docker
-# install:
-# - docker build -t larcv2_image -f .Dockerfile .
-# script:
-# - docker run --name test_build larcv2_image python -c "import larcv"
-# notifications:
-# Emails are sent to the committer's git-configured email address by default,
-# but only if they have access to the repository.  To enable Travis on your
-# public fork of Caffe, just go to travis-ci.org and flip the switch on for
-# your Caffe fork.  To configure your git email address, use:
-#     git config --global user.email me@example.com
-  # email:
-    # on_success: always
+  - develop
+script:
+- pytest -m "not distributed_test" tests/
+- mpiexec -n 2 pytest -m distributed_test tests/
 
-script: 
-  - pytest -m "not distributed_test" tests/
-  - mpiexec -n 2 pytest -m distributed_test tests/
+
+deploy:
+  provider: pypi
+  user: __token__
+  password:
+    secure: L9uC3gvtP8diHtW6ufiuO5+zWzzOIcKcBu28NI5h2ERxBDBt0tSpFNYm568nV0I0+zNW69k+YHtco1fIRWVli56//wbwVX5vlhhyfa29eSfNrPTliVEA5JPMt/GhEjuzfylBt4HYoFAXwy8G6KVRyqptq2XUHD5DE08wuRyLbXMqOp254PRhfN+P3Yragi4CyV8H3lvG2eec/U93SOmJcSmHvYCe7AqcGl7uIuVLes+GI2APJkMv8katwHTawcJ9cssxMWLD9QUKhAnwu/JjKYo53IPrgy0xszNLE4ahLAsHKCyJAECvdA7tRNKHuXy/7vA5fA8aTrG3b1ylpw87LzP2zOfBnFa5QUhhyF011Aixgi7ivIb6uZ8X8dJ02c4NZwlRrIdzb4olCyo8dSZcLudnw+PgtQt01dLFcIVROULUU5mgcm3EMdsbUKFIHgn65GF6X3nau8PKDk8tEGTzKsbOb+ipi00WfP7rardCAoif9GpO3Nl1jCZEkFC7bmWPjSkSqZEEnF7u4efmk20EX0rQW2+YLVqGL23CnT/nVgl2RReiCzy/PoF3AIi4emQzWSJSFxnF69TBOrzJ3mjLwBIFr5nvr/c9PpDp5uNFKwxRs90hXma9M5GppngkwZF8t6Ge/lNmr/lFE0A+OWrynAu1VGaFVBeLAyyMU/tupxA=
+  on:
+    tags: true
