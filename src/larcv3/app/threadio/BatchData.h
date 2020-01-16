@@ -44,6 +44,7 @@ namespace larcv3 {
     PyObject * pydata() const;
 
     inline const std::vector<int>& dim() const { return _dim; }
+    inline const std::vector<int>& dense_dim() const { return _dense_dim; }
 
     // Data size is number of elements regardless of the size of each element
     size_t data_size(bool calculate=false) const;
@@ -53,6 +54,7 @@ namespace larcv3 {
     size_t entry_data_size() const;
 
     void set_dim(const std::vector<int>& dim);
+    void set_dense_dim(const std::vector<int>& dense_dim);
     void set_entry_data(const std::vector<T>& entry_data);
 
     void reset();
@@ -65,8 +67,14 @@ namespace larcv3 {
     { return _state; }
 
   private:
+    // This holds the data for this instance, and is changed often
     std::vector<T>   _data;
+    // This holds the dimensions of the container for readout data (including sparse),
+    // and is static. _data is flattened and this provides reshaping information
     std::vector<int> _dim;
+    // This holds the dense shape of this data, in the case that the data is sparse
+    // In the case that the data is dense, this matches _dim.
+    std::vector<int> _dense_dim;
     size_t _current_size;
     BatchDataState_t _state;
   };

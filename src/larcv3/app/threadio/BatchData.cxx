@@ -81,6 +81,37 @@ namespace larcv3 {
   }
 
   template<class T>
+  void BatchData<T>::set_dense_dim(const std::vector<int>& dense_dim)
+  {
+    if (dense_dim.empty()) {
+      LARCV_SERROR() << "Dimension input has 0 length..." << std::endl;
+      return;
+    }
+    if (_dense_dim.size()) {
+
+      if (_state != BatchDataState_t::kBatchStateEmpty &&
+          _state != BatchDataState_t::kBatchStateReleased) {
+        bool allowed = (_dense_dim.size() == dense_dense_dim.size());
+        if (allowed)
+          for (size_t i = 0; i < _dense_dim.size(); ++i) {allowed = allowed && (_dense_dim[i] == dense_dim[i]);}
+
+        if (allowed) return;
+
+        LARCV_SCRITICAL() << "Dimension cannot be re-set!" << std::endl;
+        throw larbys();
+      }
+    }
+    std::stringstream ss;
+    ss << "Resetting the batch size: (" << dim.front();
+    for (size_t i = 1; i < dim.size(); ++i) ss << "," << dim[i];
+    ss << ")" << std::endl;
+    LARCV_SINFO() << ss.str();
+    _dim = dim;
+    reset_data();
+  }
+
+
+  template<class T>
   void BatchData<T>::set_entry_data(const std::vector<T>& entry_data)
   {
     if (_state != BatchDataState_t::kBatchStateFilling &&
