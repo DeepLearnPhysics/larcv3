@@ -1,11 +1,22 @@
 from skbuild import setup  # This line replaces 'from setuptools import setup'
 import argparse
 
-from os import path
 import io
-this_directory = path.abspath(path.dirname(__file__))
-with io.open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+import os
+this_directory = os.path.abspath(os.path.dirname(__file__))
+with io.open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
+
+# Several environment variables control special build features:
+if 'LARCV_WITH_MPI' in os.environ and os.environ['LARCV_WITH_MPI']:
+    mpi_value='ON'
+else:
+    mpi_value='OFF'
+
+if 'LARCV_WITH_OPENMP' in os.environ and os.environ['LARCV_WITH_OPENMP']:
+    openmp_value='ON'
+else:
+    openmp_value='OFF'
 
 
 
@@ -15,9 +26,11 @@ setup(
     cmake_source_dir='src/',
     cmake_args=[
         '-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.9',
-        '-DCMAKE_NO_SWIG=False',
-        '-DMPI:BOOL=OFF',
-        '-DOPENMP:BOOL=OFF',
+        '-DCMAKE_PYTHON_BINDINGS=True',
+        # '-DMPI_CXX_COMPILER={}'.format(mpicxx),
+        # '-DMPI_C_COMPILER={}'.format(mpicc),
+        '-DMPI:BOOL={}'.format(mpi_value),
+        '-DOPENMP:BOOL={}'.format(openmp_value),
     ],
     include_package_data=True,
     author=['Corey Adams', 'Kazuhiro Terao', 'Taritree Wongjirad', 'Marco del Tutto'],

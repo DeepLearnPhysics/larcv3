@@ -1,5 +1,5 @@
 
-from . import larcv
+from . pylarcv import *
 
 import os
 

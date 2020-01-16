@@ -57,6 +57,9 @@ namespace larcv3 {
     
   };
 }
+
+void init_larcv_base(pybind11::module m);
+
 #endif
 
 /** @} */ // end of doxygen group

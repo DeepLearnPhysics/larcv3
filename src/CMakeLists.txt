@@ -8,8 +8,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3 -g")
 
 
 if(MPI)
-    # set(MPI_ASSUME_NO_BUILTIN_MPI True)
-    find_package(MPI COMPONENTS C CXX)
+    message (STATUS "MPI_CXX_COMPILER ${MPI_CXX_COMPILER}")
+    message (STATUS "MPI_CXX_COMPILER ${MPI_C_COMPILER}")
+    set(MPI_ASSUME_NO_BUILTIN_MPI True)
+    find_package(MPI REQUIRED COMPONENTS C)
     include_directories(MPI_C_INCLUDE_DIRECTORIES)
     include_directories(MPI_CXX_INCLUDE_DIRECTORIES)
     add_definitions(-DLARCV_MPI)
@@ -25,7 +27,6 @@ if(MPI)
     MESSAGE (STATUS "MPI_C_COMPILER ${MPI_C_COMPILER}")
 
 endif()
-
 
 
 # set(CMAKE_SKIP_RPATH TRUE)
@@ -105,8 +106,11 @@ include_directories(${PYTHON_NUMPY_INCLUDE_DIR})
     
 
 # endmacro(generate_python_bindings)
-
-
+if(CMAKE_PYTHON_BINDINGS)
+  add_subdirectory(pybind11)
+else()
+  add_definitions(-DLARCV_NO_PYBIND)
+endif(CMAKE_PYTHON_BINDINGS)
 
 add_subdirectory(larcv3)
 

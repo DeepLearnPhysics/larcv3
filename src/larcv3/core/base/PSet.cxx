@@ -405,4 +405,19 @@ namespace larcv3 {
 
 }
 
+void init_PSet(pybind11::module m){
+      pybind11::class_<larcv3::PSet>(m, "PSet")
+        .def(pybind11::init<const std::string &, const std::string &>(),
+            pybind11::arg("name")="",
+            pybind11::arg("data")="")
+        // .def("default_level", (larcv3::msg::Level_t (larcv3::logger::*)()) &larcv3::logger::default_level)
+        // .def("default_level", (void (larcv3::logger::*)(larcv3::msg::Level_t)) &larcv3::logger::default_level)
+        ;
+
+        ///TODO Finish the implementation of the functions here
+}
+
+
+
+
 #endif

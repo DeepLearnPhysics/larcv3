@@ -26,6 +26,8 @@
 #include <limits>
 #include <climits>
 
+#include <pybind11/pybind11.h>
+
 /**
    \namespace larcv3
    C++ namespace for developping LArTPC software interface to computer vision software (LArCV3)
