@@ -4,20 +4,22 @@ import numpy as np
 
 class batch_pydata(object):
 
-   _storage_id = -1
-   _dtype      = None
-   _npy_data   = None
-   _dim_data   = None
-   _time_copy  = 0
+   _storage_id   = -1
+   _dtype        = None
+   _npy_data     = None
+   _dim_data     = None
+   _dim_dense    = None
+   _time_copy    = 0
    _time_reshape = 0
-   _make_copy  = False
+   _make_copy    = False
 
    def __init__(self,dtype):
-      self._storage_id = -1
-      self._dtype = dtype
-      self._npy_data = None
-      self._dim_data = None
-      self._time_copy = None
+      self._storage_id   = -1
+      self._dtype        = dtype
+      self._npy_data     = None
+      self._dim_data     = None
+      self._dim_dense    = None
+      self._time_copy    = None
       self._time_reshape = None
       
    def batch_data_size(self):
@@ -33,7 +35,10 @@ class batch_pydata(object):
 
    def set_data(self,storage_id,larcv_batchdata):
       self._storage_id = storage_id
-      dim = larcv_batchdata.dim()
+      dim   = larcv_batchdata.dim()
+      dense = larcv_batchdata.dense_dim()
+
+
 
       # set dimension
       if self._dim_data is None:
@@ -48,6 +53,19 @@ class batch_pydata(object):
                sys.stderr.write('%d-th dimension changed (%d => %d)\n' % (i,self._dim_data[i],dim[i]))
                raise ValueError
 
+      # Set dense dimension:
+      if self._dim_dense is None:
+         self._dim_dense = np.array([dense[i] for i in range(len(dense))]).astype(np.int32)
+      else:
+         if not len(self._dim_dense) == len(dense):
+            sys.stderr.write('Dimension array length changed (%d => %d)\n' % (len(self._dim_dense),len(dense)))
+            raise TypeError
+         for i in range(len(self._dim_dense)):
+            if not self._dim_dense[i] == dense[i]:
+               sys.stderr.write('%d-th dimension changed (%d => %d)\n' % (i,self._dim_dense[i],dense[i]))
+               raise ValueError
+
+               
       # copy data into numpy array
       ctime = time.time()
       if self._make_copy:
