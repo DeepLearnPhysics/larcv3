@@ -70,3 +70,162 @@ class batch_pydata(object):
       self.time_data_conv = time.time() - ctime
 
       return
+
+   def as_dense():
+
+      '''
+      This format converts the larcv sparse format to
+      the tuple format required for sparseconvnet
+      '''
+
+      # If the data is from BatchFillerSparseTensor2D,
+      # it will have the shape (batch_size, n_planes, n_elements_per_plane, 2 or 3)
+      # where the 2 or 3 is if values are included or not.
+
+      # If the data is from BatchFillerSparseTensor3D, it will have the
+      # shape (batchsize, n_elements, 3 or 4) where the 3 or 4 
+      # is if values are included or not
+
+      if len(self._dim_data) == 4:
+         # This is 2D
+         return None
+      elif len(self._dim_data) == 3:
+         # This is 3D
+         return None
+
+   def as_torch_geometric():
+
+      '''
+      This format converts the larcv sparse format to
+      the tuple format required for sparseconvnet
+      '''
+
+      # If the data is from BatchFillerSparseTensor2D,
+      # it will have the shape (batch_size, n_planes, n_elements_per_plane, 2 or 3)
+      # where the 2 or 3 is if values are included or not.
+
+      # If the data is from BatchFillerSparseTensor3D, it will have the
+      # shape (batchsize, n_elements, 3 or 4) where the 3 or 4 
+      # is if values are included or not
+
+      if len(self._dim_data) == 4:
+         # This is 2D
+         return None
+      elif len(self._dim_data) == 3:
+         # This is 3D
+         return None
+
+   def as_scnsparse():
+
+      '''
+      This format converts the larcv sparse format to
+      the tuple format required for sparseconvnet
+      '''
+
+      # If the data is from BatchFillerSparseTensor2D,
+      # it will have the shape (batch_size, n_planes, n_elements_per_plane, 2 or 3)
+      # where the 2 or 3 is if values are included or not.
+
+      # If the data is from BatchFillerSparseTensor3D, it will have the
+      # shape (batchsize, n_elements, 3 or 4) where the 3 or 4 
+      # is if values are included or not
+
+      if len(self._dim_data) == 4:
+         # This is 2D
+         return None
+      elif len(self._dim_data) == 3:
+         # This is 3D
+         return None
+
+#       # First, we can split off the features (which is the pixel value)
+#       # and the indexes (which is everythin else)
+#       n_dims = input_array.shape[-1]
+
+#       split_tensors = numpy.split(input_array, n_dims, axis=-1)
+
+
+#       # To map out the non_zero locations now is easy:
+#       non_zero_inds = numpy.where(split_tensors[-1] != -999)
+
+#       # The batch dimension is just the first piece of the non-zero indexes:
+#       batch_size  = input_array.shape[0]
+#       batch_index = non_zero_inds[0]
+
+#       # Getting the voxel values (features) is also straightforward:
+#       features = numpy.expand_dims(split_tensors[-1][non_zero_inds],axis=-1)
+
+#       # Lastly, we need to stack up the coordinates, which we do here:
+#       dimension_list = []
+#       for i in range(len(split_tensors) - 1):
+#         dimension_list.append(split_tensors[i][non_zero_inds])
+
+#       # Tack on the batch index to this list for stacking:
+#       dimension_list.append(batch_index)
+
+#       # And stack this into one numpy array:
+#       dimension = numpy.stack(dimension_list, axis=-1)
+
+#       output_array = (dimension, features, batch_size,)
+#       return output_array
+
+
+
+
+# def larcvsparse_to_scnsparse_3d(input_array):
+
+
+
+# def larcvsparse_to_scnsparse_2d(input_array):
+#     # This format converts the larcv sparse format to
+#     # the tuple format required for sparseconvnet
+
+#     # First, we can split off the features (which is the pixel value)
+#     # and the indexes (which is everythin else)
+
+#     # To handle the multiplane networks, we have to split this into
+#     # n_planes and pass it out as a list
+
+#     n_planes = input_array.shape[1]
+#     batch_size = input_array.shape[0]
+
+
+#     raw_planes = numpy.split(input_array,n_planes, axis=1)
+
+#     output_list = []
+#     output_features = []
+#     output_dimension = []
+
+#     for i, plane in enumerate(raw_planes):
+#         # First, squeeze off the plane dimension from this image:
+#         plane = numpy.squeeze(plane, axis=1)
+
+#         # Next, figure out the x, y, value coordinates:
+#         x,y,features = numpy.split(plane, 3, axis=-1)
+
+
+#         non_zero_locs = numpy.where(features != -999)
+#         # Pull together the different dimensions:
+#         x = x[non_zero_locs]
+#         y = y[non_zero_locs]
+#         p = numpy.full(x.shape, fill_value=i)
+#         features = features[non_zero_locs]
+#         features = numpy.expand_dims(features,axis=-1)
+
+#         batch = non_zero_locs[0]
+
+#         # dimension = numpy.concatenate([x,y,batch], axis=0)
+#         # dimension = numpy.stack([x,y,batch], axis=-1)
+#         dimension = numpy.stack([p,x,y,batch], axis=-1)
+
+#         output_features.append(features)
+#         output_dimension.append(dimension)
+
+#     output_features = numpy.concatenate(output_features)
+#     output_dimension = numpy.concatenate(output_dimension)
+
+#     output_list = [output_dimension, output_features, batch_size]
+
+#     return output_list
+
+
+
