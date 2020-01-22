@@ -15,14 +15,16 @@
 #endif
 
 namespace larcv3 {
+#ifdef LARCV_OPENMP
 int omp_thread_count() {
     int n = 0;
     #pragma omp parallel reduction(+:n)
     n += 1;
     return n;
 }
+#endif
 
-  
+
   QueueProcessor::QueueProcessor(std::string name)
     : larcv_base(name)
     , _processing(false)
@@ -98,7 +100,7 @@ int omp_thread_count() {
 
 
     _next_index_v.clear();
-    
+
     // others
     _configured = false;
     _batch_global_counter = 0;
@@ -187,7 +189,7 @@ int omp_thread_count() {
   {
     reset();
 
-    
+
     // std::cout << "\033[93m setting verbosity \033[00m" << orig_cfg.get<unsigned short>("Verbosity", 2) << std::endl;
     set_verbosity( (msg::Level_t)(orig_cfg.get<unsigned short>("Verbosity", 2)) );
 
@@ -232,7 +234,7 @@ int omp_thread_count() {
 
     for (auto const& pset_key : orig_cfg.pset_keys()) {
       if (pset_key == "IOManager") {
-        auto const& orig_io_cfg = orig_cfg.get_pset(pset_key);
+        // auto const& orig_io_cfg = orig_cfg.get_pset(pset_key);
         LARCV_NORMAL() << "IOManager configuration will be ignored..." << std::endl;
       }
       else if (pset_key == "ProcessList") {
@@ -297,7 +299,7 @@ int omp_thread_count() {
     _configured = true;
   }
 
-  
+
   bool QueueProcessor::batch_process() {
 
     LARCV_DEBUG() << " start" << std::endl;
@@ -334,9 +336,10 @@ int omp_thread_count() {
 #ifdef LARCV_OPENMP
     std::cout << "Number of threads: " << omp_thread_count() << std::endl;
 #endif
-    size_t i(0), i_entry(0);
+    // size_t i(0),
+    size_t i_entry(0);
 
-    // #pragma omp parallel 
+    // #pragma omp parallel
     // {
     //   #pragma omp single
     //   {
@@ -346,7 +349,8 @@ int omp_thread_count() {
             auto & entry = _next_index_v[i_entry];
             LARCV_INFO() << "Processing entry: " << entry << std::endl;
 
-            bool good_status = _driver.process_entry(entry, true);
+            // bool good_status =
+            _driver.process_entry(entry, true);
             LARCV_INFO() << "Finished processing event id: " << _driver.event_id().event_key() << std::endl;
             _next_batch_entries_v.at(i_entry) = entry;
             _next_batch_events_v.at(i_entry) = _driver.event_id();
@@ -354,7 +358,7 @@ int omp_thread_count() {
         }
     //   }
     // }
-    
+
 
     // auto duration = std::chrono::duration_cast< std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
 
@@ -363,7 +367,7 @@ int omp_thread_count() {
     // LARCV_DEBUG() << " end" << std::endl;
 
     end_batch();
-    
+
     _processing = false;
     return true;
 
@@ -408,7 +412,7 @@ int omp_thread_count() {
       if (batch_state != BatchDataState_t::kBatchStateEmpty &&
           batch_state != BatchDataState_t::kBatchStateUnknown &&
           batch_state != BatchDataState_t::kBatchStateFilled ) {
-        LARCV_CRITICAL() << " cannot fill storage " 
+        LARCV_CRITICAL() << " cannot fill storage "
                          << " because its state (" << (int)batch_state
                          << ") is neither kBatchStateUnknown nor kBatchStateEmpty nor kBatchStateFilled!" << std::endl;
         throw larbys();

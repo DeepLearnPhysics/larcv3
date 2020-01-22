@@ -86,15 +86,14 @@ namespace larcv3 {
     float  _value; ///< Pixel Value
 
 #ifndef SWIG
-  public: 
+  public:
     static hid_t get_datatype() {
 
       hid_t datatype;
-      herr_t status;
       datatype = H5Tcreate (H5T_COMPOUND, sizeof (Voxel));
-      status = H5Tinsert (datatype, "id",
+      H5Tinsert (datatype, "id",
                   HOFFSET (Voxel, _id), larcv3::get_datatype<unsigned long>());
-      status = H5Tinsert (datatype, "value", 
+      H5Tinsert (datatype, "value", 
                   HOFFSET (Voxel, _value), larcv3::get_datatype<float>());
       return datatype;
     }
@@ -182,7 +181,7 @@ namespace larcv3 {
 
     //
     // Write-access
-    //    
+    //
     /// Clear everything
     inline virtual void clear_data() { _voxel_v.clear(); }
     /// Reserve
@@ -201,7 +200,7 @@ namespace larcv3 {
     /// Emplace a new voxel. Same logic as VoxelSet::add but consumes removable reference.
     void emplace(Voxel&& vox, const bool add);
     /// Emplace a new voxel from id & value
-    inline void emplace(VoxelID_t id, float value, const bool add) 
+    inline void emplace(VoxelID_t id, float value, const bool add)
     { emplace(Voxel(id,value),add); }
     /// InstanceID_t setter
     inline void id(const InstanceID_t id) { _id = id; }
@@ -271,7 +270,7 @@ namespace larcv3 {
     /// Resize voxel array
     inline void resize(const size_t num)
     { _voxel_vv.resize(num); for(size_t i=0; i<num; ++i) _voxel_vv[i].id(i); }
-    /// Access non-const reference of a specific VoxelSet 
+    /// Access non-const reference of a specific VoxelSet
     larcv3::VoxelSet& writeable_voxel_set(const InstanceID_t id);
     /// Move an arrray of VoxelSet. Each element's InstanceID_t gets updated
     void emplace(std::vector<larcv3::VoxelSet>&& voxel_vv);
@@ -320,11 +319,11 @@ namespace larcv3 {
     /// Emplace the whole voxel set w/ meta
     inline void emplace(VoxelSet&& vs, const ImageMeta<dimension>& meta)
     {*((VoxelSet*)this) = std::move(vs); this->meta(meta);}
-    
+
     /// Set the whole voxel set w/ meta
     inline void set(const VoxelSet& vs, const ImageMeta<dimension>& meta)
-    {*((VoxelSet*)this) = vs; this->meta(meta);} 
-    
+    {*((VoxelSet*)this) = vs; this->meta(meta);}
+
     /// Clear everything
     inline void clear_data() { VoxelSet::clear_data(); _meta = ImageMeta<dimension>(); }
 
@@ -333,7 +332,7 @@ namespace larcv3 {
 
   private:
     larcv3::ImageMeta<dimension> _meta;
-    
+
   };
 
   /**
@@ -346,7 +345,7 @@ namespace larcv3 {
     /// Default ctor
     SparseCluster() {}
     SparseCluster(VoxelSetArray&& vsa, ImageMeta<dimension> meta);
-    
+
     /// Default dtor
     virtual ~SparseCluster() {}
 
@@ -372,7 +371,7 @@ namespace larcv3 {
 
   private:
     larcv3::ImageMeta<dimension> _meta;
-  };  
+  };
 
 
 // Define typedefs to specify sparse objects:
@@ -385,4 +384,3 @@ typedef SparseCluster<3> SparseCluster3D;
 
 #endif
 /** @} */ // end of doxygen group
-

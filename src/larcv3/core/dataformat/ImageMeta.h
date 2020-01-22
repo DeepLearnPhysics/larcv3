@@ -37,7 +37,7 @@ class ImageMeta {
   /// Constructor with arguments: ndims, dims, image_sizes, unit.
   ImageMeta(size_t projection_id,
             const std::vector<size_t>& number_of_voxels,
-            const std::vector<double>& image_sizes, 
+            const std::vector<double>& image_sizes,
             const std::vector<double>& origin = std::vector<double>(),
             DistanceUnit_t unit = kUnitUnknown);
 
@@ -149,6 +149,10 @@ class ImageMeta {
 
 
   // These functions are mostly for historical compatibility and consistence:
+  // inline size_t std::enable_if<dimension == 2>::type cols ()
+  // {
+  // }
+
   inline size_t cols() const {return _number_of_voxels[0];}
   inline size_t rows() const {return _number_of_voxels[1];}
 
@@ -171,10 +175,9 @@ class ImageMeta {
 
 
 #ifndef SWIG
-  public: 
+  public:
     static hid_t get_datatype() {
       hid_t datatype;
-      herr_t status;
       datatype = H5Tcreate (H5T_COMPOUND, sizeof (ImageMeta));
 
       hsize_t array_dimensions[1];
@@ -184,16 +187,21 @@ class ImageMeta {
       hid_t double_type = H5Tarray_create(larcv3::get_datatype<double>(), 1, array_dimensions);
       hid_t size_t_type = H5Tarray_create(larcv3::get_datatype<size_t>(), 1, array_dimensions);
 
-      status = H5Tinsert (datatype, "valid",
-                  HOFFSET (ImageMeta, _valid),            larcv3::get_datatype<bool>());
-      status = H5Tinsert (datatype, "projection_id",
-                  HOFFSET (ImageMeta, _projection_id),    larcv3::get_datatype<size_t>());
-      status = H5Tinsert (datatype, "image_sizes",
-                  HOFFSET (ImageMeta, _image_sizes),      double_type);
-      status = H5Tinsert (datatype, "number_of_voxels",
-                  HOFFSET (ImageMeta, _number_of_voxels), size_t_type);
-      status = H5Tinsert (datatype, "origin", 
-                  HOFFSET (ImageMeta, _origin),           double_type);
+      H5Tinsert (datatype, "valid",
+                 HOFFSET (ImageMeta, _valid),
+                 larcv3::get_datatype<bool>());
+      H5Tinsert (datatype, "projection_id",
+                 HOFFSET (ImageMeta, _projection_id),
+                 larcv3::get_datatype<size_t>());
+      H5Tinsert (datatype, "image_sizes",
+                 HOFFSET (ImageMeta, _image_sizes),
+                 double_type);
+      H5Tinsert (datatype, "number_of_voxels",
+                 HOFFSET (ImageMeta, _number_of_voxels),
+                 size_t_type);
+      H5Tinsert (datatype, "origin",
+                 HOFFSET (ImageMeta, _origin),
+                 double_type);
       return datatype;
     }
 #endif
