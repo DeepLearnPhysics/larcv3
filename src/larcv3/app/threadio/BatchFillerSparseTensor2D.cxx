@@ -121,17 +121,18 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
   if (!_include_values){
     point_dim = 2;
   }
-  // one time operation: get storage dimension
-  if (batch_data().dim().empty()) {
-    std::vector<int> dim;
-    dim.resize(4);
-    dim.at(0) = batch_size();
-    dim.at(1) = _num_channels;
-    dim.at(2) = _max_voxels;
-    dim.at(3) = point_dim;
-    this->set_dim(dim);
-  } else
-    this->assert_dimension(voxel_data);
+
+  // one time operation: get image dimension
+  // if (batch_data().dim().empty()) {
+  std::vector<int> dim;
+  dim.resize(4);
+  dim.at(0) = batch_size();
+  dim.at(1) = _num_channels;
+  dim.at(2) = _max_voxels;
+  dim.at(3) = point_dim;
+  this->set_dim(dim);
+  // } else
+  //   this->assert_dimension(voxel_data);
 
 
   // one time operation: get image dimension

@@ -82,7 +82,7 @@ bool BatchFillerTensor2D::process(IOManager& mgr) {
 
 
   // one time operation: get image dimension
-  if (batch_data().dim().empty()) {
+  // if (batch_data().dim().empty()) {
     auto const& voxel_meta = voxel_data.as_vector().front().meta();
     _rows = voxel_meta.rows();
     _cols = voxel_meta.cols();
@@ -93,8 +93,8 @@ bool BatchFillerTensor2D::process(IOManager& mgr) {
     dim[2] = _cols;
     dim[3] = _num_channels;
     this->set_dim(dim);
-  } else
-    this->assert_dimension(voxel_data);
+  // } else
+  //   this->assert_dimension(voxel_data);
 
 
 

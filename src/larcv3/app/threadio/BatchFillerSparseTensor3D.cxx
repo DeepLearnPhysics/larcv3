@@ -118,7 +118,7 @@ bool BatchFillerSparseTensor3D::process(IOManager& mgr) {
     point_dim = 3;
   }
   // one time operation: get image dimension
-  if (batch_data().dim().empty()) {
+  // if (batch_data().dim().empty()) {
     // auto const& voxel_meta = voxel_data.meta();
     std::vector<int> dim;
     dim.resize(3);
@@ -126,7 +126,7 @@ bool BatchFillerSparseTensor3D::process(IOManager& mgr) {
     dim.at(1) = _max_voxels;
     dim.at(2) = point_dim;
     this->set_dim(dim);
-  } 
+  // } 
   // else
   //   this->assert_dimension(voxel_data);
 

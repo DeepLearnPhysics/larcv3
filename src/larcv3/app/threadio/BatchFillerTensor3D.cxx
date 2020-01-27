@@ -83,7 +83,7 @@ bool BatchFillerTensor3D::process(IOManager& mgr) {
   }
 
   // one time operation: get image dimension
-  if (batch_data().dim().empty()) {
+  // if (batch_data().dim().empty()) {
     auto const& voxel_meta = voxel_data.meta();
     std::vector<int> dim;
     dim.resize(5);
@@ -93,8 +93,8 @@ bool BatchFillerTensor3D::process(IOManager& mgr) {
     dim[3] = _nx = voxel_meta.number_of_voxels(0);
     dim[4] = _num_channel;
     this->set_dim(dim);
-  } else
-    this->assert_dimension(voxel_data);
+  // } else
+  //   this->assert_dimension(voxel_data);
 
   if (_entry_data.size() != batch_data().entry_data_size())
     _entry_data.resize(batch_data().entry_data_size(), 0.);

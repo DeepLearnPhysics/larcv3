@@ -67,12 +67,12 @@ namespace larcv3 {
 
     auto const& event_part = mgr.get_data<larcv3::EventParticle>(_part_producer);
 
-    if (batch_data().dim().empty()) {
+    // if (batch_data().dim().empty()) {
       std::vector<int> dim(2);
       dim[0] = batch_size();
       dim[1] = _num_class;
       set_dim(dim);
-    }
+    // }
 
     // labels
     auto const& part_v = event_part.as_vector();

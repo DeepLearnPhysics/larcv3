@@ -41,17 +41,18 @@ class batch_pydata(object):
 
 
       # set dimension
-      if self._dim_data is None:
-         self._dim_data = np.array([dim[i] for i in range(len(dim))]).astype(np.int32)
+      # if self._dim_data is None:
+      # Dimension may change from shot to shot.  Refresh every time:
+      self._dim_data = np.array([dim[i] for i in range(len(dim))]).astype(np.int32)
 
-      else:
-         if not len(self._dim_data) == len(dim):
-            sys.stderr.write('Dimension array length changed (%d => %d)\n' % (len(self._dim_data),len(dim)))
-            raise TypeError
-         for i in range(len(self._dim_data)):
-            if not self._dim_data[i] == dim[i]:
-               sys.stderr.write('%d-th dimension changed (%d => %d)\n' % (i,self._dim_data[i],dim[i]))
-               raise ValueError
+      # else:
+      #    if not len(self._dim_data) == len(dim):
+      #       sys.stderr.write('Dimension array length changed (%d => %d)\n' % (len(self._dim_data),len(dim)))
+      #       raise TypeError
+      #    for i in range(len(self._dim_data)):
+      #       if not self._dim_data[i] == dim[i]:
+      #          sys.stderr.write('%d-th dimension changed (%d => %d)\n' % (i,self._dim_data[i],dim[i]))
+      #          raise ValueError
 
       # Set dense dimension:
       if self._dim_dense is None:
