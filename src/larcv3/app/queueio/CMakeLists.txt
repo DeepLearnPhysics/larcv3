@@ -1,4 +1,4 @@
-set(name threadio)
+set(name queueio)
 
 # Get all the source files:
 file(GLOB SOURCES *.cxx)

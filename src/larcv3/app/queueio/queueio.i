@@ -1,6 +1,5 @@
 
 #include "larcv3/app/threadio/ThreadIOTypes.h" 
-#include "larcv3/app/threadio/ThreadProcessor.h" 
 #include "larcv3/app/threadio/QueueProcessor.h"
 // The following classes require explicit template instantiation and mapping to a unique name in python
 #include "larcv3/app/threadio/BatchData.h" 
