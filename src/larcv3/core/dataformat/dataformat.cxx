@@ -1,0 +1,108 @@
+// // Basic Types:
+// #include "larcv3/core/dataformat/DataFormatTypes.h"
+// #include "larcv3/core/dataformat/EventID.h"
+// #include "larcv3/core/dataformat/Point.h"
+// #include "larcv3/core/dataformat/BBox.h"
+// #include "larcv3/core/dataformat/Vertex.h"
+// #include "larcv3/core/dataformat/Particle.h"
+// #include "larcv3/core/dataformat/ImageMeta.h"
+// #include "larcv3/core/dataformat/Tensor.h"
+// #include "larcv3/core/dataformat/Voxel.h"
+
+// // IO Interface classes:
+// #include "larcv3/core/dataformat/DataProductFactory.h"
+// #include "larcv3/core/dataformat/EventBase.h"
+// #include "larcv3/core/dataformat/EventParticle.h"
+// #include "larcv3/core/dataformat/EventTensor.h"
+// #include "larcv3/core/dataformat/IOManager.h"
+// #include "larcv3/core/dataformat/EventSparseTensor.h"
+// #include "larcv3/core/dataformat/EventSparseCluster.h"
+
+void init_dataformat(pybind11::module m){
+    init_dataformattypes(m);
+    init_bbox(m);
+    // init_dataproductfactory(m);
+    init_eventbase(m);
+    init_eventid(m);
+    init_eventparticle(m);
+    init_eventsparsecluster(m);
+    init_eventsparsetensor(m);
+    init_eventtensor(m);
+    init_imagemeta(m);
+    init_iomanager(m);
+    init_particle(m);
+    init_point(m);
+    init_tensor(m);
+    init_vertex(m);
+    init_voxel(m);
+}
+
+// // Basic Types:
+// %include "larcv3/core/dataformat/DataFormatTypes.h"
+// %include "larcv3/core/dataformat/EventID.h"
+// %include "larcv3/core/dataformat/Point.h"
+// %include "larcv3/core/dataformat/BBox.h"
+// %include "larcv3/core/dataformat/Vertex.h"
+// %include "larcv3/core/dataformat/Particle.h"
+// %include "larcv3/core/dataformat/ImageMeta.h"
+// %include "larcv3/core/dataformat/Tensor.h"
+// %include "larcv3/core/dataformat/Voxel.h"
+
+// // IO Interface classes:
+// %include "larcv3/core/dataformat/DataProductFactory.h"
+// %include "larcv3/core/dataformat/EventBase.h"
+// %include "larcv3/core/dataformat/EventParticle.h"
+// %include "larcv3/core/dataformat/EventTensor.h"
+// %include "larcv3/core/dataformat/IOManager.h"
+// %include "larcv3/core/dataformat/EventSparseTensor.h"
+// %include "larcv3/core/dataformat/EventSparseCluster.h"
+
+
+// // Define instantiations of LARCV3 templates:
+// %template(Point2D) larcv3::Point<2>;
+// %template(Point3D) larcv3::Point<3>;
+// %template(BBox2D) larcv3::BBox<2>;
+// %template(BBox3D) larcv3::BBox<3>;
+// %template(ImageMeta2D) larcv3::ImageMeta<2>;
+// %template(ImageMeta3D) larcv3::ImageMeta<3>;
+// %template(Tensor1D) larcv3::Tensor<1>;
+// %template(Image2D) larcv3::Tensor<2>;
+// %template(Tensor3D) larcv3::Tensor<3>;
+// %template(Tensor4D) larcv3::Tensor<4>;
+// %template(EventTensor1D) larcv3::EventTensor<1>;
+// %template(EventImage2D) larcv3::EventTensor<2>;
+// %template(EventTensor3D) larcv3::EventTensor<3>;
+// %template(EventTensor4D) larcv3::EventTensor<4>;
+// %template(SparseTensor2D) larcv3::SparseTensor<2>;
+// %template(SparseTensor3D) larcv3::SparseTensor<3>;
+// %template(EventSparseTensor2D) larcv3::EventSparseTensor<2>;
+// %template(EventSparseTensor3D) larcv3::EventSparseTensor<3>;
+// %template(SparseCluster2D) larcv3::SparseCluster<2>;
+// %template(SparseCluster3D) larcv3::SparseCluster<3>;
+// %template(EventSparseCluster2D) larcv3::EventSparseCluster<2>;
+// %template(EventSparseCluster3D) larcv3::EventSparseCluster<3>;
+
+
+// // Add templates for the dataproducts that get wrapped vectors:
+// %template(VectorOfDouble) std::vector<double>;
+// %template(VectorOfFloat) std::vector<float>;
+// %template(VectorOfSizet) std::vector<size_t>;
+// %template(VectorOfInt) std::vector<int>;
+// %template(VectorOfEventID) std::vector<larcv3::EventID>;
+// %template(VectorOfString) std::vector<std::string>;
+// %template(VectorOfVoxel) std::vector<larcv3::Voxel>;
+// %template(VectorOfVoxelSet) std::vector<larcv3::VoxelSet>;
+// %template(VectorOfSparse2D) std::vector<larcv3::SparseTensor2D>;
+// %template(VectorOfSparse3D) std::vector<larcv3::SparseTensor3D>;
+// %template(VectorOfCluster2D) std::vector<larcv3::SparseCluster2D>;
+// %template(VectorOfCluster3D) std::vector<larcv3::SparseCluster3D>;
+// %template(VectorOfParticle) std::vector<larcv3::Particle>;
+// %template(VectorOfTensor1D) std::vector<larcv3::Tensor1D>;
+// %template(VectorOfImage2D) std::vector<larcv3::Image2D>;
+// %template(VectorOfTensor3D) std::vector<larcv3::Tensor3D>;
+// %template(VectorOfTensor4D) std::vector<larcv3::Tensor4D>;
+// %template(VectorOfImageMeta2D) std::vector<larcv3::ImageMeta2D>;
+// %template(VectorOfImageMeta3D) std::vector<larcv3::ImageMeta3D>;
+
+
+

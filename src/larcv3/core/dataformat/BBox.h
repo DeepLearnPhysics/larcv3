@@ -80,6 +80,8 @@ namespace larcv3 {
   typedef BBox<2> BBox2D;
   typedef BBox<3> BBox3D;
 
+  void init_bbox(pybind11::module m);
+
 }
 #endif
 /** @} */ // end of doxygen group
