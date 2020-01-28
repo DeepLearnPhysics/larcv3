@@ -1,6 +1,6 @@
 from . import larcv
 import sys,time,os,signal
-import numpy as np
+import numpy 
 
 class batch_pydata(object):
 
@@ -27,11 +27,41 @@ class batch_pydata(object):
       for v in self._dim_data: dsize *= v
       return dsize
 
-   def dtype(self): return self._dtype
-   def data(self): return self._npy_data
-   def dim(self):  return self._dim_data
-   def time_copy(self): return self._time_copy
-   def time_reshape(self): return self._time_reshape
+   def dtype(self): 
+      return self._dtype
+
+   def data(self, shape=None, channels="last"): 
+      '''Return the data of this batch
+      
+      larcv is generally used to read sparse data and return in, often,
+      a sparse format.  This is acheived by packing into a buffer and returning
+      directly a buffer.  This function can quickly parse the buffer and expand
+      to a dense or other popular sparse shape.  If shape is none, it's untouched.
+      
+      Keyword Arguments:
+         shape {str} -- Set to "dense", "scnsparse", or "torch_geometric" to expand the data (default: {None})
+         channels {str} -- If shape is "dense", channels first or last? (default: {"last"})
+      
+      Returns:
+         [type] -- [description]
+      '''
+      if shape is None:
+         return numpy.reshape(self._npy_data, self._dim_data)
+      elif shape == "dense":
+         return self.as_dense(channels)
+      elif shape == "scnsparse":
+         return self.as_scnsparse()
+      elif shape == "torch_geometric":
+         return self.as_torch_geometric()
+
+   def dim(self):  
+      return self._dim_data
+
+   def time_copy(self): 
+      return self._time_copy
+
+   def time_reshape(self): 
+      return self._time_reshape
 
    def set_data(self,storage_id,larcv_batchdata):
       self._storage_id = storage_id
@@ -43,54 +73,134 @@ class batch_pydata(object):
       # set dimension
       # if self._dim_data is None:
       # Dimension may change from shot to shot.  Refresh every time:
-      self._dim_data = np.array([dim[i] for i in range(len(dim))]).astype(np.int32)
+      self._dim_data  = numpy.array([dim[i] for i in range(len(dim))]).astype(numpy.int32)
+      self._dense_dim = numpy.array([dense[i] for i in range(len(dense))]).astype(numpy.int32)
 
-      # else:
-      #    if not len(self._dim_data) == len(dim):
-      #       sys.stderr.write('Dimension array length changed (%d => %d)\n' % (len(self._dim_data),len(dim)))
-      #       raise TypeError
-      #    for i in range(len(self._dim_data)):
-      #       if not self._dim_data[i] == dim[i]:
-      #          sys.stderr.write('%d-th dimension changed (%d => %d)\n' % (i,self._dim_data[i],dim[i]))
-      #          raise ValueError
-
-      # Set dense dimension:
-      if self._dim_dense is None:
-         self._dim_dense = np.array([dense[i] for i in range(len(dense))]).astype(np.int32)
-      else:
-         if not len(self._dim_dense) == len(dense):
-            sys.stderr.write('Dimension array length changed (%d => %d)\n' % (len(self._dim_dense),len(dense)))
-            raise TypeError
-         for i in range(len(self._dim_dense)):
-            if not self._dim_dense[i] == dense[i]:
-               sys.stderr.write('%d-th dimension changed (%d => %d)\n' % (i,self._dim_dense[i],dense[i]))
-               raise ValueError
 
                
       # copy data into numpy array
       ctime = time.time()
       if self._make_copy:
          if self._npy_data is None:
-            # self._npy_data = np.array(larcv_batchdata.data())
+            # self._npy_data = numpy.array(larcv_batchdata.data())
             # print("Array type: ", self._npy_data.dtype)
             # Create an array to hold the data if it does not exits:
-            self._npy_data = np.ndarray(shape=(larcv_batchdata.data_size()), dtype=self._dtype)
+            self._npy_data = numpy.ndarray(shape=(larcv_batchdata.data_size()), dtype=self._dtype)
          self._npy_data = self._npy_data.reshape(self.batch_data_size())
-         self._npy_data = np.copy(larcv_batchdata.pydata())
+         self._npy_data = numpy.copy(larcv_batchdata.pydata())
 
       else:
          self._npy_data = larcv_batchdata.pydata()
+
+
 
       self._time_copy = time.time() - ctime
 
 
       ctime = time.time()
-      self._npy_data = self._npy_data.reshape(self._dim_data[0], int(self.batch_data_size()/self._dim_data[0]))
+      self._npy_data = numpy.reshape(self._npy_data, self._dim_data)
+      # self._npy_data = self._npy_data.reshape(self._dim_data[0], int(self.batch_data_size()/self._dim_data[0]))
       self.time_data_conv = time.time() - ctime
 
       return
 
-   def as_dense():
+   def as_dense(self, channels="last"):
+
+      '''
+      This format converts the larcv sparse format to
+      the dense format
+      '''
+
+      # If the data is from BatchFillerSparseTensor2D,
+      # it will have the shape (batch_size, n_planes, n_elements_per_plane, 2 or 3)
+      # where the 2 or 3 is if values are included or not.
+
+      # If the data is from BatchFillerSparseTensor3D, it will have the
+      # shape (batchsize, n_elements, 3 or 4) where the 3 or 4 
+      # is if values are included or not
+
+
+
+
+      if len(self._dim_data) == 4:
+         # This is 2D
+         # Initialize an output array.  Larcv puts channels last by default (B, W, H, Ch)
+         if channels == "last":
+            output_array = numpy.zeros(
+               [self._dense_dim[0], self._dense_dim[2], self._dense_dim[1], self._dense_dim[3]],
+               dtype=self._dtype)
+         else:
+            output_array = numpy.zeros(
+               [self._dense_dim[0], self._dense_dim[3], self._dense_dim[2], self._dense_dim[1]],
+               dtype=self._dtype)
+
+         # Slice the input array into x, y, vals:
+         x_coords = self._npy_data[:,:,:,0]
+         y_coords = self._npy_data[:,:,:,1]
+         val_coords = self._npy_data[:,:,:,2]
+         
+         # Where are the non-zero locations?
+         filled_locs = val_coords != -999
+         
+         # Map the output locations based on non-zero locations:
+         batch_index, plane_index, voxel_index = numpy.where(filled_locs)
+
+         # Pull out only the important values:
+         values  = val_coords[batch_index, plane_index, voxel_index]
+         x_index = numpy.int32(x_coords[batch_index, plane_index, voxel_index])
+         y_index = numpy.int32(y_coords[batch_index, plane_index, voxel_index])
+         if channels == "last":
+            output_array[batch_index, y_index, x_index, plane_index] = values
+         else:
+            output_array[batch_index, plane_index, y_index, x_index] = values
+         return output_array
+
+      elif len(self._dim_data) == 3:
+         # This is 3D
+         # Initialize an output array.  Larcv puts channels last by default (B, X, Y, Z, Ch==1)
+         if channels == "last":
+            output_array = numpy.zeros(
+               [self._dense_dim[0], self._dense_dim[1], self._dense_dim[2], self._dense_dim[3], self._dense_dim[4]],
+               dtype=self._dtype)
+         else:
+            output_array = numpy.zeros(
+               [self._dense_dim[0], self._dense_dim[4], self._dense_dim[1], self._dense_dim[2], self._dense_dim[3]],
+               dtype=self._dtype)
+         print(output_array.shape)
+
+         # Slice the input array into x, y, vals:
+         x_coords   = self._npy_data[:,:,0]
+         y_coords   = self._npy_data[:,:,1]
+         z_coords   = self._npy_data[:,:,2]
+         val_coords = self._npy_data[:,:,3]
+         
+         # Where are the non-zero locations?
+         filled_locs = val_coords != -999
+         
+         # Map the output locations based on non-zero locations:
+         batch_index, voxel_index = numpy.where(filled_locs)
+
+
+         values  = val_coords[batch_index, voxel_index]
+         x_index = numpy.int32(x_coords[batch_index, voxel_index])
+         y_index = numpy.int32(y_coords[batch_index, voxel_index])
+         z_index = numpy.int32(z_coords[batch_index, voxel_index])
+
+
+         # Fill in the output tensor
+
+         output_array[batch_index, 0, x_index, y_index, z_index] = values    
+
+         if channels == "last":
+            output_array[batch_index, x_index, y_index, z_index, 0 ] = values
+         else:
+            output_array[batch_index, 0, x_index, y_index, z_index ] = values
+         return output_array
+       
+
+
+
+   def as_torch_geometric(self):
 
       '''
       This format converts the larcv sparse format to
@@ -112,29 +222,7 @@ class batch_pydata(object):
          # This is 3D
          return None
 
-   def as_torch_geometric():
-
-      '''
-      This format converts the larcv sparse format to
-      the tuple format required for sparseconvnet
-      '''
-
-      # If the data is from BatchFillerSparseTensor2D,
-      # it will have the shape (batch_size, n_planes, n_elements_per_plane, 2 or 3)
-      # where the 2 or 3 is if values are included or not.
-
-      # If the data is from BatchFillerSparseTensor3D, it will have the
-      # shape (batchsize, n_elements, 3 or 4) where the 3 or 4 
-      # is if values are included or not
-
-      if len(self._dim_data) == 4:
-         # This is 2D
-         return None
-      elif len(self._dim_data) == 3:
-         # This is 3D
-         return None
-
-   def as_scnsparse():
+   def as_scnsparse(self):
 
       '''
       This format converts the larcv sparse format to

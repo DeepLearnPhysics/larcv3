@@ -10,7 +10,7 @@ add_library(larcv3 SHARED
     $<TARGET_OBJECTS:pyutil>
     $<TARGET_OBJECTS:cpputil>
     $<TARGET_OBJECTS:filter>
-    $<TARGET_OBJECTS:threadio>
+    $<TARGET_OBJECTS:queueio>
     $<TARGET_OBJECTS:imagemod>
     $<TARGET_OBJECTS:sbnd_imagemod>
     )

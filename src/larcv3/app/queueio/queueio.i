@@ -1,13 +1,13 @@
 
-#include "larcv3/app/threadio/ThreadIOTypes.h" 
-#include "larcv3/app/threadio/QueueProcessor.h"
+#include "larcv3/app/queueio/QueueIOTypes.h" 
+#include "larcv3/app/queueio/QueueProcessor.h"
 // The following classes require explicit template instantiation and mapping to a unique name in python
-#include "larcv3/app/threadio/BatchData.h" 
-#include "larcv3/app/threadio/BatchDataStorage.h" 
-#include "larcv3/app/threadio/BatchDataStorageFactory.h" 
-#include "larcv3/app/threadio/BatchFillerTemplate.h"
+#include "larcv3/app/queueio/BatchData.h" 
+#include "larcv3/app/queueio/BatchDataStorage.h" 
+#include "larcv3/app/queueio/BatchDataStorageFactory.h" 
+#include "larcv3/app/queueio/BatchFillerTemplate.h"
 
-#include "larcv3/app/threadio/BatchDataQueue.h" 
-#include "larcv3/app/threadio/BatchDataQueueFactory.h" 
+#include "larcv3/app/queueio/BatchDataQueue.h" 
+#include "larcv3/app/queueio/BatchDataQueueFactory.h" 
 
-#include "larcv3/app/threadio/BatchFillerPIDLabel.h" 
+#include "larcv3/app/queueio/BatchFillerPIDLabel.h" 

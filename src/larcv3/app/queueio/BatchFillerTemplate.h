@@ -63,6 +63,7 @@ namespace larcv3 {
   protected:
 
     inline void set_dim(std::vector<int> dim) {_batch_data_ptr->set_dim(dim);}
+    inline void set_dense_dim(std::vector<int> dense_dim) {_batch_data_ptr->set_dense_dim(dense_dim);}
     inline void set_entry_data(const std::vector<T>& data)
     { _batch_data_ptr->set_entry_data(data); }
 

@@ -7,7 +7,7 @@
 #include "larcv3/core/pyutil/pyutil.i"
 #include "larcv3/core/cpputil/cpputil.i"
 #include "larcv3/app/filter/filter.i"
-#include "larcv3/app/threadio/threadio.i"
+#include "larcv3/app/queueio/queueio.i"
 #include "larcv3/app/imagemod/imagemod.i"
 
 
@@ -35,5 +35,5 @@ using namespace std;
 %include "core/cpputil/cpputil.wrapper"
 %include "core/pyutil/pyutil.wrapper"
 %include "larcv3/app/filter/filter.wrapper"
-%include "larcv3/app/threadio/threadio.wrapper"
+%include "larcv3/app/queueio/queueio.wrapper"
 %include "larcv3/app/imagemod/imagemod.wrapper"

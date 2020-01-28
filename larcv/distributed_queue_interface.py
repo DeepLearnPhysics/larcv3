@@ -228,7 +228,7 @@ class queue_interface(object):
 
         # return
 
-    def fetch_minibatch_data(self, mode, pop=False, fetch_meta_data=False):
+    def fetch_minibatch_data(self, mode, pop=False, fetch_meta_data=False, data_shape=None, channels="last"):
         # Return a dictionary object with keys 'image', 'label', and others as needed
         # self._queueloaders['train'].fetch_data(keyword_label).dim() as an example
         
@@ -252,8 +252,10 @@ class queue_interface(object):
         this_data = {}
         
         for key in self._data_keys[mode]:
-            this_data[key] = self._queueloaders[mode].fetch_data(self._data_keys[mode][key]).data()
-            this_data[key] = numpy.reshape(this_data[key], self._dims[mode][key])
+            this_data[key] = self._queueloaders[mode].fetch_data(
+                self._data_keys[mode][key]).data(
+                shape=data_shape, channels=channels)
+            # this_data[key] = numpy.reshape(this_data[key], self._dims[mode][key])
 
         if fetch_meta_data:
             this_data['entries'] = self._queueloaders[mode].fetch_entries()

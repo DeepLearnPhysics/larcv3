@@ -1,7 +1,7 @@
 #ifndef __LARCV3THREADIO_THREADIOTYPES_CXX
 #define __LARCV3THREADIO_THREADIOTYPES_CXX
 
-#include "ThreadIOTypes.h"
+#include "QueueIOTypes.h"
 
 namespace larcv3{
 
