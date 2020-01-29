@@ -108,14 +108,12 @@ namespace larcv3 {
 
   void init_dataformattypes(pybind11::module m);
 
-
-#ifndef SWIG
-
   template <typename T>
   hid_t get_datatype();
 
 
-#endif
-
 }
+
+void init_dataformattypes(pybind11::module m);
+
 #endif

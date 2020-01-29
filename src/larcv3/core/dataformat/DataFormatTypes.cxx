@@ -3,8 +3,6 @@
 
 #include "larcv3/core/dataformat/DataFormatTypes.h"
 
-#ifndef SWIG
-
 namespace larcv3{
 
 
@@ -98,7 +96,36 @@ namespace larcv3{
 
 }
 
-#endif // swig
+void init_dataformattypes(pybind11::module m){
+  pybind11::enum_<larcv3::DistanceUnit_t> distanceunit_t(m,"DistanceUnit_t");
+  distanceunit_t.value("kUnitUnknown",  larcv3::kUnitUnknown);
+  distanceunit_t.value("kUnitCM",       larcv3::kUnitCM);
+  distanceunit_t.value("kUnitWireTime", larcv3::kUnitWireTime);
+
+  pybind11::class_<larcv3::Extents_t>   extents_t(m, "Extents_t");
+  extents_t.def(pybind11::init<>());
+  extents_t.def_readwrite("first", &larcv3::Extents_t::first);
+  extents_t.def_readwrite("n",     &larcv3::Extents_t::n);
+
+  pybind11::class_<larcv3::IDExtents_t> idextents_t(m, "IDExtents_t");
+  idextents_t.def(pybind11::init<>());
+  idextents_t.def_readwrite("first", &larcv3::IDExtents_t::first);
+  idextents_t.def_readwrite("n",     &larcv3::IDExtents_t::n);
+  idextents_t.def_readwrite("id",    &larcv3::IDExtents_t::id);
+
+
+  // struct Extents_t{
+  //   unsigned long long int first;
+  //   unsigned int n;
+  // };
+
+  // struct IDExtents_t{
+  //   unsigned long long int first;
+  //   unsigned int n;
+  //   unsigned int id;
+  // };
+
+}
 
 
 #endif

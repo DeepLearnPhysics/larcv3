@@ -33,7 +33,7 @@ void init_point_base(pybind11::module m){
     point.def("squared_distance", &larcv3::Point<dimension>::squared_distance);
     point.def("distance",         &larcv3::Point<dimension>::distance);
     point.def("direction",        &larcv3::Point<dimension>::direction);
-
+    point.def_readwrite("x", &larcv3::Point<dimension>::x);
 }
 
 void init_point(pybind11::module m){

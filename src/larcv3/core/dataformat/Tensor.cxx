@@ -535,3 +535,62 @@ std::vector<float> Image2D::copy_compress(size_t rows, size_t cols, CompressionM
   }
 
 */
+
+
+#include <pybind11/operators.h>
+#include <pybind11/stl.h>
+
+template <size_t dimension>
+void init_tensor_base(pybind11::module m){
+
+  using Class = larcv3::Tensor<dimension>;
+  std::string classname = "Tensor" + std::to_string(dimension) + "D";
+  pybind11::class_<Class> tensor(m, classname.c_str());
+  tensor.def(pybind11::init<>());
+  tensor.def(pybind11::init<const std::vector<size_t> &> ());
+  tensor.def(pybind11::init<const larcv3::ImageMeta<dimension>& > ());
+  tensor.def(pybind11::init<const larcv3::ImageMeta<dimension>&, const std::vector<float>&> ());
+  tensor.def(pybind11::init<const larcv3::Tensor<dimension>&> ());
+
+  tensor.def("reset",            &Class::reset);
+  tensor.def("size",           &Class::size);
+  tensor.def("pixel",
+    (float (Class::*)(const std::vector<size_t> & ) const)(&Class::pixel));
+  tensor.def("pixel", 
+    (float (Class::*)(size_t ) const)(&Class::pixel));
+  tensor.def("meta",      &Class::meta);
+  tensor.def("as_vector",        &Class::as_vector);
+  tensor.def("set_pixel",
+    (void (Class::*)(const std::vector<size_t> &, float ))(&Class::set_pixel));
+  tensor.def("set_pixel", 
+    (void (Class::*)( size_t, float  ))(&Class::set_pixel));
+  tensor.def("paint",           &Class::paint);
+  tensor.def("threshold",              &Class::threshold);
+  tensor.def("binarize",              &Class::binarize);
+  tensor.def("clear_data",       &Class::clear_data);
+
+
+  tensor.def(pybind11::self += float());
+  tensor.def(pybind11::self + float());
+  tensor.def(pybind11::self -= float());
+  tensor.def(pybind11::self - float());
+  tensor.def(pybind11::self *= float());
+  tensor.def(pybind11::self * float());
+  tensor.def(pybind11::self /= float());
+  tensor.def(pybind11::self / float());
+  // tensor.def(pybind11::self += const std::vector<float>&);
+  // tensor.def(pybind11::self -= const std::vector<float>&);
+  tensor.def(pybind11::self += pybind11::self);
+
+  tensor.def("eltwise",
+    (void (Class::*)(const Class& rhs ))(&Class::eltwise));
+  tensor.def("eltwise", 
+    (void (Class::*)( const std::vector<float>&, bool  ))(&Class::eltwise));
+
+}
+
+
+
+void init_tensor(pybind11::module m){
+  init_tensor_base<1>(m);
+}

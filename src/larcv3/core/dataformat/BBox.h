@@ -32,9 +32,7 @@ namespace larcv3 {
 
     BBox(Point<dimension> min, Point<dimension> max, ProjectionID_t id = kINVALID_PROJECTIONID);    
     
-    template<size_t other_dim>
-    inline bool operator== (const BBox<other_dim>& rhs) const {
-      assert(dimension == other_dim);
+    inline bool operator== (const BBox<dimension>& rhs) const {
       return (_p1 == rhs._p1 && _p2 == rhs._p2); 
     }
 
@@ -79,12 +77,12 @@ namespace larcv3 {
 
   typedef BBox<2> BBox2D;
   typedef BBox<3> BBox3D;
-
-  template<size_t dimension>
-  void init_bbox_base(pybind11::module m);
-
-  void init_bbox(pybind11::module m);
-
 }
+
+template<size_t dimension>
+void init_bbox_base(pybind11::module m);
+
+void init_bbox(pybind11::module m);
+
 #endif
 /** @} */ // end of doxygen group

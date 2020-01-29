@@ -174,5 +174,11 @@ namespace larcv3 {
 
 }
 
+template <size_t dimension>
+void init_tensor_base(pybind11::module m);
+
+void init_tensor(pybind11::module m);
+
+
 #endif
 /** @} */ // end of doxygen group 

@@ -128,67 +128,55 @@ template class BBox<2>;
 template class BBox<3>;
 
 
+}
+
+
+#include <pybind11/operators.h>
+
+
+
 template<size_t dimension>
 void init_bbox_instance(pybind11::module m){
-    std::string classname = "BBox" + dimension;
-    pybind11::class_<larcv3::BBox<dimension>>(m, classname.c_str())
-        .def(pybind11::init<>())
-        // .def("logger", &larcv3::BBox<dimension>::logger)
-        // .def("set_verbosity", &larcv3::BBox<dimension>::set_verbosity)
-        // .def("name", &larcv3::BBox<dimension>::name)
-        ;
+    using Class = larcv3::BBox<dimension>;
+    std::string classname = "BBox" + std::to_string(dimension) + "D";
+    pybind11::class_<Class> bbox(m, classname.c_str());
+    bbox.def(pybind11::init<>());
+    bbox.def(pybind11::init<larcv3::Point<dimension>, larcv3::Point<dimension>, larcv3::ProjectionID_t > ());
+    bbox.def(pybind11::self == pybind11::self);
 
-/*
+    bbox.def("update",
+      (void (Class::*)
+        (const std::vector<double> & , const std::vector<double> & , larcv3::ProjectionID_t )  )
+      (&Class::update));
+    bbox.def("update", 
+      (void (Class::*)
+        (const larcv3::Point<dimension> & , const larcv3::Point<dimension> & , larcv3::ProjectionID_t )  )
+      (&Class::update));
+    bbox.def("update", 
+      (void (Class::*)
+        (larcv3::ProjectionID_t) )
+      (&Class::update));
 
 
-    BBox() {}
-
-    BBox(Point<dimension> min, Point<dimension> max, ProjectionID_t id = kINVALID_PROJECTIONID);    
-    
-    template<size_t other_dim>
-    inline bool operator== (const BBox<other_dim>& rhs) const {
-      assert(dimension == other_dim);
-      return (_p1 == rhs._p1 && _p2 == rhs._p2); 
-    }
-
-    void update(const std::vector<double> & min, const std::vector<double> & max,
-                ProjectionID_t id = kINVALID_PROJECTIONID);
-
-    void update(const Point<dimension>& pt1, const Point<dimension>& pt2,
-                ProjectionID_t id = kINVALID_PROJECTIONID);
-
-    void update(ProjectionID_t id);
-
-    inline bool empty() const { return (_p1 == _p2); }
-    inline const Point<dimension>& origin      () const { return _p1; }
-    inline const Point<dimension>& bottom_left () const { return _p1; }
-    inline const Point<dimension>& top_right   () const { return _p2; }
-    inline Point<dimension> center     () const { return (_p1 + _p2) * 0.5; }
-    inline Point<dimension> min        () const { return _p1;}
-    inline Point<dimension> max        () const { return _p1;}
-    inline Point<dimension> dimensions () const { return _p2 - _p1; }
-    inline double           area       () const { return volume(); }
-    inline double           volume     () const { 
-      double v = 1.0;
-      Point<dimension> res = _p2 - _p1;
-      for (size_t i = 0; i < dimension; i ++){
-        v *= res.x[i];
-      }
-      return v; 
-    }
-    
-    inline ProjectionID_t id() const { return _id; }
-    std::string dump() const;
-
-    BBox overlap(const BBox& box) const;
-    BBox inclusive(const BBox& box) const;
-    bool contains(const Point<dimension>& point) const;
-
-*/
+    bbox.def("empty",            &Class::empty);
+    bbox.def("origin",           &Class::origin);
+    bbox.def("bottom_left",      &Class::bottom_left);
+    bbox.def("top_right",        &Class::top_right);
+    bbox.def("center",           &Class::center);
+    bbox.def("min",              &Class::min);
+    bbox.def("max",              &Class::max);
+    bbox.def("dimensions",       &Class::dimensions);
+    bbox.def("area",             &Class::area);
+    bbox.def("volume",           &Class::volume);
+    bbox.def("id",               &Class::id);
+    bbox.def("dump",             &Class::dump);
+    bbox.def("__repr__",         &Class::dump);
+    bbox.def("overlap",          &Class::overlap);
+    bbox.def("inclusive",        &Class::inclusive);
+    bbox.def("contains",         &Class::contains);
 
 
 }
-
 
 void init_bbox(pybind11::module m){
   // Here, this creates a wrapper for the classes we're interested in:
@@ -196,40 +184,5 @@ void init_bbox(pybind11::module m){
   init_bbox_instance<3>(m);
 }
 
-
-// template<size_t dimension>
-// void init_point_base(pybind11::module m){
-//     using Class = larcv3::Point<dimension>;
-//     std::string classname = "Point" + std::to_string(dimension) + "D";
-//     pybind11::class_<Class>(m, classname.c_str())
-//         .def(pybind11::init<>())
-//         .def(pybind11::init<std::array<double, dimension> > ())
-//         .def(pybind11::init<Class > ())
-//         .def(pybind11::self == pybind11::self)
-//         .def(pybind11::self != pybind11::self)
-//         .def(pybind11::self *= double())
-//         .def(pybind11::self /= double())
-//         .def(pybind11::self -= pybind11::self)
-//         .def(pybind11::self += pybind11::self)
-//         .def(pybind11::self * double())
-//         .def(pybind11::self / double())
-//         .def(pybind11::self + pybind11::self)
-//         .def(pybind11::self - pybind11::self)
-//         .def("squared_distance", &Class::squared_distance)
-//         .def("distance",         &Class::distance)
-//         .def("direction",        &Class::direction)
-//         // .def("x",                &Class::x)
-//         ;
-
-// }
-
-// void init_point(pybind11::module m){
-//     // init_point2D(m);
-//     init_point_base<2>(m);
-//     init_point_base<3>(m);
-// }
-
-
-}
 
 #endif
