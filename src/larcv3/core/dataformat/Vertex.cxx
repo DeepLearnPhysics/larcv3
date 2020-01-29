@@ -36,7 +36,7 @@ namespace larcv3 {
 
   const larcv3::Point2D Vertex::as_point2d(larcv3::PointType_t point_type) const
   {
-    double data[2] = {};
+    std::array<double, 2> data = {};
     switch(point_type) {
       case kPointXY:
         data[0] = _x; data[1] = _y;

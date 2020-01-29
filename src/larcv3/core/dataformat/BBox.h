@@ -80,6 +80,9 @@ namespace larcv3 {
   typedef BBox<2> BBox2D;
   typedef BBox<3> BBox3D;
 
+  template<size_t dimension>
+  void init_bbox_base(pybind11::module m);
+
   void init_bbox(pybind11::module m);
 
 }
