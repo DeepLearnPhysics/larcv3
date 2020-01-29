@@ -33,10 +33,10 @@ void init_dataformat(pybind11::module m){
     // init_eventtensor(m);
     // init_imagemeta(m);
     // init_iomanager(m);
-    // init_particle(m);
+    init_particle(m);
     init_point(m);
     // init_tensor(m);
-    // init_vertex(m);
+    init_vertex(m);
     // init_voxel(m);
 }
 

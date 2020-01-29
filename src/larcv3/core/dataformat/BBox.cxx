@@ -197,6 +197,39 @@ void init_bbox(pybind11::module m){
 }
 
 
+// template<size_t dimension>
+// void init_point_base(pybind11::module m){
+//     using Class = larcv3::Point<dimension>;
+//     std::string classname = "Point" + std::to_string(dimension) + "D";
+//     pybind11::class_<Class>(m, classname.c_str())
+//         .def(pybind11::init<>())
+//         .def(pybind11::init<std::array<double, dimension> > ())
+//         .def(pybind11::init<Class > ())
+//         .def(pybind11::self == pybind11::self)
+//         .def(pybind11::self != pybind11::self)
+//         .def(pybind11::self *= double())
+//         .def(pybind11::self /= double())
+//         .def(pybind11::self -= pybind11::self)
+//         .def(pybind11::self += pybind11::self)
+//         .def(pybind11::self * double())
+//         .def(pybind11::self / double())
+//         .def(pybind11::self + pybind11::self)
+//         .def(pybind11::self - pybind11::self)
+//         .def("squared_distance", &Class::squared_distance)
+//         .def("distance",         &Class::distance)
+//         .def("direction",        &Class::direction)
+//         // .def("x",                &Class::x)
+//         ;
+
+// }
+
+// void init_point(pybind11::module m){
+//     // init_point2D(m);
+//     init_point_base<2>(m);
+//     init_point_base<3>(m);
+// }
+
+
 }
 
 #endif

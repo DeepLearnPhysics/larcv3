@@ -174,7 +174,6 @@ class ImageMeta {
   std::string dump() const;
 
 
-#ifndef SWIG
   public:
     static hid_t get_datatype() {
       hid_t datatype;
@@ -204,7 +203,6 @@ class ImageMeta {
                  double_type);
       return datatype;
     }
-#endif
 
 
  protected:
