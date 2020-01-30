@@ -651,7 +651,11 @@ void init_imagemeta_base(pybind11::module m){
     imagemeta.def("position_to_coordinate", 
       (size_t (larcv3::ImageMeta<dimension>::*)(double, size_t  ) const)(&larcv3::ImageMeta<dimension>::position_to_coordinate)); 
 
-    imagemeta.def("set_dimension", &larcv3::ImageMeta<dimension>::set_dimension);
+    imagemeta.def("set_dimension", &larcv3::ImageMeta<dimension>::set_dimension,
+      pybind11::arg("axis"),
+      pybind11::arg("image_size"),
+      pybind11::arg("number_of_voxels"),
+      pybind11::arg("origin")=0);
     imagemeta.def("set_projection_id", &larcv3::ImageMeta<dimension>::set_projection_id);
     imagemeta.def("is_valid", &larcv3::ImageMeta<dimension>::is_valid);
 

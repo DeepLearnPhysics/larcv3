@@ -352,7 +352,7 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
   }
 
   _product_ptr_v[_product_ctr] =
-      (EventBase*)(DataProductFactory::get().create(name));
+      (std::shared_ptr<EventBase>)(DataProductFactory::get().create(name));
   _product_type_v[_product_ctr] = name.first;
   _producer_name_v[_product_ctr] = name.second;
 
@@ -948,7 +948,7 @@ ProducerID_t IOManager::producer_id(const ProducerName_t& name) const {
   return (*iter).second;
 }
 
-EventBase* IOManager::get_data(const std::string& type,
+std::shared_ptr<EventBase> IOManager::get_data(const std::string& type,
                                const std::string& producer) {
   LARCV_DEBUG() << "start" << std::endl;
 
@@ -970,7 +970,7 @@ EventBase* IOManager::get_data(const std::string& type,
   return get_data(id);
 }
 
-EventBase* IOManager::get_data(const size_t id) {
+std::shared_ptr<EventBase> IOManager::get_data(const size_t id) {
   __ioman_mtx.lock();
 
   LARCV_DEBUG() << "start" << std::endl;
@@ -1099,9 +1099,9 @@ void IOManager::finalize() {
 
 
   LARCV_INFO() << "Deleting data pointers" << std::endl;
-  for (auto& p : _product_ptr_v) {
-    delete p;
-  }
+  // for (auto& p : _product_ptr_v) {
+  //   delete p;
+  // }
 
   reset();
 }
@@ -1139,4 +1139,69 @@ void IOManager::reset() {
 }
 
 }  // namespace larcv3
+
+void init_iomanager(pybind11::module m){
+
+  using Class = larcv3::IOManager;
+  pybind11::class_<Class> iomanager(m, "IOManager");
+
+  pybind11::enum_<Class::IOMode_t> iomode(iomanager, "IOMode_t");
+  iomode.value("kREAD",  Class::kREAD);
+  iomode.value("kWRITE", Class::kWRITE);
+  iomode.value("kBOTH",  Class::kBOTH);
+  iomode.export_values();
+
+  iomanager.def(pybind11::init<Class::IOMode_t, std::string>(),
+    pybind11::arg("mode")=Class::kREAD,
+    pybind11::arg("name") = "IOManager");
+  iomanager.def(pybind11::init<const larcv3::PSet&>());
+  iomanager.def(pybind11::init<std::string, std::string >(),
+    pybind11::arg("config_file"),
+    pybind11::arg("name") = "IOManager");
+
+  iomanager.def("get_data",    (std::shared_ptr<larcv3::EventBase> (Class::*)(const std::string&, const std::string&) )(&Class::get_data));
+  iomanager.def("get_data",    (std::shared_ptr<larcv3::EventBase> (Class::*)(const larcv3::ProducerID_t))(&Class::get_data));
+
+  // For some reason, set_id requires more work:
+  iomanager.def("set_id", (void (Class::*)(const long, const long, const long))(&Class::set_id));
+
+  iomanager.def("io_mode",           &Class::io_mode);
+  iomanager.def("reset",             &Class::reset);
+  iomanager.def("add_in_file",       &Class::add_in_file,
+    pybind11::arg("filename"),
+    pybind11::arg("dirname") = "");
+  iomanager.def("clear_in_file",     &Class::clear_in_file);
+  iomanager.def("set_core_driver",   &Class::set_core_driver,
+    pybind11::arg("opt")=true);
+  iomanager.def("set_out_file",      &Class::set_out_file);
+  iomanager.def("producer_id",       &Class::producer_id);
+  iomanager.def("product_type",      &Class::product_type);
+  iomanager.def("configure",         &Class::configure);
+  iomanager.def("initialize",        &Class::initialize,
+    pybind11::arg("color")=0);
+  iomanager.def("read_entry",        &Class::read_entry,
+    pybind11::arg("index"),
+    pybind11::arg("force_reload")=false);
+  iomanager.def("save_entry",        &Class::save_entry);
+  iomanager.def("finalize",          &Class::finalize);
+  iomanager.def("clear_entry",       &Class::clear_entry);
+  iomanager.def("current_entry",     &Class::current_entry);
+  iomanager.def("get_n_entries_out", &Class::get_n_entries_out);
+  iomanager.def("get_file_out_name", &Class::get_file_out_name);
+  iomanager.def("get_n_entries",     &Class::get_n_entries);
+
+  iomanager.def("event_id",          &Class::event_id);
+  iomanager.def("last_event_id",     &Class::last_event_id);
+  iomanager.def("producer_list",     &Class::producer_list);
+  iomanager.def("product_list",      &Class::product_list);
+  iomanager.def("file_list",         &Class::file_list);
+
+/*
+
+*/
+}
+
+
 #endif
+
+

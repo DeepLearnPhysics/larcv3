@@ -89,6 +89,7 @@ namespace larcv3 {
     }
   }
 
+
   void VoxelSet::emplace(Voxel&& vox, const bool add)
   {
     // In case it's empty or greater than the last one
@@ -302,6 +303,153 @@ template class SparseCluster<2>;
 template class SparseCluster<3>;
 
 }
+
+#include <pybind11/operators.h>
+#include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
+
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::Voxel>);
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::VoxelSet>);
+
+void init_voxel_core(pybind11::module m){
+    using V   = larcv3::Voxel;
+    using VS  = larcv3::VoxelSet;
+    using VSA = larcv3::VoxelSetArray;
+
+    pybind11::bind_vector<std::vector<V>>(m, "VectorOfVoxel");
+    pybind11::bind_vector<std::vector<VS>>(m, "VectorOfVoxelSet");
+
+    pybind11::class_<V> voxel(m, "Voxel");
+    voxel.def(pybind11::init<larcv3::VoxelID_t, float>(),
+      pybind11::arg("id")    = larcv3::kINVALID_VOXELID,
+      pybind11::arg("value") = larcv3::kINVALID_FLOAT);
+    voxel.def("id",    &V::id);
+    voxel.def("value", &V::value);
+    voxel.def("set",   &V::set);
+    voxel.def(pybind11::self += float());
+    voxel.def(pybind11::self -= float());
+    voxel.def(pybind11::self *= float());
+    voxel.def(pybind11::self /= float());
+    voxel.def(pybind11::self == pybind11::self);
+    voxel.def(pybind11::self <  pybind11::self);
+    voxel.def(pybind11::self <= pybind11::self);
+    voxel.def(pybind11::self >  pybind11::self);
+    voxel.def(pybind11::self >= pybind11::self);
+
+    voxel.def(pybind11::self == float());
+    voxel.def(pybind11::self <  float());
+    voxel.def(pybind11::self <= float());
+    voxel.def(pybind11::self >  float());
+    voxel.def(pybind11::self >= float());
+
+    pybind11::class_<VS> voxelset(m, "VoxelSet");
+    voxelset.def(pybind11::init<>());
+
+    voxelset.def("id",             (larcv3::InstanceID_t (VS::*)() const)(&VS::id));
+    voxelset.def("id",             (void (VS::*)(const larcv3::InstanceID_t))(&VS::id));
+    voxelset.def("as_vector",      &VS::as_vector);
+    voxelset.def("find",           &VS::find);
+    voxelset.def("sum",            &VS::sum);
+    voxelset.def("mean",           &VS::mean);
+    voxelset.def("max",            &VS::max);
+    voxelset.def("min",            &VS::min);
+    voxelset.def("size",           &VS::size);
+    voxelset.def("values",         &VS::values);
+    voxelset.def("indexes",        &VS::indexes);
+    voxelset.def("clear_data",     &VS::clear_data);
+    voxelset.def("reserve",        &VS::reserve);
+    voxelset.def("threshold",      &VS::threshold);
+    voxelset.def("threshold_min",  &VS::threshold_min);
+    voxelset.def("threshold_max",  &VS::threshold_max);
+    voxelset.def("add",            &VS::add);
+    voxelset.def("insert",         &VS::insert);
+    voxelset.def("emplace",        (void (VS::*)(larcv3::VoxelID_t, float, const bool))(&VS::emplace));
+
+
+    voxelset.def(pybind11::self += float());
+    voxelset.def(pybind11::self -= float());
+    voxelset.def(pybind11::self *= float());
+    voxelset.def(pybind11::self /= float());
+
+    /// Voxel Set Array
+
+    pybind11::class_<VSA> voxelsetarray(m, "VoxelSetArray");
+    voxelsetarray.def(pybind11::init<>());
+    voxelsetarray.def("size",                 &VSA::size);
+    voxelsetarray.def("voxel_set",            &VSA::voxel_set);
+    voxelsetarray.def("as_vector",            &VSA::as_vector);
+    voxelsetarray.def("sum",                  &VSA::sum);
+    voxelsetarray.def("mean",                 &VSA::mean);
+    voxelsetarray.def("max",                  &VSA::max);
+    voxelsetarray.def("min",                  &VSA::min);
+    voxelsetarray.def("clear_data",           &VSA::clear_data);
+    voxelsetarray.def("resize",               &VSA::resize);
+    voxelsetarray.def("threshold",            &VSA::threshold);
+    voxelsetarray.def("threshold_min",        &VSA::threshold_min);
+    voxelsetarray.def("threshold_max",        &VSA::threshold_max);
+    voxelsetarray.def("writeable_voxel_set",  &VSA::writeable_voxel_set);
+    voxelsetarray.def("insert",               &VSA::insert);
+
+/*
+  Not wrapped:
+    void emplace(std::vector<larcv3::VoxelSet>&& voxel_vv);
+    void emplace(larcv3::VoxelSet&& voxel_v);
+    void move(larcv3::VoxelSetArray&& orig)
+*/
+
+}
+
+template<size_t dimension>
+void init_sparse_tensor(pybind11::module m){
+
+    using ST = larcv3::SparseTensor<dimension>;
+    std::string classname = "SparseTensor" + std::to_string(dimension) + "D";
+    pybind11::class_<ST, larcv3::VoxelSet> sparsetensor(m, classname.c_str());
+    sparsetensor.def(pybind11::init<>());
+    sparsetensor.def("meta", (const larcv3::ImageMeta<dimension>& (ST::*)() const )(&ST::meta));
+    sparsetensor.def("meta", (void (ST::*)(const larcv3::ImageMeta<dimension>& )  )(&ST::meta));
+    sparsetensor.def("emplace", (void (ST::*)(const larcv3::Voxel &, const bool))(&ST::emplace));
+    sparsetensor.def("set", &ST::set);
+    sparsetensor.def("clear_data", &ST::clear_data);
+
+/*
+  Not wrapped:
+    SparseTensor(VoxelSet&& vs, ImageMeta<dimension> meta);
+    SparseTensor& operator= (const VoxelSet& rhs)
+    inline void emplace(VoxelSet&& vs, const ImageMeta<dimension>& meta)
+
+*/
+
+}
+
+template<size_t dimension>
+void init_sparse_cluster(pybind11::module m){
+
+    using SC = larcv3::SparseCluster<dimension>;
+    std::string classname = "SparseCluster" + std::to_string(dimension) + "D";
+    pybind11::class_<SC, larcv3::VoxelSetArray> sparsecluster(m, classname.c_str());
+    sparsecluster.def(pybind11::init<>());
+    sparsecluster.def("meta", (const larcv3::ImageMeta<dimension>& (SC::*)() const )(&SC::meta));
+    sparsecluster.def("meta", (void (SC::*)(const larcv3::ImageMeta<dimension>& )  )(&SC::meta));
+    sparsecluster.def("clear_data", &SC::clear_data);
+
+/*
+   Not wrapped:
+    SparseCluster(VoxelSetArray&& vsa, ImageMeta<dimension> meta);
+
+    inline void set(VoxelSetArray&& vsa, const ImageMeta<dimension>& meta)
+*/
+
+}
+
+void init_voxel(pybind11::module m){
+  init_voxel_core(m);
+  init_sparse_tensor<2>(m);
+  init_sparse_tensor<3>(m);
+  init_sparse_cluster<2>(m);
+  init_sparse_cluster<3>(m);
+}
+
 
 
 

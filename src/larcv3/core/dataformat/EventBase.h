@@ -56,9 +56,9 @@ namespace larcv3 {
 // #endif
   };
 
-  void init_eventbase(pybind11::module m);
-
 }
+
+void init_eventbase(pybind11::module m);
 
 #endif //inc guard
 /** @} */ // end of doxygen group 

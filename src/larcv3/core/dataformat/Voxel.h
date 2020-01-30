@@ -85,7 +85,6 @@ namespace larcv3 {
     VoxelID_t _id; ///< voxel id
     float  _value; ///< Pixel Value
 
-#ifndef SWIG
   public:
     static hid_t get_datatype() {
 
@@ -97,7 +96,6 @@ namespace larcv3 {
                   HOFFSET (Voxel, _value), larcv3::get_datatype<float>());
       return datatype;
     }
-#endif
 
 
   };
@@ -381,6 +379,16 @@ typedef SparseCluster<2> SparseCluster2D;
 typedef SparseCluster<3> SparseCluster3D;
 
 }
+
+void init_voxel_core(pybind11::module m);
+
+template<size_t dimension>
+void init_sparse_tensor(pybind11::module m);
+
+template<size_t dimension>
+void init_sparse_cluster(pybind11::module m);
+
+void init_voxel(pybind11::module m);
 
 #endif
 /** @} */ // end of doxygen group

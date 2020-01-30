@@ -510,4 +510,32 @@ namespace larcv3{
 
 } // larcv3
 
+void init_eventparticle(pybind11::module m){
+
+  using Class = larcv3::EventParticle;
+  pybind11::class_<Class, std::shared_ptr<Class>> ev_particle(m, "EventParticle");
+  ev_particle.def(pybind11::init<>());
+
+  ev_particle.def("set",     &Class::set);
+  ev_particle.def("append",     &Class::append);
+  // ev_particle.def("emplace_back",    &Class::emplace_back);
+  // ev_particle.def("emplace", &Class::emplace);
+  ev_particle.def("as_vector", &Class::as_vector);
+  ev_particle.def("size", &Class::size);
+  ev_particle.def("clear", &Class::clear);
+
+
+/*
+
+
+
+    static EventParticle * to_particle(EventBase * e){
+      return (EventParticle *) e;
+    }
+
+*/
+
+}
+
+
 #endif

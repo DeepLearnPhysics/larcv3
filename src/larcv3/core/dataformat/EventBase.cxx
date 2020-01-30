@@ -18,4 +18,13 @@ namespace larcv3{
         return num_objects[0];
     }
 }
+
+void init_eventbase(pybind11::module m){
+    using Class = larcv3::EventBase;
+    pybind11::class_<Class, std::shared_ptr<Class>> base(m, "EventBase");
+
+    // We don't ever want to end up with an event base in python,
+    // So nothing is wrapped, not even the constructor.
+}
+
 #endif

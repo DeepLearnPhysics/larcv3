@@ -114,6 +114,13 @@ void init_dataformattypes(pybind11::module m){
   idextents_t.def_readwrite("id",    &larcv3::IDExtents_t::id);
 
 
+  m.attr("kINVALID_INDEX")        = larcv3::kINVALID_INDEX;
+  m.attr("kINVALID_INSTANCEID")   = larcv3::kINVALID_INSTANCEID;
+  m.attr("kINVALID_PROJECTIONID") = larcv3::kINVALID_PROJECTIONID;
+  m.attr("kINVALID_VOXELID")      = larcv3::kINVALID_VOXELID;
+  m.attr("kINVALID_PRODUCER")     = larcv3::kINVALID_PRODUCER;
+  
+
   // struct Extents_t{
   //   unsigned long long int first;
   //   unsigned int n;

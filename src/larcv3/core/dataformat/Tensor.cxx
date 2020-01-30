@@ -593,4 +593,7 @@ void init_tensor_base(pybind11::module m){
 
 void init_tensor(pybind11::module m){
   init_tensor_base<1>(m);
+  init_tensor_base<2>(m);
+  init_tensor_base<3>(m);
+  init_tensor_base<4>(m);
 }

@@ -87,7 +87,6 @@ class EventID {
     _event = event;
   }
 
-#ifndef SWIG
   public:
     static hid_t get_datatype() {
       hid_t datatype;
@@ -100,7 +99,6 @@ class EventID {
                   HOFFSET (EventID, _event), larcv3::get_datatype<long>());
       return datatype;
     }
-#endif
 
  private:
   long _run;     ///< LArSoft run number
@@ -108,6 +106,8 @@ class EventID {
   long _event;   ///< LArSoft event number
 };
 }  // namespace larcv3
+
+void init_eventid(pybind11::module m);
 
 #endif
 /** @} */  // end of doxygen group
