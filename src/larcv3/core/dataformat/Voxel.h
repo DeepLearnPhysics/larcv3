@@ -87,7 +87,7 @@ namespace larcv3 {
     inline bool operator >= (const float& rhs) const
     { return _value >= rhs; }
 
-  private:
+  protected:
     VoxelID_t _id; ///< voxel id
     float  _value; ///< Pixel Value
 
@@ -221,7 +221,7 @@ namespace larcv3 {
     inline VoxelSet& operator /= (float factor)
     { for(auto& vox : _voxel_v) vox /= factor; return (*this); }
 
-  private:
+  protected:
     /// Instance ID
     InstanceID_t _id;
     /// Ordered sparse vector of voxels
@@ -313,6 +313,10 @@ namespace larcv3 {
     //
     /// Access ImageMeta of specific projection
     inline const larcv3::ImageMeta<dimension>& meta() const { return _meta; }
+
+
+    // Take this sparseTensor and return it as a dense numpy array
+    pybind11::array_t<float> dense();
 
     //
     // Write-access

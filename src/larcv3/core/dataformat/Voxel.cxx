@@ -314,6 +314,28 @@ for (auto const& vox : this->as_vector()) {
 _meta = meta;
 }
 
+// Take this sparseTensor and return it as a dense numpy array
+template<size_t dimension>
+pybind11::array_t<float> SparseTensor<dimension>::dense(){
+
+  // First, create the buffer object:
+  // Cast the dimensions to std::array:
+  std::array<size_t, dimension> dimensions;
+  for (short i = 0; i < dimension; ++i) dimensions[i] = _meta.number_of_voxels(i);
+
+  // Allocate a spot to store the data:
+  auto array =  pybind11::array_t<float>(dimensions);
+  // Set the values we need:
+  auto x = array.request();
+  float * buf = (float *) x.ptr;
+  for (auto & vox : _voxel_v){
+    buf[vox.id()] = vox.value();
+  }
+  
+  return array;
+}
+
+
 template<size_t dimension>
 void SparseTensor<dimension>::emplace(const larcv3::Voxel & vox, const bool add)
 {
@@ -456,6 +478,7 @@ void init_sparse_tensor(pybind11::module m){
     sparsetensor.def("emplace", (void (ST::*)(const larcv3::Voxel &, const bool))(&ST::emplace));
     sparsetensor.def("set", &ST::set);
     sparsetensor.def("clear_data", &ST::clear_data);
+    sparsetensor.def("dense", &ST::dense);
 
 /*
   Not wrapped:

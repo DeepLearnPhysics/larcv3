@@ -20,6 +20,8 @@
 #include "larcv3/core/dataformat/Tensor.h"
 #include "larcv3/core/dataformat/DataProductFactory.h"
 
+#include <pybind11/numpy.h>
+
 namespace larcv3 {
   
   /**
@@ -35,6 +37,10 @@ namespace larcv3 {
 
     /// Const reference getter to an array of larcv3::Tensor<dimension>
     const std::vector<larcv3::Tensor<dimension>>& as_vector() const { return _image_v; }
+
+    /// Const reference getter to an array of larcv3::Tensor<dimension>
+    // pybind11::array_t<float> numpy() const { return _image_v; }
+
 
     /// Deprecated (use as_vector): const reference getter to an array of larcv3::Tensor<dimension> 
     const std::vector<larcv3::Tensor<dimension>>& image2d_array() const { return _image_v; }
