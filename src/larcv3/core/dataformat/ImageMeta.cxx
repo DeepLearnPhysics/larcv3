@@ -82,6 +82,29 @@ double ImageMeta<dimension>::origin(size_t axis)       const{
   }
 }
 
+
+template<size_t dimension>
+std::vector<size_t>  ImageMeta<dimension>::strides()          const{
+  
+  if (_valid ){
+
+    std::vector<size_t> strides(0,dimension);
+    size_t stride = sizeof(float);
+    for (size_t j = 0; j < dimension; j ++ ){
+      size_t axis = dimension - j - 1;
+      strides[j] = stride;
+      stride *= _number_of_voxels[axis];
+    }
+    return strides;
+  }
+  else{
+    LARCV_CRITICAL() << "Can't return voxel dimensions of invalid meta." << std::endl;
+    throw larbys();
+  }
+}
+
+
+
 template<size_t dimension>
 size_t ImageMeta<dimension>::number_of_voxels(size_t axis) const{
   if (_valid && axis >= 0 && axis < dimension){

@@ -136,7 +136,21 @@ namespace larcv3 {
     return;
   }
 
-  std::vector<float> VoxelSet::values() const {
+
+  // // Return a numpy array of this object (no copy by default)
+  // template<size_t dimension>
+  //  Tensor<dimension>::as_array(){
+  //   // Cast the dimensions to std::array:
+  //   std::array<size_t, dimension> dimensions;
+  //   for (short i = 0; i < dimension; ++i) dimensions[i] = _meta.number_of_voxels(i);
+  //   return pybind11::array_t<float>(
+  //       dimensions,
+  //       {},
+  //       &(_img[0])
+  //     );
+  // }
+
+  pybind11::array_t<float> VoxelSet::values() const {
     std::vector<float> ret;
     ret.resize(_voxel_v.size());
     size_t i = 0;
@@ -144,10 +158,14 @@ namespace larcv3 {
       ret[i] = vox.value();
       i += 1;
     }
-    return ret;
+    return pybind11::array_t<float>(
+        {ret.size()},
+        {},
+        &(ret[0])
+      );
   }
 
-  std::vector<size_t> VoxelSet::indexes() const {
+  pybind11::array_t<size_t> VoxelSet::indexes() const {
     std::vector<size_t> ret;
     ret.resize(_voxel_v.size());
     size_t i = 0;
@@ -155,8 +173,35 @@ namespace larcv3 {
       ret[i] = vox.id();
       i += 1;
     }
-    return ret;
+    return pybind11::array_t<size_t>(
+        {ret.size()},
+        {},
+        &(ret[0])
+      );
   }
+
+
+  // std::vector<float> VoxelSet::values() const {
+  //   std::vector<float> ret;
+  //   ret.resize(_voxel_v.size());
+  //   size_t i = 0;
+  //   for (auto & vox : _voxel_v){
+  //     ret[i] = vox.value();
+  //     i += 1;
+  //   }
+  //   return ret;
+  // }
+
+  // std::vector<size_t> VoxelSet::indexes() const {
+  //   std::vector<size_t> ret;
+  //   ret.resize(_voxel_v.size());
+  //   size_t i = 0;
+  //   for (auto & vox : _voxel_v){
+  //     ret[i] = vox.id();
+  //     i += 1;
+  //   }
+  //   return ret;
+  // }
 
 
 

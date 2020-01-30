@@ -69,6 +69,7 @@ class ImageMeta {
   inline const double * image_size()       const {return _image_sizes;}
   inline const size_t * number_of_voxels() const {return _number_of_voxels;}
   inline const double * origin()           const {return _origin;}
+  std::vector< size_t > strides()          const;
 
 
   inline size_t n_dims()  const { return dimension; }

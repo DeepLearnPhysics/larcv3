@@ -19,6 +19,8 @@
 #include <cstdlib>
 #include "larcv3/core/dataformat/ImageMeta.h"
 
+#include <pybind11/numpy.h>
+
 namespace larcv3 {
 
   /**
@@ -43,6 +45,12 @@ namespace larcv3 {
     Tensor(const ImageMeta<dimension>&, const std::vector<float>&);
     /// copy ctor
     Tensor(const Tensor&);
+
+    /// from numpy ctor
+    Tensor(pybind11::array_t<float>);
+
+    // Return a numpy array of this object (no copy by default)
+    pybind11::array_t<float> as_array();
     
 
     /// dtor
@@ -124,12 +132,13 @@ namespace larcv3 {
 
 
 
+
     /// Element-wise pixel value multiplication
     void eltwise( const Tensor& rhs );
     /// Element-wise multiplication w/ 1D array data
     void eltwise(const std::vector<float>& arr,bool allow_longer=false);
     
-    // The following functions were deprecated for larcv33.
+    // The following functions were deprecated for larcv3.
     // Implementations are here in the source code until a later cleanup, in case they
     // need to be un deprecated:
 

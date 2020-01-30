@@ -2,7 +2,7 @@ import unittest
 import numpy
 import pytest
 
-from larcv import larcv
+import larcv
 
 from random import Random
 random = Random()
@@ -60,9 +60,9 @@ def test_filled_constructor(dimension, execution_number):
 
     projection_id = random.randint(0,10)
 
-    number_of_voxels = larcv.VectorOfSizet()
-    image_sizes = larcv.VectorOfDouble()
-    origin = larcv.VectorOfDouble()
+    number_of_voxels = []
+    image_sizes = []
+    origin = []
 
     total_volume = 1.0
     total_voxels = 1
@@ -71,9 +71,9 @@ def test_filled_constructor(dimension, execution_number):
         L = random.uniform(0.001, 1e4)
         N = random.randint(1, 2e4)
         O = random.uniform(0.001, 1e4)
-        number_of_voxels.push_back(N)
-        image_sizes.push_back(L)
-        origin.push_back(O)
+        number_of_voxels.append(N)
+        image_sizes.append(L)
+        origin.append(O)
         total_volume *= L
         total_voxels *= N
 
@@ -153,11 +153,11 @@ def test_ravel(dimension, execution_number):
         
         # Create a list of indexes:
         indexes = []
-        vec_of_indexes = larcv.VectorOfSizet()
+        vec_of_indexes = []
         for dim in dims:
             ind = random.randint(0, dim-1)
             indexes.append(ind)
-            vec_of_indexes.push_back(ind)
+            vec_of_indexes.append(ind)
 
         # for 
         np_raveled = numpy.ravel_multi_index(indexes, dims)

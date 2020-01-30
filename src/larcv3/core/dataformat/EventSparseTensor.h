@@ -70,10 +70,6 @@ namespace larcv3 {
     void deserialize(hid_t group, size_t entry, bool reopen_groups=false);
     void finalize   ();
 
-    static EventSparseTensor * to_sparse_tensor(EventBase * e){
-      return (EventSparseTensor *) e;
-    }
-
   private:
     void open_in_datasets(hid_t group);
     void open_out_datasets(hid_t group);
@@ -119,6 +115,12 @@ namespace larcv3 {
   };
 
 }
+
+template<size_t dimension>
+void init_eventsparse_tensor_base(pybind11::module m);
+
+void init_eventsparsetensor(pybind11::module m);
+
 
 #endif
 /** @} */ // end of doxygen group

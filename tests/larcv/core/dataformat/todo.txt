@@ -1,0 +1,27 @@
+convert between types (casting):
+ - sparse to dense
+ - dense to sparse
+
+transform on types:
+ - flipping across axes
+ - rescale
+ - shifting along axes
+
+ - downsampling (average, max, sum)
+
+ - need these for tensor, sparse cluster, sparse tensor
+
+
+Cast event_* to numpy directly
+ - event_tensor cast right to numpy ndarray of shape [1,N_views, [x, y, z ...]]
+ - event_sparse cast right to numpy dense (through event tensor? straight to dense?)
+ - event cluster need to think more
+
+QueueIO
+ - map right to numpy:
+    - dense to shape [B, n_views, [x,y,z,...]]
+    - sparse to dense [B, n_views, [x,y,z,...]]
+    - sparse to scnsparse
+    - sparse to graph
+ - always output as numpy that can feed right in to TF/torch tensors
+ 

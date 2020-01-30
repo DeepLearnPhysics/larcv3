@@ -42,6 +42,17 @@ namespace larcv3 {
     _image_v.clear();
   }
 
+  template<size_t dimension>
+  const Tensor<dimension>&
+  EventTensor<dimension>::tensor(const ProjectionID_t id) const
+  {
+    if(id >= _image_v.size()) {
+      std::cerr << "EventTensor does not hold any Tensor for ProjectionID_t " << id << std::endl;
+      throw larbys();
+    }
+    return _image_v[id];
+  }
+
 
   template<size_t dimension>
   void EventTensor<dimension>::append(const Tensor<dimension>& img)
@@ -844,5 +855,50 @@ namespace larcv3 {
   template class EventTensor<4>;
 
 }
+
+
+
+template<size_t dimension>
+void init_event_tensor_base(pybind11::module m){
+
+  std::string classname = "EventTensor" + std::to_string(dimension) + "D";
+
+  using Class = larcv3::EventTensor<dimension>;
+  pybind11::class_<Class, std::shared_ptr<Class>> ev_tensor(m, classname.c_str());
+  ev_tensor.def(pybind11::init<>());
+
+
+  ev_tensor.def("move",           &Class::move);
+  ev_tensor.def("append",         &Class::append);
+  ev_tensor.def("as_vector",      &Class::as_vector);
+  ev_tensor.def("size",           &Class::size);
+  // ev_tensor.def("set", (void (Class::*)(const larcv3::Tensor<dimension> &))(&Class::set), "set");
+  // ev_tensor.def("set", (void (Class::*)(const larcv3::VoxelSet&, const larcv3::ImageMeta<dimension>&))(&Class::set), "set");
+  ev_tensor.def("clear",          &Class::clear);
+  ev_tensor.def("tensor",         &Class::tensor);
+
+/*
+
+Not wrapped:
+
+
+
+    /// Emplace into larcv3::Tensor<dimension> array
+    void emplace(Tensor<dimension>&& img);
+    /// Emplace into larcv3::Tensor<dimension> array
+    void emplace(std::vector<larcv3::Tensor<dimension>>&& image_v);
+
+*/
+
+
+}
+
+void init_eventtensor(pybind11::module m){
+  init_event_tensor_base<1>(m);
+  init_event_tensor_base<2>(m);
+  init_event_tensor_base<3>(m);
+  init_event_tensor_base<4>(m);
+}
+
 
 #endif

@@ -1,7 +1,7 @@
 import pytest
 import unittest
 import random
-from larcv import larcv
+import larcv
 
 from larcv import data_generator
 
@@ -34,6 +34,6 @@ def test_write_particles(tmpdir, rand_num_events):
 #     assert(n_read == rand_num_events)
 
 if __name__ == '__main__':
-    tmpdir = "./particle_test.h5"
+    tmpdir = "./"
     rand_num_events = 5
     test_write_particles(tmpdir, rand_num_events)

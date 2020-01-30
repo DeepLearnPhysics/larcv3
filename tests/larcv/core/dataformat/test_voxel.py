@@ -1,5 +1,5 @@
 import unittest
-from larcv import larcv
+import larcv
 
 # Testing Voxel objects:
 def test_Voxel_h_Voxel():
@@ -26,13 +26,20 @@ def test_Voxel_h_VoxelSet():
 
     vec = vs.as_vector()
 
-    assert(vec.size() == n_voxels) 
+    assert(len(vec) == n_voxels) 
     vs.clear_data()
 
     n_voxels = 11
     for j in range(n_voxels):
-        vs.emplace(larcv.Voxel(i+j, i+j), True)
-    assert(vec.size() == n_voxels) 
+        vs.insert(larcv.Voxel(i+j, i+j))
+
+    vs.clear_data()
+    n_voxels = 12
+    for j in range(n_voxels):
+        vs.add(larcv.Voxel(i+j, i+j))
+
+
+    assert(vs.size() == n_voxels) 
 
 
 
@@ -48,7 +55,7 @@ def test_Voxel_h_VoxelSetArray():
         for j in range(n_voxels):
             vs.emplace(j, j, False)
 
-        vsa.emplace(vs)
+        vsa.insert(vs)
 
     assert(vsa.size() == n_voxel_sets)
     assert(vsa.sum() > 0)

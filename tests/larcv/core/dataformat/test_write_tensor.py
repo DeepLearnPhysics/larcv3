@@ -1,6 +1,6 @@
 import pytest
 import unittest
-from larcv import larcv
+import larcv
 
 from larcv import data_generator
 

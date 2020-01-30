@@ -3,6 +3,7 @@
 
 
 #include "larcv3/core/base/larbys.h"
+#include "larcv3/core/base/larcv_logger.h"
 #include "larcv3/core/dataformat/Tensor.h"
 #include <iostream>
 #include <string.h>
@@ -42,6 +43,52 @@ namespace larcv3 {
     if (_img.size() != _meta.total_voxels()) _img.resize(_meta.total_voxels());
     paint(0.);
   }
+
+  /// from numpy ctor
+  template<size_t dimension>
+  Tensor<dimension>::Tensor(pybind11::array_t<float>  pyarray){
+
+    auto buffer = pyarray.request();
+
+    std::cout << "Received an array of dim " << buffer.ndim << std::endl;
+
+    // First, we do checks that this is an acceptable dimension:
+    if (buffer.ndim != dimension){
+      LARCV_ERROR() << "ERROR: cannot convert array of dimension " << buffer.ndim 
+                    << " to " << std::to_string(dimension) << "D Tensor\n";
+      throw larbys();
+    }
+
+    // With that satisfied, create the meta object:
+    for (size_t dim = 0; dim < dimension; ++dim)
+      _meta.set_dimension(dim, (double)(buffer.shape[dim]), (double)(buffer.shape[dim]));
+    
+
+    // Now, we copy the data from numpy into our own buffer:
+    _img.resize(_meta.total_voxels());
+
+    auto ptr = static_cast<float *>(buffer.ptr);
+
+    for (int i = 0; i < _meta.total_voxels(); ++i) {
+      _img[i] = ptr[i];
+    }
+
+  }
+
+  // Return a numpy array of this object (no copy by default)
+  template<size_t dimension>
+  pybind11::array_t<float> Tensor<dimension>::as_array(){
+    // Cast the dimensions to std::array:
+    std::array<size_t, dimension> dimensions;
+    for (short i = 0; i < dimension; ++i) dimensions[i] = _meta.number_of_voxels(i);
+    return pybind11::array_t<float>(
+        // _meta.number_of_voxels()[0],
+        dimensions,
+        {},
+        &(_img[0])
+      );
+  }
+  
 
   // void Image2D::resize(const std::vector<size_t> &  counts, float fillval)
   // {
@@ -551,23 +598,24 @@ void init_tensor_base(pybind11::module m){
   tensor.def(pybind11::init<const larcv3::ImageMeta<dimension>& > ());
   tensor.def(pybind11::init<const larcv3::ImageMeta<dimension>&, const std::vector<float>&> ());
   tensor.def(pybind11::init<const larcv3::Tensor<dimension>&> ());
+  tensor.def(pybind11::init<pybind11::array_t<float, pybind11::array::c_style>> ());
 
-  tensor.def("reset",            &Class::reset);
-  tensor.def("size",           &Class::size);
+  tensor.def("reset",                                      &Class::reset);
+  tensor.def("size",                                       &Class::size);
   tensor.def("pixel",
     (float (Class::*)(const std::vector<size_t> & ) const)(&Class::pixel));
   tensor.def("pixel", 
-    (float (Class::*)(size_t ) const)(&Class::pixel));
-  tensor.def("meta",      &Class::meta);
-  tensor.def("as_vector",        &Class::as_vector);
+    (float (Class::*)(size_t ) const)(                     &Class::pixel));
+  tensor.def("meta",                                       &Class::meta);
+  tensor.def("as_vector",                                  &Class::as_vector);
   tensor.def("set_pixel",
     (void (Class::*)(const std::vector<size_t> &, float ))(&Class::set_pixel));
   tensor.def("set_pixel", 
-    (void (Class::*)( size_t, float  ))(&Class::set_pixel));
-  tensor.def("paint",           &Class::paint);
-  tensor.def("threshold",              &Class::threshold);
-  tensor.def("binarize",              &Class::binarize);
-  tensor.def("clear_data",       &Class::clear_data);
+    (void (Class::*)( size_t, float  ))(                   &Class::set_pixel));
+  tensor.def("paint",                                      &Class::paint);
+  tensor.def("threshold",                                  &Class::threshold);
+  tensor.def("binarize",                                   &Class::binarize);
+  tensor.def("clear_data",                                 &Class::clear_data);
 
 
   tensor.def(pybind11::self += float());
@@ -586,6 +634,8 @@ void init_tensor_base(pybind11::module m){
     (void (Class::*)(const Class& rhs ))(&Class::eltwise));
   tensor.def("eltwise", 
     (void (Class::*)( const std::vector<float>&, bool  ))(&Class::eltwise));
+
+  tensor.def("as_array", &Class::as_array);
 
 }
 

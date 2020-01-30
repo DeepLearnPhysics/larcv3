@@ -59,8 +59,6 @@ namespace larcv3 {
     void set(const larcv3::SparseCluster<dimension>& clusters);
     /// Emplace a new element
     void emplace(larcv3::VoxelSetArray&& clusters, larcv3::ImageMeta<dimension>&& meta);
-    // /// Set a new element
-    // void set(const larcv3::VoxelSetArray& clusters, const larcv3::ImageMeta& meta);
 
 
 
@@ -123,6 +121,12 @@ namespace larcv3 {
   };
 
 }
+
+template<size_t dimension>
+void init_eventsparse_cluster_base(pybind11::module m);
+
+void init_eventsparsecluster(pybind11::module m);
+
 
 #endif
 /** @} */ // end of doxygen group

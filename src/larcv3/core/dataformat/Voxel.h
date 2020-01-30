@@ -17,6 +17,12 @@
 #include "larcv3/core/dataformat/DataFormatTypes.h"
 #include "larcv3/core/dataformat/ImageMeta.h"
 
+// #include <Python.h>
+// #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+// //#include <numpy/ndarrayobject.h>
+// #include "numpy/arrayobject.h"
+#include <pybind11/numpy.h>
+
 namespace larcv3 {
 
   /**
@@ -172,10 +178,10 @@ namespace larcv3 {
     inline size_t size() const { return _voxel_v.size(); }
 
     /// Get the value of all voxels in this set
-    std::vector<float> values() const;
+    pybind11::array_t<float> values() const;
 
     /// Get the index of all voxels in this set
-    std::vector<size_t> indexes() const;
+    pybind11::array_t<size_t> indexes() const;
 
     //
     // Write-access
@@ -327,6 +333,8 @@ namespace larcv3 {
 
     /// Meta setter
     void meta(const larcv3::ImageMeta<dimension>& meta);
+
+    // Tensor<dimension> as_tensor();
 
   private:
     larcv3::ImageMeta<dimension> _meta;

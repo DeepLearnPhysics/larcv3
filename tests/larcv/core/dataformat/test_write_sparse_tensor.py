@@ -1,6 +1,6 @@
 import pytest
 import unittest
-from larcv import larcv
+import larcv
 
 from random import Random
 random = Random()
