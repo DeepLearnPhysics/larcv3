@@ -42,7 +42,6 @@ def test_Voxel_h_VoxelSet():
     assert(vs.size() == n_voxels) 
 
 
-
 def test_Voxel_h_VoxelSetArray():
 
     vsa = larcv.VoxelSetArray()

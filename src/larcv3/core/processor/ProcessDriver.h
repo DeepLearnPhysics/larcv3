@@ -116,5 +116,8 @@ namespace larcv3 {
   };
 }
 
+void init_processdriver(pybind11::module m);
+
+
 #endif
 /** @} */ // end of doxygen group

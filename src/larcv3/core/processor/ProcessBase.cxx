@@ -39,4 +39,15 @@ namespace larcv3 {
 
 }
 
+void init_processbase(pybind11::module m){
+    using Class = larcv3::ProcessBase;
+    pybind11::class_<Class> processbase(m, "ProcessBase");
+    
+    // We don't actually want to construct any instances of ProcessBase
+    // processbase.def(pybind11::init<const std::string>(), 
+                    // pybind11::arg("name")="ProcessBase");
+
+}
+
+
 #endif

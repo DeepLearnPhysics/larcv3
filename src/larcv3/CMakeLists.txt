@@ -12,9 +12,8 @@ file(GLOB HEADERS *.h)
 add_library(larcv3 SHARED
     $<TARGET_OBJECTS:base>
     $<TARGET_OBJECTS:dataformat>
-    # $<TARGET_OBJECTS:processor>
+    $<TARGET_OBJECTS:processor>
     # $<TARGET_OBJECTS:pyutil>
-    # $<TARGET_OBJECTS:cpputil>
     # $<TARGET_OBJECTS:filter>
     # $<TARGET_OBJECTS:threadio>
     # $<TARGET_OBJECTS:imagemod>
