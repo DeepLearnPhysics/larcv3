@@ -46,21 +46,6 @@ void BatchFillerTensor2D::_batch_end_() {
 
 void BatchFillerTensor2D::finalize() { _entry_data.clear(); }
 
-void BatchFillerTensor2D::assert_dimension(
-    const EventSparseTensor2D& voxel_data) const {
-  auto const& voxel_meta = voxel_data.as_vector().front().meta();
-  if (_rows != voxel_meta.rows()) {
-    LARCV_CRITICAL() << "# of Y-voxels (" << _rows << ") changed ... now "
-                     << voxel_meta.rows() << std::endl;
-    throw larbys();
-  }
-  if (_cols != voxel_meta.cols()) {
-    LARCV_CRITICAL() << "# of X-voxels (" << _cols << ") changed ... now "
-                     << voxel_meta.cols() << std::endl;
-    throw larbys();
-  }
-  return;
-}
 
 bool BatchFillerTensor2D::process(IOManager& mgr) {
   LARCV_DEBUG() << "start" << std::endl;
@@ -81,21 +66,17 @@ bool BatchFillerTensor2D::process(IOManager& mgr) {
   // }
 
 
-  // one time operation: get image dimension
-  if (batch_data().dim().empty()) {
-    auto const& voxel_meta = voxel_data.as_vector().front().meta();
-    _rows = voxel_meta.rows();
-    _cols = voxel_meta.cols();
-    std::vector<int> dim;
-    dim.resize(4);
-    dim[0] = batch_size();
-    dim[1] = _rows;
-    dim[2] = _cols;
-    dim[3] = _num_channels;
-    this->set_dim(dim);
-  } else
-    this->assert_dimension(voxel_data);
-
+  auto const& voxel_meta = voxel_data.as_vector().front().meta();
+  _rows = voxel_meta.rows();
+  _cols = voxel_meta.cols();
+  std::vector<int> dim;
+  dim.resize(4);
+  dim[0] = batch_size();
+  dim[1] = voxel_meta.number_of_voxels(0);
+  dim[2] = voxel_meta.number_of_voxels(2);
+  dim[3] = _num_channels;
+  this->set_dim(dim);
+  this->set_dense_dim(dim);
 
 
   if (_entry_data.size() != batch_data().entry_data_size())

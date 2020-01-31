@@ -1,14 +1,13 @@
 
-%include "larcv3/app/threadio/ThreadIOTypes.h"
-%include "larcv3/app/threadio/ThreadProcessor.h" 
-%include "larcv3/app/threadio/QueueProcessor.h" 
-%include "larcv3/app/threadio/BatchData.h" 
-%include "larcv3/app/threadio/BatchDataStorage.h"
-%include "larcv3/app/threadio/BatchDataStorageFactory.h"
-%include "larcv3/app/threadio/BatchFillerTemplate.h"
+%include "larcv3/app/queueio/QueueIOTypes.h"
+%include "larcv3/app/queueio/QueueProcessor.h" 
+%include "larcv3/app/queueio/BatchData.h" 
+%include "larcv3/app/queueio/BatchDataStorage.h"
+%include "larcv3/app/queueio/BatchDataStorageFactory.h"
+%include "larcv3/app/queueio/BatchFillerTemplate.h"
 
-%include "larcv3/app/threadio/BatchDataQueue.h"
-%include "larcv3/app/threadio/BatchDataQueueFactory.h"
+%include "larcv3/app/queueio/BatchDataQueue.h"
+%include "larcv3/app/queueio/BatchDataQueueFactory.h"
 
 // Explicit instantiation of some template classes:
 %template(BatchFillerTemplateFloat) larcv3::BatchFillerTemplate<float>;
@@ -34,6 +33,6 @@
 %template(BatchDataQueueDouble) larcv3::BatchDataQueue<double>;
 %template(BatchDataDouble) larcv3::BatchData<double>;
 
-%include "larcv3/app/threadio/BatchFillerPIDLabel.h"
+%include "larcv3/app/queueio/BatchFillerPIDLabel.h"
 
 

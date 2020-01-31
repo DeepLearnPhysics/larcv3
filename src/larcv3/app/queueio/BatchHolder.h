@@ -15,7 +15,7 @@
 #define __LARCV3THREADIO_BATCHHOLDER_H__
 
 #include "larcv3/core/processor/ProcessBase.h"
-#include "ThreadIOTypes.h"
+#include "QueueIOTypes.h"
 namespace larcv3 {
   class ThreadProcessor;
   class QueueProcessor;

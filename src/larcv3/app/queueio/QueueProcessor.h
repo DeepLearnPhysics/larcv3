@@ -15,7 +15,7 @@
 #define __LARCV3THREADIO_QUEUEPROCESSOR_H
 
 #include "larcv3/core/processor/ProcessDriver.h"
-#include "ThreadIOTypes.h"
+#include "QueueIOTypes.h"
 #include <random>
 
 namespace larcv3 {

@@ -46,26 +46,6 @@ void BatchFillerTensor3D::_batch_end_() {
 
 void BatchFillerTensor3D::finalize() { _entry_data.clear(); }
 
-void BatchFillerTensor3D::assert_dimension(
-    const SparseTensor3D& voxel_data) const {
-  auto const& voxel_meta = voxel_data.meta();
-  if (_nx != voxel_meta.number_of_voxels(0)) {
-    LARCV_CRITICAL() << "# of X-voxels (" << _nx << ") changed ... now "
-                     << voxel_meta.number_of_voxels(0) << std::endl;
-    throw larbys();
-  }
-  if (_ny != voxel_meta.number_of_voxels(1)) {
-    LARCV_CRITICAL() << "# of Y-voxels (" << _ny << ") changed ... now "
-                     << voxel_meta.number_of_voxels(1) << std::endl;
-    throw larbys();
-  }
-  if (_nz != voxel_meta.number_of_voxels(2)) {
-    LARCV_CRITICAL() << "# of Z-voxels (" << _nz << ") changed ... now "
-                     << voxel_meta.number_of_voxels(2) << std::endl;
-    throw larbys();
-  }
-  return;
-}
 
 bool BatchFillerTensor3D::process(IOManager& mgr) {
   LARCV_DEBUG() << "start" << std::endl;
@@ -82,19 +62,16 @@ bool BatchFillerTensor3D::process(IOManager& mgr) {
     throw larbys();
   }
 
-  // one time operation: get image dimension
-  if (batch_data().dim().empty()) {
-    auto const& voxel_meta = voxel_data.meta();
-    std::vector<int> dim;
-    dim.resize(5);
-    dim[0] = batch_size();
-    dim[1] = _nz = voxel_meta.number_of_voxels(2);
-    dim[2] = _ny = voxel_meta.number_of_voxels(1);
-    dim[3] = _nx = voxel_meta.number_of_voxels(0);
-    dim[4] = _num_channel;
-    this->set_dim(dim);
-  } else
-    this->assert_dimension(voxel_data);
+  auto const& voxel_meta = voxel_data.meta();
+  std::vector<int> dim;
+  dim.resize(5);
+  dim[0] = batch_size();
+  dim[1] = voxel_meta.number_of_voxels(0);
+  dim[2] = voxel_meta.number_of_voxels(1);
+  dim[3] = voxel_meta.number_of_voxels(2);
+  dim[4] = _num_channel;
+  this->set_dim(dim);
+  this->set_dense_dim(dim);
 
   if (_entry_data.size() != batch_data().entry_data_size())
     _entry_data.resize(batch_data().entry_data_size(), 0.);

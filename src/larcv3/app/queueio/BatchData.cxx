@@ -91,7 +91,7 @@ namespace larcv3 {
 
       if (_state != BatchDataState_t::kBatchStateEmpty &&
           _state != BatchDataState_t::kBatchStateReleased) {
-        bool allowed = (_dense_dim.size() == dense_dense_dim.size());
+        bool allowed = (_dense_dim.size() == dense_dim.size());
         if (allowed)
           for (size_t i = 0; i < _dense_dim.size(); ++i) {allowed = allowed && (_dense_dim[i] == dense_dim[i]);}
 
@@ -102,11 +102,11 @@ namespace larcv3 {
       }
     }
     std::stringstream ss;
-    ss << "Resetting the batch size: (" << dim.front();
-    for (size_t i = 1; i < dim.size(); ++i) ss << "," << dim[i];
+    ss << "Resetting the batch size: (" << dense_dim.front();
+    for (size_t i = 1; i < dense_dim.size(); ++i) ss << "," << dense_dim[i];
     ss << ")" << std::endl;
     LARCV_SINFO() << ss.str();
-    _dim = dim;
+    _dense_dim = dense_dim;
     reset_data();
   }
 

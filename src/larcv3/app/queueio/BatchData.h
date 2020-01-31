@@ -16,7 +16,7 @@
 
 #include <iostream>
 #include <vector>
-#include "ThreadIOTypes.h"
+#include "QueueIOTypes.h"
 #include "larcv3/core/pyutil/PyUtils.h"
 
 namespace larcv3 {

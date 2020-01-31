@@ -16,7 +16,7 @@
 
 #include "larcv3/core/processor/ProcessFactory.h"
 #include "BatchFillerTemplate.h"
-#include "RandomCropper.h"
+
 #include "larcv3/core/dataformat/EventSparseTensor.h"
 namespace larcv3 {
 
@@ -50,13 +50,8 @@ namespace larcv3 {
 
   private:
 
-    // size_t set_data_size(const SparseTensor3D& image_data);
-    void assert_dimension(const SparseTensor3D& image_data) const;
 
     std::string _tensor3d_producer;
-    size_t _nx;
-    size_t _ny;
-    size_t _nz;
     std::vector<float>  _entry_data;
     size_t _num_channel;
     float _voxel_base_value;
