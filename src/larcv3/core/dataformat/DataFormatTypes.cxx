@@ -71,7 +71,7 @@ namespace larcv3{
                HOFFSET (Extents_t, first),
                larcv3::get_datatype<unsigned long long int>());
     H5Tinsert (datatype, "N",
-               HOFFSET (Extents_t, n),
+               HOFFSET (Extents_t, n),     
                larcv3::get_datatype<unsigned int>());
     return datatype;
 

@@ -41,7 +41,7 @@ setup(
         'Source Code': 'https://github.com/DeepLearnPhysics/larcv3'
     },
     scripts=['bin/merge_larcv3_files.py', 'bin/run_processor.py'],
-    packages=['larcv'],   
+    packages=['larcv'],
     install_requires=[
         'numpy',
         'scikit-build',

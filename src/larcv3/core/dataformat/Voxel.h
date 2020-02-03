@@ -91,6 +91,7 @@ namespace larcv3 {
     VoxelID_t _id; ///< voxel id
     float  _value; ///< Pixel Value
 
+
   public:
     static hid_t get_datatype() {
 

@@ -163,6 +163,7 @@ namespace larcv3 {
 
     std::string dump() const;
 
+
   public:
     static hid_t get_datatype() {
       hid_t datatype;

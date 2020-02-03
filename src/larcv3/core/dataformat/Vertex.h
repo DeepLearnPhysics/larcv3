@@ -65,6 +65,7 @@ namespace larcv3 {
     // What does this function do?
     // void approx();
 
+
   public:
     static hid_t get_datatype() {
       hid_t datatype;
@@ -79,6 +80,7 @@ namespace larcv3 {
                   HOFFSET (Vertex, _t), larcv3::get_datatype<double>());
       return datatype;
     }
+
 
 
   };

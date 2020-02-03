@@ -294,6 +294,8 @@ namespace larcv3{
     // Get the starting size (0) and dimensions (unlimited)
     hsize_t extents_starting_dim[] = {0};
     hsize_t extents_maxsize_dim[]  = {H5S_UNLIMITED};
+    hid_t lcpl = H5Pcreate(H5P_LINK_CREATE); // link creation property list
+    hid_t dapl = H5Pcreate(H5P_DATASET_ACCESS); // dataset access property list
 
     // Create a dataspace
     hid_t extents_dataspace = H5Screate_simple(1, extents_starting_dim, extents_maxsize_dim);
