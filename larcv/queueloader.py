@@ -4,7 +4,7 @@ import threading
 import random
 
 
-from . import larcv
+import larcv
 from . batch_pydata   import batch_pydata
 from . larcv_io_enums import RandomAccess
 from . larcv_writer   import larcv_writer

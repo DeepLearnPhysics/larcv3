@@ -1,4 +1,4 @@
-from . import larcv
+import larcv
 import sys,time,os,signal
 import numpy 
 
