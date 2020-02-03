@@ -3,8 +3,8 @@ import unittest
 import random
 import uuid
 
-from larcv import larcv, data_generator
-from larcv import queueloader
+import larcv
+from larcv import queueloader,  data_generator
 
 from collections import OrderedDict
 
