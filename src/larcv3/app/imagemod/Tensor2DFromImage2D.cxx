@@ -60,7 +60,7 @@ namespace larcv3 {
 
     // Get the image 2d data from the specified producer.
     auto const& ev_image2d =
-      mgr.get_data<larcv3::EventImage2D>(_image2d_producer);
+      mgr.get_data<larcv3::EventTensor2D>(_image2d_producer);
 
 
     // Get the reference tensor 2d, if it's specified:

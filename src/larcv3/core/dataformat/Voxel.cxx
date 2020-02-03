@@ -151,6 +151,29 @@ namespace larcv3 {
   // }
 
   pybind11::array_t<float> VoxelSet::values() const {
+    // First, create the buffer object:
+    // Cast the dimensions to std::array:
+    std::array<size_t, 1> dimensions;
+    dimensions[0] = _voxel_v.size();
+
+    // Allocate a spot to store the data:
+    auto array =  pybind11::array_t<float>(dimensions);
+
+    // Get access to the buffer:
+    auto x = array.request();
+    float * buf = (float *) x.ptr;
+
+    // Set the values we need:
+    size_t i = 0;
+    for (auto & vox : _voxel_v){
+      buf[i] = vox.value();
+      i += 1;
+    }
+  
+    return array;
+  }
+
+  std::vector<float> VoxelSet::values_vec() const {
     std::vector<float> ret;
     ret.resize(_voxel_v.size());
     size_t i = 0;
@@ -158,14 +181,35 @@ namespace larcv3 {
       ret[i] = vox.value();
       i += 1;
     }
-    return pybind11::array_t<float>(
-        {ret.size()},
-        {},
-        &(ret[0])
-      );
+    return ret;
   }
 
   pybind11::array_t<size_t> VoxelSet::indexes() const {
+    // First, create the buffer object:
+    // Cast the dimensions to std::array:
+    std::array<size_t, 1> dimensions;
+    dimensions[0] = _voxel_v.size();
+
+    // Allocate a spot to store the data:
+    auto array =  pybind11::array_t<size_t>(dimensions);
+
+    // Get access to the buffer:
+    auto x = array.request();
+    size_t * buf = (size_t *) x.ptr;
+
+    // Set the values we need:
+    size_t i = 0;
+    for (auto & vox : _voxel_v){
+      buf[i] = vox.id();
+      i += 1;
+    }
+  
+    return array;
+  }
+
+
+
+  std::vector<size_t> VoxelSet::indexes_vec() const {
     std::vector<size_t> ret;
     ret.resize(_voxel_v.size());
     size_t i = 0;
@@ -173,11 +217,7 @@ namespace larcv3 {
       ret[i] = vox.id();
       i += 1;
     }
-    return pybind11::array_t<size_t>(
-        {ret.size()},
-        {},
-        &(ret[0])
-      );
+    return ret;
   }
 
 

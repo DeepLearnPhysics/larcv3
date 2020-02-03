@@ -19,6 +19,8 @@
 #include "QueueIOTypes.h"
 #include "larcv3/core/pyutil/PyUtils.h"
 
+#include <pybind11/numpy.h>
+
 namespace larcv3 {
   /**
      \class BatchData
@@ -41,7 +43,9 @@ namespace larcv3 {
 
     const std::vector<T>& data() const;
 
-    PyObject * pydata() const;
+    // PyObject * pydata() const;
+    // PyObject * () const;
+    pybind11::array_t<float> pydata();
 
     inline const std::vector<int>& dim() const { return _dim; }
     inline const std::vector<int>& dense_dim() const { return _dense_dim; }
@@ -79,6 +83,9 @@ namespace larcv3 {
     BatchDataState_t _state;
   };
 }
+
+void init_batchdata(pybind11::module m);
+
 #endif
 /** @} */ // end of doxygen group
 

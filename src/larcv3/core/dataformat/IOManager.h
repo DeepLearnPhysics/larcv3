@@ -92,7 +92,7 @@ namespace larcv3 {
 
     template <class T>
     inline T& get_data(const std::string& producer)
-    { return *((T*)(this->get_data(product_unique_name<T>(), producer))); }
+    { return * std::dynamic_pointer_cast<T> (this->get_data(product_unique_name<T>(), producer)); }
 
     template <class T>
     inline T& get_data(const ProducerID_t id)
@@ -108,7 +108,7 @@ namespace larcv3 {
                          << std::endl;
         throw larbys();
       }
-      return *((T*)(ptr));
+      return * std::dynamic_pointer_cast<T> (ptr);
     }
 
     const EventID& event_id() const { return ( _set_event_id.valid() ? _set_event_id : _event_id ); }

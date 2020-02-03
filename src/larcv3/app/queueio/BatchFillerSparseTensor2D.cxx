@@ -179,7 +179,7 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
     }
 
     // Get all of the indexes:
-    std::vector<size_t> indexes = voxel_set.indexes();
+    std::vector<size_t> indexes = voxel_set.indexes_vec();
 
     // Convert them all to coordinates:
     std::vector<size_t> coordinates;
@@ -187,7 +187,7 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
 
 
     if (_include_values){
-      std::vector<float>  values  = voxel_set.values();
+      std::vector<float>  values  = voxel_set.values_vec();
 #ifdef LARCV_OPENMP
       #pragma omp parallel private(row, col, index) shared(_entry_data, row_mult, row_add, col_mult, col_add)
 #endif

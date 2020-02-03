@@ -1,10 +1,5 @@
 add_subdirectory(core)
-# add_subdirectory(app)
-
-# Get all the source files:
-file(GLOB SOURCES *.cxx)
-file(GLOB HEADERS *.h)
-
+add_subdirectory(app)
 
 
 # This is admittedly pretty clunky, but it gets the job done to make one object file:
@@ -13,7 +8,7 @@ add_library(larcv3 SHARED
     $<TARGET_OBJECTS:base>
     $<TARGET_OBJECTS:dataformat>
     $<TARGET_OBJECTS:processor>
-    # $<TARGET_OBJECTS:filter>
+    $<TARGET_OBJECTS:filter>
     # $<TARGET_OBJECTS:queueio>
     # $<TARGET_OBJECTS:imagemod>
     # $<TARGET_OBJECTS:sbnd_imagemod>

@@ -183,6 +183,14 @@ namespace larcv3 {
     /// Get the index of all voxels in this set
     pybind11::array_t<size_t> indexes() const;
 
+
+    /// Get the value of all voxels in this set
+    std::vector<float> values_vec() const;
+
+    /// Get the index of all voxels in this set
+    std::vector<size_t> indexes_vec() const;
+
+
     //
     // Write-access
     //
