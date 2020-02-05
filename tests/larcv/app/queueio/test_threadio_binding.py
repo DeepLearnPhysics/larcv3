@@ -6,5 +6,5 @@ random = Random()
 
 def test_import_BatchDataStorageFloat_h():
 
-    larcv.BatchDataStorageFloat()
+    # larcv.BatchDataStorageFloat()
     larcv.BatchDataFloat()

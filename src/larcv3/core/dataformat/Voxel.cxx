@@ -409,6 +409,12 @@ template class SparseTensor<3> ;
 template class SparseCluster<2>;
 template class SparseCluster<3>;
 
+
+// Instantiate the as_string methods:
+template<> std::string as_string<SparseTensor<2>>() {return "SparseTensor2D";}
+template<> std::string as_string<SparseTensor<3>>() {return "SparseTensor3D";}
+template<> std::string as_string<SparseCluster<2>>() {return "SparseCluster2D";}
+template<> std::string as_string<SparseCluster<3>>() {return "SparseCluster3D";}
 }
 
 #include <pybind11/operators.h>

@@ -80,6 +80,7 @@ def test_particle_queueio(tmpdir, make_copy, batch_size, n_reads=10):
 
     for i in range(n_reads):
         data = li.fetch_minibatch_data('primary')
+        li.prepare_next('primary')
         assert(data['label'].shape[0] == batch_size)
 
 

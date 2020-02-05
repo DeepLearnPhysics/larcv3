@@ -75,6 +75,12 @@ namespace larcv3 {
 
 }
 
+template<class T>
+void init_batchdataqueuefactory(pybind11::module m);
+
+void init_batchdataqueuefactory(pybind11::module m);
+
+
 #endif
 /** @} */ // end of doxygen group
 

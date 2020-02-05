@@ -94,6 +94,12 @@ namespace larcv3{
   }
 
 
+  // Wrapper functions and enumerations to make binding easier:
+  template<> std::string as_string<float>() {return "Float";}
+  template<> std::string as_string<int>()   {return "Int";}
+  template<> std::string as_string<double>(){return "Double";}
+  template<> std::string as_string<short>() {return "Short";}
+
 }
 
 void init_dataformattypes(pybind11::module m){

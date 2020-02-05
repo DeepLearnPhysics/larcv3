@@ -496,4 +496,42 @@ int omp_thread_count() {
 
 }
 
+#include <pybind11/stl.h>
+
+void init_queueprocessor(pybind11::module m){
+  
+  using Class = larcv3::QueueProcessor;
+  pybind11::class_<Class> queueproc(m, "QueueProcessor");
+
+  queueproc.def(pybind11::init<std::string>(),
+    pybind11::arg("name") = "QueueProcessor");
+
+  queueproc.def("batch_process",          &Class::batch_process);
+  queueproc.def("prepare_next",     &Class::prepare_next);
+  queueproc.def("reset",     &Class::reset);
+  queueproc.def("configure",   
+    (void (Class::*)(const std::string, int)) (&Class::configure),
+    pybind11::arg("config_file"),
+    pybind11::arg("color")=0);
+  queueproc.def("configure",         
+    (void (Class::*)(const larcv3::PSet&, int)) (&Class::configure),
+    pybind11::arg("cfg"),
+    pybind11::arg("color")=0);
+  queueproc.def("configured",         &Class::configured);
+  queueproc.def("pop_current_data",         &Class::pop_current_data);
+  queueproc.def("set_next_index",         &Class::set_next_index);
+  queueproc.def("set_next_batch",         &Class::set_next_batch);
+  queueproc.def("is_reading",         &Class::is_reading);
+  queueproc.def("get_n_entries",         &Class::get_n_entries);
+  queueproc.def("processed_entries",         &Class::processed_entries);
+  queueproc.def("processed_events",         &Class::processed_events);
+  queueproc.def("pd",         &Class::pd);
+  queueproc.def("storage_name",         &Class::storage_name);
+  queueproc.def("process_id",         &Class::process_id);
+  queueproc.def("batch_fillers",         &Class::batch_fillers);
+  queueproc.def("batch_types",         &Class::batch_types);
+
+
+}
+
 #endif

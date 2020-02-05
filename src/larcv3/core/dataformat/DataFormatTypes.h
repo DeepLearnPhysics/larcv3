@@ -111,6 +111,9 @@ namespace larcv3 {
   template <typename T>
   hid_t get_datatype();
 
+  template <typename T>
+  std::string as_string();
+
 
 }
 

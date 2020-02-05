@@ -558,7 +558,10 @@ template class ImageMeta<2>;
 template class ImageMeta<3>;
 template class ImageMeta<4>;
 
-
+template<> std::string as_string<ImageMeta<1>>() {return "ImageMeta1D";}
+template<> std::string as_string<ImageMeta<2>>() {return "ImageMeta2D";}
+template<> std::string as_string<ImageMeta<3>>() {return "ImageMeta3D";}
+template<> std::string as_string<ImageMeta<4>>() {return "ImageMeta4D";}
 
 
 /*
@@ -595,8 +598,8 @@ ImageMeta ImageMeta::inclusive(const ImageMeta& meta) const
 
 template<size_t dimension>
 void init_imagemeta_base(pybind11::module m){
-    std::string classname = "ImageMeta" + std::to_string(dimension) + "D";
-    pybind11::class_<larcv3::ImageMeta<dimension>> imagemeta(m, classname.c_str());
+    using Class = larcv3::ImageMeta<dimension>;
+    pybind11::class_<Class> imagemeta(m, larcv3::as_string<Class>().c_str());
     imagemeta.def(pybind11::init<>());
     imagemeta.def(pybind11::init<size_t, 
                                  const std::vector<size_t>,
@@ -612,78 +615,78 @@ void init_imagemeta_base(pybind11::module m){
     imagemeta.def(pybind11::self != pybind11::self);
 
     imagemeta.def("image_size",
-      (double (larcv3::ImageMeta<dimension>::*)( size_t ) const)(&larcv3::ImageMeta<dimension>::image_size));
+      (double (Class::*)( size_t ) const)(&Class::image_size));
     imagemeta.def("image_size", 
-      (const double * (larcv3::ImageMeta<dimension>::*)( )const)(&larcv3::ImageMeta<dimension>::image_size));
+      (const double * (Class::*)( )const)(&Class::image_size));
 
     imagemeta.def("number_of_voxels",
-      (size_t (larcv3::ImageMeta<dimension>::*)( size_t ) const)(&larcv3::ImageMeta<dimension>::number_of_voxels));
+      (size_t (Class::*)( size_t ) const)(&Class::number_of_voxels));
     imagemeta.def("number_of_voxels", 
-      (const size_t * (larcv3::ImageMeta<dimension>::*)( )const)(&larcv3::ImageMeta<dimension>::number_of_voxels));
+      (const size_t * (Class::*)( )const)(&Class::number_of_voxels));
 
     imagemeta.def("origin",
-      (double (larcv3::ImageMeta<dimension>::*)( size_t ) const)(&larcv3::ImageMeta<dimension>::origin));
+      (double (Class::*)( size_t ) const)(&Class::origin));
     imagemeta.def("origin", 
-      (const double * (larcv3::ImageMeta<dimension>::*)( )const)(&larcv3::ImageMeta<dimension>::origin));
+      (const double * (Class::*)( )const)(&Class::origin));
 
 
-    imagemeta.def("projection_id", &larcv3::ImageMeta<dimension>::projection_id);
-    imagemeta.def("id",            &larcv3::ImageMeta<dimension>::id);
-    imagemeta.def("n_dims",        &larcv3::ImageMeta<dimension>::n_dims);
-    imagemeta.def("total_voxels",  &larcv3::ImageMeta<dimension>::total_voxels);
-    imagemeta.def("total_volume",  &larcv3::ImageMeta<dimension>::total_volume);
+    imagemeta.def("projection_id", &Class::projection_id);
+    imagemeta.def("id",            &Class::id);
+    imagemeta.def("n_dims",        &Class::n_dims);
+    imagemeta.def("total_voxels",  &Class::total_voxels);
+    imagemeta.def("total_volume",  &Class::total_volume);
 
     imagemeta.def("voxel_dimensions",
-      (double (larcv3::ImageMeta<dimension>::*)( size_t ) const)(&larcv3::ImageMeta<dimension>::voxel_dimensions));
+      (double (Class::*)( size_t ) const)(&Class::voxel_dimensions));
     imagemeta.def("voxel_dimensions", 
-      (std::vector<double> (larcv3::ImageMeta<dimension>::*)( )const)(&larcv3::ImageMeta<dimension>::voxel_dimensions));
+      (std::vector<double> (Class::*)( )const)(&Class::voxel_dimensions));
 
 
-    imagemeta.def("unit",         &larcv3::ImageMeta<dimension>::unit);
+    imagemeta.def("unit",         &Class::unit);
 
 
     imagemeta.def("index",
-      (size_t (larcv3::ImageMeta<dimension>::*)( const std::vector<size_t> & ) const)(&larcv3::ImageMeta<dimension>::index));
+      (size_t (Class::*)( const std::vector<size_t> & ) const)(&Class::index));
     imagemeta.def("index", 
-      (void (larcv3::ImageMeta<dimension>::*)(const std::vector<size_t> &, std::vector<size_t> & )const)(&larcv3::ImageMeta<dimension>::index));
+      (void (Class::*)(const std::vector<size_t> &, std::vector<size_t> & )const)(&Class::index));
  
     imagemeta.def("coordinates",
-      (std::vector<size_t> (larcv3::ImageMeta<dimension>::*)( size_t ) const)(&larcv3::ImageMeta<dimension>::coordinates));
+      (std::vector<size_t> (Class::*)( size_t ) const)(&Class::coordinates));
     imagemeta.def("coordinates", 
-      (void (larcv3::ImageMeta<dimension>::*)(const std::vector<size_t> &, std::vector<size_t> & )const)(&larcv3::ImageMeta<dimension>::coordinates));
-    imagemeta.def("coordinate", &larcv3::ImageMeta<dimension>::coordinate);
+      (void (Class::*)(const std::vector<size_t> &, std::vector<size_t> & )const)(&Class::coordinates));
+    imagemeta.def("coordinate", &Class::coordinate);
  
     imagemeta.def("position",
-      (std::vector<double> (larcv3::ImageMeta<dimension>::*)(size_t) const)(&larcv3::ImageMeta<dimension>::position));
+      (std::vector<double> (Class::*)(size_t) const)(&Class::position));
     imagemeta.def("position", 
-      (std::vector<double> (larcv3::ImageMeta<dimension>::*)(const std::vector<size_t> & )const)(&larcv3::ImageMeta<dimension>::position)); 
+      (std::vector<double> (Class::*)(const std::vector<size_t> & )const)(&Class::position)); 
 
     imagemeta.def("min",
-      (double (larcv3::ImageMeta<dimension>::*)( size_t ) const)(&larcv3::ImageMeta<dimension>::min));
+      (double (Class::*)( size_t ) const)(&Class::min));
     imagemeta.def("min", 
-      (std::vector<double> (larcv3::ImageMeta<dimension>::*)( )const)(&larcv3::ImageMeta<dimension>::min));
+      (std::vector<double> (Class::*)( )const)(&Class::min));
 
     imagemeta.def("max",
-      (double (larcv3::ImageMeta<dimension>::*)( size_t ) const)(&larcv3::ImageMeta<dimension>::max));
+      (double (Class::*)( size_t ) const)(&Class::max));
     imagemeta.def("max", 
-      (std::vector<double> (larcv3::ImageMeta<dimension>::*)( )const)(&larcv3::ImageMeta<dimension>::max));
+      (std::vector<double> (Class::*)( )const)(&Class::max));
 
-    imagemeta.def("position_to_index", &larcv3::ImageMeta<dimension>::position_to_index);
+    imagemeta.def("position_to_index", &Class::position_to_index);
     imagemeta.def("position_to_coordinate",
-      (std::vector<size_t> (larcv3::ImageMeta<dimension>::*)(const std::vector<double> &) const)(&larcv3::ImageMeta<dimension>::position_to_coordinate));
+      (std::vector<size_t> (Class::*)(const std::vector<double> &) const)(&Class::position_to_coordinate));
     imagemeta.def("position_to_coordinate", 
-      (size_t (larcv3::ImageMeta<dimension>::*)(double, size_t  ) const)(&larcv3::ImageMeta<dimension>::position_to_coordinate)); 
+      (size_t (Class::*)(double, size_t  ) const)(&Class::position_to_coordinate)); 
 
-    imagemeta.def("set_dimension", &larcv3::ImageMeta<dimension>::set_dimension,
+    imagemeta.def("set_dimension", &Class::set_dimension,
       pybind11::arg("axis"),
       pybind11::arg("image_size"),
       pybind11::arg("number_of_voxels"),
       pybind11::arg("origin")=0);
-    imagemeta.def("set_projection_id", &larcv3::ImageMeta<dimension>::set_projection_id);
-    imagemeta.def("is_valid", &larcv3::ImageMeta<dimension>::is_valid);
+    imagemeta.def("set_projection_id", &Class::set_projection_id);
+    imagemeta.def("is_valid", &Class::is_valid);
 
-    imagemeta.def("dump", &larcv3::ImageMeta<dimension>::dump);
-    imagemeta.def("__repr__",&larcv3::ImageMeta<dimension>::dump);
+    imagemeta.def("dump",     &Class::dump);
+    imagemeta.def("__repr__", &Class::dump);
 
 }
 

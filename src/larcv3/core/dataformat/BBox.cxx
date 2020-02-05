@@ -127,6 +127,8 @@ namespace larcv3 {
 template class BBox<2>;
 template class BBox<3>;
 
+template<> std::string as_string<BBox<2>>() {return "BBox2D";}
+template<> std::string as_string<BBox<3>>() {return "BBox3D";}
 
 }
 
@@ -138,8 +140,7 @@ template class BBox<3>;
 template<size_t dimension>
 void init_bbox_instance(pybind11::module m){
     using Class = larcv3::BBox<dimension>;
-    std::string classname = "BBox" + std::to_string(dimension) + "D";
-    pybind11::class_<Class> bbox(m, classname.c_str());
+    pybind11::class_<Class> bbox(m, larcv3::as_string<Class>().c_str());
     bbox.def(pybind11::init<>());
     bbox.def(pybind11::init<larcv3::Point<dimension>, larcv3::Point<dimension>, larcv3::ProjectionID_t > ());
     bbox.def(pybind11::self == pybind11::self);

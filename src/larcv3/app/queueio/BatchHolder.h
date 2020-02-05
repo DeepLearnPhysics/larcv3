@@ -17,7 +17,6 @@
 #include "larcv3/core/processor/ProcessBase.h"
 #include "QueueIOTypes.h"
 namespace larcv3 {
-  class ThreadProcessor;
   class QueueProcessor;
 
   /**
@@ -26,7 +25,6 @@ namespace larcv3 {
      doxygen documentation!
   */
   class BatchHolder : public ProcessBase{
-    friend class ThreadProcessor;
     friend class QueueProcessor;
   public:
     

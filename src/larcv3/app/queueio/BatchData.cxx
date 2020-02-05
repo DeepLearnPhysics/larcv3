@@ -20,7 +20,7 @@ namespace larcv3 {
   }
 
   template<class T>
-  PyObject * BatchData<T>::pydata() const
+  pybind11::array_t<T> BatchData<T>::pydata()
   {
     if (_state != BatchDataState_t::kBatchStateFilled) {
       LARCV_SCRITICAL() << "Current batch state: " << (int)_state
@@ -28,7 +28,20 @@ namespace larcv3 {
       throw larbys();
     }
 
-    return larcv3::_as_ndarray(_data);
+    // First, create the buffer object:
+    // Cast the dimensions to std::array:
+    std::array<size_t, 1> dimensions;
+    dimensions[0] = _data.size();
+    // Allocate a spot to store the data:
+    auto array = pybind11::array_t<T>(
+        // _meta.number_of_voxels()[0],
+        dimensions,
+        {},
+        &(_data[0])
+      );
+  
+    return array;
+
   }
 
   template<class T>
@@ -172,4 +185,55 @@ template class larcv3::BatchData<short>;
 template class larcv3::BatchData<int>;
 template class larcv3::BatchData<float>;
 template class larcv3::BatchData<double>;
+
+void init_batchdata(pybind11::module m){
+
+  init_batchdata_<short>(m);
+  init_batchdata_<int>(m);
+  init_batchdata_<float>(m);
+  init_batchdata_<double>(m);
+  // init_batchdata_<larcv3::SparseTensor<2>>(m);
+
+}
+
+#include <typeinfo>
+#include <pybind11/stl.h>
+
+template <class T>
+void init_batchdata_(pybind11::module m){
+
+    using Class = larcv3::BatchData<T>;
+    std::string classname = "BatchData" + larcv3::as_string<T>();
+    pybind11::class_<Class> batch_data(m, classname.c_str());
+    batch_data.def(pybind11::init<>());
+
+
+
+
+    batch_data.def("pydata",             &Class::pydata);
+    batch_data.def("data",               &Class::data);
+    batch_data.def("dim",                &Class::dim);
+    batch_data.def("dense_dim",          &Class::dense_dim);
+    batch_data.def("data_size",          &Class::data_size,
+      pybind11::arg("data_size")=false);
+    batch_data.def("current_data_size",  &Class::current_data_size);
+    batch_data.def("entry_data_size",    &Class::entry_data_size);
+    batch_data.def("set_dim",            &Class::set_dim);
+    batch_data.def("set_dense_dim",      &Class::set_dense_dim);
+    batch_data.def("set_entry_data",     &Class::set_entry_data);
+    batch_data.def("reset",              &Class::reset);
+    batch_data.def("reset_data",         &Class::reset_data);
+    batch_data.def("is_filled",          &Class::is_filled);
+    batch_data.def("state",              &Class::state);
+
+/*
+
+    // PyObject * pydata() const;
+    // PyObject * () const;
+    // pybind11::array_t<float> pydata();
+
+*/
+
+}
+
 #endif

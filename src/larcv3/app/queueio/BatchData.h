@@ -45,7 +45,7 @@ namespace larcv3 {
 
     // PyObject * pydata() const;
     // PyObject * () const;
-    pybind11::array_t<float> pydata();
+    pybind11::array_t<T> pydata();
 
     inline const std::vector<int>& dim() const { return _dim; }
     inline const std::vector<int>& dense_dim() const { return _dense_dim; }
@@ -83,6 +83,9 @@ namespace larcv3 {
     BatchDataState_t _state;
   };
 }
+
+template <class T>
+void init_batchdata_(pybind11::module m);
 
 void init_batchdata(pybind11::module m);
 

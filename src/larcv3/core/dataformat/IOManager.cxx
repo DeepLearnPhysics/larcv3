@@ -1196,9 +1196,7 @@ void init_iomanager(pybind11::module m){
   iomanager.def("product_list",      &Class::product_list);
   iomanager.def("file_list",         &Class::file_list);
 
-/*
 
-*/
 }
 
 

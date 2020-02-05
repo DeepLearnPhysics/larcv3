@@ -416,7 +416,10 @@ template class Tensor<2>;
 template class Tensor<3>;
 template class Tensor<4>;
 
-
+template<> std::string as_string<Tensor<1>>() {return "Tensor1D";}
+template<> std::string as_string<Tensor<2>>() {return "Tensor2D";}
+template<> std::string as_string<Tensor<3>>() {return "Tensor3D";}
+template<> std::string as_string<Tensor<4>>() {return "Tensor4D";}
 }
 
 #endif
@@ -591,8 +594,7 @@ template <size_t dimension>
 void init_tensor_base(pybind11::module m){
 
   using Class = larcv3::Tensor<dimension>;
-  std::string classname = "Tensor" + std::to_string(dimension) + "D";
-  pybind11::class_<Class> tensor(m, classname.c_str());
+  pybind11::class_<Class> tensor(m, larcv3::as_string<Class>().c_str());
   tensor.def(pybind11::init<>());
   tensor.def(pybind11::init<const std::vector<size_t> &> ());
   tensor.def(pybind11::init<const larcv3::ImageMeta<dimension>& > ());

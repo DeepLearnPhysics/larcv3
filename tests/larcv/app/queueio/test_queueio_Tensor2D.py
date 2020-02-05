@@ -74,14 +74,14 @@ def test_tensor2d_queueio(tmpdir, make_copy, batch_size, n_projections, n_reads=
         'label': 'test_{}'.format(queueio_name), 
         })
 
-
+    print("here")
 
     li = queueloader.queue_interface()
     li.prepare_manager('primary', io_config, batch_size, data_keys)
 
-
     for i in range(n_reads):
-        data = li.fetch_minibatch_data('primary')
+        data = li.fetch_minibatch_data('primary', pop=True)
+        li.prepare_next('primary')
         assert(data['label'].shape[0] == batch_size)
 
 

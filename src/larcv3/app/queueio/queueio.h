@@ -17,6 +17,9 @@
 
 
 #include "BatchData.h"
+#include "BatchDataQueue.h"
+#include "BatchDataQueueFactory.h"
+#include "QueueIOTypes.h"
 #include "QueueProcessor.h"
 
 #ifndef LARCV_NO_PYBIND

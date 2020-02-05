@@ -315,9 +315,6 @@ namespace larcv3{
       // extents_cparms.setDeflate(compression);
     }
 
-    hid_t lcpl = H5Pcreate(H5P_LINK_CREATE);
-    hid_t dapl = H5Pcreate(H5P_DATASET_ACCESS);
-
 
     // Create the extents dataset:
     H5Dcreate(

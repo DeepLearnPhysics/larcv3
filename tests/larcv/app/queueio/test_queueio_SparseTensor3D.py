@@ -146,6 +146,7 @@ def test_sparsetensor3d_queueio_distributed(tmpdir, make_copy, local_batch_size,
 
     for i in range(n_reads):
         data = li.fetch_minibatch_data('primary')
+        li.prepare_next('primary')
         bs = local_batch_size
         assert(data['label'].shape[0] == bs)
 

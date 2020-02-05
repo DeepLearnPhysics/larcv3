@@ -73,7 +73,7 @@ bool BatchFillerTensor2D::process(IOManager& mgr) {
   dim.resize(4);
   dim[0] = batch_size();
   dim[1] = voxel_meta.number_of_voxels(0);
-  dim[2] = voxel_meta.number_of_voxels(2);
+  dim[2] = voxel_meta.number_of_voxels(1);
   dim[3] = _num_channels;
   this->set_dim(dim);
   this->set_dense_dim(dim);

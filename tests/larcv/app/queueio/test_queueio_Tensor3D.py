@@ -81,6 +81,7 @@ def test_tensor3d_queueio(tmpdir, make_copy, batch_size, n_reads=2):
 
     for i in range(n_reads):
         data = li.fetch_minibatch_data('primary')
+        li.prepare_next('primary')
         print(data['label'].shape)
         assert(data['label'].shape[0] == batch_size)
 

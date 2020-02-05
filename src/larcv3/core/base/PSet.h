@@ -91,7 +91,11 @@ namespace larcv3 {
     /// Insert method for a PSet rep
     void add_pset(std::string key,
                   std::string pset);
+
+    void update(std::string key, std::string value);
     
+    std::string & operator[] (std::string key);
+
     /// Dump into a text format
     std::string dump(size_t indent_size=0) const;
 
