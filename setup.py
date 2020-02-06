@@ -22,7 +22,7 @@ else:
 
 setup(
     name="larcv",
-    version="3.2.2",
+    version="3.3.0",
     cmake_source_dir='src/',
     cmake_args=[
         '-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.9',
