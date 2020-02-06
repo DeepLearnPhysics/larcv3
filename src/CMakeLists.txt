@@ -101,20 +101,18 @@ include_directories(${PYTHON_NUMPY_INCLUDE_DIR})
 
 
 # # Define a function that handles generating python bindings for a library:
-# macro(generate_python_bindings name)    
-    
-    
+# macro(generate_python_bindings name)
+
+
 
 # endmacro(generate_python_bindings)
 if(CMAKE_PYTHON_BINDINGS)
+  message("Adding pybind11")
   add_subdirectory(pybind11)
+  include_directories(${PYBIND11_INCLUDE_DIR})
+  message(${PYBIND11_INCLUDE_DIR})
 else()
   add_definitions(-DLARCV_NO_PYBIND)
 endif(CMAKE_PYTHON_BINDINGS)
 
 add_subdirectory(larcv3)
-
-
-
-
-
