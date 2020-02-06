@@ -21,9 +21,7 @@
 
 #include <mutex>
 
-#ifndef SWIG
 static std::mutex __procfactory_mtx;
-#endif
 
 namespace larcv3 {
 

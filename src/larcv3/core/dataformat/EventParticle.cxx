@@ -55,8 +55,7 @@ namespace larcv3{
   void EventParticle::clear(){
     _part_v.clear();
   }
-////////Serialization is hidden from SWIG:
-// #ifndef SWIG
+
 
 
   void EventParticle::finalize(){
@@ -505,7 +504,6 @@ namespace larcv3{
     return;
   }
 
-// #endif // swig
 
 } // larcv3
 
