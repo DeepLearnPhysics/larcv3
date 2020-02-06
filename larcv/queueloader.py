@@ -378,12 +378,12 @@ class larcv_queueio (object):
         self.__class__._instance_m[self._name] = self
 
     def set_next_batch(self, batch_indexes):
-        if type(batch_indexes) != larcv.VectorOfSizet:
-            indexes = larcv.VectorOfSizet()
-            indexes.resize(len(batch_indexes))
-            for i, val in enumerate(batch_indexes):
-                indexes[i] = int(val)
-            batch_indexes = indexes
+        # if type(batch_indexes) != larcv.VectorOfSizet:
+        #     indexes = larcv.VectorOfSizet()
+        #     indexes.resize(len(batch_indexes))
+        #     for i, val in enumerate(batch_indexes):
+        #         indexes[i] = int(val)
+        #     batch_indexes = indexes
         self._proc.set_next_batch(batch_indexes)
 
     def batch_process(self):
