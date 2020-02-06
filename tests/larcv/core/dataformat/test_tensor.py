@@ -21,7 +21,6 @@ def test_Tensor(dimension):
     raw_image = numpy.random.random(shape).astype("float32")
 
     # Create a Tensor from the array:
-    print(raw_image.shape)
     if dimension == 1:
         t = larcv.Tensor1D(raw_image)
     elif dimension == 2:
@@ -34,7 +33,7 @@ def test_Tensor(dimension):
     assert t.size() == numpy.prod(shape)
 
     for i in range(20):
-        index = random.randint(0,t.size())
+        index = random.randint(0,t.size() - 1)
         assert t.pixel(index) == raw_image.take(index)
 
     nd_t = t.as_array()

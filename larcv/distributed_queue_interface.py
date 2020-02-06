@@ -18,7 +18,8 @@ class queue_interface(object):
             verbose             = False,
             random_access_mode  = "random_blocks",
             entry_comm          = MPI.COMM_WORLD,
-            io_comm             = MPI.COMM_WORLD):
+            io_comm             = MPI.COMM_WORLD,
+            seed                = None ):
 
         '''init function
 
@@ -36,6 +37,10 @@ class queue_interface(object):
 
         self._entry_comm = entry_comm
         self._io_comm    = io_comm
+
+        if seed is not None:
+            random.seed(seed)
+            numpy.random.seed(seed)
 
         self._count = {}
         self._warning = True

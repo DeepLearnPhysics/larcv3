@@ -11,7 +11,7 @@ from . larcv_writer   import larcv_writer
 
 class queue_interface(object):
 
-    def __init__(self, verbose=False, random_access_mode="random_blocks"):
+    def __init__(self, verbose=False, random_access_mode="random_blocks", seed=None):
         '''init function
 
         Not much to store here, just a dict of dataloaders and the keys to access their data.
@@ -30,6 +30,9 @@ class queue_interface(object):
         self._queue_next_entries = {}
         self._count = {}
 
+        if seed is not None:
+            random.seed(seed)
+            numpy.random.seed(seed)
 
         self._warning = True
 
