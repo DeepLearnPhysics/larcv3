@@ -512,11 +512,16 @@ void init_voxel_core(pybind11::module m){
 
 }
 
+
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::SparseTensor<2>>);
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::SparseTensor<3>>);
+
+
 template<size_t dimension>
 void init_sparse_tensor(pybind11::module m){
 
     using ST = larcv3::SparseTensor<dimension>;
-    std::string classname = "SparseTensor" + std::to_string(dimension) + "D";
+    std::string classname = larcv3::as_string<larcv3::SparseTensor<dimension>>();
     pybind11::class_<ST, larcv3::VoxelSet> sparsetensor(m, classname.c_str());
     sparsetensor.def(pybind11::init<>());
     sparsetensor.def("meta", (const larcv3::ImageMeta<dimension>& (ST::*)() const )(&ST::meta));
@@ -525,6 +530,8 @@ void init_sparse_tensor(pybind11::module m){
     sparsetensor.def("set", &ST::set);
     sparsetensor.def("clear_data", &ST::clear_data);
     sparsetensor.def("dense", &ST::dense);
+    std::string vecname = "VectorOf" + larcv3::as_string<larcv3::SparseTensor<dimension>>();
+    pybind11::bind_vector<std::vector<larcv3::SparseTensor<dimension> > >(m, vecname);
 
 /*
   Not wrapped:
@@ -536,16 +543,24 @@ void init_sparse_tensor(pybind11::module m){
 
 }
 
+
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::SparseCluster<2>>);
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::SparseCluster<3>>);
+
+
+
 template<size_t dimension>
 void init_sparse_cluster(pybind11::module m){
 
     using SC = larcv3::SparseCluster<dimension>;
-    std::string classname = "SparseCluster" + std::to_string(dimension) + "D";
+    std::string classname = larcv3::as_string<larcv3::SparseCluster<dimension>>();
     pybind11::class_<SC, larcv3::VoxelSetArray> sparsecluster(m, classname.c_str());
     sparsecluster.def(pybind11::init<>());
     sparsecluster.def("meta", (const larcv3::ImageMeta<dimension>& (SC::*)() const )(&SC::meta));
     sparsecluster.def("meta", (void (SC::*)(const larcv3::ImageMeta<dimension>& )  )(&SC::meta));
     sparsecluster.def("clear_data", &SC::clear_data);
+    std::string vecname = "VectorOf" + larcv3::as_string<larcv3::SparseCluster<dimension>>();
+    pybind11::bind_vector<std::vector<larcv3::SparseCluster<dimension> > >(m, vecname);
 
 /*
    Not wrapped:

@@ -864,6 +864,14 @@ template class EventSparseTensor<3>;
 }
 
 
+
+#include <pybind11/stl.h>
+
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::SparseTensor<2>>);
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::SparseTensor<3>>);
+
+
+
 template<size_t dimension>
 void init_eventsparse_tensor_base(pybind11::module m){
 
@@ -882,6 +890,7 @@ void init_eventsparse_tensor_base(pybind11::module m){
   ev_sparse_tensor.def("set", (void (Class::*)(const larcv3::SparseTensor<dimension> &))(&Class::set), "set");
   ev_sparse_tensor.def("set", (void (Class::*)(const larcv3::VoxelSet&, const larcv3::ImageMeta<dimension>&))(&Class::set), "set");
   ev_sparse_tensor.def("clear",              &Class::clear);
+
 
 /*
 

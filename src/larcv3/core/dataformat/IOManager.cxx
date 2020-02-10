@@ -1140,6 +1140,7 @@ void IOManager::reset() {
 
 }  // namespace larcv3
 
+#include <pybind11/stl.h>
 void init_iomanager(pybind11::module m){
 
   using Class = larcv3::IOManager;

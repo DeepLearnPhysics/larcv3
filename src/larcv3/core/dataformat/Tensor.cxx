@@ -589,6 +589,15 @@ std::vector<float> Image2D::copy_compress(size_t rows, size_t cols, CompressionM
 
 #include <pybind11/operators.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
+
+
+
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::Tensor<1>>);
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::Tensor<2>>);
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::Tensor<3>>);
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::Tensor<4>>);
+
 
 template <size_t dimension>
 void init_tensor_base(pybind11::module m){
@@ -638,6 +647,9 @@ void init_tensor_base(pybind11::module m){
     (void (Class::*)( const std::vector<float>&, bool  ))(&Class::eltwise));
 
   tensor.def("as_array", &Class::as_array);
+  
+  std::string vecname = "VectorOf" + larcv3::as_string<larcv3::Tensor<dimension>>();
+  pybind11::bind_vector<std::vector<larcv3::Tensor<dimension> > >(m, vecname);
 
 }
 

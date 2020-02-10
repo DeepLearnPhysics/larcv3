@@ -91,7 +91,7 @@ namespace larcv3 {
 
   // Template instantiation for IO
   template<> inline std::string product_unique_name<larcv3::EventTensor1D>() { return "tensor1d"; }
-  template<> inline std::string product_unique_name<larcv3::EventTensor2D>()  { return "tensor2d";  }
+  template<> inline std::string product_unique_name<larcv3::EventTensor2D>()  { return "image2d";  }
   template<> inline std::string product_unique_name<larcv3::EventTensor3D>() { return "tensor3d"; }
   template<> inline std::string product_unique_name<larcv3::EventTensor4D>() { return "tensor4d"; }
 

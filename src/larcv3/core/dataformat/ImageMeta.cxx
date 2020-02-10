@@ -660,6 +660,12 @@ void init_imagemeta_base(pybind11::module m){
       (std::vector<double> (Class::*)(size_t) const)(&Class::position));
     imagemeta.def("position", 
       (std::vector<double> (Class::*)(const std::vector<size_t> & )const)(&Class::position)); 
+   
+    imagemeta.def("position",
+      (double (Class::*)(size_t, size_t) const)(&Class::position));
+    imagemeta.def("position", 
+      (double (Class::*)(const std::vector<size_t> & , size_t)const)(&Class::position)); 
+
 
     imagemeta.def("min",
       (double (Class::*)( size_t ) const)(&Class::min));

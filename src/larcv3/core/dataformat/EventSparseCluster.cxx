@@ -1034,6 +1034,12 @@ template class EventSparseCluster<2>;
 template class EventSparseCluster<3>;
 }
 
+#include <pybind11/stl.h>
+
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::SparseCluster<2>>);
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::SparseCluster<3>>);
+
+
 template<size_t dimension>
 void init_eventsparse_cluster_base(pybind11::module m){
 

@@ -489,6 +489,8 @@ size_t ProcessDriver::get_tree_index(size_t entry) const {
 
 }  // namespace larcv3
 
+#include <pybind11/stl.h>
+
 void init_processdriver(pybind11::module m){
     using Class = larcv3::ProcessDriver;
     pybind11::class_<Class> processdriver(m, "ProcessDriver");

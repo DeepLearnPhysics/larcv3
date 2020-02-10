@@ -856,6 +856,12 @@ namespace larcv3 {
 
 }
 
+#include <pybind11/stl.h>
+
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::Tensor<1>>);
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::Tensor<2>>);
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::Tensor<3>>);
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::Tensor<4>>);
 
 
 template<size_t dimension>
