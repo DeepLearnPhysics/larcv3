@@ -20,7 +20,7 @@ def write_tensor(file_name, event_image_list, dimension):
         if dimension == 1:
             ev_tensor = io_manager.get_data("tensor1d","test")
         if dimension == 2:
-            ev_tensor = io_manager.get_data("tensor2d","test")
+            ev_tensor = io_manager.get_data("image2d","test")
         if dimension == 3:
             ev_tensor = io_manager.get_data("tensor3d","test")
         if dimension == 4:
@@ -61,7 +61,7 @@ def read_tensor(file_name, dimensions):
         if dimensions == 1:
             ev_tensor = io_manager.get_data("tensor1d","test")
         if dimensions == 2:
-            ev_tensor = io_manager.get_data("tensor2d","test")
+            ev_tensor = io_manager.get_data("image2d","test")
         if dimensions == 3:
             ev_tensor = io_manager.get_data("tensor3d","test")
         if dimensions == 4:
