@@ -34,7 +34,7 @@
 
 #ifndef LARCV_NO_PYBIND
 
-void init_dataformat(pybind11::module m);
+__attribute__ ((visibility ("default"))) void init_dataformat(pybind11::module m);
 
 
 // bindings
