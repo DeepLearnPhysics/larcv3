@@ -143,7 +143,12 @@ int omp_thread_count() {
 
     for (size_t pid = 0; pid < _process_name_v.size(); ++pid) {
       auto const& name = _process_name_v[pid];
-      auto const& datatype = _batch_data_type_v[pid];
+
+      auto proc_ptr = _driver.process_ptr(pid);
+      if (!(proc_ptr->is("BatchFiller"))) continue;
+      auto datatype = ((BatchHolder*)(proc_ptr))->data_type() ;
+
+
       switch ( datatype ) {
       case BatchDataType_t::kBatchDataShort:
         ready = ready && BatchDataQueueFactory<short>::get().get_queue(name).is_next_ready(); break;
@@ -166,7 +171,12 @@ int omp_thread_count() {
 
     for (size_t pid = 0; pid < _process_name_v.size(); ++pid) {
       auto const& name = _process_name_v[pid];
-      auto const& datatype = _batch_data_type_v[pid];
+
+      auto proc_ptr = _driver.process_ptr(pid);
+      if (!(proc_ptr->is("BatchFiller"))) continue;
+      // _batch_filler_id_v.push_back(pid);
+      auto datatype = ((BatchHolder*)(proc_ptr))->data_type() ;
+
       switch ( datatype ) {
       case BatchDataType_t::kBatchDataShort:
         BatchDataQueueFactory<short>::get_writeable().get_queue_writeable(name).pop(); break;
@@ -282,9 +292,10 @@ int omp_thread_count() {
         auto proc_ptr = _driver.process_ptr(pid);
         if (!(proc_ptr->is("BatchFiller"))) continue;
         _batch_filler_id_v.push_back(pid);
-        _batch_data_type_v.push_back( ((BatchHolder*)(proc_ptr))->data_type() );
+        auto datatype = ((BatchHolder*)(proc_ptr))->data_type() ;
+        _batch_data_type_v.push_back(datatype);
         auto const& name = _process_name_v[pid];
-        switch ( _batch_data_type_v.back() ) {
+        switch ( datatype ) {
         case BatchDataType_t::kBatchDataShort:
           BatchDataQueueFactory<short>::get_writeable().make_queue(name); break;
         case BatchDataType_t::kBatchDataInt:
