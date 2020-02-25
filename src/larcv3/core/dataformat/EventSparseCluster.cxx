@@ -1058,8 +1058,8 @@ void init_eventsparse_cluster_base(pybind11::module m){
 
   ev_sparse_cluster.def("set",                &Class::set);
   // ev_sparse_cluster.def("emplace_back",      &Class::emplace_back);
-  // ev_sparse_cluster.def("emplace",           &Class::emplace);
-  ev_sparse_cluster.def("as_vector",          &Class::as_vector);
+  ev_sparse_cluster.def("at",                 &Class::at, pybind11::return_value_policy::reference);
+  ev_sparse_cluster.def("as_vector",          &Class::as_vector, pybind11::return_value_policy::reference);
   ev_sparse_cluster.def("size",               &Class::size);
   ev_sparse_cluster.def("clear",              &Class::clear);
   ev_sparse_cluster.def("sparse_cluster",     &Class::sparse_cluster);

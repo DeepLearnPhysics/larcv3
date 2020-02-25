@@ -50,7 +50,6 @@ namespace larcv3 {
 
     auto buffer = pyarray.request();
 
-    std::cout << "Received an array of dim " << buffer.ndim << std::endl;
 
     // First, we do checks that this is an acceptable dimension:
     if (buffer.ndim != dimension){
@@ -411,6 +410,72 @@ namespace larcv3 {
   }
 
 
+template<size_t dimension>
+Tensor<dimension> Tensor<dimension>::compress(
+  std::array<size_t, dimension> compression, PoolType_t pool_type) const
+{
+
+  // First, compress the meta:
+  ImageMeta<dimension> compressed_meta = this->_meta.compress(compression);
+
+  float unfilled_value(0.0);
+  // default fill value depends on pooling type:
+  if (pool_type == larcv3::kPoolMax)
+    unfilled_value = - std::numeric_limits< float >::max();
+
+  // Create an output tensor:
+  Tensor<dimension> output(compressed_meta);
+  std::vector<float> output_data;
+  output_data.resize(compressed_meta.total_voxels(), unfilled_value);
+
+  // Loop over the pixels, find the position in the new tensor, and add it.
+  for (size_t index = 0; index < _img.size() ;  index ++  ){
+    // First, get the old coordinates of this voxel:
+    auto coordinates = this->_meta.coordinates(index);
+    for (size_t d = 0; d < dimension; d ++) coordinates[d] = size_t(coordinates[d] / compression[d]);
+    size_t new_index = compressed_meta.index(coordinates);
+
+    // Add the new voxel to the new set:
+    if ( pool_type == larcv3::kPoolMax){
+      if (output_data[new_index] < _img[index]){
+        // Replace only if this new value is larger than the old
+        output_data[new_index] = _img[index];
+      } 
+      
+    }
+    else {
+      output_data[new_index] += _img[index];
+    }
+  }
+
+  output.move(std::move(output_data));
+
+  // Correct the output values by the total ratio of compression if averaging:
+  if (pool_type == larcv3::kPoolAverage){
+    float ratio = 1.0;
+    for (size_t d = 0; d < dimension; d ++) ratio *= compression[d];
+    output /= ratio;
+  }
+
+  return output;
+
+}
+
+template<size_t dimension>
+Tensor<dimension> Tensor<dimension>::compress(
+  size_t compression, PoolType_t pool_type) const
+{
+
+  std::array<size_t, dimension> comp;
+  for (size_t i = 0; i < dimension; ++i ) comp[i] = compression;
+
+  return this->compress(comp, pool_type);
+
+
+}
+
+
+
 template class Tensor<1>;
 template class Tensor<2>;
 template class Tensor<3>;
@@ -591,12 +656,7 @@ std::vector<float> Image2D::copy_compress(size_t rows, size_t cols, CompressionM
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
-
-
-PYBIND11_MAKE_OPAQUE(std::vector<larcv3::Tensor<1>>);
-PYBIND11_MAKE_OPAQUE(std::vector<larcv3::Tensor<2>>);
-PYBIND11_MAKE_OPAQUE(std::vector<larcv3::Tensor<3>>);
-PYBIND11_MAKE_OPAQUE(std::vector<larcv3::Tensor<4>>);
+;
 
 
 template <size_t dimension>
@@ -627,7 +687,10 @@ void init_tensor_base(pybind11::module m){
   tensor.def("threshold",                                  &Class::threshold);
   tensor.def("binarize",                                   &Class::binarize);
   tensor.def("clear_data",                                 &Class::clear_data);
-
+  tensor.def("compress",
+    (Class (Class::*)(std::array<size_t, dimension> compression, larcv3::PoolType_t)const)(&Class::compress));
+  tensor.def("compress", 
+    (Class (Class::*)( size_t, larcv3::PoolType_t ) const)( &Class::compress));
 
   tensor.def(pybind11::self += float());
   tensor.def(pybind11::self + float());
@@ -648,8 +711,6 @@ void init_tensor_base(pybind11::module m){
 
   tensor.def("as_array", &Class::as_array);
   
-  std::string vecname = "VectorOf" + larcv3::as_string<larcv3::Tensor<dimension>>();
-  pybind11::bind_vector<std::vector<larcv3::Tensor<dimension> > >(m, vecname);
 
 }
 

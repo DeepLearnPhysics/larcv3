@@ -49,6 +49,9 @@ namespace larcv3 {
     /// Number of valid projection id
     inline size_t size() const { return _tensor_v.size(); }
 
+    inline larcv3::SparseTensor<dimension>   at(size_t index) {return _tensor_v.at(index);}
+
+
     //
     // Write-access
     //

@@ -41,6 +41,11 @@ class ImageMeta {
             const std::vector<double>& origin = std::vector<double>(),
             DistanceUnit_t unit = kUnitUnknown);
 
+  // Copy constructor
+  ImageMeta(const ImageMeta<dimension> & other);
+  // Assignment operator:
+  ImageMeta<dimension>& operator=(const ImageMeta<dimension> & other);
+
   // Comparison operators:
   inline bool operator==(const ImageMeta<dimension> & rhs) const {
     for (size_t i = 0; i < dimension; i ++){
@@ -111,8 +116,6 @@ class ImageMeta {
   /// Provide absolute coordinate of the center of a specified pixel index
   std::vector<double> position(size_t index) const;
 
-
-
   /// Provide absolute coordinate of the center of a specified pixel (row,col)
   std::vector<double> position(const std::vector<size_t> & coordinates) const;
 
@@ -122,6 +125,12 @@ class ImageMeta {
 
   /// Same as above, but restricted to a single axis
   double position(const std::vector<size_t> & coordinates, size_t axis) const;
+
+  // Compress the meta by a common factor along each dimension
+  ImageMeta<dimension> compress(size_t compression) const;
+
+    // Compress the meta by a unique factor along each dimension
+  ImageMeta<dimension> compress(std::array<size_t, dimension> compression) const;
 
 
   /// Provide the minimum and maximum real space values of the image.

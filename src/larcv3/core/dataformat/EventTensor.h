@@ -41,6 +41,7 @@ namespace larcv3 {
     /// Const reference getter to an array of larcv3::Tensor<dimension>
     // pybind11::array_t<float> numpy() const { return _image_v; }
 
+    // inline std::shared_ptr<larcv3::Tensor<dimension>>& at(size_t index) const {return _image_v.at(index);}
 
     /// Deprecated (use as_vector): const reference getter to an array of larcv3::Tensor<dimension> 
     const std::vector<larcv3::Tensor<dimension>>& image2d_array() const { return _image_v; }

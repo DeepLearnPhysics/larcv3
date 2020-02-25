@@ -58,8 +58,7 @@ namespace larcv3 {
 
     /// Reset contents w/ new larcv3::ImageMeta
     void reset(const ImageMeta<dimension>&);
-    /// Various modes used to combine pixels
-    enum CompressionModes_t { kSum, kAverage, kMaxPool, kOverWrite};
+
 
     /// Size of data, equivalent of # rows x # columns x ...
     size_t size() const { return _img.size(); }
@@ -101,6 +100,11 @@ namespace larcv3 {
     void binarize(float thresh, float lower_overwrite, float upper_overwrite);
     /// Clear data contents
     void clear_data();
+
+    // Return a new tensor that is this one, but compressed/downsampled
+    // Accepts either an array of values, one per dimension, or a single value
+    Tensor<dimension> compress(std::array<size_t, dimension> compression, PoolType_t) const;
+    Tensor<dimension> compress(size_t compression, PoolType_t) const;
 
     // /// Overlay with another Image2D: overlapped pixel region is merged
     // void overlay(const Image2D&, CompressionModes_t mode=kSum);

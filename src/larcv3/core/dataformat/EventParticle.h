@@ -46,6 +46,8 @@ namespace larcv3 {
     inline const std::vector<larcv3::Particle>& as_vector() const
     { return _part_v; }
 
+    // inline const larcv3::Particle& at(size_t index) const {return _part_v.at(index);}
+
     inline size_t size() const {return _part_v.size();}
 
     /// Data clear method

@@ -21,6 +21,30 @@ ImageMeta<dimension>::ImageMeta() :
   }
  }
 
+template <size_t dimension>
+ImageMeta<dimension>::ImageMeta(const ImageMeta<dimension> & other) :
+  _valid(other.is_valid()),
+  _projection_id(other.projection_id())
+{
+  for(size_t i = 0; i < dimension; i++){
+    _image_sizes[i] = other.image_size(i);
+    _number_of_voxels[i] = other.number_of_voxels(i);
+    _origin[i] = other.origin(i);
+  }
+}
+
+template <size_t dimension>
+ImageMeta<dimension> & ImageMeta<dimension>::operator=(const ImageMeta<dimension> & other)
+{
+  this->_valid = other.is_valid();
+  this->_projection_id = other.projection_id();
+  for(size_t i = 0; i < dimension; i++){
+    _image_sizes[i] = other.image_size(i);
+    _number_of_voxels[i] = other.number_of_voxels(i);
+    _origin[i] = other.origin(i);
+  }
+  return *this;
+}
 
 /// Constructor with arguments: ndims, dims, voxel_sizes, unit.
 template<size_t dimension>
@@ -386,6 +410,40 @@ double ImageMeta<dimension>::position(const std::vector<size_t> & coordinates, s
 }
 
 
+// Compress the meta by a common factor along each dimension
+template<size_t dimension>
+ImageMeta<dimension> ImageMeta<dimension>::compress(size_t compression) const{
+  // Create a new meta:
+  ImageMeta<dimension> output;
+  output.set_projection_id(this->_projection_id);
+  for (size_t dim = 0; dim < dimension; dim ++){
+    output.set_dimension(
+      dim, 
+      this -> _image_sizes[dim] / (float) compression, 
+      size_t (this -> _number_of_voxels[dim]/ (float) compression ), 
+      this -> _origin[dim] / (float) compression);
+  }
+  return output;
+}
+
+// Compress the meta by a unique factor along each dimension
+template<size_t dimension>
+ImageMeta<dimension> ImageMeta<dimension>::compress(std::array<size_t, dimension> compression) const{
+  // Create a new meta:
+  ImageMeta<dimension> output;
+  output.set_projection_id(this->_projection_id);
+  for (size_t dim = 0; dim < dimension; dim ++){
+    output.set_dimension(
+      dim, 
+      this -> _image_sizes[dim] / (float) compression[dim], 
+      size_t (this -> _number_of_voxels[dim]/ (float) compression[dim] ), 
+      this -> _origin[dim] / (float) compression[dim]);
+  }
+  return output;
+}
+
+
+
 /// Provide the minimum and maximum real space values of the image.
 template<size_t dimension>
 std::vector<double> ImageMeta<dimension>::min() const{
@@ -543,6 +601,11 @@ std::string ImageMeta<dimension>::dump() const
       ss << ", ";
   }
   ss << ")\n";
+  if (_valid)
+    ss << "  Valid: True";
+  else
+    ss << "  Valid: False";
+  ss << "\n";
   // "rows,cols) = (" << _row_count << "," <<
   // _col_count
   //    << ") ... Distance Unit: " << (int)(this-> unit())
@@ -601,6 +664,7 @@ void init_imagemeta_base(pybind11::module m){
     using Class = larcv3::ImageMeta<dimension>;
     pybind11::class_<Class> imagemeta(m, larcv3::as_string<Class>().c_str());
     imagemeta.def(pybind11::init<>());
+    imagemeta.def(pybind11::init<Class>());
     imagemeta.def(pybind11::init<size_t, 
                                  const std::vector<size_t>,
                                  const std::vector<double>,
@@ -644,6 +708,11 @@ void init_imagemeta_base(pybind11::module m){
 
     imagemeta.def("unit",         &Class::unit);
 
+    imagemeta.def("compress",
+      (Class (Class::*)(std::array<size_t, dimension> ) const)(&Class::compress));
+    imagemeta.def("compress", 
+      (Class (Class::*)(size_t)const)(&Class::compress));
+ 
 
     imagemeta.def("index",
       (size_t (Class::*)( const std::vector<size_t> & ) const)(&Class::index));

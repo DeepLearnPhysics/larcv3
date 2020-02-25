@@ -16,11 +16,8 @@
 
 #include "larcv3/core/dataformat/DataFormatTypes.h"
 #include "larcv3/core/dataformat/ImageMeta.h"
+#include "larcv3/core/dataformat/Tensor.h"
 
-// #include <Python.h>
-// #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-// //#include <numpy/ndarrayobject.h>
-// #include "numpy/arrayobject.h"
 #include <pybind11/numpy.h>
 
 namespace larcv3 {
@@ -155,6 +152,9 @@ namespace larcv3 {
   public:
     /// Default ctor
     VoxelSet() {_id=0;}
+
+    // VoxelSet(pybind11::array_t<float> values, pybind11::array_t<size_t> indexes);
+
     /// Default dtor
     virtual ~VoxelSet() {}
 
@@ -326,6 +326,13 @@ namespace larcv3 {
 
     // Take this sparseTensor and return it as a dense numpy array
     pybind11::array_t<float> dense();
+
+    larcv3::Tensor<dimension> to_tensor();
+
+    // Return a new sparse tensor that is this one, but compressed/downsampled
+    // Accepts either an array of values, one per dimension, or a single value
+    SparseTensor<dimension> compress(std::array<size_t, dimension> compression, PoolType_t) const;
+    SparseTensor<dimension> compress(size_t compression, PoolType_t) const;
 
     //
     // Write-access
