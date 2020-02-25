@@ -70,8 +70,8 @@ namespace larcv3 {
     ProcessBase* create(const std::string name, const std::string instance_name) {
       auto iter = _factory_map.find(name);
       if(iter == _factory_map.end() || !((*iter).second)) {
-	LARCV_ERROR() << "Found no registered class " << name << std::endl;
-	return nullptr;
+        LARCV_ERROR() << "Found no registered class " << name << std::endl;
+        return nullptr;
       }
       auto ptr = (*iter).second->create(instance_name);
       ptr->_typename = name;
