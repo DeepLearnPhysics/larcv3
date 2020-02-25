@@ -147,9 +147,7 @@ bool Downsample::process(IOManager& mgr) {
           pool = _pool_types_v[i];
         }
         SparseTensor2D compressed = sparse_object.compress(downsample, larcv3::PoolType_t(pool));
-        std::cout << compressed.meta().dump() << std::endl;
         ev_output.emplace(std::move(compressed));
-
       }
     }
     if (product == "sparse3d"){
@@ -177,7 +175,8 @@ bool Downsample::process(IOManager& mgr) {
           pool = _pool_types_v[i];
         }
         
-        ev_output.emplace(std::move(sparse_object.compress(downsample, larcv3::PoolType_t(pool))));
+        SparseTensor3D compressed = sparse_object.compress(downsample, larcv3::PoolType_t(pool));
+        ev_output.emplace(std::move(compressed));
 
       }
     }
