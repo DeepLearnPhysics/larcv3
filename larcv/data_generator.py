@@ -244,7 +244,6 @@ def write_sparse_tensors(file_name, voxel_set_list, dimension, n_projections):
 
     from copy import copy
     io_manager = larcv.IOManager(larcv.IOManager.kWRITE)
-    print(type(file_name))
     io_manager.set_out_file(file_name)
     io_manager.initialize()
 
