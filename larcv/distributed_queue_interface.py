@@ -184,9 +184,14 @@ class queue_interface(object):
         # First, tell it what the entries for the first batch to read:
         self.prepare_next(mode)
 
+        while self._queueloaders[mode].is_reading():
+            # print(self._queueloaders[mode].is_reading())
+            time.sleep(0.01)
+
         # Then, we promote those entries to the "current" batch:
         io.pop_current_data()
         io.next(store_entries=True,store_event_ids=True)
+        self.prepare_next(mode)
 
         # Note that there is no "next" data pipelined yet.
 
@@ -221,7 +226,7 @@ class queue_interface(object):
             # set_entries = self.get_next_batch_indexes(mode, self._minibatch_size[mode])
 
         self._queueloaders[mode].set_next_batch(set_entries)
-        self._queueloaders[mode].batch_process()
+        self._queueloaders[mode].prepare_next()
 
         self._count[mode] = 0
 
@@ -233,7 +238,7 @@ class queue_interface(object):
 
         # return
 
-    def fetch_minibatch_data(self, mode, pop=False, fetch_meta_data=False):
+    def fetch_minibatch_data(self, mode, pop=False, fetch_meta_data=False, data_shape=None, channels="last"):
         # Return a dictionary object with keys 'image', 'label', and others as needed
         # self._queueloaders['train'].fetch_data(keyword_label).dim() as an example
 
@@ -257,8 +262,10 @@ class queue_interface(object):
         this_data = {}
 
         for key in self._data_keys[mode]:
-            this_data[key] = self._queueloaders[mode].fetch_data(self._data_keys[mode][key]).data()
-            this_data[key] = numpy.reshape(this_data[key], self._dims[mode][key])
+            this_data[key] = self._queueloaders[mode].fetch_data(
+                self._data_keys[mode][key]).data(
+                shape=data_shape, channels=channels)
+            # this_data[key] = numpy.reshape(this_data[key], self._dims[mode][key])
 
         if fetch_meta_data:
             this_data['entries'] = self._queueloaders[mode].fetch_entries()

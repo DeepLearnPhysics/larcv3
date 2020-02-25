@@ -163,7 +163,7 @@ namespace larcv3 {
 
     std::string dump() const;
 
-#ifndef SWIG
+
   public:
     static hid_t get_datatype() {
       hid_t datatype;
@@ -251,7 +251,6 @@ namespace larcv3 {
 
       return datatype;
     }
-#endif
 
   private:
 
@@ -293,5 +292,8 @@ namespace larcv3 {
 
 
 }
+
+void init_particle(pybind11::module m);
+
 #endif
 /** @} */ // end of doxygen group

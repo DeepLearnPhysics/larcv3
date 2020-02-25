@@ -106,13 +106,17 @@ namespace larcv3 {
   // In this section, we define and specialize a number of cases for mapping
   // datatypes used in larcv3 to datatypes needed for hdf5 serialization.
 
-#ifndef SWIG
+  void init_dataformattypes(pybind11::module m);
 
   template <typename T>
   hid_t get_datatype();
 
+  template <typename T>
+  std::string as_string();
 
-#endif
 
 }
+
+void init_dataformattypes(pybind11::module m);
+
 #endif

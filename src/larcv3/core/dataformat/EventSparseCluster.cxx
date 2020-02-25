@@ -120,6 +120,8 @@ namespace larcv3 {
     // Get the starting size (0) and dimensions (unlimited)
     hsize_t extents_starting_dim[] = {0};
     hsize_t extents_maxsize_dim[]  = {H5S_UNLIMITED};
+    hid_t lcpl = H5Pcreate(H5P_LINK_CREATE); // link creation property list
+    hid_t dapl = H5Pcreate(H5P_DATASET_ACCESS); // dataset access property list
 
     // Create a dataspace
     hid_t extents_dataspace = H5Screate_simple(1, extents_starting_dim, extents_maxsize_dim);
@@ -136,10 +138,6 @@ namespace larcv3 {
       H5Pset_deflate(extents_cparms, compression);
       // extents_cparms.setDeflate(compression);
     }
-
-    hid_t lcpl = H5Pcreate(H5P_LINK_CREATE);
-    hid_t dapl = H5Pcreate(H5P_DATASET_ACCESS);
-
 
     // Create the extents dataset:
     H5Dcreate(
@@ -1034,6 +1032,61 @@ namespace larcv3 {
 
 template class EventSparseCluster<2>;
 template class EventSparseCluster<3>;
+}
+
+#include <pybind11/stl.h>
+
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::SparseCluster<2>>);
+PYBIND11_MAKE_OPAQUE(std::vector<larcv3::SparseCluster<3>>);
+
+
+template<size_t dimension>
+void init_eventsparse_cluster_base(pybind11::module m){
+
+  std::string classname = "EventSparseCluster" + std::to_string(dimension) + "D";
+
+  using Class = larcv3::EventSparseCluster<dimension>;
+  pybind11::class_<Class, std::shared_ptr<Class>> ev_sparse_cluster(m, classname.c_str());
+  ev_sparse_cluster.def(pybind11::init<>());
+
+/*
+    void set(const larcv3::SparseCluster<dimension>& clusters);
+
+    void set(const larcv3::VoxelSetArray& clusters, const larcv3::ImageMeta<dimension>& meta);
+
+*/
+
+  ev_sparse_cluster.def("set",                &Class::set);
+  // ev_sparse_cluster.def("emplace_back",      &Class::emplace_back);
+  ev_sparse_cluster.def("at",                 &Class::at, pybind11::return_value_policy::reference);
+  ev_sparse_cluster.def("as_vector",          &Class::as_vector, pybind11::return_value_policy::reference);
+  ev_sparse_cluster.def("size",               &Class::size);
+  ev_sparse_cluster.def("clear",              &Class::clear);
+  ev_sparse_cluster.def("sparse_cluster",     &Class::sparse_cluster);
+
+/*
+
+
+
+    /// Access to all stores larcv3::SparseCluster
+    inline const std::vector<larcv3::SparseCluster<dimension> >& as_vector() const { return _cluster_v; }
+
+    /// Access SparseCluster of a specific projection ID
+    const larcv3::SparseCluster<dimension> & sparse_cluster(const ProjectionID_t id) const;
+
+Not wrapped:
+    void emplace(larcv3::SparseCluster<dimension>&& clusters);
+    void emplace(larcv3::VoxelSetArray&& clusters, larcv3::ImageMeta<dimension>&& meta);
+
+
+*/
+
+
+}
+
+void init_eventsparsecluster(pybind11::module m){
+  init_eventsparse_cluster_base<2>(m);
+  init_eventsparse_cluster_base<3>(m);
 }
 
 #endif

@@ -90,7 +90,7 @@ namespace larcv3 {
 
 
       auto const& ev_tensor2d = mgr.get_data<larcv3::EventSparseTensor2D>(tensor2d_producer);
-      auto& ev_out_image = mgr.get_data<larcv3::EventImage2D>(output_producer);
+      auto& ev_out_image = mgr.get_data<larcv3::EventTensor2D>(output_producer);
 
       std::vector<larcv3::Image2D> image_v;
       for (auto const& tensor2d_v : ev_tensor2d.as_vector()) {

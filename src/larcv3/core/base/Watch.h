@@ -17,6 +17,8 @@
 #include <sys/time.h>
 #include <time.h>
 
+#include <pybind11/pybind11.h>
+
 namespace larcv3 {
 
   /**
@@ -58,5 +60,8 @@ namespace larcv3 {
     double _wall_time_start;
   };
 }
+
+void init_Watch(pybind11::module m);
+
 #endif
 /** @} */ // end of doxygen group 

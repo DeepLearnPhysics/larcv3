@@ -36,7 +36,9 @@ namespace larcv3 {
 
   const larcv3::Point2D Vertex::as_point2d(larcv3::PointType_t point_type) const
   {
-    double data[2] = {};
+
+    std::array<double, 2> data = {};
+
     switch(point_type) {
       case kPointXY:
         data[0] = _x; data[1] = _y;
@@ -84,7 +86,7 @@ namespace larcv3 {
   std::string Vertex::dump() const
   {
     std::stringstream ss;
-    ss << "x = " << _x << " ; y = " << _y << " ; z = " << _z << std::endl;
+    ss << "x = " << _x << " ; y = " << _y << " ; z = " << _z << " ; t = " << _t << std::endl;
     return ss.str();
   }
 
@@ -95,6 +97,39 @@ namespace larcv3 {
   //   _z = (double)( ((double)((signed long long)(_z * 1.e6)) * 1.e-6 ));
   //   _t = (double)( ((double)((signed long long)(_t * 1.e6)) * 1.e-6 ));
   // }
+}
+
+
+#include <pybind11/operators.h>
+
+void init_vertex(pybind11::module m){
+
+    // using larcv3::Vertex = larcv3::Vertex;
+    pybind11::class_<larcv3::Vertex> vertex(m, "Vertex");
+    vertex.def(pybind11::init<>());
+    vertex.def(pybind11::init<double, double, double, double>());
+    vertex.def("reset", (void (larcv3::Vertex::*)())(&larcv3::Vertex::reset), "Reset");
+    vertex.def("reset", (void (larcv3::Vertex::*)(double, double, double, double))(&larcv3::Vertex::reset), "Reset");
+    vertex.def("x", &larcv3::Vertex::x);
+    vertex.def("y", &larcv3::Vertex::y);
+    vertex.def("z", &larcv3::Vertex::z);
+    vertex.def("t", &larcv3::Vertex::t);
+    vertex.def("as_point2d", &larcv3::Vertex::as_point2d);
+    vertex.def("as_point3d", &larcv3::Vertex::as_point3d);
+    vertex.def(pybind11::self == pybind11::self);
+    vertex.def(pybind11::self != pybind11::self);
+    vertex.def(pybind11::self < pybind11::self);
+    vertex.def("dump", &larcv3::Vertex::dump);
+    vertex.def("__repr__",&larcv3::Vertex::dump);
+
+
+/*
+
+
+    std::string dump() const;
+
+
+*/
 }
 
 #endif

@@ -9,7 +9,7 @@ N_CHECKS = 1
 
 @pytest.mark.parametrize('dimension', [2,3])
 def test_import(dimension):
-    from larcv import larcv
+    import larcv
     if dimension == 2:
         pt = larcv.Point2D()
     elif dimension == 3:

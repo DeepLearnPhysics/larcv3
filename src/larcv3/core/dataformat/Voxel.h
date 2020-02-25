@@ -16,6 +16,9 @@
 
 #include "larcv3/core/dataformat/DataFormatTypes.h"
 #include "larcv3/core/dataformat/ImageMeta.h"
+#include "larcv3/core/dataformat/Tensor.h"
+
+#include <pybind11/numpy.h>
 
 namespace larcv3 {
 
@@ -81,11 +84,11 @@ namespace larcv3 {
     inline bool operator >= (const float& rhs) const
     { return _value >= rhs; }
 
-  private:
+  protected:
     VoxelID_t _id; ///< voxel id
     float  _value; ///< Pixel Value
 
-#ifndef SWIG
+
   public:
     static hid_t get_datatype() {
 
@@ -97,7 +100,6 @@ namespace larcv3 {
                   HOFFSET (Voxel, _value), larcv3::get_datatype<float>());
       return datatype;
     }
-#endif
 
 
   };
@@ -150,6 +152,9 @@ namespace larcv3 {
   public:
     /// Default ctor
     VoxelSet() {_id=0;}
+
+    // VoxelSet(pybind11::array_t<float> values, pybind11::array_t<size_t> indexes);
+
     /// Default dtor
     virtual ~VoxelSet() {}
 
@@ -174,10 +179,18 @@ namespace larcv3 {
     inline size_t size() const { return _voxel_v.size(); }
 
     /// Get the value of all voxels in this set
-    std::vector<float> values() const;
+    pybind11::array_t<float> values() const;
 
     /// Get the index of all voxels in this set
-    std::vector<size_t> indexes() const;
+    pybind11::array_t<size_t> indexes() const;
+
+
+    /// Get the value of all voxels in this set
+    std::vector<float> values_vec() const;
+
+    /// Get the index of all voxels in this set
+    std::vector<size_t> indexes_vec() const;
+
 
     //
     // Write-access
@@ -217,7 +230,7 @@ namespace larcv3 {
     inline VoxelSet& operator /= (float factor)
     { for(auto& vox : _voxel_v) vox /= factor; return (*this); }
 
-  private:
+  protected:
     /// Instance ID
     InstanceID_t _id;
     /// Ordered sparse vector of voxels
@@ -310,6 +323,17 @@ namespace larcv3 {
     /// Access ImageMeta of specific projection
     inline const larcv3::ImageMeta<dimension>& meta() const { return _meta; }
 
+
+    // Take this sparseTensor and return it as a dense numpy array
+    pybind11::array_t<float> dense();
+
+    larcv3::Tensor<dimension> to_tensor();
+
+    // Return a new sparse tensor that is this one, but compressed/downsampled
+    // Accepts either an array of values, one per dimension, or a single value
+    SparseTensor<dimension> compress(std::array<size_t, dimension> compression, PoolType_t) const;
+    SparseTensor<dimension> compress(size_t compression, PoolType_t) const;
+
     //
     // Write-access
     //
@@ -329,6 +353,8 @@ namespace larcv3 {
 
     /// Meta setter
     void meta(const larcv3::ImageMeta<dimension>& meta);
+
+    // Tensor<dimension> as_tensor();
 
   private:
     larcv3::ImageMeta<dimension> _meta;
@@ -381,6 +407,16 @@ typedef SparseCluster<2> SparseCluster2D;
 typedef SparseCluster<3> SparseCluster3D;
 
 }
+
+void init_voxel_core(pybind11::module m);
+
+template<size_t dimension>
+void init_sparse_tensor(pybind11::module m);
+
+template<size_t dimension>
+void init_sparse_cluster(pybind11::module m);
+
+void init_voxel(pybind11::module m);
 
 #endif
 /** @} */ // end of doxygen group

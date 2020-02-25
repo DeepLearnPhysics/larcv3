@@ -32,15 +32,15 @@ namespace larcv3 {
     
     /// Default constructor
     PSet(const std::string name="",
-	 const std::string data="");
+         const std::string data="");
 
     /// Default destructor
     virtual ~PSet(){};
 
     /// Copy ctor
     PSet(const PSet& orig) : _name       ( orig._name       )
-			   , _data_value ( orig._data_value )
-			   , _data_pset  ( orig._data_pset  )
+                           , _data_value ( orig._data_value )
+                           , _data_pset  ( orig._data_pset  )
     {}
 
     /// name getter
@@ -90,8 +90,12 @@ namespace larcv3 {
 
     /// Insert method for a PSet rep
     void add_pset(std::string key,
-		  std::string pset);
+                  std::string pset);
+
+    void update(std::string key, std::string value);
     
+    std::string & operator[] (std::string key);
+
     /// Dump into a text format
     std::string dump(size_t indent_size=0) const;
 
@@ -167,6 +171,10 @@ namespace larcv3 {
   template<> PSet PSet::get<larcv3::PSet>(const std::string& key) const;
   
 }
+
+
+void init_PSet(pybind11::module m);
+
 
 #endif
 /** @} */ // end of doxygen group 

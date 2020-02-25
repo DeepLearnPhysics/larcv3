@@ -65,7 +65,7 @@ namespace larcv3 {
     // What does this function do?
     // void approx();
 
-#ifndef SWIG
+
   public:
     static hid_t get_datatype() {
       hid_t datatype;
@@ -80,10 +80,12 @@ namespace larcv3 {
                   HOFFSET (Vertex, _t), larcv3::get_datatype<double>());
       return datatype;
     }
-#endif
+
 
 
   };
 }
+
+void init_vertex(pybind11::module m);
 
 #endif

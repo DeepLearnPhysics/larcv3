@@ -3,8 +3,6 @@
 
 #include "larcv3/core/dataformat/DataFormatTypes.h"
 
-#ifndef SWIG
-
 namespace larcv3{
 
 
@@ -73,7 +71,7 @@ namespace larcv3{
                HOFFSET (Extents_t, first),
                larcv3::get_datatype<unsigned long long int>());
     H5Tinsert (datatype, "N",
-               HOFFSET (Extents_t, n),
+               HOFFSET (Extents_t, n),     
                larcv3::get_datatype<unsigned int>());
     return datatype;
 
@@ -96,9 +94,56 @@ namespace larcv3{
   }
 
 
+  // Wrapper functions and enumerations to make binding easier:
+  template<> std::string as_string<float>() {return "Float";}
+  template<> std::string as_string<int>()   {return "Int";}
+  template<> std::string as_string<double>(){return "Double";}
+  template<> std::string as_string<short>() {return "Short";}
+
 }
 
-#endif // swig
+void init_dataformattypes(pybind11::module m){
+  pybind11::enum_<larcv3::DistanceUnit_t> distanceunit_t(m,"DistanceUnit_t");
+  distanceunit_t.value("kUnitUnknown",  larcv3::kUnitUnknown);
+  distanceunit_t.value("kUnitCM",       larcv3::kUnitCM);
+  distanceunit_t.value("kUnitWireTime", larcv3::kUnitWireTime);
+  distanceunit_t.export_values();
+
+  pybind11::class_<larcv3::Extents_t>   extents_t(m, "Extents_t");
+  extents_t.def(pybind11::init<>());
+  extents_t.def_readwrite("first", &larcv3::Extents_t::first);
+  extents_t.def_readwrite("n",     &larcv3::Extents_t::n);
+
+  pybind11::class_<larcv3::IDExtents_t> idextents_t(m, "IDExtents_t");
+  idextents_t.def(pybind11::init<>());
+  idextents_t.def_readwrite("first", &larcv3::IDExtents_t::first);
+  idextents_t.def_readwrite("n",     &larcv3::IDExtents_t::n);
+  idextents_t.def_readwrite("id",    &larcv3::IDExtents_t::id);
+
+
+  m.attr("kINVALID_INDEX")        = larcv3::kINVALID_INDEX;
+  m.attr("kINVALID_INSTANCEID")   = larcv3::kINVALID_INSTANCEID;
+  m.attr("kINVALID_PROJECTIONID") = larcv3::kINVALID_PROJECTIONID;
+  m.attr("kINVALID_VOXELID")      = larcv3::kINVALID_VOXELID;
+  m.attr("kINVALID_PRODUCER")     = larcv3::kINVALID_PRODUCER;
+  
+  pybind11::enum_<larcv3::PoolType_t> pooltype_t(m,"PoolType_t");
+  pooltype_t.value("kPoolSum",      larcv3::PoolType_t::kPoolSum);
+  pooltype_t.value("kPoolAverage",  larcv3::PoolType_t::kPoolAverage);
+  pooltype_t.value("kPoolMax",      larcv3::PoolType_t::kPoolMax);
+  pooltype_t.export_values();
+  // struct Extents_t{
+  //   unsigned long long int first;
+  //   unsigned int n;
+  // };
+
+  // struct IDExtents_t{
+  //   unsigned long long int first;
+  //   unsigned int n;
+  //   unsigned int id;
+  // };
+
+}
 
 
 #endif

@@ -41,6 +41,8 @@ namespace larcv3 {
     /// EventBase::clear() override
     inline void clear() {_cluster_v.clear();}
 
+    inline larcv3::SparseCluster<dimension>  at(size_t index) {return _cluster_v.at(index);}
+
     /// Access to all stores larcv3::SparseCluster
     inline const std::vector<larcv3::SparseCluster<dimension> >& as_vector() const { return _cluster_v; }
 
@@ -59,8 +61,6 @@ namespace larcv3 {
     void set(const larcv3::SparseCluster<dimension>& clusters);
     /// Emplace a new element
     void emplace(larcv3::VoxelSetArray&& clusters, larcv3::ImageMeta<dimension>&& meta);
-    // /// Set a new element
-    // void set(const larcv3::VoxelSetArray& clusters, const larcv3::ImageMeta& meta);
 
 
 
@@ -123,6 +123,12 @@ namespace larcv3 {
   };
 
 }
+
+template<size_t dimension>
+void init_eventsparse_cluster_base(pybind11::module m);
+
+void init_eventsparsecluster(pybind11::module m);
+
 
 #endif
 /** @} */ // end of doxygen group

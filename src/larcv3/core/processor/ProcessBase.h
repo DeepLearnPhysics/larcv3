@@ -71,9 +71,7 @@ namespace larcv3 {
     bool _process_(IOManager& mgr);
 
     bool _event_creator;    ///< special flag to mark this algorithm an event creator
-#ifndef __CINT__
     larcv3::Watch _watch;    ///< algorithm profile stopwatch
-#endif
     double _proc_time;      ///< algorithm execution time record (cumulative)
     size_t _proc_count;     ///< algorithm execution counter (cumulative)
     
@@ -82,6 +80,8 @@ namespace larcv3 {
     std::string _typename;  ///< process type from factory
   };
 }
+
+void init_processbase(pybind11::module m);
 
 #endif
 /** @} */ // end of doxygen group 

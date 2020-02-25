@@ -28,7 +28,7 @@ namespace larcv3 {
 
   bool QSumFilter::process(IOManager& mgr)
   {
-    auto const& ev_image = mgr.get_data<larcv3::EventImage2D>(_image_producer);
+    auto const& ev_image = mgr.get_data<larcv3::EventTensor2D>(_image_producer);
 
     auto const& image_v = ev_image.image2d_array();
 

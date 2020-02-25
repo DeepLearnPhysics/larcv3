@@ -17,6 +17,8 @@
 #include <cstdio>
 #include <iostream>
 #include <map>
+
+
 #include "larcv3/core/base/LArCVTypes.h"
 
 namespace larcv3 {
@@ -103,7 +105,7 @@ namespace larcv3 {
       default_level(l);
       for(auto& name_logger : *_logger_m) name_logger.second.set(l);
     }
-	
+
     //
     // Verbosity level checker
     //
@@ -116,19 +118,25 @@ namespace larcv3 {
     std::ostream& send(const msg::Level_t) const;
     /// Formatted message (function name included)
     std::ostream& send(const msg::Level_t level,
-		       const std::string& function ) const;
+                       const std::string& function ) const;
     /// Formatted message (function name + line number)
     std::ostream& send(const msg::Level_t level,
-		       const std::string& function,
-		       const unsigned int line_num ) const;
+                       const std::string& function,
+                       const unsigned int line_num ) const;
     /// Formatted message (function name + line number + file name)
     std::ostream& send(const msg::Level_t level,
-		       const std::string& function,
-		       const unsigned int line_num,
-		       const std::string& file_name) const;
+                       const std::string& function,
+                       const unsigned int line_num,
+                       const std::string& file_name) const;
     
   };
 }
+
+// Wrapper init function:
+void init_logger(pybind11::module m);
+
+
+
 //
 // Compiler macro for saving us from text typing
 //

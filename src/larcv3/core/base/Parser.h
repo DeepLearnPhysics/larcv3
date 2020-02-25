@@ -18,6 +18,8 @@
 #include <vector>
 #include <algorithm>
 
+#include <pybind11/pybind11.h>
+
 namespace larcv3 {
   namespace parser {
     template <class T>

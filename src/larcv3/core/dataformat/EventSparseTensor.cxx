@@ -863,4 +863,47 @@ template class EventSparseTensor<2>;
 template class EventSparseTensor<3>;
 }
 
+
+
+#include <pybind11/stl.h>
+
+
+
+template<size_t dimension>
+void init_eventsparse_tensor_base(pybind11::module m){
+
+  std::string classname = "EventSparseTensor" + std::to_string(dimension) + "D";
+
+  using Class = larcv3::EventSparseTensor<dimension>;
+  pybind11::class_<Class, std::shared_ptr<Class>> ev_sparse_tensor(m, classname.c_str());
+  ev_sparse_tensor.def(pybind11::init<>());
+
+
+  // ev_sparse_tensor.def("emplace_back",    &Class::emplace_back);
+  // ev_sparse_tensor.def("emplace",         &Class::emplace);
+  ev_sparse_tensor.def("as_vector",          &Class::as_vector, pybind11::return_value_policy::reference);
+  ev_sparse_tensor.def("at",                 &Class::at, pybind11::return_value_policy::reference);
+  ev_sparse_tensor.def("size",               &Class::size);
+  ev_sparse_tensor.def("sparse_tensor",      &Class::sparse_tensor);
+  ev_sparse_tensor.def("set", (void (Class::*)(const larcv3::SparseTensor<dimension> &))(&Class::set), "set");
+  ev_sparse_tensor.def("set", (void (Class::*)(const larcv3::VoxelSet&, const larcv3::ImageMeta<dimension>&))(&Class::set), "set");
+  ev_sparse_tensor.def("clear",              &Class::clear);
+
+
+/*
+
+Not wrapped:
+    void emplace(larcv3::SparseTensor<dimension> && voxels);
+    void emplace(larcv3::VoxelSet&& voxels, larcv3::ImageMeta<dimension>&& meta);
+
+*/
+
+
+}
+
+void init_eventsparsetensor(pybind11::module m){
+  init_eventsparse_tensor_base<2>(m);
+  init_eventsparse_tensor_base<3>(m);
+}
+
 #endif

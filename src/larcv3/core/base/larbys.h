@@ -17,6 +17,10 @@
 #include <iostream>
 #include <exception>
 
+#include <pybind11/pybind11.h>
+
+
+
 namespace larcv3 {
 
   /**
@@ -43,6 +47,13 @@ namespace larcv3 {
     std::string _msg;
   };
 }
+
+void init_larbys(pybind11::module m);
+
+
+// PYBIND11_MODULE(larcv, m) {
+//   init_larbys(m);
+// }
 
 #endif
 /** @} */ // end of doxygen group 

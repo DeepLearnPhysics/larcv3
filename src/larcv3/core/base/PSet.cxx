@@ -127,6 +127,14 @@ namespace larcv3 {
     return res;
   }
 
+  std::string & PSet::operator[] (std::string key){
+    if ( ! this->contains_value(key)){
+      this->add_value(key, "");
+    }
+    return _data_value[key];
+  }
+
+
   void PSet::add_value(std::string key,
                        std::string value)
   {
@@ -181,6 +189,20 @@ namespace larcv3 {
     _data_pset.emplace(key,PSet(key,value));
   }
   
+
+  void PSet::update(std::string key, std::string value){
+    std::cout << "Udpate called" << std::endl;
+    if ( ! this->contains_value(key)){
+      this->add_value(key, value);
+    }
+    else{
+      //std::cout<<"value: @"<<value<<"@"<<std::endl;
+      trim_space(value);
+      //if(value.empty()) throw larbys("Empty value cannot be registered!");
+      _data_value[key]=value;
+    }
+  }
+
   void PSet::add(const std::string& contents)
   {
     if(contents.size()<1) return;
@@ -404,5 +426,51 @@ namespace larcv3 {
   { return this->get_pset(key); }
 
 }
+
+#include <pybind11/operators.h>
+
+
+void init_PSet(pybind11::module m){
+  using Class = larcv3::PSet;
+  pybind11::class_<Class> pset(m, "PSet");
+  pset.def(pybind11::init<const std::string &, const std::string &>(),
+            pybind11::arg("name")="",
+            pybind11::arg("data")="");
+
+
+  pset.def(pybind11::init<const Class &>(),
+            pybind11::arg("orig"));
+
+
+  pset.def(pybind11::self == pybind11::self);
+  pset.def(pybind11::self != pybind11::self);
+  pset.def("__getitem__",  &Class::operator[], pybind11::is_operator());
+  pset.def("__setitem__",  &Class::update);
+
+
+  pset.def("rename",         &Class::rename);
+  pset.def("name",           &Class::name);
+  pset.def("clear",          &Class::clear);
+  pset.def("add",            &Class::add);
+  // pset.def("add_pset",    &Class::add_pset);
+  // pset.def("add_pset",    &Class::add_pset);
+  pset.def("add_pset",       (void (Class::*)(const Class& p))(&Class::add_pset));
+  pset.def("add_value",      &Class::add_value);
+  pset.def("dump",           &Class::dump, pybind11::arg("indent_size")=0);
+  pset.def("__repr__",       &Class::dump, pybind11::arg("indent_size")=0);
+  pset.def("data_string",    &Class::data_string);
+  pset.def("get_pset",       &Class::get_pset);
+
+  pset.def("size",           &Class::size);
+  pset.def("keys",           &Class::keys);
+  pset.def("value_keys",     &Class::value_keys);
+  pset.def("pset_keys",      &Class::pset_keys);
+  pset.def("contains_value", &Class::contains_value);
+  pset.def("contains_pset",  &Class::contains_pset);
+    
+}
+
+
+
 
 #endif

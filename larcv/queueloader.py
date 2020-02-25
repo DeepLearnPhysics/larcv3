@@ -4,7 +4,7 @@ import threading
 import random
 
 
-from . import larcv
+import larcv
 from . batch_pydata   import batch_pydata
 from . larcv_io_enums import RandomAccess
 from . larcv_writer   import larcv_writer
@@ -150,9 +150,18 @@ class queue_interface(object):
         # there is no "start_manager" function.  Everything is manual.
         # First, tell it what the entries for the first batch to read:
 
+        # start = time.time()
+        # print(self._queueloaders[mode].is_reading())
         self.prepare_next(mode)
+        # print(self._queueloaders[mode].is_reading())
+        # end = time.time()
 
+        # print(end - start)
         # Then, we promote those entries to the "current" batch:
+        while self._queueloaders[mode].is_reading():
+            # print(self._queueloaders[mode].is_reading())
+            time.sleep(0.01)
+
         io.pop_current_data()
         io.next(store_entries=True,store_event_ids=True)
 
@@ -166,8 +175,8 @@ class queue_interface(object):
         for key in self._data_keys[mode]:
             self._dims[mode][key] = self._queueloaders[mode].fetch_data(self._data_keys[mode][key]).dim()
 
-
         end = time.time()
+        self.prepare_next(mode)
 
         # Print out how long it took to start IO:
         if self._verbose:
@@ -210,7 +219,7 @@ class queue_interface(object):
             set_entries = self.get_next_batch_indexes(mode, self._minibatch_size[mode])
 
         self._queueloaders[mode].set_next_batch(set_entries)
-        self._queueloaders[mode].batch_process()
+        self._queueloaders[mode].prepare_next()
 
         self._count[mode] = 0
 
@@ -221,7 +230,7 @@ class queue_interface(object):
 
         # return
 
-    def fetch_minibatch_data(self, mode, pop=False, fetch_meta_data=False):
+    def fetch_minibatch_data(self, mode, pop=False, fetch_meta_data=False, data_shape=None, channels="last"):
         # Return a dictionary object with keys 'image', 'label', and others as needed
         # self._queueloaders['train'].fetch_data(keyword_label).dim() as an example
 
@@ -243,9 +252,14 @@ class queue_interface(object):
         self._queueloaders[mode].next(store_entries=fetch_meta_data, store_event_ids=fetch_meta_data)
         this_data = {}
 
+        self.fetch_minibatch_dims(mode)
+
         for key in self._data_keys[mode]:
-            this_data[key] = self._queueloaders[mode].fetch_data(self._data_keys[mode][key]).data()
-            this_data[key] = numpy.reshape(this_data[key], self._dims[mode][key])
+            # self._dims[mode][key] = self._queueloaders[mode].fetch_data(self._data_keys[mode][key]).dim()
+            this_data[key] = self._queueloaders[mode].fetch_data(
+                self._data_keys[mode][key]).data(
+                shape=data_shape, channels=channels)
+            # this_data[key] = numpy.reshape(this_data[key], self._dims[mode][key])
 
         if fetch_meta_data:
             this_data['entries'] = self._queueloaders[mode].fetch_entries()
@@ -275,8 +289,8 @@ class queue_interface(object):
         return self._queueloaders[mode].fetch_n_entries()
 
 
-    def ready(self, mode):
-        return self._queueloaders[mode].ready()
+    def is_reading(self, mode):
+        return self._queueloaders[mode].is_reading()
 
 
     def write_output(self, data, datatype, producer, entries, event_ids):
@@ -367,12 +381,12 @@ class larcv_queueio (object):
         self.__class__._instance_m[self._name] = self
 
     def set_next_batch(self, batch_indexes):
-        if type(batch_indexes) != larcv.VectorOfSizet:
-            indexes = larcv.VectorOfSizet()
-            indexes.resize(len(batch_indexes))
-            for i, val in enumerate(batch_indexes):
-                indexes[i] = int(val)
-            batch_indexes = indexes
+        # if type(batch_indexes) != larcv.VectorOfSizet:
+        #     indexes = larcv.VectorOfSizet()
+        #     indexes.resize(len(batch_indexes))
+        #     for i, val in enumerate(batch_indexes):
+        #         indexes[i] = int(val)
+        #     batch_indexes = indexes
         self._proc.set_next_batch(batch_indexes)
 
     def batch_process(self):
@@ -380,6 +394,9 @@ class larcv_queueio (object):
             time.sleep(0.01)
         self._proc.batch_process()
 
+
+    def prepare_next(self):
+        self._proc.prepare_next()
 
     def is_reading(self,storage_id=None):
         return self._proc.is_reading()

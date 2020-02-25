@@ -46,20 +46,20 @@ namespace larcv3 {
     inline const std::vector<larcv3::Particle>& as_vector() const
     { return _part_v; }
 
+    // inline const larcv3::Particle& at(size_t index) const {return _part_v.at(index);}
+
     inline size_t size() const {return _part_v.size();}
 
-// #ifndef SWIG
     /// Data clear method
     void clear      ();
     void initialize (hid_t group, uint compression);
     void serialize  (hid_t group);
     void deserialize(hid_t group, size_t entry, bool reopen_groups=false);
     void finalize   ();
-// #endif
 
-    static EventParticle * to_particle(EventBase * e){
-      return (EventParticle *) e;
-    }
+    // static EventParticle * to_particle(EventBase * e){
+    //   return (EventParticle *) e;
+    // }
 
   private:
 
@@ -101,6 +101,7 @@ namespace larcv3 {
   
 }
 
+void init_eventparticle(pybind11::module m);
 
 #endif
 /** @} */ // end of doxygen group 

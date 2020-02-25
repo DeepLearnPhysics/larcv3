@@ -41,6 +41,11 @@ class ImageMeta {
             const std::vector<double>& origin = std::vector<double>(),
             DistanceUnit_t unit = kUnitUnknown);
 
+  // Copy constructor
+  ImageMeta(const ImageMeta<dimension> & other);
+  // Assignment operator:
+  ImageMeta<dimension>& operator=(const ImageMeta<dimension> & other);
+
   // Comparison operators:
   inline bool operator==(const ImageMeta<dimension> & rhs) const {
     for (size_t i = 0; i < dimension; i ++){
@@ -69,6 +74,7 @@ class ImageMeta {
   inline const double * image_size()       const {return _image_sizes;}
   inline const size_t * number_of_voxels() const {return _number_of_voxels;}
   inline const double * origin()           const {return _origin;}
+  std::vector< size_t > strides()          const;
 
 
   inline size_t n_dims()  const { return dimension; }
@@ -110,8 +116,6 @@ class ImageMeta {
   /// Provide absolute coordinate of the center of a specified pixel index
   std::vector<double> position(size_t index) const;
 
-
-
   /// Provide absolute coordinate of the center of a specified pixel (row,col)
   std::vector<double> position(const std::vector<size_t> & coordinates) const;
 
@@ -121,6 +125,12 @@ class ImageMeta {
 
   /// Same as above, but restricted to a single axis
   double position(const std::vector<size_t> & coordinates, size_t axis) const;
+
+  // Compress the meta by a common factor along each dimension
+  ImageMeta<dimension> compress(size_t compression) const;
+
+    // Compress the meta by a unique factor along each dimension
+  ImageMeta<dimension> compress(std::array<size_t, dimension> compression) const;
 
 
   /// Provide the minimum and maximum real space values of the image.
@@ -174,7 +184,6 @@ class ImageMeta {
   std::string dump() const;
 
 
-#ifndef SWIG
   public:
     static hid_t get_datatype() {
       hid_t datatype;
@@ -204,7 +213,6 @@ class ImageMeta {
                  double_type);
       return datatype;
     }
-#endif
 
 
  protected:
@@ -229,6 +237,12 @@ typedef ImageMeta<4> ImageMeta4D;
 
 
 }  // namespace larcv3
+
+void init_imagemeta(pybind11::module m);
+
+template<size_t dimension>
+void init_imagemeta_base(pybind11::module m);
+
 
 #endif
 /** @} */  // end of doxygen group

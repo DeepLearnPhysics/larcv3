@@ -19,6 +19,8 @@
 #include <cstdlib>
 #include "larcv3/core/dataformat/ImageMeta.h"
 
+#include <pybind11/numpy.h>
+
 namespace larcv3 {
 
   /**
@@ -43,6 +45,12 @@ namespace larcv3 {
     Tensor(const ImageMeta<dimension>&, const std::vector<float>&);
     /// copy ctor
     Tensor(const Tensor&);
+
+    /// from numpy ctor
+    Tensor(pybind11::array_t<float>);
+
+    // Return a numpy array of this object (no copy by default)
+    pybind11::array_t<float> as_array();
     
 
     /// dtor
@@ -50,8 +58,7 @@ namespace larcv3 {
 
     /// Reset contents w/ new larcv3::ImageMeta
     void reset(const ImageMeta<dimension>&);
-    /// Various modes used to combine pixels
-    enum CompressionModes_t { kSum, kAverage, kMaxPool, kOverWrite};
+
 
     /// Size of data, equivalent of # rows x # columns x ...
     size_t size() const { return _img.size(); }
@@ -94,6 +101,11 @@ namespace larcv3 {
     /// Clear data contents
     void clear_data();
 
+    // Return a new tensor that is this one, but compressed/downsampled
+    // Accepts either an array of values, one per dimension, or a single value
+    Tensor<dimension> compress(std::array<size_t, dimension> compression, PoolType_t) const;
+    Tensor<dimension> compress(size_t compression, PoolType_t) const;
+
     // /// Overlay with another Image2D: overlapped pixel region is merged
     // void overlay(const Image2D&, CompressionModes_t mode=kSum);
     /// Move data contents out
@@ -124,12 +136,13 @@ namespace larcv3 {
 
 
 
+
     /// Element-wise pixel value multiplication
     void eltwise( const Tensor& rhs );
     /// Element-wise multiplication w/ 1D array data
     void eltwise(const std::vector<float>& arr,bool allow_longer=false);
     
-    // The following functions were deprecated for larcv33.
+    // The following functions were deprecated for larcv3.
     // Implementations are here in the source code until a later cleanup, in case they
     // need to be un deprecated:
 
@@ -173,6 +186,12 @@ namespace larcv3 {
   typedef Tensor<4> Tensor4D;
 
 }
+
+template <size_t dimension>
+void init_tensor_base(pybind11::module m);
+
+void init_tensor(pybind11::module m);
+
 
 #endif
 /** @} */ // end of doxygen group 

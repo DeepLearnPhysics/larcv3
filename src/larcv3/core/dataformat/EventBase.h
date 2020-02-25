@@ -51,10 +51,14 @@ namespace larcv3 {
 
     int get_num_objects(hid_t group);
 
+
+
 // #endif
   };
 
 }
+
+void init_eventbase(pybind11::module m);
 
 #endif //inc guard
 /** @} */ // end of doxygen group 

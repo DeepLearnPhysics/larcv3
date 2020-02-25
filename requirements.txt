@@ -2,4 +2,3 @@ scikit-build
 numpy
 h5py
 cmake
-swig

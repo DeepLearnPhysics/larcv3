@@ -2,7 +2,7 @@ import pytest
 import unittest
 import random
 
-from larcv import larcv
+import larcv
 
 @pytest.fixture()
 def tempfile(tmpdir):

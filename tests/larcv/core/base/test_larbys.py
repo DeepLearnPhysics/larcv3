@@ -3,13 +3,13 @@ import unittest
 
 
 def test_larbys():
-    from larcv import larcv
+    import larcv
     lib = larcv.larbys()
     # Config manager is deliberately excluded:
     # lib = base.ConfigManager()
 
 def test_larbys_exception():
-    from larcv import larcv
+    import larcv
     # Creating a PSet object without a name will cause an exception.
     # We can catch that and verify we're getting a larbys exception:
     try:

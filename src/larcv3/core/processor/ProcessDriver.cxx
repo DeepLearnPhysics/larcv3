@@ -489,4 +489,49 @@ size_t ProcessDriver::get_tree_index(size_t entry) const {
 
 }  // namespace larcv3
 
+#include <pybind11/stl.h>
+
+void init_processdriver(pybind11::module m){
+    using Class = larcv3::ProcessDriver;
+    pybind11::class_<Class> processdriver(m, "ProcessDriver");
+    processdriver.def(pybind11::init<const std::string>(), 
+                    pybind11::arg("name")   = "ProcessDriver");
+
+
+    processdriver.def("configure",
+      (void (Class::*)( const std::string config_file ) )(&Class::configure));
+    processdriver.def("configure", 
+      (void (Class::*)( const larcv3::PSet& cfg))(&Class::configure));
+
+    processdriver.def("override_input_file", &Class::override_input_file);
+    processdriver.def("override_output_file", &Class::override_output_file);
+    processdriver.def("override_ana_file", &Class::override_ana_file);
+    processdriver.def("random_access", &Class::random_access);
+    processdriver.def("reset", &Class::reset);
+    processdriver.def("initialize", &Class::initialize,pybind11::arg("color")=0);
+    processdriver.def("batch_process", &Class::batch_process,
+      pybind11::arg("start_entry")=0, pybind11::arg("num_entries")=0);
+
+    processdriver.def("process_entry",
+      (bool (Class::*)() )(&Class::process_entry));
+    processdriver.def("process_entry", 
+      (bool (Class::*)( size_t, bool))(&Class::process_entry),
+      pybind11::arg("entry"), pybind11::arg("force_reload")=false);
+
+    processdriver.def("finalize", &Class::finalize);
+    processdriver.def("clear_entry", &Class::clear_entry);
+    processdriver.def("set_id", &Class::set_id);
+    processdriver.def("event_id", &Class::event_id);
+    processdriver.def("process_id", &Class::process_id);
+    processdriver.def("process_names", &Class::process_names);
+    processdriver.def("process_map", &Class::process_map);
+    processdriver.def("process_ptr", &Class::process_ptr);
+    processdriver.def("io", &Class::io);
+    processdriver.def("get_tree_index", &Class::get_tree_index);
+    processdriver.def("processing", &Class::processing);
+
+
+}
+
+
 #endif

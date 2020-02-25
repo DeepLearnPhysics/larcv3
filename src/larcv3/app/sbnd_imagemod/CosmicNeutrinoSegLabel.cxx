@@ -38,8 +38,8 @@ bool CosmicNeutrinoSegLabel::process(IOManager& mgr) {
       mgr.get_data<larcv3::EventParticle>(_particle_producer);
 
   // The output is an instance of image2D, so prepare that:
-  auto& ev_image2d_output = mgr.get_data<larcv3::EventImage2D>(_output_producer);
-  ev_image2d_output.clear();
+  auto& ev_tensor2d_output = mgr.get_data<larcv3::EventTensor2D>(_output_producer);
+  ev_tensor2d_output.clear();
   // Next, loop over the particles and clusters per projection_ID
   // and set the values in the output image to the label specified by
   // the pdg
@@ -55,7 +55,7 @@ bool CosmicNeutrinoSegLabel::process(IOManager& mgr) {
                           ev_cluster2d.sparse_cluster(projection_index).meta());
 
     // Append the output image2d:
-    ev_image2d_output.append(out_image);
+    ev_tensor2d_output.append(out_image);
   }
 
   return true;

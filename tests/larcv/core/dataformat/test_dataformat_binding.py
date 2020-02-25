@@ -1,6 +1,6 @@
 import unittest
 
-from larcv import larcv
+import larcv
 
 from random import Random
 random = Random()
@@ -60,9 +60,11 @@ def test_import_EventBase_h():
     except:
         assert(True)
 
-def test_import_DataProductFactory_h():
-    # dfb = larcv.DataProductFactoryBase()
-    df = larcv.DataProductFactory()
+
+# There is no need to wrap data product factory, so no test:
+# def test_import_DataProductFactory_h():
+#     # dfb = larcv.DataProductFactoryBase()
+#     df = larcv.DataProductFactory()
 
 def test_import_IOManager_h():
     io = larcv.IOManager()
@@ -71,11 +73,11 @@ def test_import_EventParticle_h():
     ep = larcv.EventParticle()
 
 
-def test_vector_double():
-    vec = larcv.VectorOfDouble()
-    vec.push_back(random.uniform(-1e5, 1e5))  
+# def test_vector_double():
+#     vec = larcv.VectorOfDouble()
+#     vec.push_back(random.uniform(-1e5, 1e5))  
 
-def test_vector_sizet():
-    vec = larcv.VectorOfSizet()
-    vec.push_back(random.randint(1, 2e4))  
+# def test_vector_sizet():
+#     vec = larcv.VectorOfSizet()
+#     vec.push_back(random.randint(1, 2e4))  
 

@@ -55,8 +55,7 @@ namespace larcv3{
   void EventParticle::clear(){
     _part_v.clear();
   }
-////////Serialization is hidden from SWIG:
-// #ifndef SWIG
+
 
 
   void EventParticle::finalize(){
@@ -294,6 +293,8 @@ namespace larcv3{
     // Get the starting size (0) and dimensions (unlimited)
     hsize_t extents_starting_dim[] = {0};
     hsize_t extents_maxsize_dim[]  = {H5S_UNLIMITED};
+    hid_t lcpl = H5Pcreate(H5P_LINK_CREATE); // link creation property list
+    hid_t dapl = H5Pcreate(H5P_DATASET_ACCESS); // dataset access property list
 
     // Create a dataspace
     hid_t extents_dataspace = H5Screate_simple(1, extents_starting_dim, extents_maxsize_dim);
@@ -312,9 +313,6 @@ namespace larcv3{
       H5Pset_deflate(extents_cparms, compression);
       // extents_cparms.setDeflate(compression);
     }
-
-    hid_t lcpl = H5Pcreate(H5P_LINK_CREATE);
-    hid_t dapl = H5Pcreate(H5P_DATASET_ACCESS);
 
 
     // Create the extents dataset:
@@ -506,8 +504,35 @@ namespace larcv3{
     return;
   }
 
-// #endif // swig
 
 } // larcv3
+
+void init_eventparticle(pybind11::module m){
+
+  using Class = larcv3::EventParticle;
+  pybind11::class_<Class, std::shared_ptr<Class>> ev_particle(m, "EventParticle");
+  ev_particle.def(pybind11::init<>());
+
+  ev_particle.def("set",     &Class::set);
+  ev_particle.def("append",     &Class::append);
+  // ev_particle.def("emplace_back",    &Class::emplace_back);
+  // ev_particle.def("emplace", &Class::emplace);
+  ev_particle.def("as_vector", &Class::as_vector);
+  ev_particle.def("size", &Class::size);
+  ev_particle.def("clear", &Class::clear);
+
+
+/*
+
+
+
+    static EventParticle * to_particle(EventBase * e){
+      return (EventParticle *) e;
+    }
+
+*/
+
+}
+
 
 #endif

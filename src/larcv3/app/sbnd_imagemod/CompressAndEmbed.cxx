@@ -25,7 +25,7 @@ namespace larcv3 {
 
     auto mode_v = cfg.get<std::vector<unsigned short> >("Mode");
     _mode_v.clear();
-    for (auto const& v : mode_v) _mode_v.push_back( (Image2D::CompressionModes_t)v );
+    for (auto const& v : mode_v) _mode_v.push_back( (larcv3::PoolType_t )v );
 
     if (_mode_v.size() != _producer_v.size()        ||
         _mode_v.size() != _data_type_v.size()       ||
@@ -75,7 +75,7 @@ namespace larcv3 {
       auto const& output_cols     = _output_cols_v[i];
 
       if (datatype == "image2d"){
-        auto ev_image = (EventImage2D*)(mgr.get_data("image2d", producer));
+        auto ev_image = std::dynamic_pointer_cast<EventTensor2D>(mgr.get_data("image2d", producer));
         if (!ev_image) {
           LARCV_CRITICAL() << "Input image not found by producer name " << producer << std::endl;
           throw larbys();
@@ -100,7 +100,7 @@ namespace larcv3 {
         }
       }
       else if (datatype == "cluster2d"){
-        auto ev_clust = (EventSparseCluster2D*)(mgr.get_data("cluster2d", producer));
+        auto ev_clust = std::dynamic_pointer_cast<EventSparseCluster2D>(mgr.get_data("cluster2d", producer));
         if (!ev_clust) {
           LARCV_CRITICAL() << "Input cluster2d not found by producer name " << producer << std::endl;
           throw larbys();
@@ -151,7 +151,7 @@ namespace larcv3 {
 
 
       if (datatype == "image2d"){
-        auto ev_image = (EventImage2D*)(mgr.get_data("image2d", producer));
+        auto ev_image = std::dynamic_pointer_cast<EventTensor2D>(mgr.get_data("image2d", producer));
         std::vector<larcv3::Image2D> image_v;
         for (auto& img : ev_image->as_vector()) {
 
@@ -191,7 +191,7 @@ namespace larcv3 {
                   if (orig_row >= img.meta().rows()) continue;
                   coords1[0] = orig_col;
                   coords1[1] = orig_row;
-                  if (mode == Image2D::kMaxPool){
+                  if (mode == larcv3::kPoolMax){
                     value = ( value < img.pixel(coords1) ) ? img.pixel(coords1) : value;
                   }
                   else{
@@ -201,7 +201,7 @@ namespace larcv3 {
 
                 }
               }
-              if (mode == Image2D::kAverage){
+              if (mode == larcv3::kPoolAverage){
                 value /= (float) count;
               }
 
@@ -215,7 +215,7 @@ namespace larcv3 {
         ev_image->emplace(std::move(image_v));
       }
       else if (datatype == "cluster2d"){
-        auto ev_clust = (EventSparseCluster2D*)(mgr.get_data("cluster2d", producer));
+        auto ev_clust = std::dynamic_pointer_cast<EventSparseCluster2D>(mgr.get_data("cluster2d", producer));
         std::vector<larcv3::SparseCluster2D> cluster_v;
 
         for (auto& clustPix : ev_clust->as_vector()) {
@@ -254,7 +254,7 @@ namespace larcv3 {
               new_coordinates[1] = (original_row / row_compression) + offset_rows;
               auto new_index    = new_meta.index(new_coordinates);
               float value = voxel.value();
-              if (mode == Image2D::kMaxPool){
+              if (mode == larcv3::kPoolMax){
                 if (_new_cluster.find(new_index).id() != kINVALID_VOXELID){
                   if (value > _new_cluster.find(new_index).value()){
                     _new_cluster.insert(Voxel(new_index, value));
@@ -268,7 +268,7 @@ namespace larcv3 {
                 _new_cluster.add(Voxel(new_index, value));
               }
             }
-            if (mode == Image2D::kAverage){
+            if (mode == larcv3::kPoolAverage){
               _new_cluster /= row_compression*col_compression;
             }
             cluster_v.back().emplace(std::move(_new_cluster));
@@ -286,7 +286,7 @@ namespace larcv3 {
           //            orig_row < (row - offset_rows + 1)*row_compression;
           //            orig_row ++){
           //         if (orig_row >= clustPix.meta().rows()) continue;
-          //         if (mode == Image2D::kMaxPool){
+          //         if (mode == larcv3::kPoolMax){
           //           value = ( value < clustPix.pixel(coords) ) ? clustPix.pixel(coords) : value;
           //         }
           //         else{
@@ -296,7 +296,7 @@ namespace larcv3 {
 
           //       }
           //     }
-          //     if (mode == Image2D::kAverage){
+          //     if (mode == larcv3::kPoolAverage){
           //       value /= (float) count;
           //     }
           //    image_v.back().set_pixel(row, col, value);

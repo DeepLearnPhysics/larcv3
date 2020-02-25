@@ -3,7 +3,7 @@ import os
 import time
 
 import numpy
-from . import larcv
+import larcv
 
 class larcv_writer(object):
 

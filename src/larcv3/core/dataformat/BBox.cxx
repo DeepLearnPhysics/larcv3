@@ -124,10 +124,66 @@ namespace larcv3 {
     return ss.str();
   }
 
-
 template class BBox<2>;
 template class BBox<3>;
 
+template<> std::string as_string<BBox<2>>() {return "BBox2D";}
+template<> std::string as_string<BBox<3>>() {return "BBox3D";}
+
 }
+
+
+#include <pybind11/operators.h>
+
+
+
+template<size_t dimension>
+void init_bbox_instance(pybind11::module m){
+    using Class = larcv3::BBox<dimension>;
+    pybind11::class_<Class> bbox(m, larcv3::as_string<Class>().c_str());
+    bbox.def(pybind11::init<>());
+    bbox.def(pybind11::init<larcv3::Point<dimension>, larcv3::Point<dimension>, larcv3::ProjectionID_t > ());
+    bbox.def(pybind11::self == pybind11::self);
+
+    bbox.def("update",
+      (void (Class::*)
+        (const std::vector<double> & , const std::vector<double> & , larcv3::ProjectionID_t )  )
+      (&Class::update));
+    bbox.def("update", 
+      (void (Class::*)
+        (const larcv3::Point<dimension> & , const larcv3::Point<dimension> & , larcv3::ProjectionID_t )  )
+      (&Class::update));
+    bbox.def("update", 
+      (void (Class::*)
+        (larcv3::ProjectionID_t) )
+      (&Class::update));
+
+
+    bbox.def("empty",            &Class::empty);
+    bbox.def("origin",           &Class::origin);
+    bbox.def("bottom_left",      &Class::bottom_left);
+    bbox.def("top_right",        &Class::top_right);
+    bbox.def("center",           &Class::center);
+    bbox.def("min",              &Class::min);
+    bbox.def("max",              &Class::max);
+    bbox.def("dimensions",       &Class::dimensions);
+    bbox.def("area",             &Class::area);
+    bbox.def("volume",           &Class::volume);
+    bbox.def("id",               &Class::id);
+    bbox.def("dump",             &Class::dump);
+    bbox.def("__repr__",         &Class::dump);
+    bbox.def("overlap",          &Class::overlap);
+    bbox.def("inclusive",        &Class::inclusive);
+    bbox.def("contains",         &Class::contains);
+
+
+}
+
+void init_bbox(pybind11::module m){
+  // Here, this creates a wrapper for the classes we're interested in:
+  init_bbox_instance<2>(m);
+  init_bbox_instance<3>(m);
+}
+
 
 #endif
