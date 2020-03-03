@@ -24,6 +24,8 @@ setup(
     name="larcv",
     version="3.3.0",
     cmake_source_dir='src/',
+    use_scm_version=True,
+    include_package_data=True,
     cmake_args=[
         '-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.9',
         '-DCMAKE_PYTHON_BINDINGS=True',
@@ -32,16 +34,17 @@ setup(
         '-DMPI:BOOL={}'.format(mpi_value),
         '-DOPENMP:BOOL={}'.format(openmp_value),
     ],
-    include_package_data=True,
     author=['Corey Adams', 'Kazuhiro Terao', 'Taritree Wongjirad', 'Marco del Tutto'],
+    author_email='corey.adams@anl.gov',
     description='C++ IO and Preprocessing package for sparse neutrino data, with H5 for IO and python bindings.',
     license='MIT',
     keywords='larcv larcv3 neutrinos hdf5 h5 deep learning IO sparse',
     project_urls={
         'Source Code': 'https://github.com/DeepLearnPhysics/larcv3'
     },
+    url='https://github.com/DeepLearnPhysics/larcv3',
     scripts=['bin/merge_larcv3_files.py', 'bin/run_processor.py'],
-    packages=['larcv'],
+    packages=['larcv','src/pybind11'],
     install_requires=[
         'numpy',
         'scikit-build',
