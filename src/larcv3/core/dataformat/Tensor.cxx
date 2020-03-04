@@ -68,7 +68,7 @@ namespace larcv3 {
 
     auto ptr = static_cast<float *>(buffer.ptr);
 
-    for (int i = 0; i < _meta.total_voxels(); ++i) {
+    for (size_t i = 0; i < _meta.total_voxels(); ++i) {
       _img[i] = ptr[i];
     }
 
@@ -79,7 +79,7 @@ namespace larcv3 {
   pybind11::array_t<float> Tensor<dimension>::as_array(){
     // Cast the dimensions to std::array:
     std::array<size_t, dimension> dimensions;
-    for (short i = 0; i < dimension; ++i) dimensions[i] = _meta.number_of_voxels(i);
+    for (size_t i = 0; i < dimension; ++i) dimensions[i] = _meta.number_of_voxels(i);
     return pybind11::array_t<float>(
         // _meta.number_of_voxels()[0],
         dimensions,
