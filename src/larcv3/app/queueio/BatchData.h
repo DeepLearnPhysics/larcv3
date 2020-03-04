@@ -43,8 +43,9 @@ namespace larcv3 {
 
     const std::vector<T>& data() const;
 
-    // PyObject * pydata() const;
-    // PyObject * () const;
+    // Writeable access to data:
+    std::vector<T> & writeable_data() {return _data;}
+
     pybind11::array_t<T> pydata();
 
     inline const std::vector<int>& dim() const { return _dim; }
