@@ -86,7 +86,6 @@ void init_batchdataqueue(pybind11::module m){
   init_batchdataqueue<int>(m);
   init_batchdataqueue<float>(m);
   init_batchdataqueue<double>(m);
-  // init_batchdataqueue<larcv3::SparseTensor<2>>(m);
 
 }
 
