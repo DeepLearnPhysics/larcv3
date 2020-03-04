@@ -328,6 +328,7 @@ class larcv_queueio (object):
         self._event_ids = None
 
     def reset(self):
+        while self.is_reading(): time.sleep(0.01)
         if self._proc: self._proc.reset()
 
     def __del__(self):
