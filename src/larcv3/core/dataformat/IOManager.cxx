@@ -613,10 +613,17 @@ void IOManager::open_new_input_file(std::string filename){
   // Close the currently open file if it is open:
   // H5Fclose(_in_open_file);
 
+
+
   try{
     _in_open_file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, _fapl);
   }
   catch ( ... ) {
+    LARCV_CRITICAL() << "Open attempt failed for a file: " << filename
+                     << std::endl;
+    throw larbys();
+  }
+  if (_in_open_file < 0){
     LARCV_CRITICAL() << "Open attempt failed for a file: " << filename
                      << std::endl;
     throw larbys();
