@@ -30,9 +30,9 @@ if (MPI_FOUND)
     message("OpenMP_C_LIBRARY: " ${MPI_C_LIBRARIES})
     target_link_libraries(larcv3 ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES})
 endif()
-
-# Link against hdf5:
-target_link_libraries(larcv3 ${HDF5_C_LIBRARIES})
+set(HDF5_PREFER_PARALLEL TRUE)
+message("Using hdf5 parallel: " ${HDF5_IS_PARALLEL})
+target_link_libraries(larcv3 ${HDF5_LIBRARIES})
 
 # Link against python:
 target_link_libraries(larcv3 ${PYTHON_LIBRARIES})
