@@ -35,6 +35,7 @@ namespace larcv3 {
     /// Default destructor
     ~EventParticle(){}
 
+    inline larcv3::Particle at(size_t index) {return _part_v.at(index);}
 
     
 

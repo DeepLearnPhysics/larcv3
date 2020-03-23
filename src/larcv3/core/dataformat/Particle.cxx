@@ -53,6 +53,7 @@ namespace larcv3 {
   }
 
 
+template<> std::string as_string<Particle>() {return "Particle";}
 }
 
 void init_particle(pybind11::module m){
