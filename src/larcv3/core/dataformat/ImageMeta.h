@@ -23,6 +23,7 @@
 #define __LARCV3DATAFORMAT_IMAGEMETA_H__
 
 #include <iostream>
+#include <array>
 #include "larcv3/core/dataformat/DataFormatTypes.h"
 #include "larcv3/core/base/larbys.h"
 

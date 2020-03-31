@@ -18,6 +18,7 @@
 #include <iostream>
 #include <map>
 #include <set>
+#include <memory>
 
 #include "hdf5.h"
 
