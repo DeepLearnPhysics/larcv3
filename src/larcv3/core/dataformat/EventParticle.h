@@ -2,7 +2,7 @@
  * \file EventParticle.h
  *
  * \ingroup DataFormat
- * 
+ *
  * \brief Class def header for a class EventParticle
  *
  * @author kazuhiro
@@ -26,18 +26,18 @@ namespace larcv3 {
     User-defined data product class (please comment!)
   */
   class EventParticle : public EventBase {
-    
+
   public:
-    
+
     /// Default constructor
     EventParticle();
-    
+
     /// Default destructor
     ~EventParticle(){}
 
     inline larcv3::Particle at(size_t index) {return _part_v.at(index);}
 
-    
+
 
     void set(const std::vector<larcv3::Particle>& part_v);
     void append(const larcv3::Particle& part);
@@ -65,7 +65,7 @@ namespace larcv3 {
   private:
 
     void open_in_datasets(hid_t group);
-    void open_out_datasets(hid_t group);    
+    void open_out_datasets(hid_t group);
 
     std::vector<larcv3::Particle> _part_v; ///< a collection of particles (index maintained)
 
@@ -77,11 +77,11 @@ namespace larcv3 {
 namespace larcv3 {
 
   // Template instantiation for IO
-  template<> 
+  template<>
   inline std::string product_unique_name<larcv3::EventParticle>() { return "particle"; }
-  // template<> 
+  // template<>
   // inline EventParticle& IOManager::get_data(const std::string&);
-  // template<> 
+  // template<>
   // inline EventParticle& IOManager::get_data(const ProducerID_t);
 
   /**
@@ -99,11 +99,13 @@ namespace larcv3 {
     EventBase* create() { return new EventParticle; }
   };
 
-  
+
 }
 
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 void init_eventparticle(pybind11::module m);
+#endif
 
 #endif
-/** @} */ // end of doxygen group 
-
+/** @} */ // end of doxygen group

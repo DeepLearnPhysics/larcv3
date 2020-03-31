@@ -219,7 +219,7 @@ namespace larcv3 {
 
 
     // Hold a copy of the file access property list:
-    hid_t  _fapl; //FileAccPropList 
+    hid_t  _fapl; //FileAccPropList
 
     std::map<std::string, hid_t> _groups;
 
@@ -259,9 +259,10 @@ namespace larcv3 {
   };
 
 }
-
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 void init_iomanager(pybind11::module m);
+#endif
 
 #endif
 /** @} */ // end of doxygen group
-    

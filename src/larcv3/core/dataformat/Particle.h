@@ -292,8 +292,10 @@ namespace larcv3 {
 
 
 }
-
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 void init_particle(pybind11::module m);
+#endif
 
 #endif
 /** @} */ // end of doxygen group

@@ -15,7 +15,6 @@
 #define __LARCV3DATAFORMAT_EVENTID_H
 
 #include <iostream>
-#include "hdf5.h"
 #include "larcv3/core/dataformat/DataFormatTypes.h"
 
 namespace larcv3 {
@@ -107,7 +106,10 @@ class EventID {
 };
 }  // namespace larcv3
 
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 void init_eventid(pybind11::module m);
+#endif
 
 #endif
 /** @} */  // end of doxygen group

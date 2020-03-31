@@ -47,7 +47,7 @@ namespace larcv3 {
     // configure the processor from a file on disk
     void configure(const std::string config_file, int color=0);
 
-    // configure the processor from a PSet object    
+    // configure the processor from a PSet object
     void configure(const PSet& cfg, int color=0);
 
     // Check if the processor is configured
@@ -108,7 +108,7 @@ namespace larcv3 {
     // Each QueueProcessor gets one process driver object.
     // We assume that the batch_process call can be parallelized with OpenMP
     larcv3::ProcessDriver _driver;
-    
+
     // List of processes for fillers:
     std::vector<std::string> _process_name_v;
 
@@ -123,9 +123,10 @@ namespace larcv3 {
   };
 
 }
-
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 void init_queueprocessor(pybind11::module m);
+#endif
 
 #endif
 /** @} */ // end of doxygen group
-

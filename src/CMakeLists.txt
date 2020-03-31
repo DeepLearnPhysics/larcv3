@@ -6,6 +6,12 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3 -g")
 
+# We set a larcv compiler definition to build all of the python code
+# This is obviously not set if you are including headers, which protects
+# the need to install pybind11 outside of larcv (since it's header only,
+# there is no need to link to it.)
+add_definitions(-DLARCV_INTERNAL)
+
 
 if(MPI)
     message (STATUS "MPI_CXX_COMPILER ${MPI_CXX_COMPILER}")
@@ -43,10 +49,6 @@ include_directories("./")
 find_package(HDF5 REQUIRED)
 include_directories(${HDF5_INCLUDE_DIR})
 
-# Many packages need python:
-find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
-
 if(OPENMP)
   find_package(OpenMP)
   if(OpenMP_CXX_FOUND)
@@ -55,6 +57,10 @@ if(OPENMP)
 endif()
 
 # This package needs numpy::
+
+# Many packages need python:
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
 
 ######################################
 # This is from https://github.com/Eyescale/CMake/blob/master/FindNumPy.cmake

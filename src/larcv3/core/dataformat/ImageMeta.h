@@ -238,11 +238,15 @@ typedef ImageMeta<4> ImageMeta4D;
 
 }  // namespace larcv3
 
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
+
 void init_imagemeta(pybind11::module m);
 
 template<size_t dimension>
 void init_imagemeta_base(pybind11::module m);
 
+#endif
 
 #endif
 /** @} */  // end of doxygen group

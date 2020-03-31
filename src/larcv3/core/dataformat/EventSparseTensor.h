@@ -8,7 +8,7 @@
  *
  * @author kazuhiro
  * @author cadams
- 
+
  * \addtogroup core_DataFormat
 */
 
@@ -30,7 +30,7 @@ namespace larcv3 {
     \class EventSparseTensor
     \brief Event-wise class to store a collection of VoxelSet (cluster) per projection id
   */
-  template<size_t dimension> 
+  template<size_t dimension>
   class EventSparseTensor : public EventBase {
 
   public:
@@ -76,7 +76,7 @@ namespace larcv3 {
   private:
     void open_in_datasets(hid_t group);
     void open_out_datasets(hid_t group);
-    
+
     std::vector<larcv3::SparseTensor<dimension> >  _tensor_v;
 
 
@@ -119,11 +119,13 @@ namespace larcv3 {
 
 }
 
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 template<size_t dimension>
 void init_eventsparse_tensor_base(pybind11::module m);
 
 void init_eventsparsetensor(pybind11::module m);
-
+#endif
 
 #endif
 /** @} */ // end of doxygen group

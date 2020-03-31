@@ -30,10 +30,10 @@ namespace larcv3 {
 
     BBox() {}
 
-    BBox(Point<dimension> min, Point<dimension> max, ProjectionID_t id = kINVALID_PROJECTIONID);    
-    
+    BBox(Point<dimension> min, Point<dimension> max, ProjectionID_t id = kINVALID_PROJECTIONID);
+
     inline bool operator== (const BBox<dimension>& rhs) const {
-      return (_p1 == rhs._p1 && _p2 == rhs._p2); 
+      return (_p1 == rhs._p1 && _p2 == rhs._p2);
     }
 
     void update(const std::vector<double> & min, const std::vector<double> & max,
@@ -53,15 +53,15 @@ namespace larcv3 {
     inline Point<dimension> max        () const { return _p1;}
     inline Point<dimension> dimensions () const { return _p2 - _p1; }
     inline double           area       () const { return volume(); }
-    inline double           volume     () const { 
+    inline double           volume     () const {
       double v = 1.0;
       Point<dimension> res = _p2 - _p1;
       for (size_t i = 0; i < dimension; i ++){
         v *= res.x[i];
       }
-      return v; 
+      return v;
     }
-    
+
     inline ProjectionID_t id() const { return _id; }
     std::string dump() const;
 
@@ -79,10 +79,14 @@ namespace larcv3 {
   typedef BBox<3> BBox3D;
 }
 
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 template<size_t dimension>
 void init_bbox_base(pybind11::module m);
 
 void init_bbox(pybind11::module m);
+#endif
+
 
 #endif
 /** @} */ // end of doxygen group

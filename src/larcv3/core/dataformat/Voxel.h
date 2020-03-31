@@ -18,7 +18,10 @@
 #include "larcv3/core/dataformat/ImageMeta.h"
 #include "larcv3/core/dataformat/Tensor.h"
 
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
+#endif
 
 namespace larcv3 {
 
@@ -96,7 +99,7 @@ namespace larcv3 {
       datatype = H5Tcreate (H5T_COMPOUND, sizeof (Voxel));
       H5Tinsert (datatype, "id",
                   HOFFSET (Voxel, _id), larcv3::get_datatype<unsigned long>());
-      H5Tinsert (datatype, "value", 
+      H5Tinsert (datatype, "value",
                   HOFFSET (Voxel, _value), larcv3::get_datatype<float>());
       return datatype;
     }
@@ -178,12 +181,15 @@ namespace larcv3 {
     /// Size (count) of voxels
     inline size_t size() const { return _voxel_v.size(); }
 
+
+// These functions only appear in larcv proper, not in includes:
+#ifdef LARCV_INTERNAL
     /// Get the value of all voxels in this set
     pybind11::array_t<float> values() const;
 
     /// Get the index of all voxels in this set
     pybind11::array_t<size_t> indexes() const;
-
+#endif
 
     /// Get the value of all voxels in this set
     std::vector<float> values_vec() const;
@@ -408,6 +414,9 @@ typedef SparseCluster<3> SparseCluster3D;
 
 }
 
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 void init_voxel_core(pybind11::module m);
 
 template<size_t dimension>
@@ -417,6 +426,7 @@ template<size_t dimension>
 void init_sparse_cluster(pybind11::module m);
 
 void init_voxel(pybind11::module m);
+#endif
 
 #endif
 /** @} */ // end of doxygen group

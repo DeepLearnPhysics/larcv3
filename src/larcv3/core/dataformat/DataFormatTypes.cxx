@@ -71,7 +71,7 @@ namespace larcv3{
                HOFFSET (Extents_t, first),
                larcv3::get_datatype<unsigned long long int>());
     H5Tinsert (datatype, "N",
-               HOFFSET (Extents_t, n),     
+               HOFFSET (Extents_t, n),
                larcv3::get_datatype<unsigned int>());
     return datatype;
 
@@ -126,7 +126,7 @@ void init_dataformattypes(pybind11::module m){
   m.attr("kINVALID_PROJECTIONID") = larcv3::kINVALID_PROJECTIONID;
   m.attr("kINVALID_VOXELID")      = larcv3::kINVALID_VOXELID;
   m.attr("kINVALID_PRODUCER")     = larcv3::kINVALID_PRODUCER;
-  
+
   pybind11::enum_<larcv3::PoolType_t> pooltype_t(m,"PoolType_t");
   pooltype_t.value("kPoolSum",      larcv3::PoolType_t::kPoolSum);
   pooltype_t.value("kPoolAverage",  larcv3::PoolType_t::kPoolAverage);

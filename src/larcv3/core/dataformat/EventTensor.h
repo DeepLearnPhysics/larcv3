@@ -2,7 +2,7 @@
  * \file EventTensor.h
  *
  * \ingroup DataFormat
- * 
+ *
  * \brief Class def header for a class EventTensor (was EventImage2D)
  *
  * @author kazuhiro
@@ -20,19 +20,19 @@
 #include "larcv3/core/dataformat/Tensor.h"
 #include "larcv3/core/dataformat/DataProductFactory.h"
 
-#include <pybind11/numpy.h>
+// #include <pybind11/numpy.h>
 
 namespace larcv3 {
-  
+
   /**
     \class EventTensor
     Event-wise class to store a collection of larcv3::Tensor
   */
   template<size_t dimension>
   class EventTensor : public EventBase {
-    
+
   public:
-    
+
     EventTensor();
 
     /// Const reference getter to an array of larcv3::Tensor<dimension>
@@ -43,7 +43,7 @@ namespace larcv3 {
 
     // inline std::shared_ptr<larcv3::Tensor<dimension>>& at(size_t index) const {return _image_v.at(index);}
 
-    /// Deprecated (use as_vector): const reference getter to an array of larcv3::Tensor<dimension> 
+    /// Deprecated (use as_vector): const reference getter to an array of larcv3::Tensor<dimension>
     const std::vector<larcv3::Tensor<dimension>>& image2d_array() const { return _image_v; }
 
     /// Access Tensor<dimension> of a specific projection ID
@@ -64,12 +64,12 @@ namespace larcv3 {
     /// std::move to retrieve content larcv3::Tensor<dimension> array
     void move(std::vector<larcv3::Tensor<dimension>>& image_v)
     { image_v = std::move(_image_v); }
-    
+
     void initialize (hid_t group, uint compression);
     void serialize  (hid_t group);
     void deserialize(hid_t group, size_t entry, bool reopen_groups=false);
     void finalize   ();
-    
+
   private:
     void open_in_datasets(hid_t group);
     void open_out_datasets(hid_t group);
@@ -116,12 +116,13 @@ namespace larcv3 {
 
 }
 
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 template<size_t dimension>
 void init_event_tensor_base(pybind11::module m);
 
 void init_eventtensor(pybind11::module m);
-
+#endif
 
 #endif
-/** @} */ // end of doxygen group 
-
+/** @} */ // end of doxygen group

@@ -7,7 +7,7 @@
  *
  * @author kazuhiro
  * @author cadams
- 
+
 
  * \addtogroup core_DataFormat
 
@@ -95,10 +95,10 @@ namespace larcv3 {
   template<> inline std::string product_unique_name<larcv3::EventSparseCluster2D>() { return "cluster2d"; }
   template<> inline std::string product_unique_name<larcv3::EventSparseCluster3D>() { return "cluster3d"; }
 
-  
+
   //    \class larcv3::EventSparseCluster
   //    \brief A concrete factory class for larcv3::EventSparseCluster
-  
+
 
   class EventSparseCluster2DFactory : public DataProductFactoryBase {
   public:
@@ -110,7 +110,7 @@ namespace larcv3 {
     /// create method
     EventBase* create() { return new EventSparseCluster2D; }
   };
-  
+
   class EventSparseCluster3DFactory : public DataProductFactoryBase {
   public:
     /// ctor
@@ -124,12 +124,14 @@ namespace larcv3 {
 
 }
 
+
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 template<size_t dimension>
 void init_eventsparse_cluster_base(pybind11::module m);
 
 void init_eventsparsecluster(pybind11::module m);
-
+#endif
 
 #endif
 /** @} */ // end of doxygen group
-

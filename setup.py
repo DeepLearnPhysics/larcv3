@@ -18,6 +18,10 @@ if 'LARCV_WITH_OPENMP' in os.environ and os.environ['LARCV_WITH_OPENMP']:
 else:
     openmp_value='OFF'
 
+if 'LARCV_WITHOUT_PYBIND' in os.environ and os.environ['LARCV_WITHOUT_PYBIND']:
+    pybind_value='OFF'
+else:
+    pybind_value='ON'
 
 
 setup(
@@ -28,7 +32,7 @@ setup(
     include_package_data=True,
     cmake_args=[
         '-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.9',
-        '-DCMAKE_PYTHON_BINDINGS=True',
+        '-DCMAKE_PYTHON_BINDINGS={}'.format(pybind_value),
         # '-DMPI_CXX_COMPILER={}'.format(mpicxx),
         # '-DMPI_C_COMPILER={}'.format(mpicc),
         '-DMPI:BOOL={}'.format(mpi_value),

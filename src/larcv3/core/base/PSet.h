@@ -2,7 +2,7 @@
  * \file PSet.h
  *
  * \ingroup core_Base
- * 
+ *
  * \brief Class def header for a class larcv3::PSet
  *
  * @author kazuhiro
@@ -27,9 +27,9 @@ namespace larcv3 {
      \brief A nested configuration parameter set holder for larcv3 framework.
   */
   class PSet {
-    
+
   public:
-    
+
     /// Default constructor
     PSet(const std::string name="",
          const std::string data="");
@@ -45,7 +45,7 @@ namespace larcv3 {
 
     /// name getter
     inline const std::string& name() const { return _name; }
-    
+
     /// operator override
     inline bool operator==(const PSet& rhs) const
     {
@@ -76,7 +76,7 @@ namespace larcv3 {
     inline void rename(std::string name) { _name = name; }
 
     /// clear method
-    inline void clear() 
+    inline void clear()
     { _data_value.clear(); _data_pset.clear(); }
 
     /// Set data contents
@@ -93,7 +93,7 @@ namespace larcv3 {
                   std::string pset);
 
     void update(std::string key, std::string value);
-    
+
     std::string & operator[] (std::string key);
 
     /// Dump into a text format
@@ -169,13 +169,13 @@ namespace larcv3 {
   };
 
   template<> PSet PSet::get<larcv3::PSet>(const std::string& key) const;
-  
+
 }
 
-
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 void init_PSet(pybind11::module m);
-
+#endif
 
 #endif
-/** @} */ // end of doxygen group 
-
+/** @} */ // end of doxygen group
