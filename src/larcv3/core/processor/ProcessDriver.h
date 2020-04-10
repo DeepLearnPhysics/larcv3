@@ -115,9 +115,10 @@ namespace larcv3 {
     bool _has_event_creator;
   };
 }
-
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 void init_processdriver(pybind11::module m);
-
+#endif
 
 #endif
 /** @} */ // end of doxygen group

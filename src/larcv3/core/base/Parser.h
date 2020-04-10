@@ -2,7 +2,7 @@
  * \file Parser.h
  *
  * \ingroup core_Base
- * 
+ *
  * \brief List of functions to type-cast std::string to an appropriate value type
  *
  * @author Kazu - Nevis 2015
@@ -18,7 +18,6 @@
 #include <vector>
 #include <algorithm>
 
-#include <pybind11/pybind11.h>
 
 namespace larcv3 {
   namespace parser {
@@ -73,8 +72,7 @@ namespace larcv3 {
     template <class T> std::string VecToString(const std::vector<T>& value)
     {
       std::string res="[";
-      for(auto const& v : value)
-	res += ToString(v) + ",";
+      for(auto const& v : value) res += ToString(v) + ",";
       res = res.substr(0,res.size()-1);
       res += "]";
       return res;

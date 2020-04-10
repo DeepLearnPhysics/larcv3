@@ -76,7 +76,7 @@ namespace larcv3 {
                   HOFFSET (Vertex, _y), larcv3::get_datatype<double>());
       H5Tinsert (datatype, "z",
                   HOFFSET (Vertex, _z), larcv3::get_datatype<double>());
-      H5Tinsert (datatype, "t", 
+      H5Tinsert (datatype, "t",
                   HOFFSET (Vertex, _t), larcv3::get_datatype<double>());
       return datatype;
     }
@@ -85,7 +85,9 @@ namespace larcv3 {
 
   };
 }
-
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 void init_vertex(pybind11::module m);
+#endif
 
 #endif

@@ -2,7 +2,7 @@
  * \file BatchDataQueue.h
  *
  * \ingroup ThreadIO
- * 
+ *
  * \brief Class def header for a class BatchDataQueue
  *
  * @author kazuhiro
@@ -25,7 +25,7 @@ namespace larcv3 {
   */
   template <class T>
   class BatchDataQueue {
-    
+
   public:
     /// Default constructor
     BatchDataQueue();
@@ -63,13 +63,17 @@ namespace larcv3 {
     larcv3::BatchData<T> _data_next;
 
   };
-  
+
 }
+
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 template<class T>
 void init_batchdataqueue(pybind11::module m);
 
 void init_batchdataqueue(pybind11::module m);
+#endif
+
 
 #endif
-/** @} */ // end of doxygen group 
-
+/** @} */ // end of doxygen group

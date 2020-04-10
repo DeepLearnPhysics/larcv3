@@ -19,7 +19,10 @@
 #include "QueueIOTypes.h"
 #include "larcv3/core/pyutil/PyUtils.h"
 
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
+#endif
 
 namespace larcv3 {
   /**
@@ -46,7 +49,9 @@ namespace larcv3 {
     // Writeable access to data:
     std::vector<T> & writeable_data() {return _data;}
 
+#ifdef LARCV_INTERNAL
     pybind11::array_t<T> pydata();
+#endif
 
     inline const std::vector<int>& dim() const { return _dim; }
     inline const std::vector<int>& dense_dim() const { return _dense_dim; }
@@ -85,11 +90,13 @@ namespace larcv3 {
   };
 }
 
+
+#ifdef LARCV_INTERNAL
 template <class T>
 void init_batchdata_(pybind11::module m);
 
 void init_batchdata(pybind11::module m);
+#endif
 
 #endif
 /** @} */ // end of doxygen group
-

@@ -2,7 +2,7 @@
  * \file LArCVTypes.h
  *
  * \ingroup core_Base
- * 
+ *
  * \brief basic typedefs and enums (larcv3::Point2D, larcv3::msg, etc.)
  *
  * @author Kazu - Nevis 2015
@@ -26,7 +26,6 @@
 #include <limits>
 #include <climits>
 
-#include <pybind11/pybind11.h>
 
 /**
    \namespace larcv3
@@ -48,7 +47,7 @@ namespace larcv3 {
   const short              kINVALID_SHORT     = std::numeric_limits< short              >::max();
   /// Used as an invalid value identifier for unsigned unsigned short
   const unsigned short     kINVALID_USHORT    = std::numeric_limits< unsigned short     >::max();
-  /// Used as an invalid value identifier for single-point precision  
+  /// Used as an invalid value identifier for single-point precision
   const float              kINVALID_FLOAT     = std::numeric_limits< float              >::max();
   /// Used as an invalid value identifier for double-point precision
   const double             kINVALID_DOUBLE    = std::numeric_limits< double             >::max();

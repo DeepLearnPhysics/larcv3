@@ -19,6 +19,12 @@
 #include <random>
 #include <future>
 
+
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
+#endif
+
 namespace larcv3 {
   /**
      \class QueueProcessor
@@ -47,7 +53,7 @@ namespace larcv3 {
     // configure the processor from a file on disk
     void configure(const std::string config_file, int color=0);
 
-    // configure the processor from a PSet object    
+    // configure the processor from a PSet object
     void configure(const PSet& cfg, int color=0);
 
     // Check if the processor is configured
@@ -62,6 +68,15 @@ namespace larcv3 {
 
     // Set the next set of indexes to read:
     void set_next_batch(const std::vector<size_t>& index_v);
+
+
+    // These functions only appear in larcv proper, not in included headers:
+#ifdef LARCV_INTERNAL
+    /// from numpy ctor
+    void set_next_batch(pybind11::array_t <size_t> index_v);
+
+#endif
+
 
     // Return true only if the fillers are preparing the next batch
     bool is_reading() const {return _processing;}
@@ -108,7 +123,7 @@ namespace larcv3 {
     // Each QueueProcessor gets one process driver object.
     // We assume that the batch_process call can be parallelized with OpenMP
     larcv3::ProcessDriver _driver;
-    
+
     // List of processes for fillers:
     std::vector<std::string> _process_name_v;
 
@@ -123,9 +138,10 @@ namespace larcv3 {
   };
 
 }
-
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 void init_queueprocessor(pybind11::module m);
+#endif
 
 #endif
 /** @} */ // end of doxygen group
-

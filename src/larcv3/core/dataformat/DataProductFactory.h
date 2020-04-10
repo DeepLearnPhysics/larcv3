@@ -2,7 +2,7 @@
  * \file DataProductFactory.h
  *
  * \ingroup DataFormat
- * 
+ *
  * \brief Class def header for a class DataProductFactory
  *
  * @author kazuhiro
@@ -21,6 +21,7 @@
 #include "larcv3/core/dataformat/EventBase.h"
 #include "larcv3/core/dataformat/DataFormatTypes.h"
 #include <sstream>
+
 namespace larcv3 {
 
   class EventBase;
@@ -57,7 +58,7 @@ namespace larcv3 {
     /// Static sharable instance getter
     static inline DataProductFactory& get()
     { if(!_me) _me = new DataProductFactory; return *_me; }
-    
+
     /// Factory registration method (should be called by global factory instance in algorithm header)
     void add_factory(std::string type, larcv3::DataProductFactoryBase* factory);
 
@@ -65,7 +66,7 @@ namespace larcv3 {
     inline EventBase* create(const std::string& type, const std::string& producer) {
       return create(ProducerName_t(type,producer));
     }
-    
+
     /// Factory creation method (should be called by clients, possibly you!)
     EventBase* create(const ProducerName_t& id);
 
@@ -88,5 +89,4 @@ namespace larcv3 {
   };
 }
 #endif
-/** @} */ // end of doxygen group 
-
+/** @} */ // end of doxygen group

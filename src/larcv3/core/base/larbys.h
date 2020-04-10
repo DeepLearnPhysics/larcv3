@@ -2,7 +2,7 @@
  * \file larbys.h
  *
  * \ingroup core_Base
- * 
+ *
  * \brief Class def header for exception classes for larcv3 framework
  *
  * @author kazuhiro tmw
@@ -17,7 +17,6 @@
 #include <iostream>
 #include <exception>
 
-#include <pybind11/pybind11.h>
 
 
 
@@ -25,12 +24,12 @@ namespace larcv3 {
 
   /**
      \class larbys
-     Throw insignificant larbys when you find nonesense 
+     Throw insignificant larbys when you find nonesense
   */
   class larbys : public std::exception {
-    
+
   public:
-    
+
     larbys(std::string msg="") : std::exception()
     {
       _msg = "\033[93m";
@@ -43,18 +42,19 @@ namespace larcv3 {
     { return _msg.c_str(); }
 
   private:
-    
+
     std::string _msg;
   };
 }
 
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 void init_larbys(pybind11::module m);
-
+#endif
 
 // PYBIND11_MODULE(larcv, m) {
 //   init_larbys(m);
 // }
 
 #endif
-/** @} */ // end of doxygen group 
-
+/** @} */ // end of doxygen group

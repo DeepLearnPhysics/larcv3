@@ -45,7 +45,7 @@ namespace larcv3 {
       auto iter = _queue_m.find(name);
       return iter != _queue_m.end();
     }
-    
+
     bool is_next_ready() const;
 
     // Pop all queues to promote next to current
@@ -75,12 +75,13 @@ namespace larcv3 {
 
 }
 
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 template<class T>
 void init_batchdataqueuefactory(pybind11::module m);
 
 void init_batchdataqueuefactory(pybind11::module m);
-
+#endif
 
 #endif
 /** @} */ // end of doxygen group
-

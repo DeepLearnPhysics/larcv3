@@ -2,7 +2,7 @@
  * \file Tensor.h
  *
  * \ingroup core_DataFormat
- * 
+ *
  * \brief Class def header for an tensor data holder larcv3::Tensor (was Image2D)
  *
  * @author tmw, kazu, cadams
@@ -19,7 +19,10 @@
 #include <cstdlib>
 #include "larcv3/core/dataformat/ImageMeta.h"
 
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
+#endif
 
 namespace larcv3 {
 
@@ -31,7 +34,7 @@ namespace larcv3 {
   template<size_t dimension>
   class Tensor {
     template<size_t> friend class EventTensor;
-    
+
   public:
 
     /// Default Constructor:
@@ -46,12 +49,15 @@ namespace larcv3 {
     /// copy ctor
     Tensor(const Tensor&);
 
+
+    // These functions only appear in larcv proper, not in included headers:
+#ifdef LARCV_INTERNAL
     /// from numpy ctor
     Tensor(pybind11::array_t<float>);
 
     // Return a numpy array of this object (no copy by default)
     pybind11::array_t<float> as_array();
-    
+#endif
 
     /// dtor
     virtual ~Tensor(){}
@@ -84,7 +90,7 @@ namespace larcv3 {
     // /// Crop specified region via crop_meta to generate a new larcv3::Image2D
     // Image2D crop(const ImageMeta& crop_meta) const;
     /// 1D const reference array getter
-    const std::vector<float>& as_vector() const 
+    const std::vector<float>& as_vector() const
     { return _img; }
     // /// Re-size the 1D data array w/ updated # rows and # columns
     // void resize( const std::vector<size_t> &  counts, float fillval=0.0 );
@@ -96,7 +102,7 @@ namespace larcv3 {
     void paint(float value);
     /// Apply threshold: pixels lower than "thres" are all overwritten by lower_overwrite value
     void threshold(float thresh, bool lower);
-    /// Apply threshold: make all pixels to take only 2 values, lower_overwrite or upper_overwrite 
+    /// Apply threshold: make all pixels to take only 2 values, lower_overwrite or upper_overwrite
     void binarize(float thresh, float lower_overwrite, float upper_overwrite);
     /// Clear data contents
     void clear_data();
@@ -141,7 +147,7 @@ namespace larcv3 {
     void eltwise( const Tensor& rhs );
     /// Element-wise multiplication w/ 1D array data
     void eltwise(const std::vector<float>& arr,bool allow_longer=false);
-    
+
     // The following functions were deprecated for larcv3.
     // Implementations are here in the source code until a later cleanup, in case they
     // need to be un deprecated:
@@ -152,7 +158,7 @@ namespace larcv3 {
 
     /// Move origin position
     void reset_origin(double x, double y) {_meta.reset_origin(x,y);}
-    
+
     /// Compress image2D data and returns compressed data 1D array
     std::vector<float> copy_compress(size_t row_count, size_t col_count, CompressionModes_t mode=kSum) const;
 
@@ -162,10 +168,10 @@ namespace larcv3 {
     void paint_col( int col, float value );
     /// Call copy_compress internally and set itself to the result
     void compress(size_t row_count, size_t col_count, CompressionModes_t mode=kSum);
-    
+
     // Matrix Multiplication
     /// Matrix multiplicaition
-    Image2D multiRHS( const Image2D& rhs ) const; 
+    Image2D multiRHS( const Image2D& rhs ) const;
 
 
     // /// uniry operator for matrix multiplicaition
@@ -187,11 +193,13 @@ namespace larcv3 {
 
 }
 
+#ifdef LARCV_INTERNAL
+
 template <size_t dimension>
 void init_tensor_base(pybind11::module m);
 
 void init_tensor(pybind11::module m);
-
+#endif
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group

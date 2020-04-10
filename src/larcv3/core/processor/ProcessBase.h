@@ -2,7 +2,7 @@
  * \file ProcessBase.h
  *
  * \ingroup core_Processor
- * 
+ *
  * \brief Class def header for a class larcv3::ProcessBase
  *
  * @author drinkingkazu
@@ -36,10 +36,10 @@ namespace larcv3 {
     friend class ProcessFactory;
 
   public:
-    
+
     /// Default constructor
     ProcessBase(const std::string name="ProcessBase");
-    
+
     /// Default destructor
     virtual ~ProcessBase(){}
 
@@ -56,7 +56,7 @@ namespace larcv3 {
     virtual void finalize() = 0;
 
     //
-    // Following functions are 
+    // Following functions are
     //
     /// Only for experts: allows a loose grouping for a set of ProcessBase inherit classes via true/false return to a "question".
     virtual bool is(const std::string question) const;
@@ -74,15 +74,16 @@ namespace larcv3 {
     larcv3::Watch _watch;    ///< algorithm profile stopwatch
     double _proc_time;      ///< algorithm execution time record (cumulative)
     size_t _proc_count;     ///< algorithm execution counter (cumulative)
-    
+
     larcv3::ProcessID_t _id; ///< unique algorithm identifier
     bool _profile;          ///< measure process time if profile flag is on
     std::string _typename;  ///< process type from factory
   };
 }
-
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
 void init_processbase(pybind11::module m);
+#endif
 
 #endif
-/** @} */ // end of doxygen group 
-
+/** @} */ // end of doxygen group
