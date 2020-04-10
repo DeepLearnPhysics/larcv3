@@ -19,6 +19,12 @@
 #include <random>
 #include <future>
 
+
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
+#endif
+
 namespace larcv3 {
   /**
      \class QueueProcessor
@@ -62,6 +68,15 @@ namespace larcv3 {
 
     // Set the next set of indexes to read:
     void set_next_batch(const std::vector<size_t>& index_v);
+
+
+    // These functions only appear in larcv proper, not in included headers:
+#ifdef LARCV_INTERNAL
+    /// from numpy ctor
+    void set_next_batch(pybind11::array_t <size_t> index_v);
+
+#endif
+
 
     // Return true only if the fillers are preparing the next batch
     bool is_reading() const {return _processing;}

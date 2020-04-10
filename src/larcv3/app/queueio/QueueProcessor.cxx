@@ -31,7 +31,7 @@ int omp_thread_count() {
     , _configured(false)
     , _batch_global_counter(0)
   {
-    
+
     std::future<bool> f = std::async(std::launch::deferred, [](){return true;});
     _preparation_future = std::move(f);
   }
@@ -88,6 +88,20 @@ int omp_thread_count() {
   {
     _next_index_v = index_v;
   }
+
+  void QueueProcessor::set_next_batch(pybind11::array_t<size_t> index_v)
+  {
+    _next_index_v.clear();
+
+    pybind11::buffer_info buf = index_v.request();
+
+    _next_index_v.resize(buf.size);
+    size_t * ptr = (size_t *) buf.ptr;
+    for (size_t i = 0; i < buf.size; i++ ){
+      _next_index_v[i] = ptr[i];
+    }
+  }
+
 
   void QueueProcessor::reset()
   {
@@ -329,7 +343,7 @@ int omp_thread_count() {
     return;
 
   }
-  
+
   bool QueueProcessor::batch_process() {
 
     LARCV_DEBUG() << " start" << std::endl;
@@ -510,7 +524,7 @@ int omp_thread_count() {
 #include <pybind11/stl.h>
 
 void init_queueprocessor(pybind11::module m){
-  
+
   using Class = larcv3::QueueProcessor;
   pybind11::class_<Class> queueproc(m, "QueueProcessor");
 
@@ -520,18 +534,23 @@ void init_queueprocessor(pybind11::module m){
   queueproc.def("batch_process",          &Class::batch_process);
   queueproc.def("prepare_next",     &Class::prepare_next);
   queueproc.def("reset",     &Class::reset);
-  queueproc.def("configure",   
+  queueproc.def("configure",
     (void (Class::*)(const std::string, int)) (&Class::configure),
     pybind11::arg("config_file"),
     pybind11::arg("color")=0);
-  queueproc.def("configure",         
+  queueproc.def("configure",
     (void (Class::*)(const larcv3::PSet&, int)) (&Class::configure),
     pybind11::arg("cfg"),
     pybind11::arg("color")=0);
   queueproc.def("configured",         &Class::configured);
   queueproc.def("pop_current_data",         &Class::pop_current_data);
   queueproc.def("set_next_index",         &Class::set_next_index);
-  queueproc.def("set_next_batch",         &Class::set_next_batch);
+  queueproc.def("set_next_batch",
+    (void (Class::*)(const std::vector<size_t>&)) (&Class::set_next_batch));
+
+  queueproc.def("set_next_batch",
+    (void (Class::*)(pybind11::array_t <size_t> )) (&Class::set_next_batch));
+
   queueproc.def("is_reading",         &Class::is_reading);
   queueproc.def("get_n_entries",         &Class::get_n_entries);
   queueproc.def("processed_entries",         &Class::processed_entries);
