@@ -6,40 +6,45 @@ Software framework for image(2D)/volumetric(3D) data processing with APIs to int
 
 ## Installation
 
+You can install larcv through pypi: `pip install larcv` and it should work.  You can also build from source:
+
+```bash
+git clone https://github.com/DeepLearnPhysics/larcv3.git
+cd larcv
+git submodule init --update # Pulls pybind11 subpackage
+python setup.py build [-j 12] # Optional parallel build for faster compilation
+python setup.py install [--user | -prefix ${INSTALLATION_DIR} ] 
+```
+
+To verify your larcv installation, after install has completed:
+```
+cd larcv3/tests
+py.test .
+```
+
+
 ### Dependencies
 
 * Python
 * Numpy
-* Swig (for python bindings)
 * HDF5 (for IO)
 * cmake (for building)
 * scikit-build (for installation)
 * pytest (for continuous integration)
 
-Swig, hdf5 and cmake can all be installed by package managers.  Conda will also work.
+HDF5 and cmake can all be installed by package managers.  Conda will also work.
+
+For compilation, a gcc > 4.8 is required.  GCC versions 5 to 8 are all known to work, as is clang on MacOS.
 
 To install requirements on ubuntu, you can do:
 sudo apt-get install cmake libhdf5-serial-dev python-dev
 pip install numpy scikit-build pytest
 
 To install requirements on mac, you can do:
-sudo port install cmake hdf5 swig
+sudo port install cmake hdf5
 pip install numpy scikit-build pytest
 
-To install in a generic system, you can try conda.  It has been shown to work on many linux distributions. We are working on official conda channels that manage the requirements and prerequisites.
-
-### Setup
-
-
-1. Clone & build
-```
-git clone https://github.com/DeepLearnPhysics/larcv3.git
-python setup.py build [-j 12]
-python setup.py install [--user]
-```
-That's it. When you want to use the built larcv from a different process/shell, as long as you are using the same python it will just work.
-
-If you want it to be even EASIER, and you have the dependencies installed, you can do "pip install -e larcv3 [--user]" from the level above the repo.
+To install in a generic system, you can try conda or a virtual environment.  It has been shown to work on many linux distributions.
 
 <!-- ## Wiki -->
 
