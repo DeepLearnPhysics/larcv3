@@ -34,21 +34,13 @@ namespace larcv3 {
   void BatchFillerVertex::_batch_end_()
   {
     if (logger().level() <= msg::kINFO) {
-      LARCV_INFO() << "Total data size: " << batch_data().data_size() << std::endl;
+      LARCV_INFO() << "Total data size: " << batch_data().data_size() 
+                   << " (one vertex size is " << _vtx_dim << ")" << std::endl;
 
-      std::vector<size_t> ctr_v(_vtx_dim, 0);
       auto const& data = batch_data().data();
-      for (size_t i = 0; i < data.size(); ++i) {
-        if (data[i] < 1.) continue;
-        ctr_v[i % _vtx_dim] += 1;
-      }
-      std::stringstream ss;
-      ss << "Class fractions (0";
-      for (size_t i = 1; i < _vtx_dim; ++i) ss << "," << i;
-      ss << ") ... (" << ctr_v[0];
-      for (size_t i = 1; i < _vtx_dim; ++i) ss << "," << ctr_v[i];
-      ss << ")";
-      LARCV_INFO() << ss.str() << std::endl;
+      if (data.size() < 3) return;
+      LARCV_INFO() << "First vertex is " 
+                   << "[" << data.at(0) << ", " << data.at(1) << ", " << data.at(2) << "]" << std::endl;
     }
   }
 
@@ -74,12 +66,11 @@ namespace larcv3 {
     // vertexes
     _entry_data.resize(_vtx_dim, 0);
     for (auto const& part : part_v) {
-      // _entry_data = {part.x(), part.y(), part.z()};
       _entry_data[0] = part.x();
       _entry_data[1] = part.y();
       _entry_data[2] = part.z();
       LARCV_DEBUG() << "Vertex for particle with PDG" << part.pdg_code() << " is " 
-                    << "[" << part.x() << "," << part.y() << "," << part.z() << "]" << std::endl;
+                    << "[" << part.x() << ", " << part.y() << ", " << part.z() << "]" << std::endl;
     }
 
     set_entry_data(_entry_data);
