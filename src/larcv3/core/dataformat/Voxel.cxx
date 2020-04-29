@@ -379,16 +379,18 @@ SparseTensor<dimension>::SparseTensor(VoxelSet&& vs, ImageMeta<dimension> meta)
 { this->meta(meta); }
 
 template<size_t dimension>
-void SparseTensor<dimension>::meta(const larcv3::ImageMeta<dimension>& meta)
+void SparseTensor<dimension>::meta(const larcv3::ImageMeta<dimension>& meta, bool check)
 {
-for (auto const& vox : this->as_vector()) {
- if (vox.id() < meta.total_voxels()) continue;
- std::cerr << "VoxelSet contains ID " << vox.id()
-           << " which cannot exists in ImageMeta with size " << meta.total_voxels()
-           << std::endl;
- throw larbys();
-}
-_meta = meta;
+  if (check) {
+    for (auto const& vox : this->as_vector()) {
+      if (vox.id() < meta.total_voxels()) continue;
+        std::cerr << "VoxelSet contains ID " << vox.id()
+                  << " which cannot exists in ImageMeta with size " << meta.total_voxels()
+                  << std::endl;
+        throw larbys();
+    }
+  }
+  _meta = meta;
 }
 
 // Take this sparseTensor and return it as a dense numpy array
@@ -642,7 +644,7 @@ void init_sparse_tensor(pybind11::module m){
     pybind11::class_<ST, larcv3::VoxelSet> sparsetensor(m, classname.c_str());
     sparsetensor.def(pybind11::init<>());
     sparsetensor.def("meta", (const larcv3::ImageMeta<dimension>& (ST::*)() const )(&ST::meta), pybind11::return_value_policy::reference);
-    sparsetensor.def("meta", (void (ST::*)(const larcv3::ImageMeta<dimension>& )  )(&ST::meta), pybind11::return_value_policy::reference);
+    sparsetensor.def("meta", (void (ST::*)(const larcv3::ImageMeta<dimension>&, bool )  )(&ST::meta), pybind11::arg("meta"), pybind11::arg("check") = true, pybind11::return_value_policy::reference);
     sparsetensor.def("emplace", (void (ST::*)(const larcv3::Voxel &, const bool))(&ST::emplace));
     sparsetensor.def("set",        &ST::set);
     sparsetensor.def("clear_data", &ST::clear_data);

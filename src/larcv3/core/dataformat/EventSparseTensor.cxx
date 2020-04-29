@@ -839,19 +839,20 @@ namespace larcv3 {
       );
       // std::cout << "temp_voxel_vector.size(): " << temp_voxel_vector.size() << std::endl;
 
-
       for (auto & v : temp_voxel_vector){
-        _tensor_v.at(voxel_set_index).add(v);
+        _tensor_v.at(voxel_set_index).emplace(v);
       }
+
+
       _tensor_v.at(voxel_set_index).id(voxel_set_index);
       // std::cout << "_tensor_v.at(voxel_set_index).at(cluster_id).size(): " << _tensor_v.at(voxel_set_index).at(cluster_id).size() << std::endl;
 
       offset += voxels_slab_dims[0];
 
       // Set the meta for this object:
-      _tensor_v.at(voxel_set_index).meta(image_meta.at(voxel_set_index));
+      // Skip the meta check during deserialization:
+      _tensor_v.at(voxel_set_index).meta(image_meta.at(voxel_set_index), false);
     }
-
 
 
     return;
