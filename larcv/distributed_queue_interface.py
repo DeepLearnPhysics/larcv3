@@ -284,6 +284,9 @@ class queue_interface(object):
     #     for mode in self._queueloaders:
     #         _is_active = _is_active and self._queueloaders[mode].
 
+    def is_reading(self, mode):
+        return self._queueloaders[mode].is_reading()
+
     def stop(self):
 
         for mode in self._queueloaders:
