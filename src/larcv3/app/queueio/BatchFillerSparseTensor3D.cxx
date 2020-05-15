@@ -33,7 +33,7 @@ void BatchFillerSparseTensor3D::configure(const PSet& cfg) {
     throw larbys();
   }
 
-  _allow_empty = cfg.get<bool>("AllowEmpty",false);
+  _allow_empty = cfg.get<bool>("AllowEmpty",true);
 
   LARCV_DEBUG() << "done" << std::endl;
 }
@@ -74,21 +74,21 @@ void BatchFillerSparseTensor3D::finalize() { _entry_data.clear(); }
 // }
 
 bool BatchFillerSparseTensor3D::process(IOManager& mgr) {
-  
+
   /*
 
   Filling a dense tensor of dimensions B, H, W, C produces, in the end,
   a 4D tensor.  Here, we want to produce a list of points in sparse format.
   SO, this will be a 3 dimensional tensor of dimensions B, N_max, dims_len
   Where dims_len is the number of values that represent a point.
-  In this 3D example, dims_len == 3 (H, W, Value) which are extracted from 
+  In this 3D example, dims_len == 3 (H, W, Value) which are extracted from
   the original image.
 
   In principle this can be bigger or smaller for different sized inputs:
   dims_len = 4 (H, W, D, Value) in 3D, for example
 
   The N_max value is a limit on how much memory is allocated for each event.
-  The empty values are all set to 0.0, which are easily ignored in the 
+  The empty values are all set to 0.0, which are easily ignored in the
   graph networks since the pooling layers are typically max reductions
 
   By convention, the Value component is always last in the network
@@ -138,7 +138,7 @@ bool BatchFillerSparseTensor3D::process(IOManager& mgr) {
     dense_dim[4] = 1;
     this->set_dense_dim(dense_dim);
 
-  // } 
+  // }
   // else
   //   this->assert_dimension(voxel_data);
 
@@ -155,7 +155,7 @@ bool BatchFillerSparseTensor3D::process(IOManager& mgr) {
 
   // Check that this projection ID is in the lists of channels:
   size_t i = 0;
-  
+
   // Get the random x/y/z flipping
   bool flip_x = false;
   bool flip_y = false;
@@ -174,7 +174,7 @@ bool BatchFillerSparseTensor3D::process(IOManager& mgr) {
     int i_x = coords.at(0);
     int i_y = coords.at(1);
     int i_z = coords.at(2);
-    
+
     if (flip_x) i_x = meta.number_of_voxels(0) - (i_x + 1);
     if (flip_y) i_y = meta.number_of_voxels(1) - (i_y + 1);
     if (flip_z) i_z = meta.number_of_voxels(2) - (i_z + 1);

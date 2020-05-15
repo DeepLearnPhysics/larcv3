@@ -7,9 +7,9 @@
 namespace larcv3 {
 
   void EventID::clear()
-  { _run = _subrun = _event = kINVALID_SIZE; }
-   
-  
+  { _run = _subrun = _event = kINVALID_LONG; }
+
+
   std::string EventID::event_key() const
   {
     std::stringstream ss;
@@ -18,6 +18,10 @@ namespace larcv3 {
        << std::setw( 6 ) << std::setfill( '0' ) << _event;
     return ss.str();
   }
+
+
+  template<> std::string as_string<EventID>() {return "EventID";}
+
 
 }
 
