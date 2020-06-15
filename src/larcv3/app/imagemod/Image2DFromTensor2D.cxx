@@ -92,14 +92,13 @@ namespace larcv3 {
       auto const& ev_tensor2d = mgr.get_data<larcv3::EventSparseTensor2D>(tensor2d_producer);
       auto& ev_out_image = mgr.get_data<larcv3::EventTensor2D>(output_producer);
 
-      std::vector<larcv3::Image2D> image_v;
+
       for (auto const& tensor2d_v : ev_tensor2d.as_vector()) {
+
 
         auto const& meta = tensor2d_v.meta();
 
-        if (image_v.size() <= meta.id()) image_v.resize(meta.id() + 1);
-
-        std::vector<float> img_data(meta.rows() * meta.cols(),base_pi);
+        std::vector<float> img_data(meta.total_voxels(),base_pi);
 
         for (auto const& vox : tensor2d_v.as_vector()) {
           float val = fixed_pi;
@@ -118,7 +117,10 @@ namespace larcv3 {
         larcv3::Image2D img2d(std::move(meta), std::move(img_data));
         ev_out_image.emplace(std::move(img2d));
       }
+  
     }
+
+
     return true;
   }
 
