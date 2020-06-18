@@ -85,15 +85,15 @@ class larcv_writer(object):
 
             # First, copy all of the values into a VoxelSet object:
             voxel_set = larcv.VoxelSet()
-            for i in range(len(value)):
-                voxel_set.emplace(index[i], value[i], False)
+            voxel_set.set(index, value)
+            # for i in range(len(value)):
+            # _ = [voxel_set.emplace(index[i], value[i], False) for i in range(len(value))]
 
 
             # larcv.as_voxelset(value.astype(numpy.float32), index.astype(numpy.uint64))
             # Add the voxel set:
             _writable_data.set(voxel_set, meta)
 
-        print(_writable_data.size())
         return
 
     def _write_image2d(self, data, producer):

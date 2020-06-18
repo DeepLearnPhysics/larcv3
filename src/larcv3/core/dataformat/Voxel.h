@@ -224,6 +224,11 @@ namespace larcv3 {
     /// InstanceID_t setter
     inline void id(const InstanceID_t id) { _id = id; }
 
+#ifdef LARCV_INTERNAL
+
+    void set(pybind11::array_t<size_t> indexes, pybind11::array_t<float> values);
+#endif
+
     //
     // Uniry operations
     //
