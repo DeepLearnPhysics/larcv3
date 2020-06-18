@@ -83,9 +83,12 @@ class larcv_writer(object):
             meta.set_dimension(0, shape[0], int(shape[0]))
             meta.set_dimension(1, shape[1], int(shape[1]))
 
+            # We need to put in voxels and indexes together.  Argsort handles this:
+            perm = numpy.argsort(index)
+
             # First, copy all of the values into a VoxelSet object:
             voxel_set = larcv.VoxelSet()
-            voxel_set.set(index, value)
+            voxel_set.set(index[perm], value[perm])
             # for i in range(len(value)):
             # _ = [voxel_set.emplace(index[i], value[i], False) for i in range(len(value))]
 

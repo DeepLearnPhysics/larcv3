@@ -216,8 +216,10 @@ namespace larcv3 {
     auto val_ptr = static_cast<float  *>(values_buffer.ptr);
 
     // Now, loop through the inputs and add voxels:
+    this->_voxel_v.reserve(values_buffer.shape[0]);
+
     for (size_t i = 0; i < values_buffer.shape[0]; ++ i){
-      this -> emplace(ind_ptr[i], val_ptr[i], false);
+      this -> _voxel_v.push_back(Voxel(ind_ptr[i], val_ptr[i]));
     }
 
     return;
