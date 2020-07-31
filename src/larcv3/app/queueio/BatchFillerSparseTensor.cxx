@@ -35,9 +35,8 @@ namespace larcv3 {
       throw larbys();
     }
 
-    if (dimension == 3 && _slice_v.size() != 1) {
-      LARCV_CRITICAL() << "BatchFillerSparseTensor3D is only supported with one channel!" << std::endl;
-      throw larbys();
+    if (dimension == 3 && _slice_v.size()) {
+      LARCV_WARNING() << "BatchFillerSparseTensor3D is only supported with one channel!" << std::endl;
     }
 
     _allow_empty = cfg.get<bool>("AllowEmpty",false);
@@ -134,8 +133,7 @@ namespace larcv3 {
       throw larbys();
     }
 
-    _num_channels = _slice_v.size();
-
+    _num_channels = dimension == 2 ? _slice_v.size() : 1;
     int point_dim = dimension + 1;
     if (!_include_values){
       point_dim = dimension;
@@ -219,6 +217,11 @@ namespace larcv3 {
         if(_include_values) {
           _entry_data.at(index + dimension) = voxels[i_voxel].value();
         }
+      }
+
+      // Only read the first voxel set in 3D
+      if (dimension == 3) {
+        break;
       }
     }
 
