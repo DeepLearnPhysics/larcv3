@@ -12,7 +12,7 @@ queue_io_sparsetensor2d_cfg_template = '''
 {name}: {{
   Verbosity:       2
   EnableFilter:    false
-  RandomAccess:    0 
+  RandomAccess:    0
   RandomSeed:      0
   InputFiles:      [{input_files}]
   ProcessType:     ["BatchFillerSparseTensor2D"]
@@ -20,7 +20,7 @@ queue_io_sparsetensor2d_cfg_template = '''
 
   ProcessList: {{
     test_{name}: {{
-      Tensor2DProducer: "{producer}"
+      TensorProducer: "{producer}"
       MaxVoxels: 100
       UnfilledVoxelValue: -999
       Channels: {channels}
@@ -50,7 +50,7 @@ def test_sparsetensor2d_queueio(tmpdir, make_copy, batch_size, n_projections, n_
     create_sparsetensor2d_file(file_name, rand_num_events=25, n_projections=n_projections)
 
 
-    # Generate a config for this 
+    # Generate a config for this
     channels = list(range(n_projections))
     config_contents = queue_io_sparsetensor2d_cfg_template.format(
         name        = queueio_name,
@@ -59,7 +59,7 @@ def test_sparsetensor2d_queueio(tmpdir, make_copy, batch_size, n_projections, n_
         channels    = channels,
         )
 
-    config_file = tmpdir + "/test_queueio_sparsetensor2d_{}.cfg".format(queueio_name) 
+    config_file = tmpdir + "/test_queueio_sparsetensor2d_{}.cfg".format(queueio_name)
 
     with open(str(config_file), 'w') as _f:
         _f.write(config_contents)
@@ -73,7 +73,7 @@ def test_sparsetensor2d_queueio(tmpdir, make_copy, batch_size, n_projections, n_
     }
 
     data_keys = OrderedDict({
-        'label': 'test_{}'.format(queueio_name), 
+        'label': 'test_{}'.format(queueio_name),
         })
 
 

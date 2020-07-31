@@ -12,7 +12,7 @@ queue_io_sparsetensor3d_cfg_template = '''
 {name}: {{
   Verbosity:       2
   EnableFilter:    false
-  RandomAccess:    0 
+  RandomAccess:    0
   RandomSeed:      0
   InputFiles:      [{input_files}]
   ProcessType:     ["BatchFillerSparseTensor3D"]
@@ -20,7 +20,7 @@ queue_io_sparsetensor3d_cfg_template = '''
 
   ProcessList: {{
     test_{name}: {{
-      Tensor3DProducer: "{producer}"
+      TensorProducer: "{producer}"
       MaxVoxels: 100
       UnfilledVoxelValue: -999
     }}
@@ -51,14 +51,14 @@ def test_sparsetensor3d_queueio(tmpdir, make_copy, batch_size, n_reads=10):
     create_sparsetensor3d_file(file_name, rand_num_events=25)
 
 
-    # Generate a config for this 
+    # Generate a config for this
     config_contents = queue_io_sparsetensor3d_cfg_template.format(
         name        = queueio_name,
         input_files = file_name,
         producer    = "test",
         )
 
-    config_file = tmpdir + "/test_queueio_sparsetensor3d_{}.cfg".format(queueio_name) 
+    config_file = tmpdir + "/test_queueio_sparsetensor3d_{}.cfg".format(queueio_name)
 
     with open(str(config_file), 'w') as _f:
         _f.write(config_contents)
@@ -72,7 +72,7 @@ def test_sparsetensor3d_queueio(tmpdir, make_copy, batch_size, n_reads=10):
     }
 
     data_keys = OrderedDict({
-        'label': 'test_{}'.format(queueio_name), 
+        'label': 'test_{}'.format(queueio_name),
         })
 
 
@@ -100,17 +100,17 @@ def test_sparsetensor3d_queueio_distributed(tmpdir, make_copy, local_batch_size,
 
     queueio_name = "queueio_{}".format(uuid.uuid4())
 
-    config_file = tmpdir + "/test_queueio_sparsetensor3d_{}.cfg".format(queueio_name) 
+    config_file = tmpdir + "/test_queueio_sparsetensor3d_{}.cfg".format(queueio_name)
 
     # Only generate file content on one rank:
     if comm.Get_rank() == 0:
         # First, create a file to write to:
         file_name = str(tmpdir + "/test_queueio_sparsetensor3d_{}.h5".format(queueio_name))
-    
+
         # Next, write some sparsetensor3ds to that file:
         create_sparsetensor3d_file(file_name, rand_num_events=25)
 
-        # Generate a config for this 
+        # Generate a config for this
         config_contents = queue_io_sparsetensor3d_cfg_template.format(
             name        = queueio_name,
             input_files = file_name,
@@ -136,7 +136,7 @@ def test_sparsetensor3d_queueio_distributed(tmpdir, make_copy, local_batch_size,
     }
 
     data_keys = OrderedDict({
-        'label': 'test_{}'.format(queueio_name), 
+        'label': 'test_{}'.format(queueio_name),
         })
 
     li = distributed_queue_interface.queue_interface()
