@@ -155,7 +155,7 @@ namespace larcv3 {
     dense_dim.resize(dimension + 2);
     dense_dim[0] = batch_size();
     for (size_t i = 1; i < dimension + 1; i++) {
-      dense_dim[i] = voxel_meta.number_of_voxels(i);
+      dense_dim[i] = voxel_meta.number_of_voxels(i - 1);
     }
     dense_dim[dimension + 1] = _num_channels;
     this->set_dense_dim(dense_dim);
