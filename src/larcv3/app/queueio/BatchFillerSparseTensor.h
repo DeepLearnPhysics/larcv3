@@ -1,5 +1,5 @@
 /**
- * \file BatchFillerSparseTensor2D.h
+ * \file BatchFillerSparseTensor.h
  *
  * \ingroup ThreadIO
  *
@@ -23,7 +23,7 @@ namespace larcv3 {
 
   /**
      \class ProcessBase
-     User defined class BatchFillerTensor2D ... these comments are used to generate
+     User defined class BatchFillerTensor ... these comments are used to generate
      doxygen documentation!
   */
   template<size_t dimension>
@@ -89,7 +89,7 @@ namespace larcv3 {
   public:
     /// ctor
     BatchFillerSparseTensorProcessFactory() {
-      ProcessFactory::get().add_factory(product_unique_name<larcv3::EventSparseTensor<dimension>>(),
+      ProcessFactory::get().add_factory(product_unique_name<larcv3::BatchFillerSparseTensor<dimension>>(),
                                         this);
     }
     /// dtor
