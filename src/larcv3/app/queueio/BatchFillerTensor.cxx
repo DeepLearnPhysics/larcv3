@@ -64,7 +64,9 @@ namespace larcv3 {
 
   template<size_t dimension>
   size_t BatchFillerTensor<dimension>::_set_image_size(const EventTensor<dimension>& image_data) {
+
     auto const& image_v = image_data.as_vector();
+
     if (image_v.empty()) {
       LARCV_CRITICAL() << "Input image is empty!" << std::endl;
       throw larbys();
@@ -87,7 +89,7 @@ namespace larcv3 {
 
     if (image_v.size() <= _max_ch) {
       LARCV_CRITICAL() << "Requested slice max channel (" << _max_ch
-                       << ") exceeds available # of channels in the input Tensor2D" << std::endl;
+                       << ") exceeds available # of channels in the input Tensor" << std::endl;
       throw larbys();
     }
 
@@ -96,23 +98,16 @@ namespace larcv3 {
 
     LARCV_INFO() << "Rows = " << _rows << " ... Cols = " << _cols << std::endl;
 
-    // _caffe_idx_to_img_idx.resize(_rows * _cols, 0);
-    // size_t caffe_idx = 0;
-    // for (size_t row = 0; row < _rows; ++row) {
-    //   for (size_t col = 0; col < _cols; ++col) {
-    //     _caffe_idx_to_img_idx.at(caffe_idx) = col * _rows + row;
-    //     ++caffe_idx;
-    //   }
-    // }
-
     return (_rows * _cols * _num_channels);
   }
 
   template<size_t dimension>
   void BatchFillerTensor<dimension>::_assert_dimension(const EventTensor<dimension>& image_data) const {
+
     auto const& image_v = image_data.as_vector();
+
     if (_rows == kINVALID_SIZE) {
-      LARCV_WARNING() << "set_dimension() must be called prior to check_dimension()" << std::endl;
+      LARCV_WARNING() << "_set_dimension() must be called prior to check_dimension()" << std::endl;
       return;
     }
     bool valid_ch   = (image_v.size() > _max_ch);
@@ -218,18 +213,13 @@ namespace larcv3 {
       auto const& input_image = input_img.as_vector();
 
 
-      size_t caffe_idx = 0;
+      size_t idx = 0;
       for (size_t row = 0; row < _rows; ++row) {
         for (size_t col = 0; col < _cols; ++col) {
-          _entry_data.at(caffe_idx * _num_channels + ch) = input_image.at(col * _rows + row);
-          // _caffe_idx_to_img_idx.at(caffe_idx) = col * _rows + row;
-          ++caffe_idx;
+          _entry_data.at(idx * _num_channels + ch) = input_image.at(col * _rows + row);
+          ++idx;
         }
       }
-
-      // for (size_t caffe_idx = 0; caffe_idx < (_rows * _cols); ++caffe_idx) {
-      //   _entry_data.at(caffe_idx * _num_channels + ch) = input_image.at(_caffe_idx_to_img_idx[caffe_idx]);
-      // }
     }
 
     // record the entry data
