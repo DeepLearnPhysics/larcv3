@@ -81,8 +81,8 @@ namespace larcv3 {
   }
 
   /**
-     \class larcv3::BatchFillerSparseTensor2DFactory
-     \brief A concrete factory class for larcv3::BatchFillerSparseTensor2D
+     \class larcv3::BatchFillerSparseTensorFactory
+     \brief A concrete factory class for larcv3::BatchFillerSparseTensor
   */
   template<size_t dimension>
   class BatchFillerSparseTensorProcessFactory : public ProcessFactoryBase {
