@@ -12,7 +12,7 @@ queue_io_tensor3d_cfg_template = '''
 {name}: {{
   Verbosity:       2
   EnableFilter:    false
-  RandomAccess:    0 
+  RandomAccess:    0
   RandomSeed:      0
   InputFiles:      [{input_files}]
   ProcessType:     ["BatchFillerTensor3D"]
@@ -20,7 +20,7 @@ queue_io_tensor3d_cfg_template = '''
 
   ProcessList: {{
     test_{name}: {{
-      Tensor3DProducer: "{producer}"
+      TensorProducer: "{producer}"
     }}
   }}
 }}
@@ -49,14 +49,14 @@ def test_tensor3d_queueio(tmpdir, make_copy, batch_size, n_reads=2):
     create_tensor3d_file(file_name, rand_num_events=25)
 
 
-    # Generate a config for this 
+    # Generate a config for this
     config_contents = queue_io_tensor3d_cfg_template.format(
         name        = queueio_name,
         input_files = file_name,
         producer    = "test",
         )
 
-    config_file = tmpdir + "/test_queueio_tensor3d_{}.cfg".format(queueio_name) 
+    config_file = tmpdir + "/test_queueio_tensor3d_{}.cfg".format(queueio_name)
 
     with open(str(config_file), 'w') as _f:
         _f.write(config_contents)
@@ -70,7 +70,7 @@ def test_tensor3d_queueio(tmpdir, make_copy, batch_size, n_reads=2):
     }
 
     data_keys = OrderedDict({
-        'label': 'test_{}'.format(queueio_name), 
+        'label': 'test_{}'.format(queueio_name),
         })
 
 
