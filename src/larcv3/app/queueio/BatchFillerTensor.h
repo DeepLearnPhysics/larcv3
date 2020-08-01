@@ -61,8 +61,9 @@ namespace larcv3 {
 
     std::string _tensor_producer;
     std::string _tensor_type;
-    size_t _rows;
-    size_t _cols;
+    // size_t _rows;
+    // size_t _cols;
+    size_t _dims[dimension];  ///< Total number of voxels in each dimension
     size_t _num_channels;
     std::vector<size_t> _slice_v;
     size_t _max_ch;

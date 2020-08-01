@@ -15,10 +15,15 @@ namespace larcv3 {
 
   template<size_t dimension>
   BatchFillerTensor<dimension>::BatchFillerTensor(const std::string name)
-      : BatchFillerTemplate<float>(name) {}
+      : BatchFillerTemplate<float>(name) {
+        for (size_t i = 0; i < dimension; i++) {
+          _dims[i] = kINVALID_SIZE;
+        }
+      }
 
   template<size_t dimension>
   void BatchFillerTensor<dimension>::configure(const PSet& cfg) {
+
     LARCV_DEBUG() << "start" << std::endl;
     _tensor_producer = cfg.get<std::string>("TensorProducer");
     _tensor_type = cfg.get<std::string>("TensorType", "sparse");
@@ -65,6 +70,8 @@ namespace larcv3 {
   template<size_t dimension>
   size_t BatchFillerTensor<dimension>::_set_image_size(const EventTensor<dimension>& image_data) {
 
+    LARCV_DEBUG() << "start" << std::endl;
+
     auto const& image_v = image_data.as_vector();
 
     if (image_v.empty()) {
@@ -93,12 +100,25 @@ namespace larcv3 {
       throw larbys();
     }
 
-    _rows = image_v.at(_slice_v.front()).meta().rows();
-    _cols = image_v.at(_slice_v.front()).meta().cols();
+    auto const & meta = image_v.at(_slice_v.front()).meta();
 
-    LARCV_INFO() << "Rows = " << _rows << " ... Cols = " << _cols << std::endl;
+    size_t total_dim = _num_channels;
 
-    return (_rows * _cols * _num_channels);
+    for (size_t i = 0; i < dimension; i++) {
+      _dims[i] = meta.number_of_voxels(i);
+      total_dim *= _dims[i];
+    }
+
+    if (dimension == 2) {
+      LARCV_INFO() << "Rows = " << _dims[0]
+                   << " ... Cols = " << _dims[1] << std::endl;
+    } else if (dimension == 3) {
+      LARCV_INFO() << "Rows = " << _dims[0]
+                   << " ... Cols = " << _dims[1]
+                   << " ... Depth = " << _dims[2] << std::endl;
+    }
+
+    return total_dim;
   }
 
   template<size_t dimension>
@@ -106,45 +126,33 @@ namespace larcv3 {
 
     auto const& image_v = image_data.as_vector();
 
-    if (_rows == kINVALID_SIZE) {
+    if (_dims[0] == kINVALID_SIZE) {
       LARCV_WARNING() << "_set_dimension() must be called prior to check_dimension()" << std::endl;
       return;
     }
     bool valid_ch   = (image_v.size() > _max_ch);
-    bool valid_rows = true;
+    bool valid_dim = true;
+
     for (size_t ch = 0; ch < _num_channels; ++ch) {
       size_t input_ch = _slice_v.at(ch);
       auto const& img = image_v.at(input_ch);
 
-      valid_rows = (_rows == img.meta().rows());
-      if (!valid_rows) {
-        LARCV_ERROR() << "# of rows changed! (row,col): (" << _rows << "," << _cols << ") => ("
-                      << img.meta().rows() << "," << img.meta().cols() << ")" << std::endl;
-        break;
+      for (size_t i = 0; i < dimension; i++) {
+        valid_dim = (_dims[i] == img.meta().number_of_voxels(i));
+        if (!valid_dim) {
+          LARCV_ERROR() << "# of voxeles on dimension " << i << " changed! Was: " << _dims[0]
+                        << ", now is " << img.meta().number_of_voxels(i) << std::endl;
+          break;
+        }
       }
     }
 
-    bool valid_cols = true;
-    for (size_t ch = 0; ch < _num_channels; ++ch) {
-      size_t input_ch = _slice_v.at(ch);
-      auto const& img = image_v.at(input_ch);
-      valid_cols = ( _cols == img.meta().cols() );
-      if (!valid_cols) {
-        LARCV_ERROR() << "# of cols changed! (row,col): (" << _rows << "," << _cols << ") => ("
-                      << img.meta().rows() << "," << img.meta().cols() << ")" << std::endl;
-        break;
-      }
-    }
-    if (!valid_rows) {
-      LARCV_CRITICAL() << "# of rows in the input image have changed!" << std::endl;
-      throw larbys();
-    }
-    if (!valid_cols) {
-      LARCV_CRITICAL() << "# of cols in the input image have changed!" << std::endl;
+    if (!valid_dim) {
+      LARCV_CRITICAL() << "# of dims in the input tensor have changed!" << std::endl;
       throw larbys();
     }
     if (!valid_ch) {
-      LARCV_CRITICAL() << "# of channels have changed in the input image! Image vs. MaxCh ("
+      LARCV_CRITICAL() << "# of channels have changed in the input tensor! Tensor vs. MaxCh ("
                        << image_v.size() << " vs. " << _max_ch << ")" << std::endl;
       throw larbys();
     }
@@ -169,11 +177,6 @@ namespace larcv3 {
 
     LARCV_DEBUG() << "start" << std::endl;
 
-    if (dimension > 2) {
-      LARCV_CRITICAL() << "BatchFillerTensor from dense Tensor only available in 2D." << std::endl;
-      throw larbys();
-    }
-
     auto const& image_data =
         mgr.get_data<larcv3::EventTensor<dimension>>(_tensor_producer);
 
@@ -187,11 +190,12 @@ namespace larcv3 {
       _set_image_size(image_data);
 
       std::vector<int> dim;
-      dim.resize(4);
+      dim.resize(dimension + 2);
       dim[0] = batch_size();
-      dim[1] = _rows;
-      dim[2] = _cols;
-      dim[3] = _num_channels;
+      for (size_t i = 1; i < dimension + 1; i++) {
+        dim[i] = _dims[i - 1];
+      }
+      dim[dimension + 1] = _num_channels;
       set_dim(dim);
     } else {
       _assert_dimension(image_data);
@@ -212,13 +216,28 @@ namespace larcv3 {
 
       auto const& input_image = input_img.as_vector();
 
-
-      size_t idx = 0;
-      for (size_t row = 0; row < _rows; ++row) {
-        for (size_t col = 0; col < _cols; ++col) {
-          _entry_data.at(idx * _num_channels + ch) = input_image.at(col * _rows + row);
-          ++idx;
+      if (dimension == 2) {
+        size_t idx = 0;
+        for (size_t row = 0; row < _dims[0]; ++row) {
+          for (size_t col = 0; col < _dims[1]; ++col) {
+            _entry_data.at(idx * _num_channels + ch) = input_image.at(col * _dims[0] + row);
+            ++idx;
+          }
         }
+      } else if (dimension == 3) {
+        size_t idx = 0;
+        for (size_t row = 0; row < _dims[0]; ++row) {
+          for (size_t col = 0; col < _dims[1]; ++col) {
+            for (size_t dep = 0; dep < _dims[2]; ++dep) {
+              _entry_data.at(idx * _num_channels + ch) = input_image.at(dep * _dims[0] + col * _dims[1] + row);
+              ++idx;
+            }
+          }
+        }
+      } else {
+        LARCV_CRITICAL() << "BatchFillerTensor from dense Tensor only available in 2D or 3D."
+                         << std::endl;
+      throw larbys();
       }
     }
 
@@ -233,8 +252,10 @@ namespace larcv3 {
 
   template<size_t dimension>
   bool BatchFillerTensor<dimension>::_process_sparse(IOManager& mgr) {
+
     auto const& voxel_data =
         mgr.get_data<larcv3::EventSparseTensor<dimension>>(_tensor_producer);
+
     if (!_allow_empty && voxel_data.as_vector().empty()) {
       LARCV_CRITICAL()
           << "Could not locate non-empty voxel data w/ producer name "
@@ -245,8 +266,6 @@ namespace larcv3 {
     _num_channels = _slice_v.size();
 
     auto const& voxel_meta = voxel_data.as_vector().front().meta();
-    // _rows = voxel_meta.rows();
-    // _cols = voxel_meta.cols();
     std::vector<int> dim;
     dim.resize(dimension + 2);
     dim[0] = batch_size();
