@@ -1,5 +1,5 @@
 add_subdirectory(core)
-add_subdirectory(app)
+# add_subdirectory(app)
 
 
 # This is admittedly pretty clunky, but it gets the job done to make one object file:
@@ -7,11 +7,11 @@ add_subdirectory(app)
 add_library(larcv3 SHARED
     $<TARGET_OBJECTS:base>
     $<TARGET_OBJECTS:dataformat>
-    $<TARGET_OBJECTS:processor>
-    $<TARGET_OBJECTS:filter>
-    $<TARGET_OBJECTS:queueio>
-    $<TARGET_OBJECTS:imagemod>
-    $<TARGET_OBJECTS:sbnd_imagemod>
+    # $<TARGET_OBJECTS:processor>
+    # $<TARGET_OBJECTS:filter>
+    # $<TARGET_OBJECTS:queueio>
+    # $<TARGET_OBJECTS:imagemod>
+    # $<TARGET_OBJECTS:sbnd_imagemod>
     )
 
 
@@ -40,6 +40,10 @@ target_link_libraries(larcv3 ${PYTHON_LIBRARIES})
 
 ###############################
 
+# Link against the json library:
+target_link_libraries(larcv3 nlohmann_json::nlohmann_json)
+
+
 
 if(CMAKE_PYTHON_BINDINGS)
     pybind11_add_module(pylarcv SHARED larcv.cxx)
@@ -61,7 +65,6 @@ if(CMAKE_PYTHON_BINDINGS)
     set_target_properties(pylarcv PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 endif(CMAKE_PYTHON_BINDINGS)
-
 
 ###############################
 

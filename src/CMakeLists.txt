@@ -106,9 +106,11 @@ message(${PYTHON_NUMPY_INCLUDE_DIR})
 include_directories(${PYTHON_NUMPY_INCLUDE_DIR})
 
 
-# # Define a function that handles generating python bindings for a library:
-# macro(generate_python_bindings name)
-
+# Add the json library
+add_subdirectory(json)
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+message("NLOHMANN_JSON_INCLUDE_INSTALL_DIR: ${NLOHMANN_JSON_INCLUDE_INSTALL_DIR}")
+include_directories(json/include)
 
 
 # endmacro(generate_python_bindings)
@@ -116,9 +118,15 @@ if(CMAKE_PYTHON_BINDINGS)
   message("Adding pybind11")
   add_subdirectory(pybind11)
   include_directories(${PYBIND11_INCLUDE_DIR})
-  message(${PYBIND11_INCLUDE_DIR})
+  
+  # GIves bindings between json and python
+  add_subdirectory(pybind11_json)
+  include_directories(pybind11_json/include)
+
 else()
   add_definitions(-DLARCV_NO_PYBIND)
 endif(CMAKE_PYTHON_BINDINGS)
+
+
 
 add_subdirectory(larcv3)
