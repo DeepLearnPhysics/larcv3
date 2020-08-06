@@ -28,7 +28,6 @@
 
 #include "larcv3/core/base/larcv_base.h"
 #include "larcv3/core/base/larbys.h"
-#include "larcv3/core/base/PSet.h"
 #include "larcv3/core/dataformat/EventBase.h"
 #include "larcv3/core/dataformat/EventID.h"
 
@@ -50,16 +49,14 @@ namespace larcv3 {
     /// Default constructor
     IOManager(IOMode_t mode = kREAD, std::string name = "IOManager");
 
-    /// Configuration PSet construction so you don't have to call setter functions
-    IOManager(const PSet& cfg);
-
-    /// Configuration PSet file construction so you don't have to call setter functions
-    IOManager(std::string config_file, std::string name = "IOManager");
+    /// Configuration json construction so you don't have to call setter functions
+    IOManager(const json& cfg);
+    void configure(const json& cfg);
 
     /// Destructor
     ~IOManager();
     /// IO mode accessor
-    IOMode_t io_mode() const { return _io_mode;}
+    IOMode_t io_mode() const { return config["IOMode"].get<IOMode_t>();}
     void reset();
     void add_in_file(const std::string filename, const std::string dirname = "");
     void clear_in_file();
@@ -67,7 +64,6 @@ namespace larcv3 {
     void set_out_file(const std::string name);
     ProducerID_t producer_id(const ProducerName_t& name) const;
     std::string product_type(const size_t id) const;
-    void configure(const PSet& cfg);
     bool initialize(int color=0);
     bool read_entry(const size_t index, bool force_reload = false);
     bool save_entry();
@@ -141,7 +137,25 @@ namespace larcv3 {
     const std::vector<std::string>& file_list() const
     { return _in_file_v; }
 
-
+    static json default_config(){
+        json c = {
+            {"Verbosity", logger::default_level()},
+            {"IOMode", kREAD},
+            {"Input" , {
+                {"InputFiles", std::vector<std::string>()},
+                {"UseH5CoreDriver", false},
+                {"ReadOnlyName", std::vector<std::string>()},
+                {"ReadOnlyType", std::vector<std::string>()},
+            }},
+            {"Output", {
+                {"OutFileName", ""},
+                {"Compression", 1},
+                {"StoreOnlyName", std::vector<std::string>()},
+                {"StoreOnlyType", std::vector<std::string>()},
+            }},
+        };
+        return c;
+    }
 
   protected:
     void   set_id();
@@ -156,6 +170,10 @@ namespace larcv3 {
     // Closes the objects currently open in file with id fid
     int close_all_objects(hid_t fid);
 
+    // Default configuration for IO manager:
+    json config;
+
+
     // The hdf5 model enforces the same number of entries per group,
     // since the entry list is defined per file.
 
@@ -163,7 +181,7 @@ namespace larcv3 {
     // Files are checked for consistency in which groups are present.
 
     // General Parameters
-    IOMode_t    _io_mode;
+    // IOMode_t    _io_mode;
     bool        _prepared;
     // This can override the compression level across the entire file:
     uint _compression_override;

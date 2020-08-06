@@ -21,9 +21,7 @@ namespace larcv3 {
 
 IOManager::IOManager(IOMode_t mode, std::string name)
     : larcv_base(name),
-      _io_mode(mode),
       _prepared(false),
-      _compression_override(1),
       _out_index(0),
       _out_entries(0),
       _out_file_name(""),
@@ -46,30 +44,8 @@ IOManager::IOManager(IOMode_t mode, std::string name)
   _event_id_datatype = larcv3::EventID::get_datatype();
 }
 
-IOManager::IOManager(const PSet& cfg)
-    : IOManager(kREAD, cfg.get<std::string>("Name")) {
-  reset();
-  configure(cfg);
-}
-
-IOManager::IOManager(std::string config_file, std::string name)
-    : IOManager(kREAD, name) {
-  // check cfg file
-  if (config_file.empty()) {
-    LARCV_CRITICAL() << "Config file not set!" << std::endl;
-    throw larbys();
-  }
-
-  // check cfg content top level
-  auto main_cfg = CreatePSetFromFile(config_file);
-  if (!main_cfg.contains_pset(name)) {
-    LARCV_CRITICAL() << "IOManager configuration (" << name
-                     << ") not found in the config file (dump below)"
-                     << std::endl
-                     << main_cfg.dump() << std::endl;
-    throw larbys();
-  }
-  auto const cfg = main_cfg.get<larcv3::PSet>(name);
+IOManager::IOManager(const json& cfg)
+    : IOManager(kREAD, cfg["Name"]) {
   reset();
   configure(cfg);
 }
@@ -97,17 +73,27 @@ std::string IOManager::product_type(const size_t id) const {
   return _product_type_v[id];
 }
 
-void IOManager::configure(const PSet& cfg) {
+
+
+/*
+Workflow for updating this:
+- For each parameter from config file, move it's object and default to the 
+  json object
+- Then, replace all instances of private member variables with the values
+  from the json object.
+
+*/
+
+void IOManager::configure(const json& cfg) {
   if (_prepared) throw larbys("Cannot call configure() after initialize()!");
 
-  set_verbosity(
-      (msg::Level_t)(cfg.get<unsigned short>("Verbosity", logger().level())));
-  _io_mode = (IOMode_t)(cfg.get<unsigned short>("IOMode"));
-  _out_file_name = cfg.get<std::string>("OutFileName", "");
+  set_verbosity( (msg::Level_t)(cfg["Verbosity"]) );
+  _out_file_name = cfg["OutFileName"];
 
-  _compression_override = cfg.get<uint>("Compression", _compression_override);
+  // _compression_override = cfg["Compression"];
 
-  _h5_core_driver = cfg.get<bool>("UseH5CoreDriver", false);
+  _h5_core_driver = cfg["UseH5CoreDriver"];
+  
   if (_h5_core_driver) {
     LARCV_INFO() << "File will be stored entirely on memory." << std::endl;
     // 1024 is number of bytes to increment each time more memory is needed;
@@ -115,25 +101,28 @@ void IOManager::configure(const PSet& cfg) {
     H5Pset_fapl_core(_fapl, 1024, false);
   }
 
+  auto _in_file = cfg["Input"]["InputFiles"].get<std::vector<std::string>>();
+
   // Figure out input files
   _in_file_v.clear();
-  _in_file_v = cfg.get<std::vector<std::string> >("InputFiles", _in_file_v);
-  _in_dir_v.clear();
-  _in_dir_v = cfg.get<std::vector<std::string> >("InputDirs", _in_dir_v);
-  if (_in_dir_v.empty()) _in_dir_v.resize(_in_file_v.size(), "");
-  if (_in_dir_v.size() != _in_file_v.size()) {
-    LARCV_CRITICAL() << "# of input file (" << _in_file_v.size()
-                     << ") != # of input dir (" << _in_dir_v.size() << ")!"
-                     << std::endl;
-    throw larbys();
+  for (auto & f : cfg["Input"]["InputFiles"]){
+    _in_file_v.push_back(f);
   }
+  // _in_file_v cfg["Input"]["InputFiles"];
+  // _in_dir_v.clear();
+  // _in_dir_v = cfg.get<std::vector<std::string> >("InputDirs", _in_dir_v);
+  // if (_in_dir_v.empty()) _in_dir_v.resize(_in_file_v.size(), "");
+  // if (_in_dir_v.size() != _in_file_v.size()) {
+  //   LARCV_CRITICAL() << "# of input file (" << _in_file_v.size()
+  //                    << ") != # of input dir (" << _in_dir_v.size() << ")!"
+  //                    << std::endl;
+  //   throw larbys();
+  // }
 
-  std::vector<std::string> store_only_name;
-  std::vector<std::string> store_only_type;
-  store_only_name =
-      cfg.get<std::vector<std::string> >("StoreOnlyName", store_only_name);
-  store_only_type =
-      cfg.get<std::vector<std::string> >("StoreOnlyType", store_only_type);
+  // std::vector<std::string> store_only_name;
+  // std::vector<std::string> store_only_type;
+  auto store_only_name = cfg["OutPut"]["StoreOnlyName"].get<std::vector<std::string>>();
+  auto store_only_type = cfg["OutPut"]["StoreOnlyType"].get<std::vector<std::string>>();
   if (store_only_name.size() != store_only_type.size()) {
     LARCV_CRITICAL() << "StoreOnlyName and StoreOnlyType has different lengths!"
                      << std::endl;
@@ -151,12 +140,9 @@ void IOManager::configure(const PSet& cfg) {
     val.insert(store_only_name[i]);
   }
 
-  std::vector<std::string> read_only_name;
-  std::vector<std::string> read_only_type;
-  read_only_name =
-      cfg.get<std::vector<std::string> >("ReadOnlyName", read_only_name);
-  read_only_type =
-      cfg.get<std::vector<std::string> >("ReadOnlyType", read_only_type);
+  std::vector<std::string> read_only_name = cfg["ReadOnlyName"].get<std::vector<std::string>>();
+  std::vector<std::string> read_only_type = cfg["ReadOnlyType"].get<std::vector<std::string>>();
+
   if (read_only_name.size() != read_only_type.size()) {
     LARCV_CRITICAL() << "ReadOnlyName and ReadOnlyType has different lengths!"
                      << std::endl;
@@ -213,7 +199,7 @@ bool IOManager::initialize(int color) {
   // Get the rank of the process
   MPI_Comm_rank(_private_comm, &_private_rank);
 
-  if (_io_mode != kREAD && _private_size != 1){
+  if (config["IOMode"].get<IOMode_t>() != kREAD && _private_size != 1){
     LARCV_CRITICAL() << "Only read only mode is compatible with MPI with more than one rank!" << std::endl;
     throw larbys();
   }
@@ -223,7 +209,7 @@ bool IOManager::initialize(int color) {
 
 
 
-  if (_io_mode != kREAD) {
+  if (config["IOMode"].get<IOMode_t>() != kREAD) {
     if (_out_file_name.empty()) throw larbys("Must set output file name!");
     LARCV_INFO() << "Opening an output file: " << _out_file_name << std::endl;
 
@@ -263,7 +249,7 @@ bool IOManager::initialize(int color) {
     hid_t cparams = H5Pcreate( H5P_DATASET_CREATE );
     hsize_t      extents_chunk_dims[1] ={EVENT_ID_CHUNK_SIZE};
     H5Pset_chunk(cparams, 1, extents_chunk_dims );
-    H5Pset_deflate(cparams, _compression_override);
+    H5Pset_deflate(cparams, config["Output"]["Compression"].get<int>());
 
     _out_event_id_ds = H5Dcreate(
         _out_file,                       // hid_t loc_id  IN: Location identifier
@@ -277,7 +263,7 @@ bool IOManager::initialize(int color) {
 
   }
 
-  if (_io_mode != kWRITE) {
+  if (config["IOMode"].get<IOMode_t>() != kWRITE) {
     // Prepare input will register producers for all producers in the input file.
     // It will not make output groups for store_only objects
     prepare_input();
@@ -294,7 +280,7 @@ bool IOManager::initialize(int color) {
   // Now handle "store-only" configuration
   // This has not been verified for larcv3
   _store_id_bool.clear();
-  if (_io_mode != kREAD && _store_only.size()) {
+  if (config["IOMode"].get<IOMode_t>() != kREAD && _store_only.size()) {
     // Creating a vector of the storage status
     std::vector<size_t> store_only_id;
     _store_id_bool.resize(_product_ctr, false);
@@ -367,7 +353,7 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
     // if it's not in the input, it's either virtual or output only.
     // It's virtual if the mode is kREAD
     // It's virtual if the mode is kWRITE/kBOTH AND this pair is not in the write list.
-    if (_io_mode != kREAD){
+    if (config["IOMode"].get<IOMode_t>() != kREAD){
 
       if (!_store_id_bool.empty() && _store_id_bool[_product_ctr]){
         _product_status_v[_product_ctr] = kOutputOnly;
@@ -393,7 +379,7 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
 
 
 
-  if (_io_mode != kREAD) {
+  if (config["IOMode"].get<IOMode_t>() != kREAD) {
     // _store_id_bool is not set until this function returns.  So we can't use it yet.
     // But we can't create and output group if we are not storing that product.
 
@@ -427,7 +413,7 @@ size_t IOManager::register_producer(const ProducerName_t& name) {
         H5P_DEFAULT          // hid_t gapl_id IN: Group access property list identifier
                                // (No group access properties have been implemented at this time; use H5P_DEFAULT.));
       );
-      _product_ptr_v[id]->initialize(_out_group_v[id], _compression_override);
+      _product_ptr_v[id]->initialize(_out_group_v[id], config["Output"]["Compression"].get<int>());
       LARCV_DEBUG() << "Created Group " << group_loc << " @ " << &_out_group_v[id] << std::endl;
     }
     else{
@@ -471,6 +457,8 @@ void IOManager::prepare_input() {
   // Index of currently active file - start at file 0
   _in_active_file_index = 0;
   // the file is opened at the end of this function
+
+  auto _in_file_v = config["Input"]["InputFiles"];
 
   // List of total entries in input files?
   _in_entries_v.reserve(_in_file_v.size());
@@ -645,7 +633,7 @@ bool IOManager::read_entry(const size_t index, bool force_reload) {
   _force_reopen_groups = false;
 
   LARCV_DEBUG() << "start" << std::endl;
-  if (_io_mode == kWRITE) {
+  if (config["IOMode"].get<IOMode_t>() == kWRITE) {
     LARCV_WARNING() << "Nothing to read in kWRITE mode..." << std::endl;
     return false;
   }
@@ -759,13 +747,13 @@ bool IOManager::save_entry() {
     throw larbys();
   }
 
-  if (_io_mode == kREAD) {
+  if (config["IOMode"].get<IOMode_t>() == kREAD) {
     LARCV_ERROR() << "Cannot save in READ mode..." << std::endl;
     return false;
   }
 
   // in kBOTH mode make sure all Group entries are read-in
-  if (_io_mode == kBOTH) {
+  if (config["IOMode"].get<IOMode_t>() == kBOTH) {
     for (size_t id = 0; id < _out_group_v.size(); ++id) {
       if ( _store_id_bool.size() &&
            (id >= _store_id_bool.size() || !_store_id_bool[id])
@@ -965,7 +953,7 @@ std::shared_ptr<EventBase> IOManager::get_data(const std::string& type,
 
   if (id == kINVALID_SIZE) {
     id = register_producer(prod_name);
-    if (_io_mode == kREAD) {
+    if (config["IOMode"].get<IOMode_t>() == kREAD) {
       LARCV_NORMAL() << type << " created w/ producer name " << producer
                      << " but won't be stored in file (kREAD mode)"
                      << std::endl;
@@ -988,7 +976,7 @@ std::shared_ptr<EventBase> IOManager::get_data(const size_t id) {
     throw larbys();
   }
 
-  if (_io_mode != kWRITE && _in_index != kINVALID_SIZE &&
+  if (config["IOMode"].get<IOMode_t>() != kWRITE && _in_index != kINVALID_SIZE &&
       (id >= _read_id_bool.size() || _read_id_bool[id]) &&
       _product_status_v[id] == kInputFileUnread ) {
     // Reading in is just getting the group, calling deserialize with the right
@@ -1015,7 +1003,7 @@ std::shared_ptr<EventBase> IOManager::get_data(const size_t id) {
     }
     catch (...){
       // When there is an error in deserialization, close the open input file gracefully:
-      if(_io_mode != kWRITE){
+      if(config["IOMode"].get<IOMode_t>() != kWRITE){
         LARCV_CRITICAL() << "Exception caught in deserialization, closing input file gracefully" << std::endl;
         H5Fclose(_in_open_file);
         // _in_open_file.close();
@@ -1028,7 +1016,7 @@ std::shared_ptr<EventBase> IOManager::get_data(const size_t id) {
 
 void IOManager::set_id(const long run, const long subrun,
                        const long event) {
-  if (_io_mode == kREAD) {
+  if (config["IOMode"].get<IOMode_t>() == kREAD) {
     LARCV_CRITICAL() << "Cannot change event id in kREAD mode" << std::endl;
     throw larbys();
   }
@@ -1050,7 +1038,7 @@ void IOManager::set_id(const long run, const long subrun,
 void IOManager::set_id() {
   LARCV_DEBUG() << "start" << std::endl;
 
-  if (_io_mode == kREAD) {
+  if (config["IOMode"].get<IOMode_t>() == kREAD) {
     return;
   }
 
@@ -1096,7 +1084,7 @@ int IOManager::close_all_objects(hid_t fid) {
 
 void IOManager::finalize() {
 
-  if (_io_mode != kREAD) {
+  if (config["IOMode"].get<IOMode_t>() != kREAD) {
 
 
     close_all_objects(_out_file);
@@ -1163,10 +1151,7 @@ void init_iomanager(pybind11::module m){
   iomanager.def(pybind11::init<Class::IOMode_t, std::string>(),
     pybind11::arg("mode")=Class::kREAD,
     pybind11::arg("name") = "IOManager");
-  iomanager.def(pybind11::init<const larcv3::PSet&>());
-  iomanager.def(pybind11::init<std::string, std::string >(),
-    pybind11::arg("config_file"),
-    pybind11::arg("name") = "IOManager");
+  iomanager.def(pybind11::init<const json&>());
 
   iomanager.def("get_data",    (std::shared_ptr<larcv3::EventBase> (Class::*)(const std::string&, const std::string&) )(&Class::get_data));
   iomanager.def("get_data",    (std::shared_ptr<larcv3::EventBase> (Class::*)(const larcv3::ProducerID_t))(&Class::get_data));
