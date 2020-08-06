@@ -17,7 +17,6 @@
 
 #include "larbys.h"
 #include "larcv_base.h"
-#include "PSet.h"
 #include "Watch.h"
 
 #ifndef LARCV_NO_PYBIND

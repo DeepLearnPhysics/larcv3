@@ -17,6 +17,13 @@
 
 #include <vector>
 #include "larcv3/core/base/larcv_logger.h"
+#include "pybind11_json/pybind11_json.hpp"
+#include <nlohmann/json.hpp>
+
+// for convenience
+using json = nlohmann::json;
+
+
 
 namespace larcv3 {
 
@@ -50,6 +57,16 @@ namespace larcv3 {
     /// Name getter, defined in a logger instance attribute
     const std::string& name() const
     { return logger().name(); }
+
+    /// Base config getter
+    static json default_config(){
+      json j = {{ "larcv_base" ,
+        {"", ""}
+      }};
+      return j;
+    };
+    
+
 
   private:
 

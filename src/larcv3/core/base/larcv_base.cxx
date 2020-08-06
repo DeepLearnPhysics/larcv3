@@ -6,5 +6,6 @@ void init_larcv_base(pybind11::module m){
         .def("logger", &larcv3::larcv_base::logger)
         .def("set_verbosity", &larcv3::larcv_base::set_verbosity)
         .def("name", &larcv3::larcv_base::name)
+        .def("default_config", &larcv3::larcv_base::default_config)
         ;
 }
