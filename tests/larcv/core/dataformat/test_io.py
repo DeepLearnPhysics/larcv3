@@ -12,6 +12,17 @@ def tempfile(tmpdir):
 def rand_num_events():
     return random.randint(1, 10)
 
+def test_augment_config():
+    io_manager = larcv.IOManager()
+    # Static default config:
+    default_config = larcv.IOManager.default_config()
+
+
+    default_config["Input"]["InputFiles"] = ['temp.h5']
+    io_manager.configure(default_config)
+
+    print(io_manager.get_config())
+
 def write_temp_file(tempfile, rand_num_events):
 
 

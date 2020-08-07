@@ -53,12 +53,14 @@ namespace larcv3 {
     IOManager(const json& cfg);
     void configure(const json& cfg);
 
+    json get_config(){return config;}
+
     /// Destructor
     ~IOManager();
     /// IO mode accessor
     IOMode_t io_mode() const { return config["IOMode"].get<IOMode_t>();}
     void reset();
-    void add_in_file(const std::string filename, const std::string dirname = "");
+    void add_in_file(const std::string filename);
     void clear_in_file();
     void set_core_driver(const bool opt = true);
     void set_out_file(const std::string name);
@@ -76,7 +78,7 @@ namespace larcv3 {
     { return _out_entries;}
 
     std::string get_file_out_name() const
-    { return _out_file_name;}
+    { return config["Output"]["OutFileName"];}
 
     size_t get_n_entries() const
     { return (_in_entries_total ? _in_entries_total : _out_entries); }
@@ -134,8 +136,8 @@ namespace larcv3 {
       return res;
     }
 
-    const std::vector<std::string>& file_list() const
-    { return _in_file_v; }
+    const std::vector<std::string> file_list() const
+    { return config["Input"]["InputFiles"].get<std::vector<std::string> >(); }
 
     static json default_config(){
         json c = {
@@ -181,10 +183,7 @@ namespace larcv3 {
     // Files are checked for consistency in which groups are present.
 
     // General Parameters
-    // IOMode_t    _io_mode;
     bool        _prepared;
-    // This can override the compression level across the entire file:
-    uint _compression_override;
 
 
     // Parameters controlling output file large scale tracking:
@@ -194,8 +193,7 @@ namespace larcv3 {
     size_t      _out_index;
     // Total output entries
     size_t      _out_entries;
-    // Name of the output file
-    std::string _out_file_name;
+
 
     // Parameters controllign input file large scale tracking:
     // Current index in the input files
@@ -205,14 +203,10 @@ namespace larcv3 {
     size_t      _in_entries_total;
     // Index of currently active file
     size_t      _in_active_file_index;
-    // List of input file names:
-    std::vector<std::string>        _in_file_v;
-    // List of input directory names:
-    std::vector<std::string>        _in_dir_v;
     // Currently open file:
     hid_t       _in_open_file;
     // List of total entries in input files
-    std::vector<size_t>             _in_entries_v;
+    std::vector<size_t> _in_entries_v;
 
     // Parameters for the event ID management:
     EventID   _event_id;
@@ -258,7 +252,6 @@ namespace larcv3 {
     std::map<std::string,std::set<std::string> > _read_only;
     std::vector<bool> _store_id_bool;
     std::vector<bool> _read_id_bool;
-    bool _h5_core_driver;
 
 
     // IOManager has to control the EventID dataset it's self for the output file.
@@ -268,6 +261,7 @@ namespace larcv3 {
 
     // Internal bookkeeping for when the input file switches:
     bool _force_reopen_groups;
+
 
     // MPI Variables:
 #ifdef LARCV_MPI

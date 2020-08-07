@@ -24,24 +24,22 @@ IOManager::IOManager(IOMode_t mode, std::string name)
       _prepared(false),
       _out_index(0),
       _out_entries(0),
-      _out_file_name(""),
       _in_index(0),
       _current_offset(0),
       _in_entries_total(0),
-      _in_file_v(),
-      _in_dir_v(),
       _out_group_v(),
       _key_list(),
       _product_ctr(0),
       _product_ptr_v(),
       _product_type_v(),
       _producer_name_v(),
-      _h5_core_driver(false),
       _force_reopen_groups(false) {
   reset();
   _fapl = H5Pcreate(H5P_FILE_ACCESS);
   xfer_plist_id = H5Pcreate(H5P_DATASET_XFER);
   _event_id_datatype = larcv3::EventID::get_datatype();
+  config = this->default_config();
+  config["IOMode"] = mode;
 }
 
 IOManager::IOManager(const json& cfg)
@@ -52,17 +50,20 @@ IOManager::IOManager(const json& cfg)
 
 IOManager::~IOManager(){}
 
-void IOManager::add_in_file(const std::string filename,
-                            const std::string dirname) {
-  _in_file_v.push_back(filename);
-  _in_dir_v.push_back(dirname);
+void IOManager::add_in_file(const std::string filename) {
+  // Get the original:
+  auto in_files = config["Input"]["InputFiles"].get<std::vector<std::string>>();
+  // Add the new files:
+  in_files.push_back(filename);
+  // Overwrite the original:
+  config["Input"]["InputFiles"] = in_files;
 }
 
-void IOManager::clear_in_file() { _in_file_v.clear(); }
+void IOManager::clear_in_file() { config["Input"]["InputFiles"] = std::vector<std::string>(); }
 
-void IOManager::set_core_driver(const bool opt) { _h5_core_driver = opt; }
+void IOManager::set_core_driver(const bool opt) { config["UseH5CoreDriver"] = opt; }
 
-void IOManager::set_out_file(const std::string name) { _out_file_name = name; }
+void IOManager::set_out_file(const std::string name) { config["Output"]["OutFileName"] = name; }
 
 std::string IOManager::product_type(const size_t id) const {
   if (id > _product_type_v.size()) {
@@ -87,42 +88,26 @@ Workflow for updating this:
 void IOManager::configure(const json& cfg) {
   if (_prepared) throw larbys("Cannot call configure() after initialize()!");
 
-  set_verbosity( (msg::Level_t)(cfg["Verbosity"]) );
-  _out_file_name = cfg["OutFileName"];
 
-  // _compression_override = cfg["Compression"];
+  auto config = this->default_config();
 
-  _h5_core_driver = cfg["UseH5CoreDriver"];
-  
-  if (_h5_core_driver) {
+  // Use the base class function to update the config:
+  config = augment_default_config(config, cfg);
+
+
+  set_verbosity( cfg["Verbosity"].get<msg::Level_t>() );
+
+  if (config["Input"]["UseH5CoreDriver"].get<bool>()) {
     LARCV_INFO() << "File will be stored entirely on memory." << std::endl;
     // 1024 is number of bytes to increment each time more memory is needed;
     //'false': do not write contents to disk when the file is closed
     H5Pset_fapl_core(_fapl, 1024, false);
   }
 
-  auto _in_file = cfg["Input"]["InputFiles"].get<std::vector<std::string>>();
-
-  // Figure out input files
-  _in_file_v.clear();
-  for (auto & f : cfg["Input"]["InputFiles"]){
-    _in_file_v.push_back(f);
-  }
-  // _in_file_v cfg["Input"]["InputFiles"];
-  // _in_dir_v.clear();
-  // _in_dir_v = cfg.get<std::vector<std::string> >("InputDirs", _in_dir_v);
-  // if (_in_dir_v.empty()) _in_dir_v.resize(_in_file_v.size(), "");
-  // if (_in_dir_v.size() != _in_file_v.size()) {
-  //   LARCV_CRITICAL() << "# of input file (" << _in_file_v.size()
-  //                    << ") != # of input dir (" << _in_dir_v.size() << ")!"
-  //                    << std::endl;
-  //   throw larbys();
-  // }
-
   // std::vector<std::string> store_only_name;
   // std::vector<std::string> store_only_type;
-  auto store_only_name = cfg["OutPut"]["StoreOnlyName"].get<std::vector<std::string>>();
-  auto store_only_type = cfg["OutPut"]["StoreOnlyType"].get<std::vector<std::string>>();
+  auto store_only_name = config["Output"]["StoreOnlyName"].get<std::vector<std::string>>();
+  auto store_only_type = config["Output"]["StoreOnlyType"].get<std::vector<std::string>>();
   if (store_only_name.size() != store_only_type.size()) {
     LARCV_CRITICAL() << "StoreOnlyName and StoreOnlyType has different lengths!"
                      << std::endl;
@@ -140,8 +125,8 @@ void IOManager::configure(const json& cfg) {
     val.insert(store_only_name[i]);
   }
 
-  std::vector<std::string> read_only_name = cfg["ReadOnlyName"].get<std::vector<std::string>>();
-  std::vector<std::string> read_only_type = cfg["ReadOnlyType"].get<std::vector<std::string>>();
+  std::vector<std::string> read_only_name = config["Input"]["ReadOnlyName"].get<std::vector<std::string>>();
+  std::vector<std::string> read_only_type = config["Input"]["ReadOnlyType"].get<std::vector<std::string>>();
 
   if (read_only_name.size() != read_only_type.size()) {
     LARCV_CRITICAL() << "ReadOnlyName and ReadOnlyType has different lengths!"
@@ -199,6 +184,8 @@ bool IOManager::initialize(int color) {
   // Get the rank of the process
   MPI_Comm_rank(_private_comm, &_private_rank);
 
+  std::cout << config["IOMode"].get<IOMode_t>() << std::endl;
+
   if (config["IOMode"].get<IOMode_t>() != kREAD && _private_size != 1){
     LARCV_CRITICAL() << "Only read only mode is compatible with MPI with more than one rank!" << std::endl;
     throw larbys();
@@ -208,13 +195,14 @@ bool IOManager::initialize(int color) {
 
 
 
+  auto out_file_name = config["Output"]["OutFileName"].get<std::string>();
 
   if (config["IOMode"].get<IOMode_t>() != kREAD) {
-    if (_out_file_name.empty()) throw larbys("Must set output file name!");
-    LARCV_INFO() << "Opening an output file: " << _out_file_name << std::endl;
+    if (out_file_name.empty()) throw larbys("Must set output file name!");
+    LARCV_INFO() << "Opening an output file: " << out_file_name << std::endl;
 
     // Using default file creation properties, default file access properties
-    _out_file = H5Fcreate(_out_file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    _out_file = H5Fcreate(out_file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     // Create the top level groups in the output file.
     H5Gcreate(
@@ -673,7 +661,8 @@ bool IOManager::read_entry(const size_t index, bool force_reload) {
     if (_this_file_index != _in_active_file_index) {
       // Open a new file for reading:
       _in_active_file_index = _this_file_index;
-      open_new_input_file(_in_file_v[_in_active_file_index]);
+      auto files = config["Input"]["InputFiles"].get<std::vector<std::string>>();
+      open_new_input_file(files[_in_active_file_index]);
 
       LARCV_INFO() << "Opening new file for continued event reading"
                      << std::endl;
@@ -1123,9 +1112,6 @@ void IOManager::reset() {
   _out_index = 0;
   _in_entries_total = 0;
   _prepared = false;
-  _out_file_name = "";
-  _in_file_v.clear();
-  _in_dir_v.clear();
   _key_list.clear();
   _in_key_list.clear();
   _read_only.clear();
@@ -1162,8 +1148,7 @@ void init_iomanager(pybind11::module m){
   iomanager.def("io_mode",           &Class::io_mode);
   iomanager.def("reset",             &Class::reset);
   iomanager.def("add_in_file",       &Class::add_in_file,
-    pybind11::arg("filename"),
-    pybind11::arg("dirname") = "");
+    pybind11::arg("filename"));
   iomanager.def("clear_in_file",     &Class::clear_in_file);
   iomanager.def("set_core_driver",   &Class::set_core_driver,
     pybind11::arg("opt")=true);
@@ -1189,6 +1174,9 @@ void init_iomanager(pybind11::module m){
   iomanager.def("producer_list",     &Class::producer_list);
   iomanager.def("product_list",      &Class::product_list);
   iomanager.def("file_list",         &Class::file_list);
+
+  iomanager.def("default_config",    &Class::default_config);
+  iomanager.def("get_config",        &Class::get_config);
 
 
 }

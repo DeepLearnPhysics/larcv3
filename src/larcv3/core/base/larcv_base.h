@@ -66,9 +66,11 @@ namespace larcv3 {
       return j;
     };
     
-
+  protected:    
+    json augment_default_config(json default_config, json user_config);
 
   private:
+
 
     larcv3::logger *_logger;   ///< logger
 
