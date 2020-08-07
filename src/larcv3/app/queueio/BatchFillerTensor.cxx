@@ -216,7 +216,11 @@ namespace larcv3 {
 
       auto const& input_image = input_img.as_vector();
 
-      if (dimension == 2) {
+      if (dimension == 1) {
+        for (size_t i = 0; i < _dims[0]; i++) {
+          _entry_data.at(i) = input_image.at(i);
+        }
+      } else if (dimension == 2) {
         size_t idx = 0;
         for (size_t row = 0; row < _dims[0]; ++row) {
           for (size_t col = 0; col < _dims[1]; ++col) {
@@ -229,15 +233,30 @@ namespace larcv3 {
         for (size_t row = 0; row < _dims[0]; ++row) {
           for (size_t col = 0; col < _dims[1]; ++col) {
             for (size_t dep = 0; dep < _dims[2]; ++dep) {
-              _entry_data.at(idx * _num_channels + ch) = input_image.at(dep * _dims[0] + col * _dims[1] + row);
+              _entry_data.at(idx * _num_channels + ch) =
+                      input_image.at(dep * _dims[0] + col * _dims[1] + row);
               ++idx;
             }
           }
         }
+      } else if (dimension == 4) {
+        size_t idx = 0;
+        for (size_t row = 0; row < _dims[0]; ++row) {
+          for (size_t col = 0; col < _dims[1]; ++col) {
+            for (size_t dep = 0; dep < _dims[2]; ++dep) {
+              for (size_t j = 0; j < _dims[3]; ++j) {
+                _entry_data.at(idx * _num_channels + ch) =
+                        input_image.at(j * _dims[0] + dep * _dims[1] + col * _dims[2] + row);
+                ++idx;
+              }
+            }
+          }
+        }
       } else {
-        LARCV_CRITICAL() << "BatchFillerTensor from dense Tensor only available in 2D or 3D."
+        LARCV_CRITICAL() << "BatchFillerTensor from dense Tensor not available in "
+                         << dimension << "D."
                          << std::endl;
-      throw larbys();
+        throw larbys();
       }
     }
 
