@@ -38,18 +38,14 @@ namespace larcv3 {
     //
     // Configuration setter/modifiers
     //
-    /// Decodes given configuration text file to create larcv3::PSet, then calls the other configure function.
-    void configure(const std::string config_file);
     /// Configure itself (mainly larcv3::IOManager) and also attached process modules.
-    void configure(const PSet& cfg);
+    void configure(const json& cfg);
     /// When needs to override the list of input files from what's specified in the configuration
     void override_input_file(const std::vector<std::string>& flist);
     /// When needs to override the name of output data file from what's specified in the configuration
     void override_output_file(const std::string fname);
-    /// When needs to override the name of output analysis file from what's specified in the configuration
-    void override_ana_file(const std::string fname);
     /// When needs to override the randomized event access in IO from what's specified in the configuration
-    void random_access(int flag) { _random_access = flag; }
+    void random_access(int flag) { config["RandomAccess"] = flag; }
 
     //
     // Process flow execution methods
@@ -99,20 +95,33 @@ namespace larcv3 {
     /// Returns true if after any entry is processed (process_entry/batch_process) but not yet finalized
     inline bool processing() const { return _processing; }
 
+    static json default_config(){
+        json c = {
+            {"Verbosity", logger::default_level()},
+            {"IOManager", IOManager::default_config()},
+            {"ProcessList", {} },
+            {"EnableFilter", false},
+            {"RandomAccess", false},
+            {"RandomSeed",   NULL},
+            {"StartEntry", 0},
+            {"NumEntries", 0},
+        };
+        return c;
+    }
+
   protected:
+
+    json config;
 
     bool _process_entry_();
     size_t _batch_start_entry;
     size_t _batch_num_entry;
     size_t _current_entry;
-    bool _enable_filter;
-    int _random_access;
     std::vector<size_t> _access_entry_v;
     IOManager _io;
     std::map<std::string,larcv3::ProcessID_t> _proc_m;
     std::vector<larcv3::ProcessBase*> _proc_v;
     bool _processing;
-    bool _has_event_creator;
   };
 }
 #ifdef LARCV_INTERNAL

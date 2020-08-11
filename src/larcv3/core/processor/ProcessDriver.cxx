@@ -11,10 +11,6 @@ namespace larcv3 {
 
 ProcessDriver::ProcessDriver(std::string name)
     : larcv_base(name),
-      _batch_start_entry(0),
-      _batch_num_entry(0),
-      _enable_filter(false),
-      _random_access(0),
       _proc_v(),
       _processing(false) {
       }
@@ -22,12 +18,11 @@ ProcessDriver::ProcessDriver(std::string name)
 void ProcessDriver::reset() {
   LARCV_DEBUG() << "Called" << std::endl;
   _io.reset();
-  _enable_filter = false;
-  _random_access = 0;
   for (size_t i = 0; i < _proc_v.size(); ++i) {
     delete _proc_v[i];
     _proc_v[i] = nullptr;
   }
+  config = json();
   _proc_v.clear();
   _processing = false;
 }
@@ -43,14 +38,6 @@ void ProcessDriver::override_output_file(const std::string fname) {
   _io.set_out_file(fname);
 }
 
-void ProcessDriver::override_ana_file(const std::string fname) {
-  LARCV_DEBUG() << "Called" << std::endl;
-  if (_processing) {
-    LARCV_CRITICAL() << "Cannot change ana file name during processing!"
-                     << std::endl;
-    throw larbys();
-  }
-}
 
 ProcessID_t ProcessDriver::process_id(std::string name) const {
   LARCV_DEBUG() << "Called" << std::endl;
@@ -86,62 +73,50 @@ const ProcessBase* ProcessDriver::process_ptr(size_t id) const {
   return _proc_v[id];
 }
 
-void ProcessDriver::configure(const std::string config_file) {
-  LARCV_DEBUG() << "Called" << std::endl;
-  // check state
-  if (_processing) {
-    LARCV_CRITICAL() << "Must call finalize() before calling initialize() "
-                        "after starting to process..."
-                     << std::endl;
-    throw larbys();
-  }
-  // check cfg file
-  if (config_file.empty()) {
-    LARCV_CRITICAL() << "Config file not set!" << std::endl;
-    throw larbys();
-  }
-  // check cfg content top level
-  auto main_cfg = CreatePSetFromFile(config_file);
-  if (!main_cfg.contains_pset(name())) {
-    LARCV_CRITICAL() << "ProcessDriver configuration (" << name()
-                     << ") not found in the config file (dump below)"
-                     << std::endl
-                     << main_cfg.dump() << std::endl;
-    throw larbys();
-  }
 
-  auto const cfg = main_cfg.get<larcv3::PSet>(name());
-  configure(cfg);
-}
-
-void ProcessDriver::configure(const PSet& cfg) {
+void ProcessDriver::configure(const json& cfg) {
   reset();
+
+  // Grab the default config:
+  config = this->default_config();
+
+  // Use the base class function to update the config:
+  config = augment_default_config(config, cfg);
+
+
   // Set the verbosity up front: 
-  set_verbosity(
-      (msg::Level_t)(cfg.get<unsigned short>("Verbosity", logger().level())));
+  set_verbosity(config["Verbosity"].get<msg::Level_t>());
   larcv3::logger::get_shared().set(logger().level());
 
-  // check io config exists
-  LARCV_INFO() << "Retrieving IO config" << std::endl;
-  PSet io_config("Empty");
-  if (cfg.contains_pset("IOManager"))
-    io_config = cfg.get<larcv3::PSet>("IOManager");
-  else if (cfg.contains_pset(std::string(name() + "IOManager")))
-    io_config = cfg.get<larcv3::PSet>(name() + "IOManager");
-  else {
-    LARCV_CRITICAL() << "IOManager config not found!" << std::endl
-                     << cfg.dump() << std::endl;
-    throw larbys();
-  }
+  // // check io config exists
+  // LARCV_INFO() << "Retrieving IO config" << std::endl;
+  // json io_config("Empty");
+  // if (cfg.contains_pset("IOManager"))
+  //   io_config = cfg.get<larcv3::PSet>("IOManager");
+  // else if (cfg.contains_pset(std::string(name() + "IOManager")))
+  //   io_config = cfg.get<larcv3::PSet>(name() + "IOManager");
+  // else {
+  //   LARCV_CRITICAL() << "IOManager config not found!" << std::endl
+  //                    << cfg.dump() << std::endl;
+  //   throw larbys();
+  // }
+  /// CJA, 8/10/20: IOManager is filled in by default now, so this check isn't necessary.
 
-  // check process config exists
-  LARCV_INFO() << "Retrieving ProcessList" << std::endl;
-  if (!cfg.contains_pset("ProcessList")) {
-    LARCV_CRITICAL() << "ProcessList config not found!" << std::endl
-                     << cfg.dump() << std::endl;
-    throw larbys();
-  }
-  auto const proc_config = cfg.get<larcv3::PSet>("ProcessList");
+
+
+  // // check process config exists
+  // LARCV_INFO() << "Retrieving ProcessList" << std::endl;
+  // if (!cfg.contains("ProcessList")) {
+  //   LARCV_CRITICAL() << "ProcessList config not found!" << std::endl
+  //                    << cfg.dump() << std::endl;
+  //   throw larbys();
+  // }
+  /// CJA, 8/10/20: ProcessList is in the default now, so this check isn't necessary.
+
+
+  auto const io_config   = config["IOManager"].get<json>();
+  auto const proc_config = config["ProcessList"].get<json>();
+
 
   // Prepare IO manager
   LARCV_INFO() << "Configuring IO" << std::endl;
@@ -149,26 +124,17 @@ void ProcessDriver::configure(const PSet& cfg) {
   // Set ProcessDriver
   LARCV_INFO() << "Retrieving self (ProcessDriver) config" << std::endl;
   
-  _enable_filter = cfg.get<bool>("EnableFilter", false);
-  LARCV_INFO() << "Enable Filter is :  " << _enable_filter << std::endl;
-  auto random_access_bool = cfg.get<bool>("RandomAccess");
+
+  LARCV_INFO() << "Enable Filter is :  " << config["EnableFilter"].get<bool>() << std::endl;
+  auto random_access_bool = config["RandomAccess"].get<bool>();
   LARCV_INFO() << "RandomAccess is :  " << random_access_bool << std::endl;
-  if (!random_access_bool)
-    _random_access = 0;
-  else
-    _random_access = -1;
-  try {
-    auto random_access_int = cfg.get<int>("RandomSeed");
-    if (random_access_int != 0) _random_access = random_access_int;
-  } catch (...) {
-  }
-  _batch_start_entry = cfg.get<int>("StartEntry", 0);
-  _batch_num_entry = cfg.get<int>("NumEntries", 0);
+
+
   // Process list
   auto process_instance_type_v =
-      cfg.get<std::vector<std::string> >("ProcessType");
+      config["ProcessType"].get<std::vector<std::string> >();
   auto process_instance_name_v =
-      cfg.get<std::vector<std::string> >("ProcessName");
+      config["ProcessName"].get<std::vector<std::string> >();
 
   if (process_instance_type_v.size() != process_instance_name_v.size()) {
     LARCV_CRITICAL() << "ProcessType and ProcessName config parameters have "
@@ -186,7 +152,6 @@ void ProcessDriver::configure(const PSet& cfg) {
     }
   _proc_v.clear();
   _proc_m.clear();
-  _has_event_creator = false;
   for (size_t i = 0; i < process_instance_type_v.size(); ++i) {
     auto const& name = process_instance_name_v[i];
     auto const& type = process_instance_type_v[i];
@@ -207,22 +172,9 @@ void ProcessDriver::configure(const PSet& cfg) {
     */
     auto ptr = ProcessFactory::get().create(type, name);
     ptr->_id = id;
-    ptr->_configure_(proc_config.get_pset(name));
+    ptr->_configure_(proc_config[name].get<json>());
     _proc_m[name] = id;
-    if (ptr->event_creator()) {
-      if (_has_event_creator) {
-        LARCV_CRITICAL() << "Only 1 event creator is allowed to exist!"
-                         << std::endl;
-        throw larbys();
-      }
-      if ((i + 1) != process_instance_type_v.size()) {
-        LARCV_CRITICAL()
-            << "Event creator must be set to the last of ProcessList!"
-            << std::endl;
-        throw larbys();
-      }
-      _has_event_creator = true;
-    }
+
     _proc_v.push_back(ptr);
   }
 }
@@ -246,7 +198,7 @@ void ProcessDriver::initialize(int color) {
   auto const io_mode = _io.io_mode();
 
   // Random access + write mode cannot be combined
-  if (_random_access != 0 && io_mode == IOManager::kWRITE) {
+  if (config["RandomAccess"].get<bool>() != 0 && io_mode == IOManager::kWRITE) {
     LARCV_CRITICAL() << "Random access mode not supported for kWRITE IO mode!"
                      << std::endl;
     throw larbys();
@@ -274,14 +226,14 @@ void ProcessDriver::initialize(int color) {
   if (nentries) {
     _access_entry_v.resize(nentries);
     for (size_t i = 0; i < _access_entry_v.size(); ++i) _access_entry_v[i] = i;
-    // if(_random_access)
+    // if(config["RandomAccess"].get<bool>())
     // std::random_shuffle(_access_entry_v.begin(),_access_entry_v.end());
-    if (_random_access != 0) {
+    if (config["RandomAccess"].get<bool>()) {
       unsigned int seed = 0;
-      if (_random_access < 0)
+      if (config["RandomSeed"].get<int>() < 0)
         seed = std::chrono::system_clock::now().time_since_epoch().count();
       else
-        seed = _random_access;
+        seed = config["RandomSeed"].get<int>();
       std::shuffle(_access_entry_v.begin(), _access_entry_v.end(),
                    std::default_random_engine(seed));
     }
@@ -300,25 +252,15 @@ bool ProcessDriver::_process_entry_() {
   // bool cleared=false;
   for (auto& p : _proc_v) {
     good_status = good_status && p->_process_(_io);
-    if (!good_status && _enable_filter) break;
+    if (!good_status && config["EnableFilter"].get<bool>() ) break;
   }
-  // No event-write to be done if _has_event_creator is set. Otherwise go ahead
-  if (!_has_event_creator) {
-    // If not read mode save entry
-    if (_io.io_mode() != IOManager::kREAD && (!_enable_filter || good_status)) {
-      // cleared = true;
-      _io.save_entry();
-    }
-    /*
-    if(!cleared)
-      _io.clear_entry();
-    cleared=true;
-    */
+  // If not read mode save entry
+  if (_io.io_mode() != IOManager::kREAD && (!config["EnableFilter"].get<bool>()  || good_status)) {
+    // cleared = true;
+    _io.save_entry();
   }
-  /*
-  if(!cleared && _io.io_mode() == IOManager::kREAD)
-    _io.clear_entry();
-  */
+
+   
   // Bump up entry record
   ++_current_entry;
 
@@ -381,8 +323,8 @@ bool ProcessDriver::process_entry(size_t entry, bool force_reload) {
 void ProcessDriver::batch_process(size_t start_entry, size_t num_entries) {
   LARCV_DEBUG() << "Called" << std::endl;
   // Public method to execute num_entries starting from start_entry
-  if (!start_entry) start_entry = _batch_start_entry;
-  if (!num_entries) num_entries = _batch_num_entry;
+  if (!start_entry) start_entry = config["StartEntry"].get<int>();
+  if (!num_entries) num_entries = config["NumEntries"].get<int>();
 
   // Check state
   if (!_processing) {
@@ -498,14 +440,11 @@ void init_processdriver(pybind11::module m){
                     pybind11::arg("name")   = "ProcessDriver");
 
 
-    processdriver.def("configure",
-      (void (Class::*)( const std::string config_file ) )(&Class::configure));
     processdriver.def("configure", 
-      (void (Class::*)( const larcv3::PSet& cfg))(&Class::configure));
+      (void (Class::*)( const json& cfg))(&Class::configure));
 
     processdriver.def("override_input_file", &Class::override_input_file);
     processdriver.def("override_output_file", &Class::override_output_file);
-    processdriver.def("override_ana_file", &Class::override_ana_file);
     processdriver.def("random_access", &Class::random_access);
     processdriver.def("reset", &Class::reset);
     processdriver.def("initialize", &Class::initialize,pybind11::arg("color")=0);

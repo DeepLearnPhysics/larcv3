@@ -16,11 +16,10 @@ namespace larcv3 {
   bool ProcessBase::is(const std::string question) const
   { return false; }
 
-  void ProcessBase::_configure_(const PSet& cfg)
+  void ProcessBase::_configure_(const json& cfg)
   {
-    _profile = cfg.get<bool>("Profile",_profile);
-    set_verbosity((msg::Level_t)(cfg.get<unsigned short>("Verbosity",logger().level())));
-    _event_creator=cfg.get<bool>("EventCreator",false);
+    _profile = cfg["Profile"].get<bool>();
+    set_verbosity(cfg["Verbosity"].get<msg::Level_t>());
     configure(cfg);
   }
   

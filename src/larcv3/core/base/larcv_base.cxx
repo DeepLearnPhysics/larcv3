@@ -50,4 +50,5 @@ void init_larcv_base(pybind11::module m){
     .def("name", &larcv3::larcv_base::name)
     .def("default_config", &larcv3::larcv_base::default_config)
     ;
+
 }

@@ -47,7 +47,7 @@ namespace larcv3 {
     // Four pure virtual functions that larcv3::ProcessDriver calls and need implementation.
     //
     /// Called first with the argument passing the configuration parameters.
-    virtual void configure(const PSet&) = 0;
+    virtual void configure(const json&) = 0;
     /// Called after configure, this is where you should initialize variables to be stored in an output analysis file.
     virtual void initialize() = 0;
     /// Called per-event, this is where you should implement your per-event action/analysis.
@@ -60,13 +60,19 @@ namespace larcv3 {
     //
     /// Only for experts: allows a loose grouping for a set of ProcessBase inherit classes via true/false return to a "question".
     virtual bool is(const std::string question) const;
-    /// Only for experts: larcv3::ProcessDriver to see if this module can create a new event or not
-    bool event_creator() const
-    { return _event_creator; }
+
+    static json default_config(){
+      json c = {
+          {"ProcessName", ""},
+          {"ProcessType", ""},
+      };
+      return c;
+    }
+
 
   private:
 
-    void _configure_(const PSet&);
+    void _configure_(const json&);
 
     bool _process_(IOManager& mgr);
 

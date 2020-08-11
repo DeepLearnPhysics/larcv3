@@ -89,7 +89,7 @@ void IOManager::configure(const json& cfg) {
   if (_prepared) throw larbys("Cannot call configure() after initialize()!");
 
 
-  auto config = this->default_config();
+  config = this->default_config();
 
   // Use the base class function to update the config:
   config = augment_default_config(config, cfg);
