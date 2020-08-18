@@ -107,8 +107,8 @@ include_directories(${PYTHON_NUMPY_INCLUDE_DIR})
 
 
 # Add the json library
-add_subdirectory(json)
 set(JSON_BuildTests OFF CACHE INTERNAL "")
+add_subdirectory(json)
 message("NLOHMANN_JSON_INCLUDE_INSTALL_DIR: ${NLOHMANN_JSON_INCLUDE_INSTALL_DIR}")
 include_directories(json/include)
 
