@@ -11,9 +11,10 @@ namespace larcv3 {
     : ProcessBase(name)
   {}
     
-  void EmptyImageFilter::configure(const PSet& cfg)
+  void EmptyImageFilter::configure(const json& cfg)
   {
-    _image_producer = cfg.get<std::string>("ImageProducer");
+    config = this -> default_config();
+    config = augment_default_config(config, cfg);
   }
 
   void EmptyImageFilter::initialize()
@@ -21,7 +22,8 @@ namespace larcv3 {
 
   bool EmptyImageFilter::process(IOManager& mgr)
   {
-    auto const& ev_image = mgr.get_data<larcv3::EventTensor2D>(_image_producer);
+
+    auto const& ev_image = mgr.get_data<larcv3::EventTensor2D>(config["ImageProducer"].get<std::string>());
     if(ev_image.image2d_array().empty()) return false;
     return true;
   }

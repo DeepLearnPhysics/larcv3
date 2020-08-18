@@ -3,7 +3,7 @@
 
 #include "EmptyTensorFilter.h"
 #include "larcv3/core/dataformat/EventSparseTensor.h"
-// #include "larcv3/core/DataFormat/EventVoxel3D.h"
+#include "larcv3/core/dataformat/EventTensor.h"
 namespace larcv3 {
 
   static EmptyTensorFilterProcessFactory __global_EmptyTensorFilterProcessFactory__;
@@ -12,66 +12,51 @@ namespace larcv3 {
     : ProcessBase(name)
   {}
 
-  void EmptyTensorFilter::configure_labels(const PSet& cfg)
+  // void EmptyTensorFilter::configure_labels(const json& cfg)
+  // {
+  //   _tensor2d_producer_v.clear();
+  //   _tensor3d_producer_v.clear();
+
+  //   _tensor2d_producer_v = cfg.get<std::vector<std::string> >("Tensor2DProducerList", _tensor2d_producer_v);
+  //   _tensor3d_producer_v = cfg.get<std::vector<std::string> >("Tensor3DProducerList", _tensor3d_producer_v);
+
+  //   if (_tensor2d_producer_v.empty()) {
+  //     auto tensor2d_producer = cfg.get<std::string>("Tensor2DProducer", "");
+  //     if (!tensor2d_producer.empty()) {
+  //       _tensor2d_producer_v.push_back(tensor2d_producer);
+  //     }
+  //   }
+
+  //   if (_tensor3d_producer_v.empty()) {
+  //     auto tensor3d_producer = cfg.get<std::string>("Tensor3DProducer", "");
+  //     if (!tensor3d_producer.empty()) {
+  //       _tensor3d_producer_v.push_back(tensor3d_producer);
+  //     }
+  //   }
+  // }
+
+  void EmptyTensorFilter::configure(const json& cfg)
   {
-    _tensor2d_producer_v.clear();
-    _tensor3d_producer_v.clear();
 
-    _tensor2d_producer_v = cfg.get<std::vector<std::string> >("Tensor2DProducerList", _tensor2d_producer_v);
-    _tensor3d_producer_v = cfg.get<std::vector<std::string> >("Tensor3DProducerList", _tensor3d_producer_v);
+    config = this -> default_config();
+    config = augment_default_config(config, cfg);
 
-    if (_tensor2d_producer_v.empty()) {
-      auto tensor2d_producer = cfg.get<std::string>("Tensor2DProducer", "");
-      if (!tensor2d_producer.empty()) {
-        _tensor2d_producer_v.push_back(tensor2d_producer);
-      }
-    }
+    // assert that all lengths are the same:
 
-    if (_tensor3d_producer_v.empty()) {
-      auto tensor3d_producer = cfg.get<std::string>("Tensor3DProducer", "");
-      if (!tensor3d_producer.empty()) {
-        _tensor3d_producer_v.push_back(tensor3d_producer);
-      }
-    }
-  }
+    auto size = config["TensorProducer"].get<std::vector<std::string>>().size();
 
-  void EmptyTensorFilter::configure(const PSet& cfg)
-  {
-    configure_labels(cfg);
+    std::vector<std::string> keys = {"TensorType", "MinVoxelCount", "MinVoxelValue"};
 
-    _min_voxel2d_count_v = cfg.get<std::vector<size_t> >("MinVoxel2DCountList", _min_voxel2d_count_v);
-    if (_min_voxel2d_count_v.empty()) {
-      auto min_voxel2d_count = cfg.get<size_t>("MinVoxel2DCount", 0);
-      _min_voxel2d_count_v.resize(_tensor2d_producer_v.size(), min_voxel2d_count);
-    } else if (_min_voxel2d_count_v.size() != _tensor2d_producer_v.size()) {
-      LARCV_CRITICAL() << "MinVoxel2DCount size mismatch with other input parameters!" << std::endl;
+    if ( config["TensorType"].get<std::vector<std::string>>().size() != size){    
+      LARCV_CRITICAL() << "TensorType" << " size mismatch with other input parameters!" << std::endl;
       throw larbys();
     }
-
-    _min_voxel2d_value_v = cfg.get<std::vector<float> >("MinVoxel2DValueList", _min_voxel2d_value_v);
-    if (_min_voxel2d_value_v.empty()) {
-      auto min_voxel2d_value = cfg.get<float>("MinVoxel2DValue", 0.);
-      _min_voxel2d_value_v.resize(_tensor2d_producer_v.size(), min_voxel2d_value);
-    } else if (_min_voxel2d_value_v.size() != _tensor2d_producer_v.size()) {
-      LARCV_CRITICAL() << "MinVoxel2DValue size mismatch with other input parameters!" << std::endl;
+    if ( config["MinVoxelCount"].get<std::vector<int>>().size() != size){    
+      LARCV_CRITICAL() << "MinVoxelCount" << " size mismatch with other input parameters!" << std::endl;
       throw larbys();
     }
-
-     _min_voxel3d_count_v = cfg.get<std::vector<size_t> >("MinVoxel3DCountList", _min_voxel3d_count_v); 
-    if (_min_voxel3d_count_v.empty()) {
-      auto min_voxel3d_count = cfg.get<size_t>("MinVoxel3DCount", 0);
-      _min_voxel3d_count_v.resize(_tensor3d_producer_v.size(), min_voxel3d_count);
-    } else if (_min_voxel3d_count_v.size() != _tensor3d_producer_v.size()) {
-      LARCV_CRITICAL() << "MinVoxel3DCount size mismatch with other input parameters!" << std::endl;
-      throw larbys();
-    }
-
-    _min_voxel3d_value_v = cfg.get<std::vector<float> >("MinVoxel3DValueList", _min_voxel3d_value_v);
-    if (_min_voxel3d_value_v.empty()) {
-      auto min_voxel3d_value = cfg.get<float>("MinVoxel3DValue", 0.);
-      _min_voxel3d_value_v.resize(_tensor3d_producer_v.size(), min_voxel3d_value);
-    } else if (_min_voxel3d_value_v.size() != _tensor3d_producer_v.size()) {
-      LARCV_CRITICAL() << "MinVoxel3DValue size mismatch with other input parameters!" << std::endl;
+    if ( config["MinVoxelValue"].get<std::vector<float>>().size() != size){    
+      LARCV_CRITICAL() << "MinVoxelValue" << " size mismatch with other input parameters!" << std::endl;
       throw larbys();
     }
 
@@ -82,36 +67,71 @@ namespace larcv3 {
 
   bool EmptyTensorFilter::process(IOManager& mgr)
   {
-    for (size_t producer_index = 0; producer_index < _tensor3d_producer_v.size(); ++producer_index) {
-      auto const& producer = _tensor3d_producer_v[producer_index];
-      auto const& event_tensor3d = mgr.get_data<larcv3::EventSparseTensor3D>(producer);
-      auto const& min_voxel_value = _min_voxel3d_value_v[producer_index];
-      auto const& min_voxel_count = _min_voxel3d_count_v[producer_index];
-      for (auto const& vox_set : event_tensor3d.as_vector()) {
-        size_t ctr = 0;
-        for (auto const& vox : vox_set.as_vector()) {
-          if (vox.value() < min_voxel_value) continue;
-          ctr++;
-        }
-        if (ctr < min_voxel_count) return false;
+
+    auto producers = config["TensorProducer"].get<std::vector<std::string>>();
+    auto products  = config["TensorProduct"].get<std::vector<std::string>>();
+    auto values    = config["MinVoxelCount"].get<std::vector<int>>();
+    auto counts    = config["MinVoxelValue"].get<std::vector<float>>();
+
+    for (size_t index = 0; index < producers.size(); index ++){
+
+      bool filter_status = true;
+
+      if (products[index] == "sparse2d") {
+        filter_status = process_sparse<2>(mgr, producers[index], values[index], counts[index]);
       }
+      else if (products[index] == "sparse3d"){
+        filter_status = process_sparse<3>(mgr, producers[index], values[index], counts[index]);
+      }
+      else if (products[index] == "tensor1d"){
+        filter_status = process_tensor<1>(mgr, producers[index], values[index], counts[index]);
+      }
+      else if (products[index] == "tensor2d" || products[index] == "image2d"){
+        filter_status = process_tensor<2>(mgr, producers[index], values[index], counts[index]);
+      }
+      else if (products[index] == "tensor3d"){
+        filter_status = process_tensor<3>(mgr, producers[index], values[index], counts[index]);
+      }
+      else if (products[index] == "tensor4d"){
+        filter_status = process_tensor<4>(mgr, producers[index], values[index], counts[index]);
+      }
+      if (! filter_status) return false;
     }
 
-    for (size_t producer_index = 0; producer_index < _tensor2d_producer_v.size(); ++producer_index) {
-      auto const& producer = _tensor2d_producer_v[producer_index];
-      auto const& event_tensor2d = mgr.get_data<larcv3::EventSparseTensor2D>(producer);
-      auto const& min_voxel_value = _min_voxel2d_value_v[producer_index];
-      auto const& min_voxel_count = _min_voxel2d_count_v[producer_index];
-      for (auto const& vox_set : event_tensor2d.as_vector()) {
-        size_t ctr = 0;
-        for (auto const& vox : vox_set.as_vector()) {
-          if (vox.value() < min_voxel_value) continue;
-          ctr++;
-        }
-        if (ctr < min_voxel_count) return false;
+    return true;
+  }
+
+  template<size_t dimension>
+  bool EmptyTensorFilter::process_tensor(IOManager & mgr, std::string producer, int min_voxel_count, float min_voxel_value){
+
+    // Get the data:
+    auto const& event_tensor = mgr.get_data<EventTensor<dimension>>(producer);
+    for (auto const& tensor : event_tensor.as_vector()) {
+      size_t ctr = 0;
+      for (auto const& vox_value : tensor.as_vector()) {
+        if (vox_value < min_voxel_value) continue;
+        ctr++;
       }
+      if (ctr < min_voxel_count) return false;
     }
     return true;
+  }
+
+  template <size_t dimension>
+  bool EmptyTensorFilter::process_sparse(IOManager & mgr, std::string producer, int min_voxel_count, float min_voxel_value){
+
+    // Get the data:
+    auto const& event_tensor = mgr.get_data<EventSparseTensor<dimension>>(producer);
+    for (auto const& tensor : event_tensor.as_vector()) {
+      size_t ctr = 0;
+      for (auto const& vox_value : tensor.values_vec()) {
+        if (vox_value < min_voxel_value) continue;
+        ctr++;
+      }
+      if (ctr < min_voxel_count) return false;
+    }
+    return true;
+
   }
 
   void EmptyTensorFilter::finalize()

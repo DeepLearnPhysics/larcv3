@@ -33,7 +33,7 @@ namespace larcv3 {
     /// Default destructor
     ~EmptyTensorFilter(){}
 
-    void configure(const larcv3::PSet&);
+    void configure(const json&);
 
     void initialize();
 
@@ -41,13 +41,26 @@ namespace larcv3 {
 
     void finalize();
 
+    static json default_config() {
+      json c = {
+            {"TensorProducer", std::vector<std::string>()}, // Name of producer
+            {"TensorType",     std::vector<std::string>()}, // Type of produce, eg, sparse2d
+            {"MinVoxelCount",  std::vector<int>()}, // Min Number of voxels per projection
+            {"MinVoxelValue",  std::vector<float>()}, // Min voxel value per projection
+      };
+      return c;
+    }
+
   private:
-    void configure_labels(const PSet& cfg);
-    std::vector<std::string> _tensor3d_producer_v, _tensor2d_producer_v;
-    std::vector<size_t>      _min_voxel2d_count_v;
-    std::vector<float>       _min_voxel2d_value_v;
-    std::vector<size_t>      _min_voxel3d_count_v;
-    std::vector<float>       _min_voxel3d_value_v;
+    template<size_t dimension>
+    bool process_tensor(IOManager & mgr, std::string producer, int min_voxel_count, float min_voxel_value);
+
+    template<size_t dimension>
+    bool process_sparse(IOManager & mgr, std::string producer, int min_voxel_count, float min_voxel_value);
+
+
+    json config;
+
   };
 
   /**

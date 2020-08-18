@@ -33,7 +33,7 @@ namespace larcv3 {
     /// Default destructor
     ~EmptyImageFilter(){}
 
-    void configure(const larcv3::PSet&);
+    void configure(const json&);
 
     void initialize();
 
@@ -41,9 +41,16 @@ namespace larcv3 {
 
     void finalize();
 
-  private:
-    std::string _image_producer;
+    static json default_config() {
+      json c = {
+            {"ImageProducer", ""},
+      };
+      return c;
+    }
 
+  private:
+
+    json config;
   };
 
   /**
