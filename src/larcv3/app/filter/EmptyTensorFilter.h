@@ -45,8 +45,8 @@ namespace larcv3 {
       json c = {
             {"TensorProducer", std::vector<std::string>()}, // Name of producer
             {"TensorType",     std::vector<std::string>()}, // Type of produce, eg, sparse2d
-            {"MinVoxelCount",  std::vector<int>()}, // Min Number of voxels per projection
-            {"MinVoxelValue",  std::vector<float>()}, // Min voxel value per projection
+            {"MinVoxelCount",  std::vector<int>()},         // Min Number of voxels per projection
+            {"MinVoxelValue",  std::vector<float>()},       // Min voxel value per projection
       };
       return c;
     }
