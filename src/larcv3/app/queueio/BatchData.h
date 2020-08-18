@@ -17,7 +17,7 @@
 #include <iostream>
 #include <vector>
 #include "QueueIOTypes.h"
-#include "larcv3/core/pyutil/PyUtils.h"
+#include "larcv3/core/dataformat/DataFormatTypes.h"
 
 #ifdef LARCV_INTERNAL
 #include <pybind11/pybind11.h>

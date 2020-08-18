@@ -50,11 +50,9 @@ namespace larcv3 {
     // Reset the state
     void reset();
 
-    // configure the processor from a file on disk
-    void configure(const std::string config_file, int color=0);
 
     // configure the processor from a PSet object
-    void configure(const PSet& cfg, int color=0);
+    void configure(const json& cfg, int color=0);
 
     // Check if the processor is configured
     inline bool configured() const { return _configured;}
@@ -69,6 +67,13 @@ namespace larcv3 {
     // Set the next set of indexes to read:
     void set_next_batch(const std::vector<size_t>& index_v);
 
+    static json default_config(){
+        {"Verbosity", 2},
+        {"InputFiles", std::vector<std::string>()},
+        {"IOManager", IOManager::default_config()},
+        {"ProcessName", 0},
+        {"RandomAccess", 0},
+    }
 
     // These functions only appear in larcv proper, not in included headers:
 #ifdef LARCV_INTERNAL
@@ -105,6 +110,8 @@ namespace larcv3 {
 
   private:
 
+    json config;
+
     bool set_batch_storage();
     bool begin_batch();
     bool end_batch();
@@ -113,7 +120,6 @@ namespace larcv3 {
     bool _configured;
     std::vector<size_t> _next_index_v;
 
-    std::vector<std::string> _input_fname_v;
     size_t _batch_global_counter;
 
     // This controls the different pieces of a batch (data, image, label, pid, etc)

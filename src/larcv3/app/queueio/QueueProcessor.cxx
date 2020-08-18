@@ -124,32 +124,6 @@ int omp_thread_count() {
     _batch_global_counter = 0;
   }
 
-  void QueueProcessor::configure(const std::string config_file, int color)
-  {
-    LARCV_DEBUG() << "Called" << std::endl;
-    // check state
-    if (_processing) {
-      LARCV_CRITICAL() << "Must call finalize() before calling initialize() after starting to process..." << std::endl;
-      throw larbys();
-    }
-    // check cfg file
-    if (config_file.empty()) {
-      LARCV_CRITICAL() << "Config file not set!" << std::endl;
-      throw larbys();
-    }
-
-    // check cfg content top level
-    auto main_cfg = CreatePSetFromFile(config_file);
-    if (!main_cfg.contains_pset(name())) {
-      LARCV_CRITICAL() << "QueueProcessor configuration (" << name() << ") not found in the config file (dump below)" << std::endl
-                       << main_cfg.dump()
-                       << std::endl;
-      throw larbys();
-    }
-    auto const cfg = main_cfg.get<larcv3::PSet>(name());
-    configure(cfg);
-  }
-
   void QueueProcessor::pop_current_data()
   {
 
@@ -213,15 +187,17 @@ int omp_thread_count() {
     _current_batch_entries_v = std::move(_next_batch_entries_v);
   }
 
-  void QueueProcessor::configure(const PSet& orig_cfg, int color)
+  void QueueProcessor::configure(const json& orig_cfg, int color)
   {
     reset();
 
+    config = this->default_config();
 
-    // std::cout << "\033[93m setting verbosity \033[00m" << orig_cfg.get<unsigned short>("Verbosity", 2) << std::endl;
-    set_verbosity( (msg::Level_t)(orig_cfg.get<unsigned short>("Verbosity", 2)) );
+    config = augment_default_config(config, orig_cfg);
 
-    _input_fname_v = orig_cfg.get<std::vector<std::string> >("InputFiles");
+    set_verbosity( config["Verbosity"].get<msg::Level_t>() );
+
+    auto _input_fname_v = config["InputFiles"].get<std::vector<std::string>>();
 
     _process_name_v.clear();
 
@@ -250,13 +226,13 @@ int omp_thread_count() {
     proc_cfg.add_value("RandomAccess", "false");
 
     // Brew read-only configuration
-    PSet io_cfg(io_cfg_name);
-    io_cfg.add_value("Verbosity", std::string(std::to_string(logger().level())));
-    io_cfg.add_value("Name", io_cfg_name);
-    io_cfg.add_value("IOMode", "0");
-    io_cfg.add_value("OutFileName", "");
-    io_cfg.add_value("StoreOnlyType", "[]");
-    io_cfg.add_value("StoreOnlyName", "[]");
+    // PSet io_cfg(io_cfg_name);
+    // io_cfg.add_value("Verbosity", std::string(std::to_string(logger().level())));
+    // io_cfg.add_value("Name", io_cfg_name);
+    // io_cfg.add_value("IOMode", "0");
+    // io_cfg.add_value("OutFileName", "");
+    // io_cfg.add_value("StoreOnlyType", "[]");
+    // io_cfg.add_value("StoreOnlyName", "[]");
     // io_cfg.add_value("UseH5CoreDriver", "true");
 
 
