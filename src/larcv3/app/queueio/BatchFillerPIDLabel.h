@@ -34,7 +34,7 @@ namespace larcv3 {
     /// Default destructor
     ~BatchFillerPIDLabel(){}
 
-    void configure(const PSet&);
+    void configure(const json&);
 
     void initialize();
 
@@ -46,11 +46,19 @@ namespace larcv3 {
 
     void finalize();
 
+    static json default_config(){
+      json c = {
+        {"ParticleProducer", std::string()},
+        {"PdgClassList", std::vector<int>()},
+      };
+      return c;
+    }
+
   private:
-    std::string _part_producer;
+
+    json config;
+
     std::vector<float> _entry_data;
-    size_t _num_class;
-    std::vector<int> _pdg_list;
   };
 
   /**

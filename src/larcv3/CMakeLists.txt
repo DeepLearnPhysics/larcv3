@@ -9,7 +9,7 @@ add_library(larcv3 SHARED
     $<TARGET_OBJECTS:dataformat>
     $<TARGET_OBJECTS:processor>
     $<TARGET_OBJECTS:filter>
-    # $<TARGET_OBJECTS:queueio>
+    $<TARGET_OBJECTS:queueio>
     # $<TARGET_OBJECTS:imagemod>
     # $<TARGET_OBJECTS:sbnd_imagemod>
     )

@@ -37,13 +37,25 @@ namespace larcv3 {
     /// Default destructor
     ~BatchFillerSparseTensor(){}
 
-    void configure(const PSet&);
+    void configure(const json&);
 
     void initialize();
 
     bool process(IOManager& mgr);
 
     void finalize();
+
+    static json default_config(){
+      json c = {
+        {"TensorProducer", std::string()},
+        {"Augment", true},
+        {"MaxVoxels", 0},
+        {"UnfilledVoxelValue", -999.},
+        {"Channels", std::vector<int>()},
+        {"IncludeValues", true},
+      };
+      return c;
+    }
 
   protected:
 
@@ -52,21 +64,23 @@ namespace larcv3 {
 
   private:
 
-    size_t set_data_size(const EventSparseTensor<dimension>& image_data);
-    int _check_projection(const int & projection_id);
+    json config;
 
-    std::string _tensor_producer;
-    size_t _max_voxels;
-    float _unfilled_voxel_value;
-    std::vector<size_t> _slice_v;
+    size_t set_data_size(const EventSparseTensor<dimension>& image_data);
+    int _check_projection(const int & projection_id, const std::vector<int> & _slice_v);
+
+    // std::string _tensor_producer;
+    // size_t _max_voxels;
+    // float _unfilled_voxel_value;
+    // std::vector<size_t> _slice_v;
 
 
 
     std::vector<float>  _entry_data;
     size_t _num_channels;
     bool _allow_empty;
-    bool _include_values;
-    bool _augment;
+    // bool _include_values;
+    // bool _augment;
   };
 
   typedef BatchFillerSparseTensor<2>  BatchFillerSparseTensor2D;

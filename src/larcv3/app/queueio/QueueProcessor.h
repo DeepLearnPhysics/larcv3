@@ -68,11 +68,13 @@ namespace larcv3 {
     void set_next_batch(const std::vector<size_t>& index_v);
 
     static json default_config(){
-        {"Verbosity", 2},
-        {"InputFiles", std::vector<std::string>()},
-        {"IOManager", IOManager::default_config()},
-        {"ProcessName", 0},
-        {"RandomAccess", 0},
+        json c = {
+            {"Verbosity", 2},
+            {"InputFiles", std::vector<std::string>()},
+            {"ProcessName", 0},
+            {"ProcessDriver", ProcessDriver::default_config()},
+        };
+        return c;
     }
 
     // These functions only appear in larcv proper, not in included headers:

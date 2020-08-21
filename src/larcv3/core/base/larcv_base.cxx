@@ -14,14 +14,18 @@ json larcv3::larcv_base::augment_default_config(json default_config, json user_c
 
     // If the parameter's object is in fact an iterable, recurse.
 
-    std::cout << "  Calling augment_default_config with " << std::endl;
-    std::cout << "    default: " << default_config << std::endl;
-    std::cout << "    user: " << user_config << std::endl;
+    // std::cout << "  Calling augment_default_config with " << std::endl;
+    // std::cout << "    default: " << default_config << std::endl;
+    // std::cout << "    user: " << user_config << std::endl;
+
+// For future corey: this is thinking array objects are actually sub classes.  Whoops.
+// Gotta fix tath
 
     for (json::iterator it = default_config.begin(); it != default_config.end(); ++it) {
-        std::cout << *it << '\n';
+        // std::cout << *it << '\n';
         if ( user_config.contains(it.key()) ){
-            if (it.value().is_array()){
+            // Check if the object itself is a json class
+            if (it.value().is_object()){
                 // recurse
                 auto updated_sub_config = augment_default_config(
                     default_config[it.key()],
@@ -35,7 +39,7 @@ json larcv3::larcv_base::augment_default_config(json default_config, json user_c
         }
     }
 
-    std::cout << "  Final config is " << updated_config << std::endl;
+    // std::cout << "  Final config is " << updated_config << std::endl;
 
     return updated_config;
 

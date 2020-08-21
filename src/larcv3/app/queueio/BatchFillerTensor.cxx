@@ -22,23 +22,22 @@ namespace larcv3 {
       }
 
   template<size_t dimension>
-  void BatchFillerTensor<dimension>::configure(const PSet& cfg) {
+  void BatchFillerTensor<dimension>::configure(const json& cfg) {
 
     LARCV_DEBUG() << "start" << std::endl;
-    _tensor_producer = cfg.get<std::string>("TensorProducer");
-    _tensor_type = cfg.get<std::string>("TensorType", "sparse");
+
+    config = this -> default_config();
+    config = augment_default_config(config, cfg);
+
+
+    // _tensor_producer = cfg.get<std::string>("TensorProducer");
+    auto _tensor_type = cfg["TensorType"].template get<std::string>();
 
     if (_tensor_type != "dense" && _tensor_type != "sparse") {
       LARCV_CRITICAL() << "TensorType can only be dense or sparse." << std::endl;
       throw larbys();
     }
 
-    _slice_v.clear();
-    _slice_v.resize(1,0);
-    _slice_v = cfg.get<std::vector<size_t> >("Channels", _slice_v);
-
-    _voxel_base_value = cfg.get<float>("EmptyVoxelValue",0.);
-    _allow_empty = cfg.get<bool>("AllowEmpty",false);
 
     LARCV_DEBUG() << "done" << std::endl;
   }
@@ -177,6 +176,9 @@ namespace larcv3 {
 
     LARCV_DEBUG() << "start" << std::endl;
 
+    auto _slice_v          = config["Channels"]. template get<std::vector<size_t> >();
+    auto _allow_empty      = config["AllowEmpty"]. template get<bool>();
+
     auto const& image_data =
         mgr.get_data<larcv3::EventTensor<dimension>>(_tensor_producer);
 
@@ -271,6 +273,10 @@ namespace larcv3 {
 
   template<size_t dimension>
   bool BatchFillerTensor<dimension>::_process_sparse(IOManager& mgr) {
+    
+    auto _slice_v          = config["Channels"]. template get<std::vector<size_t> >();
+    auto _voxel_base_value = config["EmptyVoxelValue"]. template get<float>();
+    auto _allow_empty      = config["AllowEmpty"]. template get<bool>();
 
     auto const& voxel_data =
         mgr.get_data<larcv3::EventSparseTensor<dimension>>(_tensor_producer);

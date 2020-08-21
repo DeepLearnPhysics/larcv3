@@ -99,7 +99,9 @@ namespace larcv3 {
         json c = {
             {"Verbosity", logger::default_level()},
             {"IOManager", IOManager::default_config()},
-            {"ProcessList", {} },
+            {"ProcessType", std::vector<std::string>()},
+            {"ProcessName", std::vector<std::string>()},
+            {"ProcessList", json()},
             {"EnableFilter", false},
             {"RandomAccess", false},
             {"RandomSeed",   NULL},

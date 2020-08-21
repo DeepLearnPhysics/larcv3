@@ -18,8 +18,11 @@ namespace larcv3 {
 
   void ProcessBase::_configure_(const json& cfg)
   {
-    _profile = cfg["Profile"].get<bool>();
-    set_verbosity(cfg["Verbosity"].get<msg::Level_t>());
+    LARCV_NORMAL() << "config is " << cfg << std::endl;
+    _profile = false;
+    if (cfg.contains("Profile")){
+      _profile = cfg["Profile"].get<bool>();
+    }
     configure(cfg);
   }
   

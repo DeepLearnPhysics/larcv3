@@ -114,6 +114,8 @@ void ProcessDriver::configure(const json& cfg) {
   /// CJA, 8/10/20: ProcessList is in the default now, so this check isn't necessary.
 
 
+  std::cout << "Getting IO manager config" << std::endl;
+
   auto const io_config   = config["IOManager"].get<json>();
   auto const proc_config = config["ProcessList"].get<json>();
 
@@ -129,12 +131,14 @@ void ProcessDriver::configure(const json& cfg) {
   auto random_access_bool = config["RandomAccess"].get<bool>();
   LARCV_INFO() << "RandomAccess is :  " << random_access_bool << std::endl;
 
+  std::cout << "Getting process list" << std::endl;
 
   // Process list
   auto process_instance_type_v =
       config["ProcessType"].get<std::vector<std::string> >();
   auto process_instance_name_v =
       config["ProcessName"].get<std::vector<std::string> >();
+  std::cout << "Got process list" << std::endl;
 
   if (process_instance_type_v.size() != process_instance_name_v.size()) {
     LARCV_CRITICAL() << "ProcessType and ProcessName config parameters have "
@@ -441,34 +445,35 @@ void init_processdriver(pybind11::module m){
 
 
     processdriver.def("configure", 
-      (void (Class::*)( const json& cfg))(&Class::configure));
+      (void (Class::*)( const json& cfg))(    &Class::configure));
 
-    processdriver.def("override_input_file", &Class::override_input_file);
+    processdriver.def("override_input_file",  &Class::override_input_file);
     processdriver.def("override_output_file", &Class::override_output_file);
-    processdriver.def("random_access", &Class::random_access);
-    processdriver.def("reset", &Class::reset);
-    processdriver.def("initialize", &Class::initialize,pybind11::arg("color")=0);
-    processdriver.def("batch_process", &Class::batch_process,
+    processdriver.def("random_access",        &Class::random_access);
+    processdriver.def("reset",                &Class::reset);
+    processdriver.def("initialize",           &Class::initialize,pybind11::arg("color")=0);
+    processdriver.def("batch_process",        &Class::batch_process,
       pybind11::arg("start_entry")=0, pybind11::arg("num_entries")=0);
 
     processdriver.def("process_entry",
-      (bool (Class::*)() )(&Class::process_entry));
+      (bool (Class::*)() )(                   &Class::process_entry));
     processdriver.def("process_entry", 
-      (bool (Class::*)( size_t, bool))(&Class::process_entry),
+      (bool (Class::*)( size_t, bool))(       &Class::process_entry),
       pybind11::arg("entry"), pybind11::arg("force_reload")=false);
 
-    processdriver.def("finalize", &Class::finalize);
-    processdriver.def("clear_entry", &Class::clear_entry);
-    processdriver.def("set_id", &Class::set_id);
-    processdriver.def("event_id", &Class::event_id);
-    processdriver.def("process_id", &Class::process_id);
-    processdriver.def("process_names", &Class::process_names);
-    processdriver.def("process_map", &Class::process_map);
-    processdriver.def("process_ptr", &Class::process_ptr);
-    processdriver.def("io", &Class::io);
-    processdriver.def("get_tree_index", &Class::get_tree_index);
-    processdriver.def("processing", &Class::processing);
+    processdriver.def("finalize",             &Class::finalize);
+    processdriver.def("clear_entry",          &Class::clear_entry);
+    processdriver.def("set_id",               &Class::set_id);
+    processdriver.def("event_id",             &Class::event_id);
+    processdriver.def("process_id",           &Class::process_id);
+    processdriver.def("process_names",        &Class::process_names);
+    processdriver.def("process_map",          &Class::process_map);
+    processdriver.def("process_ptr",          &Class::process_ptr);
+    processdriver.def("io",                   &Class::io);
+    processdriver.def("get_tree_index",       &Class::get_tree_index);
+    processdriver.def("processing",           &Class::processing);
 
+    processdriver.def("default_config",       &Class::default_config);
 
 }
 

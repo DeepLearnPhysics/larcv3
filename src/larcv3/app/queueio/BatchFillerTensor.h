@@ -38,7 +38,7 @@ namespace larcv3 {
     /// Default destructor
     ~BatchFillerTensor(){}
 
-    void configure(const PSet&);
+    void configure(const json&);
 
     void initialize();
 
@@ -46,12 +46,26 @@ namespace larcv3 {
 
     void finalize();
 
+    static json default_config(){
+      json c = {
+        {"TensorProducer", std::string()},
+        {"TensorType", "sparse"},
+        {"Augment", true},
+        {"MaxVoxels", 0},
+        {"UnfilledVoxelValue", -999.},
+        {"Channels", std::vector<int>()},
+      };
+      return c;
+    }
+
   protected:
 
     void _batch_begin_();
     void _batch_end_();
 
   private:
+
+    json config;
 
     bool _process_sparse(IOManager& mgr);
     bool _process_dense(IOManager& mgr);

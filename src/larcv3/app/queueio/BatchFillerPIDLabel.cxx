@@ -14,16 +14,18 @@ namespace larcv3 {
     : BatchFillerTemplate<float>(name)
   {}
 
-  void BatchFillerPIDLabel::configure(const PSet& cfg)
+  void BatchFillerPIDLabel::configure(const json& cfg)
   {
-    _part_producer = cfg.get<std::string>("ParticleProducer");
+    config = this -> default_config();
+    config = augment_default_config(config, cfg);
 
-    _pdg_list = cfg.get<std::vector<int> >("PdgClassList");
+
+
+    auto _pdg_list = cfg["PdgClassList"].get<std::vector<int> >();
     if (_pdg_list.empty()) {
       LARCV_CRITICAL() << "PdgClassList needed to define classes!" << std::endl;
       throw larbys();
     }
-    _num_class = _pdg_list.size();
   }
 
   void BatchFillerPIDLabel::initialize()
@@ -40,23 +42,23 @@ namespace larcv3 {
 
   void BatchFillerPIDLabel::_batch_end_()
   {
-    if (logger().level() <= msg::kINFO) {
-      LARCV_INFO() << "Total data size: " << batch_data().data_size() << std::endl;
+    // if (logger().level() <= msg::kINFO) {
+    //   LARCV_INFO() << "Total data size: " << batch_data().data_size() << std::endl;
 
-      std::vector<size_t> ctr_v(_num_class, 0);
-      auto const& data = batch_data().data();
-      for (size_t i = 0; i < data.size(); ++i) {
-        if (data[i] < 1.) continue;
-        ctr_v[i % _num_class] += 1;
-      }
-      std::stringstream ss;
-      ss << "Class fractions (0";
-      for (size_t i = 1; i < _num_class; ++i) ss << "," << i;
-      ss << ") ... (" << ctr_v[0];
-      for (size_t i = 1; i < _num_class; ++i) ss << "," << ctr_v[i];
-      ss << ")";
-      LARCV_INFO() << ss.str() << std::endl;
-    }
+    //   std::vector<size_t> ctr_v(_num_class, 0);
+    //   auto const& data = batch_data().data();
+    //   for (size_t i = 0; i < data.size(); ++i) {
+    //     if (data[i] < 1.) continue;
+    //     ctr_v[i % _num_class] += 1;
+    //   }
+    //   std::stringstream ss;
+    //   ss << "Class fractions (0";
+    //   for (size_t i = 1; i < _num_class; ++i) ss << "," << i;
+    //   ss << ") ... (" << ctr_v[0];
+    //   for (size_t i = 1; i < _num_class; ++i) ss << "," << ctr_v[i];
+    //   ss << ")";
+    //   LARCV_INFO() << ss.str() << std::endl;
+    // }
   }
 
   void BatchFillerPIDLabel::finalize()
@@ -65,12 +67,14 @@ namespace larcv3 {
   bool BatchFillerPIDLabel::process(IOManager & mgr)
   {
 
-    auto const& event_part = mgr.get_data<larcv3::EventParticle>(_part_producer);
+    std::string producer = config["ParticleProducer"].get<std::string>();
+    auto const& event_part = mgr.get_data<larcv3::EventParticle>(producer);
+    auto _pdg_list = config["PdgClassList"].get<std::vector<int> >();
 
     // Refresh the dimension:
     std::vector<int> dim(2);
     dim[0] = batch_size();
-    dim[1] = _num_class;
+    dim[1] = _pdg_list.size();
     set_dim(dim);
     // In this case, set the dense dim as the same:
     set_dense_dim(dim);
@@ -94,7 +98,7 @@ namespace larcv3 {
       if (label != kINVALID_SIZE) break;
     }
     LARCV_DEBUG() << "Found PDG code " << pdg << " (class=" << label << ")" << std::endl;
-    _entry_data.resize(_num_class, 0);
+    _entry_data.resize(_pdg_list.size(), 0);
     for (auto& v : _entry_data) v = 0;
     _entry_data.at(label) = 1.;
 
