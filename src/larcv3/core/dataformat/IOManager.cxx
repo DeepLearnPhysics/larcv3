@@ -74,16 +74,14 @@ std::string IOManager::product_type(const size_t id) const {
   return _product_type_v[id];
 }
 
+const EventID & IOManager::event_id() const{
+  LARCV_DEBUG() << "Set id valid? " << _set_event_id.valid() << std::endl;
+  LARCV_DEBUG() << "_set_event_id: " << _set_event_id.event_key() << std::endl;
+  LARCV_DEBUG() << "_event_id: " << _event_id.event_key() << std::endl;
+  if (_set_event_id.valid() ) return _set_event_id;
+    return _event_id ;
+}
 
-
-/*
-Workflow for updating this:
-- For each parameter from config file, move it's object and default to the 
-  json object
-- Then, replace all instances of private member variables with the values
-  from the json object.
-
-*/
 
 void IOManager::configure(const json& cfg) {
   if (_prepared) throw larbys("Cannot call configure() after initialize()!");
@@ -184,7 +182,6 @@ bool IOManager::initialize(int color) {
   // Get the rank of the process
   MPI_Comm_rank(_private_comm, &_private_rank);
 
-  std::cout << config["IOMode"].get<IOMode_t>() << std::endl;
 
   if (config["IOMode"].get<IOMode_t>() != kREAD && _private_size != 1){
     LARCV_CRITICAL() << "Only read only mode is compatible with MPI with more than one rank!" << std::endl;

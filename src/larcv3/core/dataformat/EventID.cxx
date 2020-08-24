@@ -19,7 +19,6 @@ namespace larcv3 {
     return ss.str();
   }
 
-
   template<> std::string as_string<EventID>() {return "EventID";}
 
 
@@ -28,6 +27,7 @@ namespace larcv3 {
 #include <pybind11/operators.h>
 
 void init_eventid(pybind11::module m){
+
     using Class = larcv3::EventID;
     pybind11::class_<Class> eventid(m, "EventID");
     eventid.def(pybind11::init<>());

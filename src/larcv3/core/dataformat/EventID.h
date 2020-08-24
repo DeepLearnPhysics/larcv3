@@ -28,7 +28,7 @@ class DataProductFactory;
 class EventID {
  public:
   /// Default constructor
-  EventID() = default;
+  EventID() : _run(kINVALID_LONG), _subrun(kINVALID_LONG), _event(kINVALID_LONG) {}
   /// Copy ctor
   EventID(const EventID& rhs)
       : _run(rhs._run), _subrun(rhs._subrun), _event(rhs._event) {}

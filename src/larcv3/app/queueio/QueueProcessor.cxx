@@ -127,6 +127,8 @@ int omp_thread_count() {
   void QueueProcessor::pop_current_data()
   {
 
+    std::cout << "Trying to pop." << std::endl;
+
     bool ready = true;
 
     for (size_t pid = 0; pid < _process_name_v.size(); ++pid) {
@@ -254,7 +256,6 @@ int omp_thread_count() {
     //   else
     //     proc_cfg.add_pset(orig_cfg.get_pset(pset_key));
 
-    std::cout << "Going to configure process Driver" << std::endl;
 
     auto & proc_cfg = config["ProcessDriver"];
     std::cout << "Got  process Driver" << std::endl;
@@ -267,7 +268,6 @@ int omp_thread_count() {
     _driver.reset();
     _driver.configure(proc_cfg);
     _driver.override_input_file(_input_fname_v);
-    std::cout << "process Driver configured!" << std::endl;
 
 
     LARCV_NORMAL() << "Done configuration ..." << std::endl;
@@ -279,13 +279,18 @@ int omp_thread_count() {
       auto ptr = _driver.process_ptr(id);
 
       LARCV_INFO() << "Process " << process_name << " ... ID=" << id << "... BatchFiller? : " << ptr->is("BatchFiller") << std::endl;
+      _process_name_v.push_back(process_name);
     }
     _driver.initialize(color);
+
+    // Prepare P}
 
     // only-once-operation among all queueus: initialize storage
     _batch_filler_id_v.clear();
     _batch_data_type_v.clear();
     for (size_t pid = 0; pid < _process_name_v.size(); ++pid) {
+
+
       auto proc_ptr = _driver.process_ptr(pid);
       if (!(proc_ptr->is("BatchFiller"))) continue;
       _batch_filler_id_v.push_back(pid);
@@ -315,6 +320,7 @@ int omp_thread_count() {
   void QueueProcessor::prepare_next() {
 
     _preparation_future.wait();
+
 
 
     _processing = true;
@@ -405,6 +411,7 @@ int omp_thread_count() {
   }
 
   bool QueueProcessor::set_batch_storage(){
+
 
     for (size_t pid = 0; pid < _process_name_v.size(); ++pid) {
       auto proc_ptr = _driver.process_ptr(pid);

@@ -12,7 +12,7 @@ namespace larcv3 {
   const std::vector<T>& BatchData<T>::data() const
   {
     if (_state != BatchDataState_t::kBatchStateFilled) {
-      LARCV_SCRITICAL() << "Current batch state: " << (int)_state
+      LARCV_SCRITICAL() << "Current batch state: " << (int)this->state()
                         << " not ready to expose data!" << std::endl;
       throw larbys();
     }
@@ -23,7 +23,7 @@ namespace larcv3 {
   pybind11::array_t<T> BatchData<T>::pydata()
   {
     if (_state != BatchDataState_t::kBatchStateFilled) {
-      LARCV_SCRITICAL() << "Current batch state: " << (int)_state
+      LARCV_SCRITICAL() << "Current batch state: " << (int)this->state()
                         << " not ready to expose data!" << std::endl;
       throw larbys();
     }
@@ -129,7 +129,7 @@ namespace larcv3 {
   {
     if (_state != BatchDataState_t::kBatchStateFilling &&
         _state != BatchDataState_t::kBatchStateEmpty) {
-      LARCV_SERROR() << "Current batch state: " << (int)(_state)
+      LARCV_SERROR() << "Current batch state: " << (int)this->state()
                      << " not ready for filling data..." << std::endl;
       return;
     }
@@ -173,7 +173,8 @@ namespace larcv3 {
                      << _current_size << "/" << _data.size() << ")" << std::endl;
       return;
     }
-    LARCV_SINFO() << "Resetting batch data status to " << (int)(BatchDataState_t::kBatchStateEmpty) << std::endl;
+
+    LARCV_INFO() << "Resetting batch data status to " << (int)(BatchDataState_t::kBatchStateEmpty) << std::endl;
     _data.resize(data_size(true));
     _current_size = 0;
     _state = BatchDataState_t::kBatchStateEmpty;
