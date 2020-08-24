@@ -127,7 +127,6 @@ int omp_thread_count() {
   void QueueProcessor::pop_current_data()
   {
 
-    std::cout << "Trying to pop." << std::endl;
 
     bool ready = true;
 
@@ -258,7 +257,6 @@ int omp_thread_count() {
 
 
     auto & proc_cfg = config["ProcessDriver"];
-    std::cout << "Got  process Driver" << std::endl;
 
 
     LARCV_INFO() << "Enforcing configuration ..." << std::endl;
