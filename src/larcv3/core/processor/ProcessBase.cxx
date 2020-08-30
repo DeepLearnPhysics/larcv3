@@ -18,7 +18,7 @@ namespace larcv3 {
 
   void ProcessBase::_configure_(const json& cfg)
   {
-    LARCV_NORMAL() << "config is " << cfg << std::endl;
+    LARCV_DEBUG() << "config is " << cfg << std::endl;
     _profile = false;
     if (cfg.contains("Profile")){
       _profile = cfg["Profile"].get<bool>();

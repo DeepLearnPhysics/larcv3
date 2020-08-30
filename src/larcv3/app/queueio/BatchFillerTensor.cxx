@@ -31,7 +31,7 @@ namespace larcv3 {
 
 
     // _tensor_producer = cfg.get<std::string>("TensorProducer");
-    auto _tensor_type = cfg["TensorType"].template get<std::string>();
+    auto _tensor_type     = config["TensorType"].template get<std::string>();
 
     if (_tensor_type != "dense" && _tensor_type != "sparse") {
       LARCV_CRITICAL() << "TensorType can only be dense or sparse." << std::endl;
@@ -69,7 +69,8 @@ namespace larcv3 {
   template<size_t dimension>
   size_t BatchFillerTensor<dimension>::_set_image_size(const EventTensor<dimension>& image_data) {
 
-    LARCV_DEBUG() << "start" << std::endl;
+    LARCV_DEBUG() << "start set image size" << std::endl;
+    auto _slice_v = config["Channels"].template get<std::vector<size_t>>();
 
     auto const& image_v = image_data.as_vector();
 
@@ -85,7 +86,6 @@ namespace larcv3 {
       }
     }
 
-    _num_channels = _slice_v.size();
     _max_ch = 0;
     for (auto const& v : _slice_v) {
       if (_max_ch < v) {
@@ -101,7 +101,7 @@ namespace larcv3 {
 
     auto const & meta = image_v.at(_slice_v.front()).meta();
 
-    size_t total_dim = _num_channels;
+    size_t total_dim = _slice_v.size();
 
     for (size_t i = 0; i < dimension; i++) {
       _dims[i] = meta.number_of_voxels(i);
@@ -121,7 +121,8 @@ namespace larcv3 {
   }
 
   template<size_t dimension>
-  void BatchFillerTensor<dimension>::_assert_dimension(const EventTensor<dimension>& image_data) const {
+  void BatchFillerTensor<dimension>::_assert_dimension(
+    const EventTensor<dimension>& image_data, const std::vector<size_t> & _slice_v) const {
 
     auto const& image_v = image_data.as_vector();
 
@@ -132,7 +133,7 @@ namespace larcv3 {
     bool valid_ch   = (image_v.size() > _max_ch);
     bool valid_dim = true;
 
-    for (size_t ch = 0; ch < _num_channels; ++ch) {
+    for (size_t ch = 0; ch < _slice_v.size(); ++ch) {
       size_t input_ch = _slice_v.at(ch);
       auto const& img = image_v.at(input_ch);
 
@@ -162,8 +163,9 @@ namespace larcv3 {
   template<size_t dimension>
   bool BatchFillerTensor<dimension>::process(IOManager& mgr) {
 
-    LARCV_DEBUG() << "start" << std::endl;
+    LARCV_SDEBUG() << "start batch filler tensor process" << std::endl;
 
+    auto _tensor_type = config["TensorType"].template get<std::string>();
     if (_tensor_type == "sparse") {
       return _process_sparse(mgr);
     }
@@ -176,8 +178,9 @@ namespace larcv3 {
 
     LARCV_DEBUG() << "start" << std::endl;
 
-    auto _slice_v          = config["Channels"]. template get<std::vector<size_t> >();
-    auto _allow_empty      = config["AllowEmpty"]. template get<bool>();
+    auto _allow_empty     = config["AllowEmpty"]. template get<bool>();
+    auto _slice_v         = config["Channels"]. template get<std::vector<size_t> >();
+    auto _tensor_producer = config["TensorProducer"].template get<std::string>();
 
     auto const& image_data =
         mgr.get_data<larcv3::EventTensor<dimension>>(_tensor_producer);
@@ -197,10 +200,10 @@ namespace larcv3 {
       for (size_t i = 1; i < dimension + 1; i++) {
         dim[i] = _dims[i - 1];
       }
-      dim[dimension + 1] = _num_channels;
+      dim[dimension + 1] = _slice_v.size();
       set_dim(dim);
     } else {
-      _assert_dimension(image_data);
+      _assert_dimension(image_data, _slice_v);
     }
 
     if (_entry_data.size() != batch_data().entry_data_size()) {
@@ -211,7 +214,7 @@ namespace larcv3 {
 
     auto const& image_v = image_data.as_vector();
 
-    for (size_t ch = 0; ch < _num_channels; ++ch) {
+    for (size_t ch = 0; ch < _slice_v.size(); ++ch) {
 
       size_t input_ch = _slice_v.at(ch);
       auto const& input_img = image_v.at(input_ch);
@@ -226,7 +229,7 @@ namespace larcv3 {
         size_t idx = 0;
         for (size_t row = 0; row < _dims[0]; ++row) {
           for (size_t col = 0; col < _dims[1]; ++col) {
-            _entry_data.at(idx * _num_channels + ch) = input_image.at(col * _dims[0] + row);
+            _entry_data.at(idx * _slice_v.size() + ch) = input_image.at(col * _dims[0] + row);
             ++idx;
           }
         }
@@ -235,7 +238,7 @@ namespace larcv3 {
         for (size_t row = 0; row < _dims[0]; ++row) {
           for (size_t col = 0; col < _dims[1]; ++col) {
             for (size_t dep = 0; dep < _dims[2]; ++dep) {
-              _entry_data.at(idx * _num_channels + ch) =
+              _entry_data.at(idx * _slice_v.size() + ch) =
                       input_image.at(dep * _dims[0] + col * _dims[1] + row);
               ++idx;
             }
@@ -247,7 +250,7 @@ namespace larcv3 {
           for (size_t col = 0; col < _dims[1]; ++col) {
             for (size_t dep = 0; dep < _dims[2]; ++dep) {
               for (size_t j = 0; j < _dims[3]; ++j) {
-                _entry_data.at(idx * _num_channels + ch) =
+                _entry_data.at(idx * _slice_v.size() + ch) =
                         input_image.at(j * _dims[0] + dep * _dims[1] + col * _dims[2] + row);
                 ++idx;
               }
@@ -274,9 +277,12 @@ namespace larcv3 {
   template<size_t dimension>
   bool BatchFillerTensor<dimension>::_process_sparse(IOManager& mgr) {
     
-    auto _slice_v          = config["Channels"]. template get<std::vector<size_t> >();
+
+    // auto _slice_v          = config["Channels"]. template get<std::vector<size_t> >();
     auto _voxel_base_value = config["EmptyVoxelValue"]. template get<float>();
+    auto _tensor_producer  = config["TensorProducer"].template get<std::string>();
     auto _allow_empty      = config["AllowEmpty"]. template get<bool>();
+    auto _slice_v          = config["Channels"]. template get<std::vector<size_t> >();
 
     auto const& voxel_data =
         mgr.get_data<larcv3::EventSparseTensor<dimension>>(_tensor_producer);
@@ -288,7 +294,6 @@ namespace larcv3 {
       throw larbys();
     }
 
-    _num_channels = _slice_v.size();
 
     auto const& voxel_meta = voxel_data.as_vector().front().meta();
     std::vector<int> dim;
@@ -297,7 +302,7 @@ namespace larcv3 {
     for (size_t i = 1; i < dimension + 1; i++) {
       dim[i] = voxel_meta.number_of_voxels(i - 1);
     }
-    dim[dimension + 1] = _num_channels;
+    dim[dimension + 1] = _slice_v.size();
     this->set_dim(dim);
     this->set_dense_dim(dim);
 
@@ -342,6 +347,8 @@ namespace larcv3 {
       return 0;
     }
 
+    auto _slice_v = config["Channels"].template get<std::vector<size_t>>();
+
     bool found = false;
     int count = 0;
     for (auto & channel : _slice_v){
@@ -358,5 +365,11 @@ namespace larcv3 {
       return -1;
     }
   }
+
+// template class BatchFillerTensor<1>;
+template class BatchFillerTensor<2>;
+template class BatchFillerTensor<3>;
+// template class BatchFillerTensor<4>;
+
 }
 #endif

@@ -51,9 +51,9 @@ namespace larcv3 {
         {"TensorProducer", std::string()},
         {"TensorType", "sparse"},
         {"Augment", true},
-        {"MaxVoxels", 0},
-        {"UnfilledVoxelValue", -999.},
+        {"EmptyVoxelValue", -999.},
         {"Channels", std::vector<int>()},
+        {"AllowEmpty", true}
       };
       return c;
     }
@@ -71,21 +71,18 @@ namespace larcv3 {
     bool _process_dense(IOManager& mgr);
     int _check_projection(const int & projection_id);
     size_t _set_image_size(const EventTensor<dimension>& image_data);
-    void _assert_dimension(const EventTensor<dimension>& image_data) const;
+    void _assert_dimension(const EventTensor<dimension>& image_data, const std::vector<size_t> &) const;
 
-    std::string _tensor_producer;
-    std::string _tensor_type;
+    // std::string _tensor_producer;
+    // std::string _tensor_type;
     // size_t _rows;
     // size_t _cols;
     size_t _dims[dimension];  ///< Total number of voxels in each dimension
-    size_t _num_channels;
-    std::vector<size_t> _slice_v;
+    // size_t _num_channels;
+    // std::vector<size_t> _slice_v;
     size_t _max_ch;
 
     std::vector<float>  _entry_data;
-    size_t _num_channel;
-    float _voxel_base_value;
-    bool _allow_empty;
   };
 
   typedef BatchFillerTensor<2>  BatchFillerTensor2D;

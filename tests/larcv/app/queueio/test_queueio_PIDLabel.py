@@ -6,7 +6,7 @@ import numpy
 import time
 
 import larcv
-from larcv import queueloader,  data_generator
+from larcv import  data_generator
 
 from collections import OrderedDict
 
@@ -15,9 +15,8 @@ def create_particle_file(file_name, rand_num_events):
     data_generator.write_particles(file_name, rand_num_events, particles_per_event=1)
 
 
-@pytest.mark.parametrize('make_copy', [True, False])
-@pytest.mark.parametrize('batch_size', [2])
-def test_particle_queueio(tmpdir, make_copy, batch_size, n_reads=10):
+@pytest.mark.parametrize('batch_size', [1, 2])
+def test_particle_queueio(tmpdir, batch_size, n_reads=10):
 
     queueio_name = "queueio_{}".format(uuid.uuid4())
 
@@ -83,6 +82,6 @@ def test_particle_queueio(tmpdir, make_copy, batch_size, n_reads=10):
 
 
 if __name__ == "__main__":
-    test_particle_queueio("./", make_copy=False, batch_size=2, n_reads=10)
-    test_particle_queueio("./", make_copy=False, batch_size=2, n_reads=10)
+    test_particle_queueio("./", batch_size=2, n_reads=10)
+    test_particle_queueio("./", batch_size=2, n_reads=10)
     print("Success")

@@ -2,30 +2,15 @@ import pytest
 import unittest
 import random
 import uuid
+import numpy
+import time
 
 import larcv
 from larcv import queueloader,  data_generator
 
 from collections import OrderedDict
 
-queue_io_tensor3d_cfg_template = '''
-{name}: {{
-  Verbosity:       2
-  EnableFilter:    false
-  RandomAccess:    0
-  RandomSeed:      0
-  InputFiles:      [{input_files}]
-  ProcessType:     ["BatchFillerTensor3D"]
-  ProcessName:     ["test_{name}"]
 
-  ProcessList: {{
-    test_{name}: {{
-      TensorProducer: "{producer}"
-      TensorType: "{type}"
-    }}
-  }}
-}}
-'''
 
 
 def create_tensor3d_file(file_name, rand_num_events, n_projections=1):
@@ -62,45 +47,58 @@ def test_tensor3d_queueio(tmpdir, make_copy, batch_size, from_dense, n_reads=2):
     else:
         tensor_type = "sparse"
 
+    # Now, let's get the configuration of a queueio object:
+    default_config = larcv.QueueProcessor.default_config()
+    default_config["InputFiles"].append(file_name)
 
-    # Generate a config for this
-    config_contents = queue_io_tensor3d_cfg_template.format(
-        name        = queueio_name,
-        input_files = file_name,
-        producer    = "test",
-        type        = tensor_type,
-        )
+    # Add the batch filler to the default config:
+    default_config["Verbosity"] = 0
+    default_config["ProcessDriver"]["ProcessName"].append(f"test_{queueio_name}")
+    default_config["ProcessDriver"]["ProcessType"].append("BatchFillerTensor3D")
 
-    config_file = tmpdir + "/test_queueio_tensor3d_{}.cfg".format(queueio_name)
-
-    with open(str(config_file), 'w') as _f:
-        _f.write(config_contents)
-
-    # Prepare data managers:
-    io_config = {
-        'filler_name' : queueio_name,
-        'filler_cfg'  : str(config_file),
-        'verbosity'   : 3,
-        'make_copy'   : make_copy
+    process_list = {f"test_{queueio_name}": 
+    {
+      "TensorProducer": "test",
+      "TensorType": tensor_type,
+      "Channels": [0,],
+      "EmptyVoxelValue": -999.,
+      "Augment": True,
+      }
     }
 
-    data_keys = OrderedDict({
-        'label': 'test_{}'.format(queueio_name),
-        })
+    if default_config["ProcessDriver"]["ProcessList"] is None:
+      default_config["ProcessDriver"]["ProcessList"] = process_list
+    else:
+      default_config["ProcessDriver"]["ProcessList"].append(process_list)
+ 
+
+    queue_proc = larcv.QueueProcessor()
+    queue_proc.configure(default_config)
 
 
+    indexes = numpy.arange(batch_size*n_reads*2) % queue_proc.get_n_entries()
 
-    li = queueloader.queue_interface()
-    li.prepare_manager('primary', io_config, batch_size, data_keys)
-
+    queue_proc.set_next_batch(indexes[0:batch_size])
+    print(queue_proc.is_reading())
+    queue_proc.prepare_next()
+    time.sleep(2)
+    while queue_proc.is_reading():
+      print("Sleeping")
+      time.sleep(0.5)
+    queue_proc.pop_current_data()
 
     for i in range(n_reads):
-        data = li.fetch_minibatch_data('primary')
-        li.prepare_next('primary')
-        print(data['label'].shape)
-        assert(data['label'].shape[0] == batch_size)
+      batch=indexes[i*batch_size:(i+1)*batch_size]
+      queue_proc.set_next_batch(batch)
+      queue_proc.prepare_next()
+      
+      while queue_proc.is_reading():
+        print("Sleeping")
+        time.sleep(0.1)
+
 
 
 if __name__ == "__main__":
     test_tensor3d_queueio("./", make_copy=False, batch_size=1, from_dense=False, n_reads=2)
+    test_tensor3d_queueio("./", make_copy=False, batch_size=1, from_dense=True, n_reads=2)
     print("Success")

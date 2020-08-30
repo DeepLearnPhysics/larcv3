@@ -114,7 +114,6 @@ void ProcessDriver::configure(const json& cfg) {
   /// CJA, 8/10/20: ProcessList is in the default now, so this check isn't necessary.
 
 
-  std::cout << "Getting IO manager config" << std::endl;
 
   auto const io_config   = config["IOManager"].get<json>();
   auto const proc_config = config["ProcessList"].get<json>();
@@ -131,14 +130,12 @@ void ProcessDriver::configure(const json& cfg) {
   auto random_access_bool = config["RandomAccess"].get<bool>();
   LARCV_INFO() << "RandomAccess is :  " << random_access_bool << std::endl;
 
-  std::cout << "Getting process list" << std::endl;
 
   // Process list
   auto process_instance_type_v =
       config["ProcessType"].get<std::vector<std::string> >();
   auto process_instance_name_v =
       config["ProcessName"].get<std::vector<std::string> >();
-  std::cout << "Got process list" << std::endl;
 
   if (process_instance_type_v.size() != process_instance_name_v.size()) {
     LARCV_CRITICAL() << "ProcessType and ProcessName config parameters have "
