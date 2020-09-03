@@ -18,7 +18,6 @@
 #include "larcv3/core/dataformat/Particle.h"
 #include "larcv3/core/dataformat/DataProductFactory.h"
 
-class EventParticle;
 
 namespace larcv3 {
   /**
