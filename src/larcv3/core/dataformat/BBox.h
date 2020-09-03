@@ -15,8 +15,10 @@
 #define __LARCV3DATAFORMAT_BBOX_H__
 
 #include <iostream>
-#include "larcv3/core/dataformat/Point.h"
 #include "larcv3/core/dataformat/DataFormatTypes.h"
+
+
+
 namespace larcv3 {
 
   /**
@@ -28,61 +30,123 @@ namespace larcv3 {
   class BBox{
   public:
 
-    BBox() {}
+    BBox();
 
-    BBox(Point<dimension> min, Point<dimension> max, ProjectionID_t id = kINVALID_PROJECTIONID);
+    BBox(const std::array<double, dimension>& centroid, 
+         const std::array<double, dimension>& half_length,
+         const std::array<double, dimension*dimension> & rotation = {});
+
+
+    std::array<double, dimension*dimension > identity_rotation();
+
+    const std::array<double, dimension>& centroid() {return _centroid;} 
+    const std::array<double, dimension>& half_length() {return _half_length;}
+    const std::array<double, dimension*dimension> & rotation_matrix() {return _rotation;}
 
     inline bool operator== (const BBox<dimension>& rhs) const {
-      return (_p1 == rhs._p1 && _p2 == rhs._p2);
+      return ( _centroid    == rhs._centroid && 
+               _half_length == rhs._half_length && 
+               _rotation    == rhs._rotation);
     }
 
-    void update(const std::vector<double> & min, const std::vector<double> & max,
-                ProjectionID_t id = kINVALID_PROJECTIONID);
 
-    void update(const Point<dimension>& pt1, const Point<dimension>& pt2,
-                ProjectionID_t id = kINVALID_PROJECTIONID);
-
-    void update(ProjectionID_t id);
-
-    inline bool empty() const { return (_p1 == _p2); }
-    inline const Point<dimension>& origin      () const { return _p1; }
-    inline const Point<dimension>& bottom_left () const { return _p1; }
-    inline const Point<dimension>& top_right   () const { return _p2; }
-    inline Point<dimension> center     () const { return (_p1 + _p2) * 0.5; }
-    inline Point<dimension> min        () const { return _p1;}
-    inline Point<dimension> max        () const { return _p1;}
-    inline Point<dimension> dimensions () const { return _p2 - _p1; }
-    inline double           area       () const { return volume(); }
-    inline double           volume     () const {
-      double v = 1.0;
-      Point<dimension> res = _p2 - _p1;
-      for (size_t i = 0; i < dimension; i ++){
-        v *= res.x[i];
-      }
-      return v;
-    }
-
-    inline ProjectionID_t id() const { return _id; }
     std::string dump() const;
 
-    BBox overlap(const BBox& box) const;
-    BBox inclusive(const BBox& box) const;
-    bool contains(const Point<dimension>& point) const;
+
 
   private:
-    ProjectionID_t _id; ///< ProjectionID_t identifies types of 2D projections to which BBox belongs
-    Point<dimension> _p1; ///< bottom-left point coordinate where x1<x2 and y1<y2, ...
-    Point<dimension> _p2; ///< top-right point coordinate where x1<x2 and y1<y2, ...
+
+    // central location of the bbox.  Rotations, if used, are around this point.
+    std::array<double, dimension> _centroid;             
+    
+    // half length of BBox in each dimension.
+    std::array<double, dimension> _half_length;          
+
+    // unitary rotation matrix, defaults to identity.
+    std::array<double, dimension*dimension> _rotation;  
+
+  public:
+    static hid_t get_datatype() {
+      hid_t datatype;
+      datatype = H5Tcreate (H5T_COMPOUND, sizeof (BBox));
+
+      hsize_t array_dimensions[1];
+      array_dimensions[0] = dimension;
+
+      hid_t double_type   = H5Tarray_create(larcv3::get_datatype<double>(), 1, array_dimensions);
+
+      hsize_t rotation_dimensions[1];
+      rotation_dimensions[0] = dimension*dimension;
+      hid_t rotation_type = H5Tarray_create(larcv3::get_datatype<double>(), 1, rotation_dimensions);
+
+      H5Tinsert (datatype, "centroid",
+                 HOFFSET (BBox, _centroid),
+                 double_type);
+      H5Tinsert (datatype, "half_length",
+                 HOFFSET (BBox, _half_length),
+                 double_type);
+      H5Tinsert (datatype, "rotation",
+                 HOFFSET (BBox, _rotation),
+                 rotation_type);
+
+      return datatype;
+    }
+
   };
 
   typedef BBox<2> BBox2D;
   typedef BBox<3> BBox3D;
+
+
+  template<size_t dimension>
+  class BBoxCollection{
+  public:
+
+    BBoxCollection(){};
+
+      /// Get # of BBox
+    inline size_t size() const { return _bbox_v.size(); }
+    /// Access specific BBox
+    const larcv3::BBox<dimension> & bbox(InstanceID_t id) const {return _bbox_v.at(id);}
+    /// Access all BBox as a vector
+    inline const std::vector<larcv3::BBox<dimension> >& as_vector() const
+    { return _bbox_v; }
+
+    //
+    // Write-access
+    //
+
+    /// Clear everything
+    inline void clear_data() { _bbox_v.clear(); }
+    /// Resize voxel array
+    inline void resize(const size_t num)
+    { this->clear_data(); _bbox_v.resize(num); }
+
+    /// Access non-const reference of a specific BBox
+    larcv3::BBox<dimension>& writeable_bbox(const InstanceID_t id) {return _bbox_v.at(id);}
+
+    /// Move a BBox into a collection.
+    void emplace(larcv3::BBox<dimension> && bbox){_bbox_v.push_back(bbox);}
+
+    /// Set a BBox into a collection.
+    void append(const larcv3::BBox<dimension> & bbox) {_bbox_v.push_back(bbox);}
+    
+    /// Mover
+    void move(larcv3::BBoxCollection<dimension> && orig)
+    { _bbox_v = std::move(orig._bbox_v); }
+
+  private:
+    std::vector<BBox<dimension> > _bbox_v;
+  
+  };
+
+  typedef BBoxCollection<2> BBoxCollection2D;
+  typedef BBoxCollection<3> BBoxCollection3D;
+
 }
 
 #ifdef LARCV_INTERNAL
 #include <pybind11/pybind11.h>
-template<size_t dimension>
-void init_bbox_base(pybind11::module m);
 
 void init_bbox(pybind11::module m);
 #endif

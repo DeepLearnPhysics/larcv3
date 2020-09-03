@@ -9,132 +9,85 @@
 
 namespace larcv3 {
 
-  template<size_t dimension>
-  BBox<dimension>::BBox(Point<dimension> min, Point<dimension> max, ProjectionID_t id )
-    : _id(id), _p1(min), _p2(max)
-  {
+
+  template <size_t dimension>
+  BBox<dimension>::BBox(){
     for (size_t i = 0; i < dimension; i++){
-      if(_p1.x[i] > _p2.x[i]) throw larbys("min > max not allowed for BBox construction!");
+      _centroid[i] = 0.0;
+      _half_length[i] = 1.0;
     }
+
+    _rotation = this->identity_rotation();
   }
 
-  template<size_t dimension>
-  void BBox<dimension>::update(const std::vector<double> & min, const std::vector<double> & max, ProjectionID_t id)
+  template <size_t dimension>
+  BBox<dimension>::BBox(
+        const std::array<double, dimension>& centroid, 
+        const std::array<double, dimension>& half_length,
+        const std::array<double, dimension*dimension> & rotation)
+    : _centroid(centroid),
+      _half_length(half_length)
+    // rotation(_rotation)
   {
-    if(min.size() != max.size() ||
-       min.size() != dimension){
-      throw larbys("Must use min and max of correct length for BBox update!");
-    }
-    for (size_t i = 0; i < dimension; i++){
-      if(min[i] > max[i]) throw larbys("min > max not allowed for BBox construction!");
-    }
-    for (size_t i = 0; i < dimension; i++){
-      _p1.x[i] = min[i];
-      _p2.x[i] = max[i];
-    }
-    _id = id;
-  }
-
-  template<size_t dimension>
-  void BBox<dimension>::update(const Point<dimension>& p1, const Point<dimension>& p2, ProjectionID_t id)
-  {    
-
-    for (size_t i = 0; i < dimension; i++){
-      if(p1.x[i] > p2.x[i]) throw larbys("min > max not allowed for BBox construction!");
-    }
-    for (size_t i = 0; i < dimension; i++){
-      _p1.x[i] = p1.x[i];
-      _p2.x[i] = p2.x[i];
-    }
-    _id = id;
-  }
-
-  template<size_t dimension>
-  void BBox<dimension>::update(ProjectionID_t id)
-  { _id = id; }
-
-  template<size_t dimension>
-  BBox<dimension> BBox<dimension>::overlap(const BBox<dimension>& box) const
-  {
-
-    Point<dimension> overlap_p1;
-    Point<dimension> overlap_p2;
-
-    for (size_t i = 0; i < dimension; i ++){
-      overlap_p1.x[i] = std::max(this->_p1.x[i], box.min().x[i]); // Pick larger min coordinate
-      overlap_p2.x[i] = std::min(this->_p1.x[i], box.max().x[i]); // Pick smaller max coordinate
-      if (overlap_p2.x[i] < overlap_p1.x[i]){ // verify there is overlap
-              std::stringstream ss;
-        ss << "No overlap found along dimension " << i << ":\n" 
-           << "  this X: " << this->_p1.x[i] << " ... the other X: " << box.min().x[i] << std::endl;
-        throw larbys(ss.str());
+    bool rotation_set = false;
+    for (size_t i = 0; i < dimension*dimension; i ++){
+      if (rotation[i] != 0){
+        rotation_set = true;
+        break;
       }
     }
 
-    return BBox<dimension>(overlap_p1, overlap_p2);
-  }
-
-  template<size_t dimension>
-  BBox<dimension> BBox<dimension>::inclusive(const BBox<dimension>& box) const
-  {
-
-
-    Point<dimension> overlap_p1;
-    Point<dimension> overlap_p2;
-
-    for (size_t i = 0; i < dimension; i ++){
-
-      overlap_p1.x[i] = std::min(this->_p1.x[i], box.min().x[i]); // Pick smaller min coordinate
-      overlap_p2.x[i] = std::max(this->_p1.x[i], box.max().x[i]); // Pick larger max coordinate
-    }
-
-    return BBox<dimension>(overlap_p1, overlap_p2);
+    if (!rotation_set) _rotation = this->identity_rotation();
 
   }
 
-  template<size_t dimension>
-  bool BBox<dimension>::contains(const Point<dimension>& point) const
-  {
-    bool contained(true);
-    for (size_t i = 0; i < dimension; i ++){
-      contained = ( contained && point.x[i] >= _p1.x[i] && point.x[i] <= _p2.x[i]);
-    }
-    return contained;
+  template <size_t dimension>
+  std::array<double, dimension*dimension > BBox<dimension>::identity_rotation(){
+    std::array<double, dimension*dimension > rot_mat = {0.};
+
+    for (size_t i = 0; i < dimension*dimension; i += dimension) rot_mat[i] = 1.0;
+
+    return rot_mat;
   }
+
 
   template<size_t dimension>
   std::string BBox<dimension>::dump() const
   {
     std::stringstream ss;
-    // Add the first point:
-    ss << "    (";
+    // Add the centroid:
+    ss << "Centroid: (";
     for (size_t i = 0; i < dimension; i ++){
-      ss << _p1.x[i];
+      ss << _centroid[i];
       if (i != dimension -1) ss << ",";
     }
 
-    ss << ") => (";
-    // Add the second point:
+    ss << "), half lengths: (";
     for (size_t i = 0; i < dimension; i ++){
-      ss << _p2.x[i];
+      ss << _half_length[i];
       if (i != dimension -1) ss << ",";
     }
-
-    ss << ")" << std::endl;;
+    ss << ")" << std::endl;
     return ss.str();
   }
 
 template class BBox<2>;
 template class BBox<3>;
 
+template class BBoxCollection<2>;
+template class BBoxCollection<3>;
+
 template<> std::string as_string<BBox<2>>() {return "BBox2D";}
 template<> std::string as_string<BBox<3>>() {return "BBox3D";}
+
+template<> std::string as_string<BBoxCollection<2>>() {return "BBoxCollection2D";}
+template<> std::string as_string<BBoxCollection<3>>() {return "BBoxCollection3D";}
 
 }
 
 
 #include <pybind11/operators.h>
-
+#include <pybind11/stl.h>
 
 
 template<size_t dimension>
@@ -142,40 +95,43 @@ void init_bbox_instance(pybind11::module m){
     using Class = larcv3::BBox<dimension>;
     pybind11::class_<Class> bbox(m, larcv3::as_string<Class>().c_str());
     bbox.def(pybind11::init<>());
-    bbox.def(pybind11::init<larcv3::Point<dimension>, larcv3::Point<dimension>, larcv3::ProjectionID_t > ());
-    bbox.def(pybind11::self == pybind11::self);
+    bbox.def(pybind11::init<const std::array<double, dimension>&, 
+                            const std::array<double, dimension>&,
+                            const std::array<double, dimension*dimension>
+                           > (),
+             pybind11::arg("centroid"),
+             pybind11::arg("half_length"),
+             pybind11::arg("rotation")
+    );
+    bbox.def(pybind11::init<const std::array<double, dimension>&, 
+                            const std::array<double, dimension>&
+                           > (),
+             pybind11::arg("centroid"),
+             pybind11::arg("half_length")
+    );
 
-    bbox.def("update",
-      (void (Class::*)
-        (const std::vector<double> & , const std::vector<double> & , larcv3::ProjectionID_t )  )
-      (&Class::update));
-    bbox.def("update", 
-      (void (Class::*)
-        (const larcv3::Point<dimension> & , const larcv3::Point<dimension> & , larcv3::ProjectionID_t )  )
-      (&Class::update));
-    bbox.def("update", 
-      (void (Class::*)
-        (larcv3::ProjectionID_t) )
-      (&Class::update));
+    bbox.def("centroid",           &Class::centroid);
+    bbox.def("half_length",        &Class::half_length);
+    bbox.def("rotation_matrix",    &Class::rotation_matrix);
+    bbox.def("identity_rotation",  &Class::identity_rotation);
 
+    bbox.def("dump",               &Class::dump);
+    bbox.def("__repr__",           &Class::dump);
 
-    bbox.def("empty",            &Class::empty);
-    bbox.def("origin",           &Class::origin);
-    bbox.def("bottom_left",      &Class::bottom_left);
-    bbox.def("top_right",        &Class::top_right);
-    bbox.def("center",           &Class::center);
-    bbox.def("min",              &Class::min);
-    bbox.def("max",              &Class::max);
-    bbox.def("dimensions",       &Class::dimensions);
-    bbox.def("area",             &Class::area);
-    bbox.def("volume",           &Class::volume);
-    bbox.def("id",               &Class::id);
-    bbox.def("dump",             &Class::dump);
-    bbox.def("__repr__",         &Class::dump);
-    bbox.def("overlap",          &Class::overlap);
-    bbox.def("inclusive",        &Class::inclusive);
-    bbox.def("contains",         &Class::contains);
+}
 
+template<size_t dimension>
+void init_bbox_collection(pybind11::module m){
+    using Class = larcv3::BBoxCollection<dimension>;
+    pybind11::class_<Class> bbox_c(m, larcv3::as_string<Class>().c_str());
+    bbox_c.def(pybind11::init<>());
+
+    bbox_c.def("bbox",           &Class::bbox);
+    bbox_c.def("as_vector",      &Class::as_vector);
+    bbox_c.def("clear_data",     &Class::clear_data);
+    bbox_c.def("resize",         &Class::resize);
+    bbox_c.def("writeable_bbox", &Class::writeable_bbox);
+    bbox_c.def("append",         &Class::append);
 
 }
 
@@ -183,6 +139,9 @@ void init_bbox(pybind11::module m){
   // Here, this creates a wrapper for the classes we're interested in:
   init_bbox_instance<2>(m);
   init_bbox_instance<3>(m);
+
+  init_bbox_collection<2>(m);
+  init_bbox_collection<3>(m);
 }
 
 

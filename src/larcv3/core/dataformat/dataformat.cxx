@@ -42,6 +42,9 @@ void init_dataformat(pybind11::module m){
     wrap_vector<larcv3::ImageMeta<3>>(m);
     wrap_vector<larcv3::ImageMeta<4>>(m);
 
+    wrap_vector<larcv3::BBox<2>>(m);
+    wrap_vector<larcv3::BBox<3>>(m);
+
     wrap_vector<larcv3::Particle> (m);
 
     init_dataformattypes(m);
