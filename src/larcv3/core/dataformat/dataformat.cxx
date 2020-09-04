@@ -61,5 +61,6 @@ void init_dataformat(pybind11::module m){
     init_eventsparsecluster(m);
     init_eventsparsetensor(m);
     init_eventtensor(m);
+    init_eventbbox(m);
     init_iomanager(m);
 }

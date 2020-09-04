@@ -12,7 +12,7 @@
 #define N_DATASETS 2
 
 namespace larcv3{
-  /// Global larcv3::SBClusterFactory to register ClusterAlgoFactory
+
   static EventParticleFactory __global_EventParticleFactory__;
 
   EventParticle::EventParticle(){
@@ -200,12 +200,6 @@ namespace larcv3{
     /////////////////////////////////////////////////////////
     // Get the extents dataset
     /////////////////////////////////////////////////////////
-
-    // H5::DataSet * extents_dataset = &(_open_out_datasets[EXTENTS_DATASET]);
-
-    // Get a dataspace inside this file:
-    // H5::DataSpace extents_dataspace = extents_dataset.getSpace();
-
 
     // Get the dataset current size
      hsize_t extents_dims_current[1];

@@ -100,6 +100,10 @@ namespace larcv3 {
 
   template<size_t dimension>
   class BBoxCollection{
+
+    // template <size_t dimension> friend class EventBBox<dimension>;
+    template<size_t> friend class EventBBox;
+
   public:
 
     BBoxCollection(){};
