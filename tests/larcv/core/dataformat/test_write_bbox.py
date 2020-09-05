@@ -19,9 +19,14 @@ def test_write_bboxes(tmpdir, rand_num_events, dimension, n_projections):
 
     bbox_list = data_generator.create_bbox_list(rand_num_events, n_projections = n_projections, dimension =dimension)
 
+
     random_file_name = str(tmpdir + "/test_write_bboxes.h5")
 
     data_generator.write_bboxes(random_file_name, bbox_list, dimension, n_projections)
+
+
+
+
 
 
 @pytest.mark.parametrize('dimension', [2, 3])
@@ -32,41 +37,56 @@ def test_read_write_bboxes(tmpdir, rand_num_events, dimension, n_projections):
 
     random_file_name = str(tmpdir + "/test_write_read_bboxes.h5")
 
-    bbox_list = data_generator.create_bbox_list(rand_num_events, n_projections = n_projections)
+    bbox_list = data_generator.create_bbox_list(rand_num_events, n_projections = n_projections, dimension =dimension)
 
-    data_generator.write_bboxes(random_file_name, voxel_set_list, dimension, n_projections)
-    read_voxel_set_list = data_generator.read_bboxes(random_file_name, dimension)
+    data_generator.write_bboxes(random_file_name, bbox_list, dimension, n_projections)
+    read_bbox_list = data_generator.read_bboxes(random_file_name, dimension)
+
+    # print("Input BBoxes:")
+    # for event in range(len(bbox_list)):
+    #     for projection_id in range(len(bbox_list[event])):
+    #         print()
+    #         print("Projection: ", projection_id)
+    #         print(bbox_list[event][projection_id])
+
+    # print("Read BBoxes:")
+    # for event in range(len(read_bbox_list)):
+    #     for projection_id in range(len(read_bbox_list[event])):
+    #         print()
+    #         print("Projection: ", projection_id)
+    #         print([b for b in read_bbox_list[event][projection_id].as_vector() ])
+
 
     # Check the same number of events came back:
-    assert(len(read_voxel_set_list) == rand_num_events)
+    assert(len(read_bbox_list) == rand_num_events)
     for event in range(rand_num_events):
         # Check the same number of projections per event:
-        assert(len(read_voxel_set_list[event]) == len(voxel_set_list[event]))
+        assert(len(read_bbox_list[event]) == len(bbox_list[event]))
         for projection in range(n_projections):
             # Check the same number of voxels:
-            input_voxelset = voxel_set_list[event][projection]
-            read_voxelset = read_voxel_set_list[event][projection]
-            assert(read_voxelset['n_voxels'] == input_voxelset['n_voxels'])
+            this_input_bbox_list = bbox_list[event][projection]
+            this_read_bbox_list  = read_bbox_list[event][projection]
+            print(this_read_bbox_list.size())
+            print(len(this_input_bbox_list))
+            print(this_input_bbox_list)
+            print(this_read_bbox_list.bbox(0))
+            assert(this_read_bbox_list.size() == len(this_input_bbox_list))
 
-            # Check voxel properties:
-            # Sum of indexes
-            # Sum of values
-            # std of values
-            if input_voxelset['n_voxels'] == 0:
-                continue
-            print(input_voxelset['values'])
-            assert(numpy.sum(input_voxelset['indexes']) == numpy.sum(read_voxelset['indexes']))
-            assert( abs( numpy.sum(input_voxelset['values']) - numpy.sum(read_voxelset['values']) ) < 1e-3 )
-            assert( abs( numpy.std(input_voxelset['values']) - numpy.std(read_voxelset['values']) ) < 1e-3 )
+            for i_box in range(len(this_input_bbox_list)):
+                for i in range(dimension):
+                    print(this_input_bbox_list[i_box]['half_length'][i]) 
+                    print(this_read_bbox_list.bbox(i_box).half_length()[i])
+                    assert abs(this_read_bbox_list.bbox(i_box).half_length()[i] - this_input_bbox_list[i_box]['half_length'][i]) < 1e-3
+                    assert abs(this_read_bbox_list.bbox(i_box).centroid()[i] - this_input_bbox_list[i_box]['centroid'][i]) < 1e-3
 
 
 
 if __name__ == '__main__':
     tmpdir = "./"
-    rand_num_events = 5
+    rand_num_events = 2
     n_projections = 3
     dimension = 2
-    test_write_bboxes(tmpdir, rand_num_events, dimension, n_projections)
+    # test_write_bboxes(tmpdir, rand_num_events, dimension, n_projections)
     test_read_write_bboxes(tmpdir, rand_num_events, dimension, n_projections)
 
 

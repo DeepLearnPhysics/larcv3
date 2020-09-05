@@ -282,6 +282,7 @@ namespace larcv3 {
     hsize_t bboxes_dims_current[1];
     H5Sget_simple_extent_dims(_open_out_dataspaces[BBOX_DATASET], bboxes_dims_current, NULL);
 
+
     /////////////////////////////////////////////////////////
     // Step 2: Build the BBox Extents
     /////////////////////////////////////////////////////////
@@ -290,7 +291,7 @@ namespace larcv3 {
     // We need to make the image extents object first, which we can do from the vector of images.
     std::vector<IDExtents_t> bbox_extents;
 
-    size_t last_bbox_index = bbox_extents_dims_current[0];
+    size_t last_bbox_index = bboxes_dims_current[0];
     size_t n_new_bbox_c    = _bbox_c_v.size();
     size_t new_bbox_c_size = 0;
     bbox_extents.resize(n_new_bbox_c);
@@ -419,10 +420,11 @@ namespace larcv3 {
     _open_out_dataspaces[BBOX_DATASET] = H5Dget_space(_open_out_datasets[BBOX_DATASET]);
 
     // We start writing after the last one:
-    hsize_t starting_index = last_bbox_index;
+    hsize_t starting_index = bboxes_dims_current[0];
 
     // Now we've extended the dataset.  Let's loop over projectionIDs and write to file:
     for (size_t projection_id = 0; projection_id < _bbox_c_v.size(); projection_id ++){
+
 
         hsize_t new_bboxes_slab_dims[1];
         hsize_t offset_bboxes_slab_dims[1];
@@ -430,11 +432,11 @@ namespace larcv3 {
         new_bboxes_slab_dims[0] = bbox_extents.at(projection_id).n;
         offset_bboxes_slab_dims[0] = starting_index;
 
-        // std::cout << "[" << projection_id << "][" << cluster_id << "]: \n"
+        // std::cout << "[" << projection_id << "]: \n"
         //           << "  Offset: " << offset_bboxes_slab_dims[0]
         //           << "\n  starting_index: " << starting_index
         //           << "\n  N: " << new_bboxes_slab_dims[0]
-        //           << "\n  N: " << _cluster_v.at(projection_id).at(cluster_id).size()
+        //           << "\n  N: " << _bbox_c_v.at(projection_id).size()
         //           << std::endl;
 
         // Select as a hyperslab the last section of data for writing:

@@ -132,6 +132,7 @@ void init_bbox_collection(pybind11::module m){
     bbox_c.def("resize",         &Class::resize);
     bbox_c.def("writeable_bbox", &Class::writeable_bbox);
     bbox_c.def("append",         &Class::append);
+    bbox_c.def("size",           &Class::size);
 
 }
 

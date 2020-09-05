@@ -413,7 +413,7 @@ def create_bbox_list(rand_num_events, n_projections, dimension):
     for i_event in range(rand_num_events):
         bbox_list.append([])
         for i_projection in range(n_projections):
-            n_bboxes = i_event + i_projection
+            n_bboxes = i_event + i_projection + 1
 
 
             bbox_list[i_event].append([])
@@ -451,11 +451,11 @@ def write_bboxes(tempfile, bbox_list, dimension, n_projections):
         io_manager.set_id(1001, 0, i_evt)
         
         ev_bbox = io_manager.get_data(datatype,"test")
-        bbox_collection = collection_constructor()
 
         for i_projection in range(n_projections):
             n_bboxes = len(bbox_list[i_evt][i_projection])
 
+            bbox_collection = collection_constructor()
 
             for j in range(n_bboxes):
                 bbox = box_constructor(
@@ -466,8 +466,8 @@ def write_bboxes(tempfile, bbox_list, dimension, n_projections):
 
                 bbox_collection.append(bbox)
         
-        # Add the whole collection:
-        ev_bbox.append(bbox_collection)
+            # Add the whole collection:
+            ev_bbox.append(bbox_collection)
 
 
         io_manager.save_entry()
@@ -479,21 +479,29 @@ def write_bboxes(tempfile, bbox_list, dimension, n_projections):
 
     return
  
-def read_bboxes(tempfile, use_core_driver=False):
+def read_bboxes(tempfile, dimension, use_core_driver=False):
 
     io_manager = larcv.IOManager(larcv.IOManager.kREAD)
     if use_core_driver: 
-      io_manager.set_core_driver()
+        io_manager.set_core_driver()
     io_manager.add_in_file(tempfile)
     io_manager.initialize()
 
-    read_events = 0
+    if dimension == 2:
+        product = "bbox2d"
+    elif dimension == 3:
+        product = "bbox3d"
+    else:
+        raise Exception("Can't read bbox of dimension ", dimension)
+
+    bbox_list = []
     for i in range(io_manager.get_n_entries()):
         io_manager.read_entry(i)
         # print(io_manager.current_entry())
         event_id = io_manager.event_id()
+        data = io_manager.get_data(product, 'test')
+        collection = [data.at(i) for i in range(data.size())]
 
-        ev_particles = io_manager.get_data('particle', 'test')
-        read_events += 1
+        bbox_list.append(collection)
 
-    return read_events
+    return bbox_list
