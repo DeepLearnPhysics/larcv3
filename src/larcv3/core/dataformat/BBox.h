@@ -39,9 +39,9 @@ namespace larcv3 {
 
     std::array<double, dimension*dimension > identity_rotation();
 
-    const std::array<double, dimension>& centroid() {return _centroid;} 
-    const std::array<double, dimension>& half_length() {return _half_length;}
-    const std::array<double, dimension*dimension> & rotation_matrix() {return _rotation;}
+    const std::array<double, dimension>& centroid() const {return _centroid;} 
+    const std::array<double, dimension>& half_length() const {return _half_length;}
+    const std::array<double, dimension*dimension> & rotation_matrix() const {return _rotation;}
 
     inline bool operator== (const BBox<dimension>& rhs) const {
       return ( _centroid    == rhs._centroid && 

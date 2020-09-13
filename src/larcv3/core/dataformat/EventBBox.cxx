@@ -663,6 +663,8 @@ namespace larcv3 {
 
 }
 
+#include <pybind11/stl.h>
+
 template <size_t dimension>
 void init_eventbbox_instance(pybind11::module m){
 
