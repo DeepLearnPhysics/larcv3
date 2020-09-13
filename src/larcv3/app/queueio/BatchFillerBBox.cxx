@@ -97,7 +97,7 @@ namespace larcv3 {
     /*
     Here we're collecting bboxes and buffering them into an array.
     Each array is of shape:
-    [batch_size][num_channels][2*dimension]
+    [batch_size][num_channels][max_boxes][2*dimension]
     the [2] represents first the centroid, then the extents (half lengths)
     */
 
@@ -118,10 +118,9 @@ namespace larcv3 {
     dim.resize(4);
     dim.at(0) = batch_size();
     dim.at(1) = _num_channels;
-    dim.at(2) = 2;
-    dim.at(3) = dimension;
+    dim.at(2) = _max_boxes;
+    dim.at(3) = 2*dimension;
     this->set_dim(dim);
-
 
     if (_entry_data.size() != batch_data().entry_data_size())
       _entry_data.resize(batch_data().entry_data_size(), 0.);
@@ -135,6 +134,9 @@ namespace larcv3 {
       LARCV_CRITICAL() << "Insufficient projections for BBox Filler " << std::endl;
       throw larbys();
     }
+
+
+
 
     for ( size_t _projection = 0; _projection < _num_channels; _projection ++ ){
       // Check that this projection ID is in the lists of channels:
@@ -153,7 +155,14 @@ namespace larcv3 {
       size_t index(0);
       for (size_t i_bbox = 0; i_bbox < max_bbox; i_bbox ++) {
 
-        index = (_num_channels*_max_boxes*2*dimension) +  2*dimension*i_bbox;
+
+        // Index is the first index for this bbox.
+
+        // So, it's _projection*projection_stride + i_box * box_stride
+        // box_stride = 2*dimension
+        // projection_stride = box_stride * max_boxes
+
+        index = _projection * (2*dimension*_max_boxes) + i_bbox * (2*dimension);
 
         for (size_t i_dim = 0; i_dim < dimension; i_dim ++){
           _entry_data.at(index + 0         + i_dim) = bbox_collection.bbox(i_bbox).centroid()[i_dim];
@@ -177,5 +186,8 @@ namespace larcv3 {
 
     return true;
   }
+
+template class BatchFillerBBox<2>;
+template class BatchFillerBBox<3>;
 }
 #endif
