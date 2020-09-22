@@ -41,10 +41,22 @@ namespace larcv3 {
 
     void finalize();
 
+    static json default_config(){
+        json c = {
+          {"Producer", std::string()},
+          {"Product", std::string()},
+          {"OutputProducer", std::string()},
+          {"Threshold", 0.0},
+        }
+        return c;
+    }
+
   private:
 
     void configure_labels(const PSet&);
 
+    json config;
+    
     // List of input producers:
     std::vector<std::string> _input_producer_v;
     // List of input datatypes:

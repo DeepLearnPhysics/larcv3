@@ -22,4 +22,5 @@ PYBIND11_MODULE(pylarcv, m) {
   init_dataformat(m);
   init_processor(m);
   init_queueio(m);
+  init_imagemod(m);
 }

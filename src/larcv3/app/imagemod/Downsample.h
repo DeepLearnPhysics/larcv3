@@ -33,7 +33,7 @@ namespace larcv3 {
     /// Default destructor
     ~Downsample(){}
 
-    void configure(const PSet&);
+    void configure(const json&);
 
     void initialize();
 
@@ -41,20 +41,23 @@ namespace larcv3 {
 
     void finalize();
 
+
+    static json default_config(){
+        json c = {
+          {"Producer", std::string()},
+          {"Product", std::string()},
+          {"OutputProducer", std::string()},
+          {"Downsample", 0},
+          {"PoolType", kPoolAverage},
+        }
+        return c;
+    }
+
+
   private:
 
-    void configure_labels(const PSet&);
+    json config;
 
-    // List of input producers:
-    std::vector<std::string> _input_producer_v;
-    // List of input datatypes:
-    std::vector<std::string> _input_product_v;
-    // List of output producers:
-    std::vector<std::string> _output_producer_v;
-    // List of downsampling amount per projection ID (or one global Downsample for all)
-    std::vector<size_t>       _downsamples_v;
-    // Pooling Types
-    std::vector<int> _pool_types_v;
 
   };
 
@@ -72,8 +75,14 @@ namespace larcv3 {
     ProcessBase* create(const std::string instance_name) { return new Downsample(instance_name); }
   };
 
+  #ifdef LARCV_INTERNAL
+  #include <pybind11/pybind11.h>
+  void init_downsample(pybind11::module m);
+  #endif
+
 }
 
 #endif
 /** @} */ // end of doxygen group
 
+  
