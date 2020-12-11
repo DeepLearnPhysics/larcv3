@@ -50,7 +50,7 @@ namespace larcv3 {
     std::vector<T> & writeable_data() {return _data;}
 
 #ifdef LARCV_INTERNAL
-    pybind11::array_t<T> pydata();
+    // pybind11::array_t<T> pydata();
 #endif
 
     inline const std::vector<int>& dim() const { return _dim; }

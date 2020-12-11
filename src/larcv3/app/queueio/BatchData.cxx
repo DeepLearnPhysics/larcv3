@@ -4,6 +4,7 @@
 #include "BatchData.h"
 #include "larcv3/core/base/larcv_logger.h"
 #include "larcv3/core/base/larbys.h"
+#include "larcv3/core/dataformat/Particle.h"
 #include <sstream>
 
 namespace larcv3 {
@@ -19,30 +20,30 @@ namespace larcv3 {
     return _data;
   }
 
-  template<class T>
-  pybind11::array_t<T> BatchData<T>::pydata()
-  {
-    if (_state != BatchDataState_t::kBatchStateFilled) {
-      LARCV_SCRITICAL() << "Current batch state: " << (int)this->state()
-                        << " not ready to expose data!" << std::endl;
-      throw larbys();
-    }
+  // template<class T>
+  // pybind11::array_t<T> BatchData<T>::pydata()
+  // {
+  //   if (_state != BatchDataState_t::kBatchStateFilled) {
+  //     LARCV_SCRITICAL() << "Current batch state: " << (int)this->state()
+  //                       << " not ready to expose data!" << std::endl;
+  //     throw larbys();
+  //   }
 
-    // First, create the buffer object:
-    // Cast the dimensions to std::array:
-    std::array<size_t, 1> dimensions;
-    dimensions[0] = _data.size();
-    // Allocate a spot to store the data:
-    auto array = pybind11::array_t<T>(
-        // _meta.number_of_voxels()[0],
-        dimensions,
-        {},
-        &(_data[0])
-      );
+  //   // First, create the buffer object:
+  //   // Cast the dimensions to std::array:
+  //   std::array<size_t, 1> dimensions;
+  //   dimensions[0] = _data.size();
+  //   // Allocate a spot to store the data:
+  //   auto array = pybind11::array_t<T>(
+  //       // _meta.number_of_voxels()[0],
+  //       dimensions,
+  //       {},
+  //       &(_data[0])
+  //     );
   
-    return array;
+  //   return array;
 
-  }
+  // }
 
   template<class T>
   size_t BatchData<T>::data_size(bool calculate) const
@@ -186,6 +187,7 @@ template class larcv3::BatchData<short>;
 template class larcv3::BatchData<int>;
 template class larcv3::BatchData<float>;
 template class larcv3::BatchData<double>;
+template class larcv3::BatchData<larcv3::Particle>;
 
 void init_batchdata(pybind11::module m){
 
@@ -211,7 +213,7 @@ void init_batchdata_(pybind11::module m){
 
 
 
-    batch_data.def("pydata",             &Class::pydata);
+    // batch_data.def("pydata",             &Class::pydata);
     batch_data.def("data",               &Class::data);
     batch_data.def("dim",                &Class::dim);
     batch_data.def("dense_dim",          &Class::dense_dim);

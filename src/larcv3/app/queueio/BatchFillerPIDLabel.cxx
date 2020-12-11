@@ -42,23 +42,7 @@ namespace larcv3 {
 
   void BatchFillerPIDLabel::_batch_end_()
   {
-    // if (logger().level() <= msg::kINFO) {
-    //   LARCV_INFO() << "Total data size: " << batch_data().data_size() << std::endl;
 
-    //   std::vector<size_t> ctr_v(_num_class, 0);
-    //   auto const& data = batch_data().data();
-    //   for (size_t i = 0; i < data.size(); ++i) {
-    //     if (data[i] < 1.) continue;
-    //     ctr_v[i % _num_class] += 1;
-    //   }
-    //   std::stringstream ss;
-    //   ss << "Class fractions (0";
-    //   for (size_t i = 1; i < _num_class; ++i) ss << "," << i;
-    //   ss << ") ... (" << ctr_v[0];
-    //   for (size_t i = 1; i < _num_class; ++i) ss << "," << ctr_v[i];
-    //   ss << ")";
-    //   LARCV_INFO() << ss.str() << std::endl;
-    // }
   }
 
   void BatchFillerPIDLabel::finalize()

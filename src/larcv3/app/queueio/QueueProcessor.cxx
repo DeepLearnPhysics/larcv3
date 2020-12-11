@@ -10,6 +10,8 @@
 #include <mutex>
 #include <chrono>
 
+#include "larcv3/core/dataformat/Particle.h"
+
 #ifdef LARCV_OPENMP
 #include <omp.h>
 #endif
@@ -147,6 +149,8 @@ int omp_thread_count() {
         ready = ready && BatchDataQueueFactory<float>::get().get_queue(name).is_next_ready(); break;
       case BatchDataType_t::kBatchDataDouble:
         ready = ready && BatchDataQueueFactory<double>::get().get_queue(name).is_next_ready(); break;
+      case BatchDataType_t::kBatchDataParticle:
+        ready = ready && BatchDataQueueFactory<larcv3::Particle>::get().get_queue(name).is_next_ready(); break;
       default:
         LARCV_CRITICAL() << "Process name " << name
                          << " encountered none-supported BatchDataType_t: " << int(datatype) << std::endl;
@@ -175,6 +179,8 @@ int omp_thread_count() {
         BatchDataQueueFactory<float>::get_writeable().get_queue_writeable(name).pop(); break;
       case BatchDataType_t::kBatchDataDouble:
         BatchDataQueueFactory<double>::get_writeable().get_queue_writeable(name).pop(); break;
+      case BatchDataType_t::kBatchDataParticle:
+        BatchDataQueueFactory<larcv3::Particle>::get_writeable().get_queue_writeable(name).pop(); break;
       default:
         LARCV_CRITICAL() << "Process name " << name
                          << " encountered none-supported BatchDataType_t: " << int(datatype) << std::endl;
@@ -304,6 +310,8 @@ int omp_thread_count() {
         BatchDataQueueFactory<float>::get_writeable().make_queue(name); break;
       case BatchDataType_t::kBatchDataDouble:
         BatchDataQueueFactory<double>::get_writeable().make_queue(name); break;
+      case BatchDataType_t::kBatchDataParticle:
+        BatchDataQueueFactory<larcv3::Particle>::get_writeable().make_queue(name); break;
       default:
         LARCV_CRITICAL() << "Process name " << name
                          << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(proc_ptr))->data_type()) << std::endl;
@@ -438,6 +446,11 @@ int omp_thread_count() {
           = &(BatchDataQueueFactory<double>::get_writeable().get_queue_writeable(name).get_next_writeable());
         batch_state = ((BatchFillerTemplate<double>*)proc_ptr)->_batch_data_ptr->state();
         break;
+      case BatchDataType_t::kBatchDataParticle:
+        ((BatchFillerTemplate<larcv3::Particle>*)proc_ptr)->_batch_data_ptr
+          = &(BatchDataQueueFactory<larcv3::Particle>::get_writeable().get_queue_writeable(name).get_next_writeable());
+        batch_state = ((BatchFillerTemplate<larcv3::Particle>*)proc_ptr)->_batch_data_ptr->state();
+        break;
       default:
         LARCV_CRITICAL() << "Process name " << name
                          << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(proc_ptr))->data_type()) << std::endl;
@@ -475,6 +488,8 @@ int omp_thread_count() {
         ((BatchFillerTemplate<float>*)ptr)->batch_begin(); break;
       case BatchDataType_t::kBatchDataDouble:
         ((BatchFillerTemplate<double>*)ptr)->batch_begin(); break;
+      case BatchDataType_t::kBatchDataParticle:
+        ((BatchFillerTemplate<larcv3::Particle>*)ptr)->batch_begin(); break;
       default:
         LARCV_CRITICAL() << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(ptr))->data_type()) << std::endl;
         throw larbys();
@@ -497,6 +512,8 @@ int omp_thread_count() {
         ((BatchFillerTemplate<float>*)ptr)->batch_end(); break;
       case BatchDataType_t::kBatchDataDouble:
         ((BatchFillerTemplate<double>*)ptr)->batch_end(); break;
+      case BatchDataType_t::kBatchDataParticle:
+        ((BatchFillerTemplate<larcv3::Particle>*)ptr)->batch_end(); break;
       default:
         LARCV_CRITICAL() << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(ptr))->data_type()) << std::endl;
         throw larbys();

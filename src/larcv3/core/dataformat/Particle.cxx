@@ -17,6 +17,28 @@ namespace larcv3 {
   //   throw larbys(ss.str());
   // }
 
+  Particle::Particle(larcv3::ShapeType_t shape){
+    _particle_holder._id               =  kINVALID_INDEX;
+    _particle_holder._mcst_index       =  kINVALID_INDEX;
+    _particle_holder._mct_index        =  kINVALID_INDEX;
+    _particle_holder._shape            =  shape;
+    _particle_holder._current_type     = -1;
+    _particle_holder._interaction_type = -1;
+    _particle_holder._trackid          =  kINVALID_UINT;
+    _particle_holder._pdg              =  0;
+    _particle_holder._px               =  0.;
+    _particle_holder._py               =  0.;
+    _particle_holder._pz               =  0.;
+    _particle_holder._dist_travel      = -1;
+    _particle_holder._energy_init      =  0.;
+    _particle_holder._energy_deposit   =  0.;
+    // _particle_holder._process       =  ""; // Process deliberately not assigned.
+    _particle_holder._parent_trackid   =  kINVALID_UINT;
+    _particle_holder._parent_pdg       =  0;
+    _particle_holder._ancestor_trackid =  kINVALID_UINT;
+    _particle_holder._ancestor_pdg     =  0;
+  }
+
   std::string Particle::dump() const
   {
     std::stringstream ss;
@@ -41,7 +63,7 @@ namespace larcv3 {
 
   void Particle::creation_process (const std::string& proc) { 
     if (proc.size() < PARTICLE_PROCESS_STRLEN){
-      std::copy(proc.begin(), proc.end(),_process); 
+      std::copy(proc.begin(), proc.end(),_particle_holder._process); 
     }
     else{
       LARCV_CRITICAL() << "Can not use a string longer than 64 characters in Particle creation_process!" << std::endl;
@@ -49,14 +71,72 @@ namespace larcv3 {
     }
   }
   std::string Particle::creation_process() const { 
-    return std::string(_process); 
+    return std::string(_particle_holder._process); 
   }
+
+  // Return a numpy array of this object (no copy by default)
+  pybind11::array_t<ParticleHolder> Particle::as_array(){
+    // Cast the dimensions to std::array:
+    std::array<size_t, 1> dimensions;
+    dimensions[0] = 1;
+    return pybind11::array_t<ParticleHolder>(
+        // _meta.number_of_voxels()[0],
+        dimensions,
+        {},
+        &(_particle_holder)
+      );
+  }
+  
 
 
 template<> std::string as_string<Particle>() {return "Particle";}
 }
 
+#include <pybind11/numpy.h>
+
 void init_particle(pybind11::module m){
+    // std::cout << std::boolalpha;
+    // std::cout << std::is_pod<larcv3::ParticleHolder>::value << '\n';
+    // std::cout << std::is_pod<larcv3::Particle>::value << '\n';
+    // std::cout << std::is_pod<larcv3::Vertex>::value << '\n';
+    // std::cout << std::is_pod<char[PARTICLE_PROCESS_STRLEN]>::value << '\n';
+
+    // std::cout << "Layouts" << '\n';
+    // std::cout << std::is_standard_layout<larcv3::ParticleHolder>::value << '\n';
+    // std::cout << std::is_standard_layout<larcv3::Particle>::value << '\n';
+    // std::cout << std::is_standard_layout<larcv3::Vertex>::value << '\n';
+    // std::cout << std::is_standard_layout<char[PARTICLE_PROCESS_STRLEN]>::value << '\n';
+
+    PYBIND11_NUMPY_DTYPE(larcv3::ParticleHolder,
+      _id,
+      _mcst_index,
+      _mct_index,
+      _shape,
+      _current_type,
+      _interaction_type,
+      _trackid,
+      _pdg,
+      _px,
+      _py,
+      _pz,
+      _vtx,
+      _end_pt,
+      _first_step,
+      _last_step,
+      _dist_travel,
+      _energy_init,
+      _energy_deposit,
+      _process,
+      _parent_trackid,
+      _parent_pdg,
+      _parent_vtx,
+      _ancestor_trackid,
+      _ancestor_pdg,
+      _ancestor_vtx
+    );
+
+
+
     pybind11::class_<larcv3::Particle> particle(m, "Particle");
 
     particle.def(pybind11::init<>());
@@ -161,6 +241,8 @@ void init_particle(pybind11::module m){
 
     particle.def("dump",       &larcv3::Particle::dump);
     particle.def("__repr__",   &larcv3::Particle::dump);
+
+    particle.def("as_array",   &larcv3::Particle::as_array);
   /*
 
 

@@ -101,8 +101,14 @@ namespace larcv3 {
 
 
 #include <pybind11/operators.h>
+#include <pybind11/numpy.h>
 
 void init_vertex(pybind11::module m){
+
+
+
+    PYBIND11_NUMPY_DTYPE(larcv3::Vertex, _x, _y, _z, _t);
+
 
     // using larcv3::Vertex = larcv3::Vertex;
     pybind11::class_<larcv3::Vertex> vertex(m, "Vertex");

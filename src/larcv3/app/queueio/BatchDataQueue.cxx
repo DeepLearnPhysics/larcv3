@@ -4,6 +4,7 @@
 #include "BatchDataQueue.h"
 #include "larcv3/core/base/larcv_logger.h"
 #include "larcv3/core/base/larbys.h"
+#include "larcv3/core/dataformat/Particle.h"
 
 namespace larcv3 {
 
@@ -62,6 +63,7 @@ template class larcv3::BatchDataQueue<short>;
 template class larcv3::BatchDataQueue<int>;
 template class larcv3::BatchDataQueue<float>;
 template class larcv3::BatchDataQueue<double>;
+template class larcv3::BatchDataQueue<larcv3::Particle>;
 // template class larcv3::BatchDataQueue<larcv3::SparseTensor<2>>;
 
 
@@ -86,6 +88,8 @@ void init_batchdataqueue(pybind11::module m){
   init_batchdataqueue<int>(m);
   init_batchdataqueue<float>(m);
   init_batchdataqueue<double>(m);
+  init_batchdataqueue<larcv3::Particle>(m);
+
 
 }
 

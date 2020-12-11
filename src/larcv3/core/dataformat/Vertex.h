@@ -58,7 +58,7 @@ namespace larcv3 {
 
     std::string dump() const;
 
-  private:
+  public:
 
     double _x, _y, _z, _t;
 

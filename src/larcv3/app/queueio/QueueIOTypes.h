@@ -19,7 +19,8 @@ namespace larcv3 {
     kBatchDataInt,
     kBatchDataFloat,
     kBatchDataDouble,
-    kBatchDataString
+    kBatchDataString,
+    kBatchDataParticle,
   };
 
   std::string BatchDataTypeName(BatchDataType_t type);

@@ -20,7 +20,10 @@
 #include "larcv3/core/dataformat/Tensor.h"
 #include "larcv3/core/dataformat/DataProductFactory.h"
 
-// #include <pybind11/numpy.h>
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
+#endif
 
 namespace larcv3 {
 
@@ -38,9 +41,11 @@ namespace larcv3 {
     /// Const reference getter to an array of larcv3::Tensor<dimension>
     const std::vector<larcv3::Tensor<dimension>>& as_vector() const { return _image_v; }
 
-    /// Const reference getter to an array of larcv3::Tensor<dimension>
-    // pybind11::array_t<float> numpy() const { return _image_v; }
-
+#ifdef LARCV_INTERNAL
+    /// Get a list of numpy arrays for each projection ID
+    // std::vector<pybind11::array_t<float> > numpy() const;
+#endif
+    
     // inline std::shared_ptr<larcv3::Tensor<dimension>>& at(size_t index) const {return _image_v.at(index);}
 
     /// Deprecated (use as_vector): const reference getter to an array of larcv3::Tensor<dimension>
