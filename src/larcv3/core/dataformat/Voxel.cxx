@@ -2,6 +2,8 @@
 #define __LARCV3DATAFORMAT_VOXEL_CXX__
 
 #include "larcv3/core/dataformat/Voxel.h"
+#include "larcv3/core/base/larbys.h"
+#include "larcv3/core/base/larcv_logger.h"
 #include <iostream>
 
 namespace larcv3 {
@@ -186,6 +188,44 @@ namespace larcv3 {
   //       &(_img[0])
   //     );
   // }
+
+  void VoxelSet::set(pybind11::array_t<size_t> pyindexes, pybind11::array_t<float> pyvalues){
+
+    auto index_buffer = pyindexes.request();
+    auto values_buffer = pyvalues.request();
+
+    // First, check that we have the same dimension in each input:
+    if ( values_buffer.ndim != 1){
+      LARCV_ERROR() << "ERROR: cannot convert values array of dimension " << index_buffer.ndim  
+                    << " to VoxelSet\n";
+      throw larbys();
+    }
+    if ( index_buffer.ndim != 1){
+      LARCV_ERROR() << "ERROR: cannot convert index array of dimension " << index_buffer.ndim  
+                    << " to VoxelSet\n";
+      throw larbys();
+    }
+    if ( values_buffer.shape[0] != index_buffer.shape[0]){
+      LARCV_ERROR() << "ERROR: values and index must be the same length but are ";
+                    // << values_buffer.shape[0] << " and " < index_buffer.shape[0] << "\n";
+      throw larbys();
+    }
+
+    // Get a ptr to the data:
+    auto ind_ptr = static_cast<size_t *>(index_buffer.ptr);
+    auto val_ptr = static_cast<float  *>(values_buffer.ptr);
+
+    // Now, loop through the inputs and add voxels:
+    this->_voxel_v.reserve(values_buffer.shape[0]);
+
+    for (size_t i = 0; i < values_buffer.shape[0]; ++ i){
+      this -> _voxel_v.push_back(Voxel(ind_ptr[i], val_ptr[i]));
+    }
+
+    return;
+
+  }
+
 
   pybind11::array_t<float> VoxelSet::values() const {
     // First, create the buffer object:
@@ -379,16 +419,18 @@ SparseTensor<dimension>::SparseTensor(VoxelSet&& vs, ImageMeta<dimension> meta)
 { this->meta(meta); }
 
 template<size_t dimension>
-void SparseTensor<dimension>::meta(const larcv3::ImageMeta<dimension>& meta)
+void SparseTensor<dimension>::meta(const larcv3::ImageMeta<dimension>& meta, bool check)
 {
-for (auto const& vox : this->as_vector()) {
- if (vox.id() < meta.total_voxels()) continue;
- std::cerr << "VoxelSet contains ID " << vox.id()
-           << " which cannot exists in ImageMeta with size " << meta.total_voxels()
-           << std::endl;
- throw larbys();
-}
-_meta = meta;
+  if (check) {
+    for (auto const& vox : this->as_vector()) {
+      if (vox.id() < meta.total_voxels()) continue;
+        std::cerr << "VoxelSet contains ID " << vox.id()
+                  << " which cannot exists in ImageMeta with size " << meta.total_voxels()
+                  << std::endl;
+        throw larbys();
+    }
+  }
+  _meta = meta;
 }
 
 // Take this sparseTensor and return it as a dense numpy array
@@ -584,6 +626,7 @@ void init_voxel_core(pybind11::module m){
     voxelset.def("max",            &VS::max);
     voxelset.def("min",            &VS::min);
     voxelset.def("size",           &VS::size);
+    voxelset.def("set",            &VS::set);
     voxelset.def("values",         &VS::values);
     voxelset.def("indexes",        &VS::indexes);
     voxelset.def("clear_data",     &VS::clear_data);
@@ -642,7 +685,7 @@ void init_sparse_tensor(pybind11::module m){
     pybind11::class_<ST, larcv3::VoxelSet> sparsetensor(m, classname.c_str());
     sparsetensor.def(pybind11::init<>());
     sparsetensor.def("meta", (const larcv3::ImageMeta<dimension>& (ST::*)() const )(&ST::meta), pybind11::return_value_policy::reference);
-    sparsetensor.def("meta", (void (ST::*)(const larcv3::ImageMeta<dimension>& )  )(&ST::meta), pybind11::return_value_policy::reference);
+    sparsetensor.def("meta", (void (ST::*)(const larcv3::ImageMeta<dimension>&, bool )  )(&ST::meta), pybind11::arg("meta"), pybind11::arg("check") = true, pybind11::return_value_policy::reference);
     sparsetensor.def("emplace", (void (ST::*)(const larcv3::Voxel &, const bool))(&ST::emplace));
     sparsetensor.def("set",        &ST::set);
     sparsetensor.def("clear_data", &ST::clear_data);

@@ -26,6 +26,9 @@ void wrap_vector(pybind11::module m){
 void init_dataformat(pybind11::module m){
 
     // Wrap vectors of various products:
+
+    wrap_vector<larcv3::EventID>(m);
+
     wrap_vector<larcv3::SparseTensor<2>>(m);
     wrap_vector<larcv3::SparseTensor<3>>(m);
 
@@ -57,4 +60,3 @@ void init_dataformat(pybind11::module m){
     init_eventtensor(m);
     init_iomanager(m);
 }
-

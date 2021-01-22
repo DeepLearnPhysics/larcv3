@@ -748,6 +748,7 @@ void IOManager::read_current_event_id(){
       &(input_event_id)              // void * buf  OUT: Buffer to receive data read from file.
     );
     _event_id = input_event_id;
+
 }
 
 bool IOManager::save_entry() {
@@ -1209,5 +1210,3 @@ void init_iomanager(pybind11::module m){
 
 
 #endif
-
-

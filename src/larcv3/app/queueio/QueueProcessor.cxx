@@ -257,6 +257,8 @@ int omp_thread_count() {
     io_cfg.add_value("OutFileName", "");
     io_cfg.add_value("StoreOnlyType", "[]");
     io_cfg.add_value("StoreOnlyName", "[]");
+    // io_cfg.add_value("UseH5CoreDriver", "true");
+
 
     LARCV_INFO() << "Constructing IO configuration: " << io_cfg_name << std::endl;
 

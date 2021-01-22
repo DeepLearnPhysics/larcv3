@@ -22,7 +22,6 @@ class larcv_writer(object):
              {} -- [description]
         '''
 
-        print(io_config)
 
         self._io = larcv.IOManager(io_config)
 
@@ -72,7 +71,7 @@ class larcv_writer(object):
             data {list} -- list (by projection ID) of dict objects.  dict must have the keys 'index', 'value' and 'meta'
             producer {[type]} -- [description]
         '''
-        _writable_data = larcv.EventSparseTensor2D.to_sparse_tensor(self._io.get_data("sparse2d", producer))
+        _writable_data = self._io.get_data("sparse2d", producer)
 
 
         for projection in range(len(data)):
@@ -84,8 +83,17 @@ class larcv_writer(object):
             meta.set_dimension(0, shape[0], int(shape[0]))
             meta.set_dimension(1, shape[1], int(shape[1]))
 
+            # We need to put in voxels and indexes together.  Argsort handles this:
+            perm = numpy.argsort(index)
+
             # First, copy all of the values into a VoxelSet object:
-            voxel_set = larcv.as_voxelset(value.astype(numpy.float32), index.astype(numpy.uint64))
+            voxel_set = larcv.VoxelSet()
+            voxel_set.set(index[perm], value[perm])
+            # for i in range(len(value)):
+            # _ = [voxel_set.emplace(index[i], value[i], False) for i in range(len(value))]
+
+
+            # larcv.as_voxelset(value.astype(numpy.float32), index.astype(numpy.uint64))
             # Add the voxel set:
             _writable_data.set(voxel_set, meta)
 
@@ -99,7 +107,7 @@ class larcv_writer(object):
         '''
 
 
-        ev_image2d = larcv.EventImage2D.to_image2d(self._io.get_data("image2d", producer))
+        ev_image2d = self._io.get_data("image2d", producer)
 
         for projection_id, image in enumerate(data):
             meta = larcv.ImageMeta2D()
@@ -126,7 +134,7 @@ class larcv_writer(object):
 
         n_classes = len(data)
 
-        ev_tensor = larcv.EventTensor1D.to_tensor(self._io.get_data("tensor1d", producer))
+        ev_tensor = self._io.get_data("tensor1d", producer)
 
         tensor = larcv.as_tensor1d(data)
 
@@ -136,7 +144,7 @@ class larcv_writer(object):
 
 
 
-    def write(self, data, datatype, producer, entries, event_ids):
+    def write(self, data, datatype, producer, entry, event_id):
         '''Write data to file
         
         This function writes data to the output file.  It will check the entries and event ids
@@ -155,11 +163,13 @@ class larcv_writer(object):
         # First, check if the entries recieved for the data match the current entry
         # for the output file:
 
-        # print("Request recieved to write at entry ", entries[0])
+        # print("Request recieved to write at entry ", entry)
         # print("Current entry is ", self._io.current_entry())
+        # print("Current event ID is ", self._io.event_id())
+        # print("Set event ID is ", event_id)
 
-        if self._io.current_entry() != entries[0]:
-            self._seek(entries[0])
+        if self._io.current_entry() != entry:
+            self._seek(entry)
 
         if datatype not in self._write_workers:
             raise Exception("No current support to write datatypes of type " + datatype)

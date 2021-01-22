@@ -112,6 +112,10 @@ class queue_interface(object):
         It will scatter it evenly to the entire comm that is passed in.
         '''
 
+        # Don't coordinate if MPI is finalized:
+        if MPI.Is_finalized():
+            return None
+
         comm_size = comm.Get_size()
 
         if comm.Get_rank() == root_rank:
@@ -225,6 +229,10 @@ class queue_interface(object):
             set_entries = self.coordinate_next_batch_indexes(mode, comm=self._entry_comm)
             # set_entries = self.get_next_batch_indexes(mode, self._minibatch_size[mode])
 
+        # If set entries is still none, escape:
+        if set_entries is None:
+            return
+
         self._queueloaders[mode].set_next_batch(set_entries)
         self._queueloaders[mode].prepare_next()
 
@@ -242,6 +250,10 @@ class queue_interface(object):
         # Return a dictionary object with keys 'image', 'label', and others as needed
         # self._queueloaders['train'].fetch_data(keyword_label).dim() as an example
 
+        # Don't try to pull data if MPI is finalized, since IO is shutdown:
+        if MPI.Is_finalized():
+            return None
+
         if self._count[mode] != 0:
             if self._warning:
                 print("Calling fetch_minibatch_data without calling prepare_next. This will not give new data.")
@@ -251,7 +263,7 @@ class queue_interface(object):
         if pop:
             # This function will pop the data
             while self._queueloaders[mode].is_reading():
-                time.sleep(0.001)
+                time.sleep(0.01)
             self._queueloaders[mode].pop_current_data()
         else:
             if self._warning:

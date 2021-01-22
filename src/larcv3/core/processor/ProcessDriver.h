@@ -82,8 +82,8 @@ namespace larcv3 {
     // Information access methods
     //
     /// Returns larcv3::EventBase object that contains an "ID" (run/event integers)
-    inline const EventID& event_id() const
-    { return ( _io.io_mode() == larcv3::IOManager::kREAD ? _io.event_id() : _io.last_event_id()); }
+    inline const EventID& event_id() const { return _io.event_id(); }
+
     /// Returns a unique ID (integer) assigned for a process module (provide the module's name in argument)
     ProcessID_t process_id(std::string name) const;
     /// Returns the set of process modules' name
