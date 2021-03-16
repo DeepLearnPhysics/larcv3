@@ -112,10 +112,7 @@ namespace larcv3 {
       return * std::dynamic_pointer_cast<T> (ptr);
     }
 
-    const EventID& event_id() const {
-        if (_set_event_id.valid() ) return _set_event_id;
-        return _event_id ;
-     }
+    const EventID& event_id() const;
 
     const EventID& last_event_id() const { return _last_event_id; }
 

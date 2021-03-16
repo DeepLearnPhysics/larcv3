@@ -82,6 +82,11 @@ void IOManager::add_in_file(const std::string filename,
   _in_dir_v.push_back(dirname);
 }
 
+const EventID& IOManager::event_id() const {
+  if (_set_event_id.valid() ) return _set_event_id;
+  return _event_id ;
+}
+
 void IOManager::clear_in_file() { _in_file_v.clear(); }
 
 void IOManager::set_core_driver(const bool opt) { _h5_core_driver = opt; }
