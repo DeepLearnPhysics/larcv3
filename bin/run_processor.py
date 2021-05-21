@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sys,os,argparse
-from larcv import larcv
+import larcv
 
 # This script is a simplification of run_processordb but without the proddb dependence.
 # It incorporates command line arguments but runs stand-alone with just larcv.
@@ -48,12 +48,7 @@ if args.larcv_fout != '':
 
 proc.override_ana_file(args.ana_fout)
 
-flist = larcv.VectorOfString()
-for f in args.larcv_fin:
-    print(f)
-    flist.push_back(f)
-
-proc.override_input_file(flist)
+proc.override_input_file(args.larcv_fin)
 
 proc.initialize()
 
