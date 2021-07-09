@@ -79,7 +79,7 @@ namespace larcv3 {
 
 
     // Return true only if the fillers are preparing the next batch
-    bool is_reading() const {return _processing;}
+    bool is_reading() const;
 
     // Get number of entries possible to read
     size_t get_n_entries() const;

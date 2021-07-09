@@ -153,15 +153,13 @@ class queue_interface(object):
         # start = time.time()
         # print(self._queueloaders[mode].is_reading())
         self.prepare_next(mode)
-        # print(self._queueloaders[mode].is_reading())
         # end = time.time()
 
-        # print(end - start)
         # Then, we promote those entries to the "current" batch:
         while self._queueloaders[mode].is_reading():
-            # print(self._queueloaders[mode].is_reading())
-            time.sleep(0.01)
+            time.sleep(0.05)
 
+        status = self._queueloaders[mode].is_reading()
         io.pop_current_data()
         io.next(store_entries=True,store_event_ids=True)
 
@@ -400,7 +398,36 @@ class larcv_queueio (object):
         self._proc.prepare_next()
 
     def is_reading(self,storage_id=None):
-        return self._proc.is_reading()
+
+        ready = True
+
+
+        # if any storage items are not ready, it's still reading
+        for name,storage in self._storage.items():
+            dtype = storage.dtype()
+            if dtype == "float32":
+                factory = larcv.BatchDataQueueFactoryFloat.get()
+            elif dtype == "float64":
+                factory = larcv.BatchDataQueueFactoryDouble.get()
+            elif dtype == "int":
+                factory = larcv.BatchDataQueueFactoryInt.get()
+            # These here below are NOT yet wrapped with swig.  Submit a ticket if you need them!
+            # elif dtype == "char":
+            #    factory = larcv.BatchDataQueueFactoryDouble.get()
+            # elif dtype == "short":
+            #    factory = larcv.BatchDataQueueFactoryDouble.get()
+            # elif dtype == "string":
+            #    factory = larcv.BatchDataQueueFactoryDouble.get()
+            else:
+                factory = None
+            batch_storage = factory.get_queue(name)
+
+
+            ready = ready and batch_storage.is_next_ready()
+
+        ready =  (ready) and not self._proc.is_reading()
+
+        return not ready
 
     def pop_current_data(self):
         # Promote the "next" data to current in C++ and release current
