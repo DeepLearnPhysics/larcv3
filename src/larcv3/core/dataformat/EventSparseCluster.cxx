@@ -19,7 +19,6 @@
 
 namespace larcv3 {
 
-  /// Global larcv3::EventClusterPixel2DFactory to register EventSparseCluster
   static EventSparseCluster2DFactory __global_EventSparseCluster2DFactory__;
   static EventSparseCluster3DFactory __global_EventSparseCluster3DFactory__;
 

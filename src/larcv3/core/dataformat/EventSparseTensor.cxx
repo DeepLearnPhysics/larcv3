@@ -18,7 +18,6 @@
 
 namespace larcv3 {
 
-  /// Global larcv3::EventSparseTensorFactory to register EventSparseTensor
   static EventSparseTensorFactory<2> __global_EventSparseTensor2DFactory__;
   static EventSparseTensorFactory<3> __global_EventSparseTensor3DFactory__;
 
@@ -283,7 +282,7 @@ namespace larcv3 {
 
        _open_in_datasets[VOXELS_DATASET]          = H5Dopen(group, "voxels", H5P_DEFAULT);
        _open_in_dataspaces[VOXELS_DATASET]        = H5Dget_space(_open_in_datasets[VOXELS_DATASET]);
-;
+
      }
 
     return;

@@ -16,7 +16,6 @@
 
 namespace larcv3 {
 
-  /// Global larcv3::SBClusterFactory to register ClusterAlgoFactory
   static EventTensorFactory<1> __global_EventTensor1DFactory__;
   static EventTensorFactory<2> __global_EventTensor2DFactory__;
   static EventTensorFactory<3> __global_EventTensor3DFactory__;
@@ -316,13 +315,13 @@ namespace larcv3 {
 
         // Create the extents dataset:
         H5Dcreate(
-          group,                           // hid_t loc_id  IN: Location identifier
+          group,                       // hid_t loc_id  IN: Location identifier
           "images",                    // const char *name      IN: Dataset name
           _data_types[IMAGES_DATASET], // hid_t dtype_id  IN: Datatype identifier
-          image_dataspace,            // hid_t space_id  IN: Dataspace identifier
-          lcpl,                            // hid_t lcpl_id IN: Link creation property list
-          image_cparms,               // hid_t dcpl_id IN: Dataset creation property list
-          dapl                             // hid_t dapl_id IN: Dataset access property list
+          image_dataspace,             // hid_t space_id  IN: Dataspace identifier
+          lcpl,                        // hid_t lcpl_id IN: Link creation property list
+          image_cparms,                // hid_t dcpl_id IN: Dataset creation property list
+          dapl                         // hid_t dapl_id IN: Dataset access property list
         );
 
 

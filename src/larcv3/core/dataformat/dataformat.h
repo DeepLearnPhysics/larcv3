@@ -24,6 +24,7 @@
 #include "EventSparseCluster.h"
 #include "EventSparseTensor.h"
 #include "EventTensor.h"
+#include "EventBBox.h"
 #include "ImageMeta.h"
 #include "IOManager.h"
 #include "Particle.h"

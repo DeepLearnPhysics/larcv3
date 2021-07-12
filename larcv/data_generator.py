@@ -404,3 +404,104 @@ def read_particles(tempfile, use_core_driver=False):
         read_events += 1
 
     return read_events
+
+
+def create_bbox_list(rand_num_events, n_projections, dimension):
+
+    bbox_list = []
+
+    for i_event in range(rand_num_events):
+        bbox_list.append([])
+        for i_projection in range(n_projections):
+            n_bboxes = i_event + i_projection + 1
+
+
+            bbox_list[i_event].append([])
+            for i_box in range(n_bboxes):
+                bbox_list[i_event][i_projection].append({
+                    'centroid':    [ random.uniform(-1e4, 1e4) for d in range(dimension)],
+                    'half_length': [ random.uniform(1., 1e4) for d in range(dimension)],
+                    })
+
+    return bbox_list
+
+
+
+def write_bboxes(tempfile, bbox_list, dimension, n_projections):
+
+    io_manager = larcv.IOManager(larcv.IOManager.kWRITE)
+    io_manager.set_out_file(tempfile)
+    io_manager.initialize()
+
+
+    if dimension == 2:            
+        box_constructor = larcv.BBox2D
+        collection_constructor = larcv.BBoxCollection2D
+        datatype = "bbox2d"
+    elif dimension == 3:
+        box_constructor = larcv.BBox3D
+        collection_constructor = larcv.BBoxCollection3D
+        datatype = "bbox3d"       
+    else:
+        raise Exception("Can't get bbox of dimension ", dimension)
+
+    n_events = len(bbox_list)
+
+    for i_evt in range(n_events):
+        io_manager.set_id(1001, 0, i_evt)
+        
+        ev_bbox = io_manager.get_data(datatype,"test")
+
+        for i_projection in range(n_projections):
+            n_bboxes = len(bbox_list[i_evt][i_projection])
+
+            bbox_collection = collection_constructor()
+
+            for j in range(n_bboxes):
+                bbox = box_constructor(
+                    centroid    = bbox_list[i_evt][i_projection][j]["centroid"],
+                    half_length = bbox_list[i_evt][i_projection][j]["half_length"]
+                )
+
+
+                bbox_collection.append(bbox)
+        
+            # Add the whole collection:
+            ev_bbox.append(bbox_collection)
+
+
+        io_manager.save_entry()
+
+
+    assert(io_manager.get_n_entries_out() == n_events)
+
+    io_manager.finalize()
+
+    return
+ 
+def read_bboxes(tempfile, dimension, use_core_driver=False):
+
+    io_manager = larcv.IOManager(larcv.IOManager.kREAD)
+    if use_core_driver: 
+        io_manager.set_core_driver()
+    io_manager.add_in_file(tempfile)
+    io_manager.initialize()
+
+    if dimension == 2:
+        product = "bbox2d"
+    elif dimension == 3:
+        product = "bbox3d"
+    else:
+        raise Exception("Can't read bbox of dimension ", dimension)
+
+    bbox_list = []
+    for i in range(io_manager.get_n_entries()):
+        io_manager.read_entry(i)
+        # print(io_manager.current_entry())
+        event_id = io_manager.event_id()
+        data = io_manager.get_data(product, 'test')
+        collection = [data.at(i) for i in range(data.size())]
+
+        bbox_list.append(collection)
+
+    return bbox_list
