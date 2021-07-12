@@ -10,7 +10,7 @@ You can install larcv through pypi: `pip install larcv` and it should work.  You
 
 ```bash
 git clone https://github.com/DeepLearnPhysics/larcv3.git
-cd larcv
+cd larcv3
 git submodule update --init  # Pulls pybind11 subpackage
 python setup.py build [-j 12] # Optional parallel build for faster compilation
 python setup.py install [--user | -prefix ${INSTALLATION_DIR} ] 

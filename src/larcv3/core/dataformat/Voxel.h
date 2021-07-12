@@ -334,9 +334,10 @@ namespace larcv3 {
     /// Access ImageMeta of specific projection
     inline const larcv3::ImageMeta<dimension>& meta() const { return _meta; }
 
-
+#ifdef LARCV_INTERNAL
     // Take this sparseTensor and return it as a dense numpy array
     pybind11::array_t<float> dense();
+#endif
 
     larcv3::Tensor<dimension> to_tensor();
 
