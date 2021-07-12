@@ -165,7 +165,7 @@ class ImageMeta {
   // }
 
   inline size_t cols() const {return _number_of_voxels[0];}
-  inline size_t rows() const {return _number_of_voxels[1];}
+  size_t rows() const;
 
   // inline void update(size_t row_count, size_t col_count) {
   //   _row_count = row_count;

@@ -61,6 +61,12 @@ void IOManager::add_in_file(const std::string filename) {
 
 void IOManager::clear_in_file() { config["Input"]["InputFiles"] = std::vector<std::string>(); }
 
+const EventID& IOManager::event_id() const {
+  if (_set_event_id.valid() ) return _set_event_id;
+  return _event_id ;
+}
+
+
 void IOManager::set_core_driver(const bool opt) { config["UseH5CoreDriver"] = opt; }
 
 void IOManager::set_out_file(const std::string name) { config["Output"]["OutFileName"] = name; }
@@ -74,13 +80,6 @@ std::string IOManager::product_type(const size_t id) const {
   return _product_type_v[id];
 }
 
-const EventID & IOManager::event_id() const{
-  LARCV_DEBUG() << "Set id valid? " << _set_event_id.valid() << std::endl;
-  LARCV_DEBUG() << "_set_event_id: " << _set_event_id.event_key() << std::endl;
-  LARCV_DEBUG() << "_event_id: " << _event_id.event_key() << std::endl;
-  if (_set_event_id.valid() ) return _set_event_id;
-    return _event_id ;
-}
 
 
 void IOManager::configure(const json& cfg) {

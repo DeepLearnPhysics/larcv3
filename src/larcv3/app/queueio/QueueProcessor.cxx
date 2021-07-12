@@ -104,6 +104,9 @@ int omp_thread_count() {
     }
   }
 
+  bool QueueProcessor::is_reading() const {
+    return !(_preparation_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready);
+  }
 
   void QueueProcessor::reset()
   {

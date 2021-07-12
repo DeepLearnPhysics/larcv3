@@ -195,7 +195,6 @@ namespace larcv3 {
       dapl                          // hid_t dapl_id IN: Dataset access property list
     );
 
-    std::cout << "Created extents " << std::endl;
     /////////////////////////////////////////////////////////
     // Create the image_extents dataset
     /////////////////////////////////////////////////////////
@@ -227,7 +226,6 @@ namespace larcv3 {
       image_extents_cparms,               // hid_t dcpl_id IN: Dataset creation property list
       dapl                                // hid_t dapl_id IN: Dataset access property list
     );
-    std::cout << "Created image extents " << std::endl;
 
     /////////////////////////////////////////////////////////
     // Create the image_meta dataset
@@ -266,7 +264,6 @@ namespace larcv3 {
 
     _compression = compression;
 
-    std::cout << "Initialized" << std::endl;
 
     return;
   }
@@ -281,6 +278,7 @@ namespace larcv3 {
     // Create the Image dataset
     /////////////////////////////////////////////////////////
     // if ( ! group -> nameExists("images")){
+
     if (  get_num_objects(group) != 4){
         // std::cout << "Images dataset does not yet exist, creating it." << std::endl;
         // An image is stored as a flat vector, so it's type is float.
@@ -299,6 +297,8 @@ namespace larcv3 {
         for (auto & image : _image_v){
             chunk_size += image.size();
         }
+
+
 
         /*
          * Modify dataset creation properties, i.e. enable chunking.
@@ -328,8 +328,8 @@ namespace larcv3 {
 
     }
 
-    open_out_datasets(group);
 
+    open_out_datasets(group);
 
     // Serialization of images proceeds as:
     // 1) Read the current dimensions of all tables (extents, image_extents, image_meta, images)

@@ -119,6 +119,8 @@ if(CMAKE_PYTHON_BINDINGS)
   add_subdirectory(pybind11)
   include_directories(${PYBIND11_INCLUDE_DIR})
   
+  set(pybind11_DIR pybind11)
+
   # GIves bindings between json and python
   add_subdirectory(pybind11_json)
   include_directories(pybind11_json/include)

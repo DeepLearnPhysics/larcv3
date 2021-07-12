@@ -573,6 +573,11 @@ bool ImageMeta<dimension>::is_valid() const {
 
 }
 
+template<size_t dimension>
+size_t ImageMeta<dimension>::rows() const {
+  if (dimension > 1) return _number_of_voxels[1];
+  else throw larbys("Can't return rows of size 1 meta.");
+}
 
 
 template<size_t dimension>
