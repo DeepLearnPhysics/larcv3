@@ -33,7 +33,7 @@ namespace larcv3 {
     /// Default destructor
     ~Threshold(){}
 
-    void configure(const PSet&);
+    void configure(const json&);
 
     void initialize();
 
@@ -46,25 +46,29 @@ namespace larcv3 {
           {"Producer", std::string()},
           {"Product", std::string()},
           {"OutputProducer", std::string()},
-          {"Threshold", 0.0},
-        }
+          {"Threshold", std::vector<float>() = {0.0}},
+        };
         return c;
     }
 
   private:
 
-    void configure_labels(const PSet&);
-
     json config;
     
-    // List of input producers:
-    std::vector<std::string> _input_producer_v;
-    // List of input datatypes:
-    std::vector<std::string> _input_product_v;
-    // List of output producers:
-    std::vector<std::string> _output_producer_v;
-    // List of thresholds per projection ID (or one global threshold for all)
-    std::vector<float>       _thresholds_v;
+    template <class dataproduct>
+    bool process_dense_product(
+        IOManager& mgr,
+        std::string producer, 
+        std::string output_producer,
+        const std::vector<float>& threshold);
+
+    template <class dataproduct>
+    bool process_sparse_product(
+        IOManager& mgr,
+        std::string producer, 
+        std::string output_producer,
+        const std::vector<float>& threshold);
+
   };
 
   /**

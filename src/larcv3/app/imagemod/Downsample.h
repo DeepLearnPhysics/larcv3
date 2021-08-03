@@ -49,17 +49,25 @@ namespace larcv3 {
           {"OutputProducer", std::string()},
           {"Downsample", 0},
           {"PoolType", kPoolAverage},
-        }
+        };
         return c;
     }
 
 
   private:
 
+    template< class dataproduct>
+    bool process_data_product(
+        IOManager& mgr,
+        std::string producer, 
+        std::string output_producer,
+        int downsample,
+        PoolType_t pool);
+
     json config;
 
-
   };
+
 
   /**
      \class larcv3::ThresholdFactory
@@ -75,14 +83,18 @@ namespace larcv3 {
     ProcessBase* create(const std::string instance_name) { return new Downsample(instance_name); }
   };
 
-  #ifdef LARCV_INTERNAL
-  #include <pybind11/pybind11.h>
-  void init_downsample(pybind11::module m);
-  #endif
-
 }
+
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
+void init_downsample(pybind11::module m);
+#endif
+
 
 #endif
 /** @} */ // end of doxygen group
+
+
+
 
   

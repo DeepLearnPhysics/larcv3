@@ -8,14 +8,14 @@
 
 namespace larcv3 {
 
-static DownsampleProcessFactory
-    __global_DownsampleProcessFactory__;
+static DownsampleProcessFactory __global_DownsampleProcessFactory__;
 
-
+ 
 Downsample::Downsample(const std::string name)
     : ProcessBase(name) {}
 
 
+ 
 void Downsample::configure(const json& cfg) {
 
   config = this -> default_config();
@@ -23,8 +23,10 @@ void Downsample::configure(const json& cfg) {
 
 }
 
+ 
 void Downsample::initialize() {}
 
+ 
 bool Downsample::process(IOManager& mgr) {
 
   //We apply thresholding for each projection id.
@@ -38,100 +40,71 @@ bool Downsample::process(IOManager& mgr) {
   auto const& downsample      = config["Downsample"].get<int>();
 
 
-    // The VoxelSet and VoxelSetArray both have thresholding functions.
-
-    // It is annoying, but it still has to be split:
-
-    if (product == "sparse2d"){
-      auto const & ev_input  = mgr.get_data<larcv3::EventSparseTensor2D>(producer);
-      auto       & ev_output = mgr.get_data<larcv3::EventSparseTensor2D>(output_producer);
-
-      for (size_t i = 0; i < ev_input.as_vector().size(); i ++ ){
-        auto const & sparse_object = ev_input.sparse_tensor(i);
-        SparseTensor2D compressed = sparse_object.compress(downsample, larcv3::PoolType_t(pool));
-        ev_output.emplace(std::move(compressed));
-      }
-    }
-    else if (product == "sparse3d"){
-      auto const & ev_input  = mgr.get_data<larcv3::EventSparseTensor3D>(producer);
-      auto       & ev_output = mgr.get_data<larcv3::EventSparseTensor3D>(output_producer);
-
-      for (size_t i = 0; i < ev_input.as_vector().size(); i ++ ){
-        auto sparse_object = ev_input.as_vector().at(i);
-        SparseTensor3D compressed = sparse_object.compress(downsample, larcv3::PoolType_t(pool));
-        ev_output.emplace(std::move(compressed));
-
-      }
-    }
-    else if (product == "tensor1d"){
-      auto const & ev_input  = mgr.get_data<larcv3::EventTensor1D>(producer);
-      auto       & ev_output = mgr.get_data<larcv3::EventTensor1D>(output_producer);
-
-      for (size_t i = 0; i < ev_input.as_vector().size(); i ++ ){
-        auto object = ev_input.as_vector().at(i);
-        Tensor1D compressed = object.compress(downsample, larcv3::PoolType_t(pool));
-        ev_output.emplace(std::move(compressed));
-      }
-    }
-    else if (product == "tensor2d"){
-      auto const & ev_input  = mgr.get_data<larcv3::EventTensor2D>(producer);
-      auto       & ev_output = mgr.get_data<larcv3::EventTensor2D>(output_producer);
-
-      for (size_t i = 0; i < ev_input.as_vector().size(); i ++ ){
-        auto object = ev_input.as_vector().at(i);
-        Tensor2D compressed = object.compress(downsample, larcv3::PoolType_t(pool));
-        ev_output.emplace(std::move(compressed));
-      }
-    }
-    else if (product == "tensor3d"){
-      auto const & ev_input  = mgr.get_data<larcv3::EventTensor3D>(producer);
-      auto       & ev_output = mgr.get_data<larcv3::EventTensor3D>(output_producer);
-
-      for (size_t i = 0; i < ev_input.as_vector().size(); i ++ ){
-        auto object = ev_input.as_vector().at(i);
-        Tensor3D compressed = object.compress(downsample, larcv3::PoolType_t(pool));
-        ev_output.emplace(std::move(compressed));
-      }
-    }
-    else if (product == "tensor4d"){
-      auto const & ev_input  = mgr.get_data<larcv3::EventTensor4D>(producer);
-      auto       & ev_output = mgr.get_data<larcv3::EventTensor4D>(output_producer);
-
-      for (size_t i = 0; i < ev_input.as_vector().size(); i ++ ){
-        auto object = ev_input.as_vector().at(i);
-        Tensor4D compressed = object.compress(downsample, larcv3::PoolType_t(pool));
-        ev_output.emplace(std::move(compressed));
-      }
-    }
-    else{
-      LARCV_CRITICAL() << "Can't apply downsampling to product " << product << std::endl;
-      throw larbys();
-    }
+  if (product == "sparse2d") 
+    process_data_product<larcv3::EventSparseTensor2D>(mgr, producer, output_producer, downsample, pool);
+  else if (product == "sparse3d")
+    process_data_product<larcv3::EventSparseTensor3D>(mgr, producer, output_producer, downsample, pool);
+  else if (product == "tensor1d")
+    process_data_product<larcv3::EventTensor1D>(mgr, producer, output_producer, downsample, pool);
+  else if (product == "tensor2d")
+    process_data_product<larcv3::EventTensor2D>(mgr, producer, output_producer, downsample, pool);
+  else if (product == "tensor3d")
+    process_data_product<larcv3::EventTensor3D>(mgr, producer, output_producer, downsample, pool);
+  else if (product == "tensor4d")
+    process_data_product<larcv3::EventTensor4D>(mgr, producer, output_producer, downsample, pool);
+  else{
+    LARCV_CRITICAL() << "Can't apply downsampling to product " << product << std::endl;
+    throw larbys();
   }
-  // std::cout << "Exit Downsample::process " << std::endl;
 
   return true;
 }
 
+template< class dataproduct>
+bool Downsample::process_data_product(IOManager& mgr, std::string producer, 
+                                      std::string output_producer,
+                                      int downsample, PoolType_t pool){
+
+  auto const & ev_input  = mgr.template get_data<dataproduct>(producer);
+  auto       & ev_output = mgr.template get_data<dataproduct>(output_producer);
+
+  for (size_t i = 0; i < ev_input.as_vector().size(); i ++ ){
+    auto object = ev_input.as_vector().at(i);
+    auto compressed = object.compress(downsample, larcv3::PoolType_t(pool));
+    ev_output.emplace(std::move(compressed));
+  }
+
+  return true;
+}
+
+
+ 
 void Downsample::finalize() {}
+
+} //namespace larcv3
 
 
 #include <pybind11/stl.h>
 
+
+
 void init_downsample(pybind11::module m){
 
-  using Class = larcv3::Downsample;
-  pybind11::class_<Class> queueproc(m, "Downsample");
 
-  queueproc.def(pybind11::init<std::string>(),
+  using Class = larcv3::Downsample;
+  pybind11::class_<Class> downsample(m, "Downsample");
+  // pybind11::class_<Class, std::shared_ptr<Class>> ev_sparse_tensor(m, classname.c_str());
+
+  downsample.def(pybind11::init<std::string>(),
     pybind11::arg("name") = "Downsample");
 
-  queueproc.def("default_config", &Class::default_config);
-
-
-
+  downsample.def("default_config", &Class::default_config);
 }
 
-
-}
 #endif
+
+
+
+
+
+
