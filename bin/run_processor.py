@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys,os,argparse
 import larcv
+import json
 
 # This script is a simplification of run_processordb but without the proddb dependence.
 # It incorporates command line arguments but runs stand-alone with just larcv.
@@ -9,7 +10,7 @@ parser = argparse.ArgumentParser(description='LArCV ProcessDriver execution scri
 
 parser.add_argument('-c','--config',
                     type=str, dest='cfg',
-                    help='string, Config file',required=True)
+                    help='string, Config file or json text',required=True)
 
 parser.add_argument('-il','--input-larcv',required=True,
                     dest='larcv_fin',nargs='+',
@@ -41,12 +42,29 @@ if len(args.larcv_fin) == 0:
 
 proc = larcv.ProcessDriver('ProcessDriver')
 
-proc.configure(args.cfg)
+print(args)
+
+# Read the config, if present.  
+if "cfg" in args:
+    # Could be a file:
+    if os.path.exists(args.cfg):
+        # Read it in as json:
+        with open(args.cfg) as config_file:
+            conf = json.load(config_file)
+    else:
+        # REad it directly from string:
+        conf = joson.loads(args.cfg)
+
+    print(conf)
+
+    proc.configure(conf)
+
+print(json.dumps(proc.config(), indent=4))
+
 
 if args.larcv_fout != '':
     proc.override_output_file(args.larcv_fout)
 
-proc.override_ana_file(args.ana_fout)
 
 proc.override_input_file(args.larcv_fin)
 
