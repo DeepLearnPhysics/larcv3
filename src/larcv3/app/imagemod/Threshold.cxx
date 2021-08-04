@@ -143,4 +143,23 @@ void Threshold::finalize() {}
 
 }
 
+
+#include <pybind11/stl.h>
+
+
+
+void init_threshold(pybind11::module m){
+
+
+  using Class = larcv3::Threshold;
+  pybind11::class_<Class> threshold(m, "Threshold");
+  // pybind11::class_<Class, std::shared_ptr<Class>> ev_sparse_tensor(m, classname.c_str());
+
+  threshold.def(pybind11::init<std::string>(),
+    pybind11::arg("name") = "Threshold");
+
+  threshold.def("default_config", &Class::default_config);
+}
+
+
 #endif

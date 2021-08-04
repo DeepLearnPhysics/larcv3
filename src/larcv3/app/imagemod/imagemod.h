@@ -16,7 +16,6 @@
 #define __LARCV3IMAGEMOD_IMAGEMOD_H__
 
 
-#include "Downsample.h"
 
 #ifndef LARCV_NO_PYBIND
 #ifdef LARCV_INTERNAL

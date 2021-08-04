@@ -54,7 +54,7 @@ namespace larcv3 {
   private:
 
     json config;
-    
+
     template <class dataproduct>
     bool process_dense_product(
         IOManager& mgr,
@@ -86,6 +86,11 @@ namespace larcv3 {
   };
 
 }
+
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
+void init_threshold(pybind11::module m);
+#endif
 
 #endif
 /** @} */ // end of doxygen group

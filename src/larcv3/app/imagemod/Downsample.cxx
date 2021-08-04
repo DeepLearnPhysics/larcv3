@@ -21,6 +21,25 @@ void Downsample::configure(const json& cfg) {
   config = this -> default_config();
   config = augment_default_config(config, cfg);
 
+  // We're really just verifying that everything is a filled
+  auto const& producer        = config["Producer"].get<std::string>();
+  auto const& product         = config["Product"].get<std::string>();
+  auto const& output_producer = config["OutputProducer"].get<std::string>();
+
+  if (producer.empty()) {
+    LARCV_CRITICAL() << "Must specify a producer" << std::endl;
+    throw larbys();
+  }
+  if (product.empty()) {
+    LARCV_CRITICAL() << "Must specify a Product" << std::endl;
+    throw larbys();
+  }
+  if (output_producer.empty()) {
+    LARCV_CRITICAL() << "Must specify an OutputProducer" << std::endl;
+    throw larbys();
+  }
+
+
 }
 
  

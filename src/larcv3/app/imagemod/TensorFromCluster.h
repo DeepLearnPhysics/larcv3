@@ -5,7 +5,7 @@
  *
  * \brief Class def header for a class TensorFromCluster
  *
- * @author kazuhiro, cadams
+ * @author cadams
  */
 
 /** \addtogroup ImageMod
@@ -24,7 +24,6 @@ namespace larcv3 {
      User defined class TensorFromCluster ... these comments are used to generate
      doxygen documentation!
   */
-  template<size_t dimension> 
   class TensorFromCluster : public ProcessBase {
 
   public:
@@ -35,7 +34,7 @@ namespace larcv3 {
     /// Default destructor
     ~TensorFromCluster(){}
 
-    void configure(const PSet&);
+    void configure(const json&);
 
     void initialize();
 
@@ -43,21 +42,23 @@ namespace larcv3 {
 
     void finalize();
 
+    static json default_config(){
+        json c = {
+          {"Producer", std::string()},
+          {"Product",  std::string()},
+          {"OutputProducer", std::string()},
+        };
+        return c;
+    }
+
   private:
 
-    void configure_labels(const PSet& cfg);
+    json config;
 
-    enum class PIType_t {
-      kPITypeFixedPI,
-      kPITypeInputVoxel,
-      kPITypeClusterIndex,
-      kPITypeUndefined
-    };
 
-    std::vector<std::string> _cluster_producer_v;
-    std::vector<std::string> _output_producer_v;
-    std::vector<unsigned short> _pi_type_v;
-    std::vector<float> _fixed_pi_v;
+    template<class dataproduct_in, class dataproduct_out>
+    bool merge_clusters(IOManager& mgr, std::string producer, std::string output_producer);
+
   };
 
   /**
@@ -66,28 +67,23 @@ namespace larcv3 {
   */
 
 
-  class TensorFromCluster2DProcessFactory : public ProcessFactoryBase {
+  class TensorFromClusterProcessFactory : public ProcessFactoryBase {
   public:
     /// ctor
-    TensorFromCluster2DProcessFactory() { ProcessFactory::get().add_factory("TensorFromCluster2D",this); }
+    TensorFromClusterProcessFactory() { ProcessFactory::get().add_factory("TensorFromCluster",this); }
     /// dtor
-    ~TensorFromCluster2DProcessFactory() {}
+    ~TensorFromClusterProcessFactory() {}
     /// creation method
-    ProcessBase* create(const std::string instance_name) { return new TensorFromCluster<2>(instance_name); }
-  };
-
-  class TensorFromCluster3DProcessFactory : public ProcessFactoryBase {
-  public:
-    /// ctor
-    TensorFromCluster3DProcessFactory() { ProcessFactory::get().add_factory("TensorFromCluster3D",this); }
-    /// dtor
-    ~TensorFromCluster3DProcessFactory() {}
-    /// creation method
-    ProcessBase* create(const std::string instance_name) { return new TensorFromCluster<3>(instance_name); }
+    ProcessBase* create(const std::string instance_name) { return new TensorFromCluster(instance_name); }
   };
 
 
 }
+
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
+void init_tensor_from_cluster(pybind11::module m);
+#endif
 
 #endif
 /** @} */ // end of doxygen group
