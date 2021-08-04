@@ -37,7 +37,7 @@ namespace larcv3 {
     /// Default destructor
     ~BatchFillerBBox(){}
 
-    void configure(const PSet&);
+    void configure(const json&);
 
     void initialize();
 
@@ -45,6 +45,15 @@ namespace larcv3 {
 
     void finalize();
 
+    static json default_config(){
+      json c = {
+        {"BBoxProducer", std::string()},
+        {"MaxBoxes", 25},
+        {"UnfilledBoxValue", 0.0},
+        {"Channels", std::vector<int>()},
+      };
+      return c;
+    }
   protected:
 
     void _batch_begin_();
@@ -55,15 +64,14 @@ namespace larcv3 {
     size_t set_data_size(const EventBBox<dimension>& image_data);
     int _check_projection(const int & projection_id);
 
-    std::string _bbox_producer;
-    size_t _max_boxes;
-    float _unfilled_box_value;
-    std::vector<size_t> _slice_v;
+    // std::string _bbox_producer;
+    // size_t _max_boxes;
+    // float _unfilled_box_value;
+    // std::vector<size_t> _slice_v;
 
-
+    json config;
 
     std::vector<float>  _entry_data;
-    size_t _num_channels;
   };
 
   typedef BatchFillerBBox<2>  BatchFillerBBox2D;

@@ -18,16 +18,15 @@ namespace larcv3 {
       : BatchFillerTemplate<float>(name) {}
 
   template<size_t dimension>
-  void BatchFillerBBox<dimension>::configure(const PSet& cfg) {
+  void BatchFillerBBox<dimension>::configure(const json& cfg) {
+    
+    config = this -> default_config();
+    config = augment_default_config(config, cfg);
 
 
     LARCV_DEBUG() << "start" << std::endl;
-    _bbox_producer = cfg.get<std::string>("BBoxProducer");
-
-
-    _max_boxes = cfg.get<float>("MaxBoxes", 0);
-    _unfilled_box_value = cfg.get<float>("UnfilledBoxValue", 0.0);
-    _slice_v = cfg.get<std::vector<size_t> >("Channels", _slice_v);
+    int _max_boxes               = config["MaxBoxes"].template get<int>();
+    std::vector<size_t> _slice_v = config["Channels"].template get<std::vector<size_t>>();
 
     if (_max_boxes == 0){
       LARCV_CRITICAL() << "Maximum number of voxels must be non zero!" << std::endl;
@@ -71,6 +70,7 @@ namespace larcv3 {
     if (dimension == 3) {
       return 0;
     }
+    auto _slice_v            = config["Channels"].template         get<std::vector<size_t>>();
 
     bool found = false;
     int count = 0;
@@ -100,6 +100,10 @@ namespace larcv3 {
     [batch_size][num_channels][max_boxes][2*dimension]
     the [2] represents first the centroid, then the extents (half lengths)
     */
+    auto _bbox_producer      = config["ParticleProducer"].template get<std::string>();
+    auto _unfilled_box_value = config["UnfilledBoxValue"].template get<float>();
+    auto _max_boxes          = config["MaxBoxes"].template         get<int>();
+    auto _slice_v            = config["Channels"].template         get<std::vector<size_t>>();
 
 
     LARCV_DEBUG() << "start" << std::endl;
@@ -112,7 +116,7 @@ namespace larcv3 {
     //   throw larbys();
     // }
 
-    _num_channels = dimension == 2 ? _slice_v.size() : 1;
+    int _num_channels = dimension == 2 ? _slice_v.size() : 1;
 
     std::vector<int> dim;
     dim.resize(4);

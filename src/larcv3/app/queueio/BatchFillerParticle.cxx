@@ -39,8 +39,6 @@ namespace larcv3 {
       throw larbys();
     }
     // class
-    size_t label = kINVALID_SIZE;
-    int pdg = 0;
 
     _entry_data.resize(1);
     _entry_data.at(0) = part_v.front();
