@@ -80,8 +80,9 @@ void ProcessDriver::configure(const json& cfg) {
   // Grab the default config:
   config = this->default_config();
 
-  // Use the base class function to update the config:
+
   config = augment_default_config(config, cfg);
+
 
 
   // Set the verbosity up front: 
@@ -441,8 +442,11 @@ void init_processdriver(pybind11::module m){
                     pybind11::arg("name")   = "ProcessDriver");
 
 
-    processdriver.def("configure", 
-      (void (Class::*)( const json& cfg))(    &Class::configure));
+    // processdriver.def("configure",            &Class::configure);
+
+    processdriver.def("configure",            &Class::configure);
+    processdriver.def("config",               &Class::get_config);
+    processdriver.def("get_config",           &Class::get_config);
 
     processdriver.def("override_input_file",  &Class::override_input_file);
     processdriver.def("override_output_file", &Class::override_output_file);

@@ -40,6 +40,10 @@ namespace larcv3 {
     //
     /// Configure itself (mainly larcv3::IOManager) and also attached process modules.
     void configure(const json& cfg);
+
+    /// Get the current configuration
+    const json & get_config() const {return config;}
+
     /// When needs to override the list of input files from what's specified in the configuration
     void override_input_file(const std::vector<std::string>& flist);
     /// When needs to override the name of output data file from what's specified in the configuration

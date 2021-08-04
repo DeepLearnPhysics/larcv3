@@ -67,7 +67,7 @@ namespace larcv3 {
     };
     
   protected:    
-    json augment_default_config(json default_config, json user_config);
+    json augment_default_config(const json& default_config, const json& user_config);
 
   private:
 

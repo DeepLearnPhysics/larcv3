@@ -1,6 +1,7 @@
 #include "larcv_base.h"
+#include <iomanip>
 
-json larcv3::larcv_base::augment_default_config(json default_config, json user_config){
+json larcv3::larcv_base::augment_default_config(const json& default_config, const json & user_config){
 
     // This function looks at every option in the default config, which is assumed to be the right format.
     // First, make a copy of the default config.
@@ -10,36 +11,48 @@ json larcv3::larcv_base::augment_default_config(json default_config, json user_c
     //    - if the item is iterable, recurse on the sub json.
     //    - if the item is not iterable, replace the default with the user config.
 
-    auto updated_config = default_config;
+    json updated_config = default_config;
 
     // If the parameter's object is in fact an iterable, recurse.
 
     // std::cout << "  Calling augment_default_config with " << std::endl;
-    // std::cout << "    default: " << default_config << std::endl;
-    // std::cout << "    user: " << user_config << std::endl;
+    // std::cout << std::setw(4) << "    default: " << default_config << std::endl;
+    // std::cout << std::setw(4) << "    user: " << user_config << std::endl;
 
 // For future corey: this is thinking array objects are actually sub classes.  Whoops.
-// Gotta fix tath
+// Gotta fix that
 
-    for (json::iterator it = default_config.begin(); it != default_config.end(); ++it) {
-        // std::cout << *it << '\n';
+    for (auto it = default_config.begin(); it != default_config.end(); ++it) {
+        // std::cout << it.key() << ": " << *it << '\n';
         if ( user_config.contains(it.key()) ){
+            // std::cout << "  Key " << it.key() << " IS in user_config" << std::endl;
             // Check if the object itself is a json class
             if (it.value().is_object()){
+                // std::cout << "    Key " << it.key() << " treated as object" << std::endl;
                 // recurse
-                auto updated_sub_config = augment_default_config(
+                // Merge the two together and put it into the updated config
+                updated_config[it.key()] = augment_default_config(
                     default_config[it.key()],
                     user_config[it.key()]);
-                updated_config[it.key()] = updated_sub_config;
+                
             }
             else{
+                // std::cout << "    Key " << it.key() << " NOT treated as object" << std::endl;
                 // Replace the single item:
                 updated_config[it.key()] = user_config[it.key()];
             }
         }
-    }
+        else{
+            // std::cout << "  Key " << it.key() << " is NOT in user_config" << std::endl;
+            // This key is not in the user config, so we copy the default in entirety
+            updated_config[it.key()] = default_config[it.key()];
 
-    // std::cout << "  Final config is " << updated_config << std::endl;
+        }
+    }
+    // std::cout << "  Finshed augment_default_config with " << std::endl;
+    // std::cout << std::setw(4) <<  "    default: " << default_config << std::endl;
+    // std::cout << std::setw(4) <<  "    user: " << user_config << std::endl;
+    // std::cout << std::setw(4) <<  "    Final config is " << updated_config << std::endl;
 
     return updated_config;
 
