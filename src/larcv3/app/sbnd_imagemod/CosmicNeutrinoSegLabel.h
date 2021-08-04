@@ -40,7 +40,7 @@ class CosmicNeutrinoSegLabel : public ProcessBase {
   /// Default destructor
   ~CosmicNeutrinoSegLabel() {}
 
-  void configure(const PSet&);
+  void configure(const json&);
 
   void initialize();
 
@@ -53,6 +53,8 @@ class CosmicNeutrinoSegLabel : public ProcessBase {
                             const ImageMeta2D & meta);
 
  private:
+
+  json config;
 
   std::string _cluster2d_producer;
   std::string _output_producer;

@@ -49,7 +49,7 @@ class ParentParticleSeg : public ProcessBase {
   /// Default destructor
   ~ParentParticleSeg() {}
 
-  void configure(const PSet&);
+  void configure(const json&);
 
   void initialize();
 
@@ -62,15 +62,28 @@ class ParentParticleSeg : public ProcessBase {
 
   larcv3::VoxelSet cluster_merger(const larcv3::SparseCluster3D & clusters,
                                  particle_node * primary_node);
+
+  static json default_config(){
+      json c = {
+        {"Cluster2dProducer", ""},
+        {"Cluster3dProducer", ""},
+        {"OutputProducer",    ""},
+        {"ParticleProducer",  ""},
+      };
+      return c;
+  }
+
  private:
+
+  json config;
 
   void get_all_daughter_ids(std::vector<int> & ids, const particle_node * node);
 
 
-  std::string _cluster3d_producer;
-  std::string _cluster2d_producer;
-  std::string _output_producer;
-  std::string _particle_producer;
+  // std::string _cluster3d_producer;
+  // std::string _cluster2d_producer;
+  // std::string _output_producer;
+  // std::string _particle_producer;
 
 };
 
@@ -94,6 +107,12 @@ class ParentParticleSegProcessFactory
   }
 };
 }
+
+#ifdef LARCV_INTERNAL
+#include <pybind11/pybind11.h>
+void init_parent_particle_seg(pybind11::module m);
+#endif
+
 
 #endif
 /** @} */  // end of doxygen group

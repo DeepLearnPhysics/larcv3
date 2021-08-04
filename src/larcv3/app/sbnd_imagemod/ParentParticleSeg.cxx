@@ -1,6 +1,8 @@
 #ifndef __PARENTPARTICLESEG_CXX__
 #define __PARENTPARTICLESEG_CXX__
 
+#include <iomanip>
+
 #include "ParentParticleSeg.h"
 #include "larcv3/core/dataformat/EventTensor.h"
 #include "larcv3/core/dataformat/EventParticle.h"
@@ -14,40 +16,50 @@ static ParentParticleSegProcessFactory
 ParentParticleSeg::ParentParticleSeg(const std::string name)
     : ProcessBase(name) {}
 
-void ParentParticleSeg::configure(const PSet& cfg) {
-  _cluster2d_producer = cfg.get<std::string>("Cluster2dProducer", "");
-  _cluster3d_producer = cfg.get<std::string>("Cluster3dProducer", "");
-  _output_producer = cfg.get<std::string>("OutputProducer");
-  _particle_producer = cfg.get<std::string>("ParticleProducer");
+void ParentParticleSeg::configure(const json& cfg) {
 
-  if (_cluster2d_producer == "" && _cluster3d_producer == ""){
+  // Grab the default config:
+  config = this->default_config();
+  config = augment_default_config(config, cfg);
+
+  const auto & cluster2dproducer = config["Cluster2dProducer"].get<std::string>();
+  const auto & cluster3dproducer = config["Cluster3dProducer"].get<std::string>();
+  const auto & output_producer   = config["OutputProducer"].get<std::string>();
+  const auto & particle_producer = config["ParticleProducer"].get<std::string>();
+
+  if (cluster2dproducer.empty() && cluster3dproducer.empty()){
         LARCV_CRITICAL() << "Must specify at least one cluster producer!" << std::endl;
         throw larbys();
   }
-
+  if (output_producer.empty()) {
+    LARCV_CRITICAL() << "Must specify an OutputProducer" << std::endl;
+    throw larbys();
+  }
+  if (particle_producer.empty()) {
+    LARCV_CRITICAL() << "Must specify an ParticleProducer" << std::endl;
+    throw larbys();
+  }
 }
 
 void ParentParticleSeg::initialize() {}
 
 bool ParentParticleSeg::process(IOManager& mgr) {
 
+  auto const& cluster2d_producer = config["Cluster2dProducer"].get<std::string>();
+  auto const& cluster3d_producer = config["Cluster3dProducer"].get<std::string>();
+  auto const& output_producer    = config["OutputProducer"].get<std::string>();
+  auto const& particle_producer  = config["ParticleProducer"].get<std::string>();
 
   // std::cout << "Enter ParentParticleSeg::process " << std::endl;
   // Read in the particles that define the pdg types:
   auto const& ev_particle =
-      mgr.get_data<larcv3::EventParticle>(_particle_producer);
+      mgr.get_data<larcv3::EventParticle>(particle_producer);
 
-  // Also output a corresponding particle 2d to match the clusters:
-  auto& ev_particle_output =
-      mgr.get_data<larcv3::EventParticle>(_output_producer);
-
-  ev_particle_output.clear();
 
   bool debug = false;
 
   if (debug){
     std::cout << "Initial number of particles: " << ev_particle.as_vector().size() << std::endl;
-    std::cout << "Initial number of output particles: " << ev_particle_output.as_vector().size() << std::endl;
   }
 
   // Loop over all of the input particles and determine their ancestor
@@ -204,6 +216,15 @@ bool ParentParticleSeg::process(IOManager& mgr) {
   }
   // Here, every particle is sorted into it's own group by ancestor.
 
+
+  // Now, make a corresponding particle 2d to match the clusters.
+  auto& ev_particle_output =
+      mgr.get_data<larcv3::EventParticle>(output_producer);
+    std::cout << "Initial number of output particles: " << ev_particle_output.as_vector().size() << std::endl;
+
+  ev_particle_output.clear();
+    std::cout << "Initial number of output particles: " << ev_particle_output.as_vector().size() << std::endl;
+
   // Make the appropriate list of new particles:
   for (auto node : primary_nodes){
     if (node -> reference != NULL){
@@ -217,15 +238,15 @@ bool ParentParticleSeg::process(IOManager& mgr) {
 
   // We now loop over the clusters indicated and merge them together based on
 
-  if (_cluster2d_producer != ""){
+  if (cluster2d_producer != ""){
     // Read in the original source of segmentation, the cluster indexes:
     auto const& ev_cluster2d =
-        mgr.get_data<larcv3::EventSparseCluster2D>(_cluster2d_producer);
+        mgr.get_data<larcv3::EventSparseCluster2D>(cluster2d_producer);
 
     if (ev_cluster2d.as_vector().size() < 2) return false;
     // The output is an instance of cluster2d, so prepare that:
     auto& ev_cluster2d_output =
-        mgr.get_data<larcv3::EventSparseCluster2D>(_output_producer);
+        mgr.get_data<larcv3::EventSparseCluster2D>(output_producer);
 
 
     for (size_t projection_index = 0;
@@ -253,19 +274,20 @@ bool ParentParticleSeg::process(IOManager& mgr) {
       // Append the output image2d:
       ev_cluster2d_output.emplace(std::move(new_clusters));
     }
+    std::cout << "Final number of clusters2d: " << ev_cluster2d_output.sparse_cluster(0).as_vector().size() << std::endl;
   }
-  if (_cluster3d_producer != ""){
+  if (cluster3d_producer != ""){
 
     // Read in the original source of segmentation, the cluster indexes:
     auto const& ev_cluster3d =
-        mgr.get_data<larcv3::EventSparseCluster3D>(_cluster3d_producer);
+        mgr.get_data<larcv3::EventSparseCluster3D>(cluster3d_producer);
     
     // std::cout << "ev_cluster3d.size() " << ev_cluster3d.size() << std::endl;
     // if (ev_cluster3d.size() < 2) return false;
 
     // The output is an instance of cluster3d, so prepare that:
     auto& ev_cluster3d_output =
-        mgr.get_data<larcv3::EventSparseCluster3D>(_output_producer);
+        mgr.get_data<larcv3::EventSparseCluster3D>(output_producer);
 
 
     // For each projection index, get the list of clusters
@@ -285,19 +307,19 @@ bool ParentParticleSeg::process(IOManager& mgr) {
     orphanage->trackID = i;
     auto out_cluster = cluster_merger(ev_cluster3d.sparse_cluster(0), orphanage);
     new_clusters.insert(out_cluster);
-    // std::cout << "Number of primary_nodes: " << primary_nodes.size()
-    //           << std::endl;
-    // std::cout << "Number of new clusters: " << new_clusters.size() << std::endl;
+    std::cout << "Number of primary_nodes: " << primary_nodes.size()
+              << std::endl;
+    std::cout << "Number of new clusters: " << new_clusters.size() << std::endl;
     // Append the output image2d:
     ev_cluster3d_output.emplace(std::move(new_clusters));
 
+    std::cout << "Final number of clusters3d: " << ev_cluster3d_output.sparse_cluster(0).as_vector().size() << std::endl;
   }
 
 
 
   // Final numbers:
-  // std::cout << "Final number of particles: " << ev_particle_output.as_vector().size() << std::endl;
-  // std::cout << "Final number of clusters: " << ev_cluster2d_output.sparse_cluster(0).as_vector().size() << std::endl;
+  std::cout << "Final number of particles: " << ev_particle_output.as_vector().size() << std::endl;
 
   // Clean up:
   for (auto node : particle_nodes){
@@ -383,5 +405,21 @@ larcv3::VoxelSet ParentParticleSeg::cluster_merger(
 
 
 void ParentParticleSeg::finalize() {}
+
+} // namespace larcv3
+
+void init_parent_particle_seg(pybind11::module m){
+
+
+  using Class = larcv3::ParentParticleSeg;
+  pybind11::class_<Class> parent_particle_seg(m, "ParentParticleSeg");
+  // pybind11::class_<Class, std::shared_ptr<Class>> ev_sparse_tensor(m, classname.c_str());
+
+  parent_particle_seg.def(pybind11::init<std::string>(),
+    pybind11::arg("name") = "ParentParticleSeg");
+
+  parent_particle_seg.def("default_config", &Class::default_config);
 }
+
+
 #endif
