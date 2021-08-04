@@ -26,7 +26,7 @@ else:
 
 setup(
     name="larcv",
-    version="3.3.4",
+    version="3.4.0",
     cmake_source_dir='src/',
     use_scm_version=True,
     include_package_data=True,
