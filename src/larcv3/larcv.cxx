@@ -2,6 +2,8 @@
 #include "larcv3/core/dataformat/dataformat.h"
 #include "larcv3/core/processor/processor.h"
 #include "larcv3/app/queueio/queueio.h"
+#include "larcv3/app/imagemod/imagemod.h"
+#include "larcv3/app/sbnd_imagemod/sbnd_imagemod.h"
 
 
 PYBIND11_MAKE_OPAQUE(std::vector<larcv3::SparseTensor<2> >);
@@ -22,5 +24,6 @@ PYBIND11_MODULE(pylarcv, m) {
   init_dataformat(m);
   init_processor(m);
   init_queueio(m);
-  // init_imagemod(m);
+  init_imagemod(m);
+  init_sbnd_imagemod(m);
 }
