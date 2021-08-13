@@ -43,15 +43,26 @@ namespace larcv3 {
   {
     std::stringstream ss;
     std::stringstream buf;
-    ss  << "      \033[95m" << "Particle " << " (PdgCode,TrackID) = (" << pdg_code() << "," << track_id() << ")\033[00m "
-	<< "... with Parent (" << parent_pdg_code() << "," << parent_track_id() << ")" << std::endl;
+    ss  << "      \033[95m" << "Particle " << id() << " (PdgCode,TrackID) = (" 
+        << pdg_code() << "," << track_id() << ")\033[00m "
+	      << "... with Parent (" << parent_pdg_code() 
+        << "," << parent_track_id() << ")" << std::endl;
     buf << "      ";
 
     ss << buf.str() << "Vertex   (x, y, z, t) = (" << x() << "," << y() << "," << z() << "," << t() << ")" << std::endl
        << buf.str() << "Momentum (px, py, pz) = (" << px() << "," << py() << "," << pz() << ")" << std::endl
-       << buf.str() << "Inittial Energy  = " << energy_init() << std::endl
-       << buf.str() << "Deposit  Energy  = " << energy_deposit() << std::endl
-       << buf.str() << "Creation Process = " << creation_process() << std::endl;
+       << buf.str() << "Inittial Energy       = " << energy_init() << std::endl
+       << buf.str() << "Deposit  Energy       = " << energy_deposit() << std::endl
+       << buf.str() << "Creation Process      = " << creation_process() << std::endl
+       << buf.str() << "Shape                 = " << shape() << std::endl
+       << buf.str() << "Mcst Index            = " << mcst_index() << std::endl
+       << buf.str() << "Mct Index             = " << mct_index() << std::endl
+       << buf.str() << "Nu Current Type       = " << nu_current_type() << std::endl
+       << buf.str() << "Nu interaction Type   = " << nu_interaction_type() << std::endl
+       << buf.str() << "Distance Travel       = " << distance_travel() << std::endl
+       << buf.str() << "Energy Init           = " << energy_init() << std::endl
+       << buf.str() << "Energy Deposit        = " << energy_deposit() << std::endl;
+
 
     // ss << buf.str() << "BBox3D: " << _bb3d.dump();
     // buf << "    ";

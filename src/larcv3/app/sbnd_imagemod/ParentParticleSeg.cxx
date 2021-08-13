@@ -79,13 +79,13 @@ bool ParentParticleSeg::process(IOManager& mgr) {
 
   for (auto& particle : ev_particle.as_vector()) {
     if (debug){
-      std::cout << "Particle: "
-                << "ancestor track ID " << particle.ancestor_track_id() << ", "
-                << "ancestor PDG " << particle.ancestor_pdg_code() << ", "
-                << "ID " << particle.id() << ", "
-                << "parent ID " << particle.parent_track_id() << ", "
-                << "PDG " << particle.pdg_code() << ", "
-                << "track ID " << particle.track_id() << "." << std::endl;
+      // std::cout << "Particle: "
+      //           << "ancestor track ID " << particle.ancestor_track_id() << ", "
+      //           << "ancestor PDG " << particle.ancestor_pdg_code() << ", "
+      //           << "ID " << particle.id() << ", "
+      //           << "parent ID " << particle.parent_track_id() << ", "
+      //           << "PDG " << particle.pdg_code() << ", "
+      //           << "track ID " << particle.track_id() << "." << std::endl;
     }
 
     // Particles are top level if their ancestor ID == their own track ID
@@ -97,6 +97,7 @@ bool ParentParticleSeg::process(IOManager& mgr) {
     node->trackID = particle.track_id();
     node->parentID = particle.parent_track_id();
     node->ancestorID = particle.ancestor_track_id();
+    node->is_virtual = false;
 
     // Primary?
     // if (particle.ancestor_track_id() == particle.track_id() ||
@@ -105,7 +106,17 @@ bool ParentParticleSeg::process(IOManager& mgr) {
     if (particle.creation_process() == "primary")
     {
       // Yes, it's a primary
-      if (debug) std::cout << "-> Primary " << particle.track_id() << " - address: " << node << std::endl;
+      if (debug) {
+        std::cout << "Primary Particle: "
+                << "ancestor track ID " << particle.ancestor_track_id() << ", "
+                << "ancestor PDG " << particle.ancestor_pdg_code() << ", "
+                << "ID " << particle.id() << ", "
+                << "parent ID " << particle.parent_track_id() << ", "
+                << "PDG " << particle.pdg_code() << ", "
+                << "track ID " << particle.track_id() << "." << std::endl;
+        // std::cout << "-> Primary " 
+        //           << particle.track_id() << " - address: " << node << std::endl;
+      }
       node->primary = true;
       node->parent = NULL;
       primary_nodes.push_back(node);
@@ -121,24 +132,68 @@ bool ParentParticleSeg::process(IOManager& mgr) {
 
   }
 
-  // // Fill out the rest of the ancestor nodes:
+  // Store a list of pointers to update later when daughters are sorted out.
+  std::vector<particle_node* > virtual_ancestors;
+  std::vector<Particle> new_ancestors;
+  // Save enough room for everything:
+  new_ancestors.reserve(_ancestor_trackids.size());
+  size_t i_virtual = 0;
+  // Fill out the rest of the ancestor nodes:
   for (auto& trackID : _ancestor_trackids) {
     if (_found_ancestor_nodes.find(trackID) == _found_ancestor_nodes.end()) {
       // This ancestor id isn't a tangible particle
-      particle_node * this_node = new particle_node;
-      particle_nodes.push_back(this_node);
-      primary_nodes.push_back(this_node);
-      this_node->reference = NULL;
-      this_node->parent = NULL;
-      this_node->trackID = trackID;
-      this_node->primary = true;
+
+
+      // Make a new particle
+      new_ancestors.push_back(Particle());
+      new_ancestors[i_virtual].track_id(trackID);
+
+
+      particle_node * pn = new particle_node;
+      pn->trackID = trackID;
+      pn->primary = trackID;
+      pn->is_virtual = true;
+      pn->reference = &(new_ancestors[i_virtual]); 
+      pn->parent = NULL;
+     
+      virtual_ancestors.push_back(pn);
+
+
+      // The reference particle will be the end one:
+      virtual_ancestors[i_virtual]->reference = & (new_ancestors[i_virtual]);
+      virtual_ancestors[i_virtual]->parent = NULL;
+      virtual_ancestors[i_virtual]->primary = true;
+      virtual_ancestors[i_virtual]->trackID = trackID;
+      virtual_ancestors[i_virtual]->is_virtual = true;
+
+      // Assign the addresses to the list of pointers.
+      particle_nodes.push_back(virtual_ancestors[i_virtual]);
+      primary_nodes.push_back(virtual_ancestors[i_virtual]);
+
+
+      // For Particles that don't *actually* exist, we care about the interaction
+      // type for cosmic tagger.  Daughter particles have the same interaction type
+      // so we pick that up below.
+      // std::cout << "Just created virtual primary particle " << trackID 
+      //           << ", reference: " << virtual_ancestors[i_virtual]->reference
+      //           << ", number of daughters: " << virtual_ancestors[i_virtual]->daughters.size() 
+      //           << std::endl;
+      i_virtual ++;
     }
     // std::cout << "Ancestor ID " << trackID << std::endl;
   }
 
   if (debug){
+
+    std::cout << "virtual_ancestors: \n";
+    for (auto va : virtual_ancestors){
+      std::cout << "  trackID: " << va->trackID << ", is_virtual: " << va->is_virtual
+                << ", reference: " << va->reference << "\n";
+    }
+    std::cout << std::endl;
+
     for (auto node : primary_nodes){
-      std::cout << "Found the following primary: " << node->trackID << std::endl;
+      std::cout << "Found the following primary: " << node->trackID  << " at " << node->reference << std::endl;
     }
   }
 
@@ -154,6 +209,7 @@ bool ParentParticleSeg::process(IOManager& mgr) {
   // of each particle.  To speed up a little, since most particles
   // are only one layer deep, check the ancestor nodes first
   for (auto node : particle_nodes){
+    // Skip primary nodes
     if (node->primary) continue;
 
     bool found = false;
@@ -193,20 +249,37 @@ bool ParentParticleSeg::process(IOManager& mgr) {
     }
 
   }
+  // Here, all the virtual ancestors are updated with an interaction type
+  // from their daughters
+  for (size_t i_va = 0; i_va < virtual_ancestors.size(); i_va ++){
+    // Identify the interaction type from the daughters
+    if (virtual_ancestors.at(i_va)->daughters.size() > 0){
+      auto interaction_type = virtual_ancestors.at(i_va)->daughters.front()->reference->nu_interaction_type();
+      // auto replacement = new Particle(*virtual_ancestor.reference);
+      // replacement->nu_interaction_type(interaction_type);
+      // virtual_ancestor.reference->nu_interaction_type(interaction_type);
+      new_ancestors.at(i_va).nu_interaction_type(interaction_type);
+    }
+  }
+
+
 
 
   if (debug){
     for (auto ancestor_node : primary_nodes){
       std::cout << "Top level particle.  TrackID is "
                 << ancestor_node->trackID
+                << ", id: " << ancestor_node->reference->id()
                 << ", number of daughers: "
                 << ancestor_node->daughters.size()
+                << ", is_virtual: " << ancestor_node->is_virtual 
                 << ", reference: " << ancestor_node->reference
+                // << ", interaction_type: " << ancestor_node->reference->nu_interaction_type()
                 << std::endl;
-      for (auto daughter : ancestor_node->daughters){
-        std::cout << "--> daughter trackID " << daughter->trackID << std::endl;
-        // std::cout << "--> daughter trackID " << daughter->trackID << ", id " << daughter->reference->id() << std::endl;
-      }
+      // for (auto daughter : ancestor_node->daughters){
+      //   std::cout << "--> daughter trackID " << daughter->trackID << std::endl;
+      //   // std::cout << "--> daughter trackID " << daughter->trackID << ", id " << daughter->reference->id() << std::endl;
+      // }
     }
     // Print out the orphaned particles too:
     std::cout << "Orphanage: " <<std::endl;
@@ -220,21 +293,23 @@ bool ParentParticleSeg::process(IOManager& mgr) {
   // Now, make a corresponding particle 2d to match the clusters.
   auto& ev_particle_output =
       mgr.get_data<larcv3::EventParticle>(output_producer);
-    std::cout << "Initial number of output particles: " << ev_particle_output.as_vector().size() << std::endl;
+    // std::cout << "Initial number of output particles: " << ev_particle_output.as_vector().size() << std::endl;
 
   ev_particle_output.clear();
-    std::cout << "Initial number of output particles: " << ev_particle_output.as_vector().size() << std::endl;
+    // std::cout << "Initial number of output particles: " << ev_particle_output.as_vector().size() << std::endl;
 
   // Make the appropriate list of new particles:
   for (auto node : primary_nodes){
     if (node -> reference != NULL){
-      if (debug) std::cout << "Appending particle " << std::endl;
+      // if (debug) std::cout << "Appending particle " << std::endl;
       ev_particle_output.append(*(node->reference));
     }
     else{
       ev_particle_output.append(Particle());
     }
   }
+
+  if (debug) std::cout << "New particles created " << std::endl;
 
   // We now loop over the clusters indicated and merge them together based on
 
@@ -257,33 +332,42 @@ bool ParentParticleSeg::process(IOManager& mgr) {
       larcv3::SparseCluster2D new_clusters;
       new_clusters.meta(clusters.meta());
 
+      // if (debug) std::cout << "Meta created for projection_index " << projection_index << std::endl; 
       int i = 0;
       for (auto ancestor_node : primary_nodes) {
         auto out_cluster = cluster_merger(clusters, ancestor_node);
+        // if (debug) std::cout << "Cluster merged with " << out_cluster.size() << " voxels.";
         out_cluster.id(i);
         i++;
         new_clusters.emplace(std::move(out_cluster));
+        // std::cout << "done" << std::endl;
       }
+      // if (debug) std::cout << "All owned particles merged" << std::endl;
       // Handle the orphanage, as well:
       orphanage->trackID = i;
       auto out_cluster = cluster_merger(clusters, orphanage);
       new_clusters.emplace(std::move(out_cluster));
-      // std::cout << "Number of primary_nodes: " << primary_nodes.size()
-      //           << std::endl;
-      // std::cout << "Number of new clusters: " << new_clusters.size() << std::endl;
+      // if (debug) {
+      //   std::cout << "Number of primary_nodes: " << primary_nodes.size()
+      //            << std::endl;
+      //   std::cout << "Number of new clusters: " << new_clusters.size() << std::endl;
+      // }
       // Append the output image2d:
       ev_cluster2d_output.emplace(std::move(new_clusters));
     }
-    std::cout << "Final number of clusters2d: " << ev_cluster2d_output.sparse_cluster(0).as_vector().size() << std::endl;
+    // if (debug) std::cout << "Final number of clusters2d: " << ev_cluster2d_output.sparse_cluster(0).as_vector().size() << std::endl;
   }
+
   if (cluster3d_producer != ""){
 
     // Read in the original source of segmentation, the cluster indexes:
     auto const& ev_cluster3d =
         mgr.get_data<larcv3::EventSparseCluster3D>(cluster3d_producer);
     
-    // std::cout << "ev_cluster3d.size() " << ev_cluster3d.size() << std::endl;
-    // if (ev_cluster3d.size() < 2) return false;
+    // if (debug) {
+    //   std::cout << "ev_cluster3d.size() " << ev_cluster3d.size() << std::endl;
+    // }
+    // // if (ev_cluster3d.size() < 2) return false;
 
     // The output is an instance of cluster3d, so prepare that:
     auto& ev_cluster3d_output =
@@ -307,23 +391,31 @@ bool ParentParticleSeg::process(IOManager& mgr) {
     orphanage->trackID = i;
     auto out_cluster = cluster_merger(ev_cluster3d.sparse_cluster(0), orphanage);
     new_clusters.insert(out_cluster);
-    std::cout << "Number of primary_nodes: " << primary_nodes.size()
-              << std::endl;
-    std::cout << "Number of new clusters: " << new_clusters.size() << std::endl;
+
     // Append the output image2d:
     ev_cluster3d_output.emplace(std::move(new_clusters));
 
-    std::cout << "Final number of clusters3d: " << ev_cluster3d_output.sparse_cluster(0).as_vector().size() << std::endl;
   }
 
 
 
   // Final numbers:
-  std::cout << "Final number of particles: " << ev_particle_output.as_vector().size() << std::endl;
+  // std::cout << "Final number of particles: " << ev_particle_output.as_vector().size() << std::endl;
 
   // Clean up:
   for (auto node : particle_nodes){
+    // if (debug) std::cout << "Delete node at " << node << "?: ";
+    // Don't delete the virtual anscestors, they will clean up automatically.
     delete node;
+    // if (! node->is_virtual){
+    //   // if (debug) std::cout << "yes." << std::endl;
+    //   delete node;
+    // }
+    // else{
+    //   // if (debug) std::cout << "no." << std::endl;
+
+    // }
+
   }
   delete orphanage;
 
@@ -335,8 +427,12 @@ bool ParentParticleSeg::process(IOManager& mgr) {
 
 void ParentParticleSeg::get_all_daughter_ids(std::vector<int> & ids, const particle_node * node){
   if (node -> reference != NULL){
+    // std::cout << "reference is " << node->reference << std::endl;
     ids.push_back(node->reference->id());
   }
+#ifdef LARCV_OPENMP
+#pragma omp parallel
+#endif
   for (auto const daughter : node -> daughters){
     get_all_daughter_ids(ids, daughter);
   }
@@ -363,7 +459,12 @@ larcv3::VoxelSet ParentParticleSeg::cluster_merger(
 
 
   for (auto id : cluster_indexes) {
+    // Make sure the target cluster exists :
+    if (id > clusters.size()) continue;
     auto& input_cluster = clusters.voxel_set(id);
+#ifdef LARCV_OPENMP
+#pragma omp parallel
+#endif
     for (auto& voxel : input_cluster.as_vector()) {
       output_set.add(larcv3::Voxel(voxel.id(), voxel.value()));
     }
@@ -389,8 +490,12 @@ larcv3::VoxelSet ParentParticleSeg::cluster_merger(
 
   // std::cout << "Clusters.size() " << clusters.as_vector().size() << std::endl;
   for (auto id : cluster_indexes) {
+    if (id > clusters.size()) continue;
     auto& input_cluster = clusters.voxel_set(id);
     // std::cout << "Cluster index " << id << ", number of voxels: " << input_cluster.as_vector().size() << std::endl;
+#ifdef LARCV_OPENMP
+#pragma omp parallel
+#endif
     for (auto& voxel : input_cluster.as_vector()) {
       if (voxel.id() >= clusters.meta().total_voxels()){
         continue;

@@ -46,6 +46,7 @@ namespace larcv3 {
           {"Producer", std::string()},
           {"Product", std::string()},
           {"OutputProducer", std::string()},
+          {"ReferenceProducer", std::string()}
         };
         return c;
     }
@@ -58,7 +59,8 @@ namespace larcv3 {
     bool process_product(
         IOManager& mgr,
         std::string producer, 
-        std::string output_producer);
+        std::string output_producer,
+        std::string ref_producer);
 
   };
 

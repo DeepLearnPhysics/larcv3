@@ -31,7 +31,7 @@ namespace larcv3 {
 class CosmicNeutrinoSegLabel : public ProcessBase {
  public:
 
-  enum particleLabel {kBackground, kNeutrino, kCosmic};
+  enum particleLabel {kBackground, kCosmic, kNeutrino};
 
   /// Default constructor
   CosmicNeutrinoSegLabel(
@@ -50,17 +50,24 @@ class CosmicNeutrinoSegLabel : public ProcessBase {
 
   Image2D seg_image_creator(const std::vector<Particle> & particles,
                             const SparseCluster2D & clusters,
-                            const ImageMeta2D & meta);
+                            const ImageMeta2D & meta,
+                            const int neutrino_label,
+                            const int cosmic_label);
+  static json default_config(){
+      json c = {
+        {"Cluster2dProducer", ""},
+        {"OutputProducer",    ""},
+        {"ParticleProducer",  ""},
+        {"NeutrinoLabel", 1},
+        {"CosmicLabel", 2}
+      };
+      return c;
+  }
 
  private:
 
   json config;
 
-  std::string _cluster2d_producer;
-  std::string _output_producer;
-  std::string _particle_producer;
-  int _cosmic_label;
-  int _neutrino_label;
 
 };
 

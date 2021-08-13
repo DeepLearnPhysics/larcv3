@@ -14,6 +14,7 @@
 std::mutex __ioman_mtx;
 
 #ifdef LARCV_OPENMP
+#include <omp.h>
 omp_lock_t __ioman_omp_lock;
 #endif
 

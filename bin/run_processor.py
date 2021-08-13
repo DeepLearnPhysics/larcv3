@@ -42,7 +42,6 @@ if len(args.larcv_fin) == 0:
 
 proc = larcv.ProcessDriver('ProcessDriver')
 
-print(args)
 
 # Read the config, if present.  
 if "cfg" in args:
@@ -54,8 +53,6 @@ if "cfg" in args:
     else:
         # REad it directly from string:
         conf = joson.loads(args.cfg)
-
-    print(conf)
 
     proc.configure(conf)
 

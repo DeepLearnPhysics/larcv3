@@ -35,7 +35,8 @@ struct particle_node{
   int parentID;
   int ancestorID;
   bool primary;
-  const Particle * reference;
+  bool is_virtual;
+  const Particle * reference; 
   particle_node * parent;
   std::vector<const particle_node *> daughters;
 };

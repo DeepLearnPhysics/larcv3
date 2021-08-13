@@ -838,6 +838,9 @@ namespace larcv3 {
       );
       // std::cout << "temp_voxel_vector.size(): " << temp_voxel_vector.size() << std::endl;
 
+#ifdef LARCV_OPENMP
+#pragma omp parallel
+#endif
       for (auto & v : temp_voxel_vector){
         _tensor_v.at(voxel_set_index).emplace(v);
       }

@@ -1,125 +1,148 @@
-// #ifndef __LARCV_COSMICNEUTRINOSEGLABEL_CXX__
-// #define __LARCV_COSMICNEUTRINOSEGLABEL_CXX__
+#ifndef __LARCV_COSMICNEUTRINOSEGLABEL_CXX__
+#define __LARCV_COSMICNEUTRINOSEGLABEL_CXX__
 
-// #include "CosmicNeutrinoSegLabel.h"
-// #include "larcv3/core/dataformat/EventTensor.h"
-// #include "larcv3/core/dataformat/EventParticle.h"
-// #include "larcv3/core/dataformat/EventSparseCluster.h"
-// #include "larcv3/core/dataformat/EventSparseTensor.h"
+#include "CosmicNeutrinoSegLabel.h"
+#include "larcv3/core/dataformat/EventTensor.h"
+#include "larcv3/core/dataformat/EventParticle.h"
+#include "larcv3/core/dataformat/EventSparseCluster.h"
+#include "larcv3/core/dataformat/EventSparseTensor.h"
 
-// namespace larcv3 {
+namespace larcv3 {
 
-// static CosmicNeutrinoSegLabelProcessFactory
-//     __global_CosmicNeutrinoSegLabelProcessFactory__;
+static CosmicNeutrinoSegLabelProcessFactory
+    __global_CosmicNeutrinoSegLabelProcessFactory__;
 
-// CosmicNeutrinoSegLabel::CosmicNeutrinoSegLabel(
-//     const std::string name)
-//     : ProcessBase(name) {}
+CosmicNeutrinoSegLabel::CosmicNeutrinoSegLabel(
+    const std::string name)
+    : ProcessBase(name) {}
 
-// void CosmicNeutrinoSegLabel::configure(const PSet& cfg) {
-//   _cluster2d_producer = cfg.get<std::string>("Cluster2dProducer");
-//   _output_producer    = cfg.get<std::string>("OutputProducer");
-//   _particle_producer  = cfg.get<std::string>("ParticleProducer");
-//   _cosmic_label       = cfg.get<int>("CosmicLabel");
-//   _neutrino_label     = cfg.get<int>("NeutrinoLabel");
+void CosmicNeutrinoSegLabel::configure(const json& cfg) {
+  // Grab the default config:
+  config = this->default_config();
+  config = augment_default_config(config, cfg);
 
-// }
+  const auto & cluster2dproducer = config["Cluster2dProducer"].get<std::string>();
+  const auto & output_producer   = config["OutputProducer"].get<std::string>();
+  const auto & particle_producer = config["ParticleProducer"].get<std::string>();
 
-// void CosmicNeutrinoSegLabel::initialize() {}
+  if (cluster2dproducer.empty()){
+        LARCV_CRITICAL() << "Must specify cluster producer!" << std::endl;
+        throw larbys();
+  }
+  if (output_producer.empty()) {
+    LARCV_CRITICAL() << "Must specify an OutputProducer" << std::endl;
+    throw larbys();
+  }
+  if (particle_producer.empty()) {
+    LARCV_CRITICAL() << "Must specify an ParticleProducer" << std::endl;
+    throw larbys();
+  }
+}
 
-// bool CosmicNeutrinoSegLabel::process(IOManager& mgr) {
+void CosmicNeutrinoSegLabel::initialize() {}
 
-//   // Read in the original source of segmentation, the cluster indexes:
-//   auto const& ev_cluster2d =
-//       mgr.get_data<larcv3::EventSparseCluster2D>(_cluster2d_producer);
+bool CosmicNeutrinoSegLabel::process(IOManager& mgr) {
 
-//   // Read in the particles that define the pdg types:
-//   auto const& ev_particle =
-//       mgr.get_data<larcv3::EventParticle>(_particle_producer);
+  auto _cluster2d_producer = config["Cluster2dProducer"].get<std::string>();
+  auto _output_producer    = config["OutputProducer"].get<std::string>();
+  auto _particle_producer  = config["ParticleProducer"].get<std::string>();
+  auto cosmic_label       = config["CosmicLabel"].get<int>();
+  auto neutrino_label     = config["NeutrinoLabel"].get<int>();
 
-//   // The output is an instance of image2D, so prepare that:
-//   auto& ev_tensor2d_output = mgr.get_data<larcv3::EventTensor2D>(_output_producer);
-//   ev_tensor2d_output.clear();
-//   // Next, loop over the particles and clusters per projection_ID
-//   // and set the values in the output image to the label specified by
-//   // the pdg
+  // Read in the original source of segmentation, the cluster indexes:
+  auto const& ev_cluster2d =
+      mgr.get_data<larcv3::EventSparseCluster2D>(_cluster2d_producer);
 
-//   auto const& particles = ev_particle.as_vector();
-//   for (size_t projection_index = 0;
-//        projection_index < ev_cluster2d.size(); ++projection_index) {
-//     // For each projection index, get the list of clusters
-//     auto const& clusters = ev_cluster2d.sparse_cluster(projection_index);
+  // Read in the particles that define the pdg types:
+  auto const& ev_particle =
+      mgr.get_data<larcv3::EventParticle>(_particle_producer);
 
-//     auto const& out_image =
-//         seg_image_creator(particles, clusters,
-//                           ev_cluster2d.sparse_cluster(projection_index).meta());
+  // The output is an instance of image2D, so prepare that:
+  auto& ev_tensor2d_output = mgr.get_data<larcv3::EventTensor2D>(_output_producer);
+  ev_tensor2d_output.clear();
+  // Next, loop over the particles and clusters per projection_ID
+  // and set the values in the output image to the label specified by
+  // the pdg
 
-//     // Append the output image2d:
-//     ev_tensor2d_output.append(out_image);
-//   }
+  auto const& particles = ev_particle.as_vector();
+  for (size_t projection_index = 0;
+       projection_index < ev_cluster2d.size(); ++projection_index) {
+    // For each projection index, get the list of clusters
+    auto const& clusters = ev_cluster2d.sparse_cluster(projection_index);
 
-//   return true;
-// }
+    auto const& out_image =
+        seg_image_creator(particles, clusters,
+                          ev_cluster2d.sparse_cluster(projection_index).meta(),
+                          neutrino_label, cosmic_label);
 
-// Image2D CosmicNeutrinoSegLabel::seg_image_creator(
-//     const std::vector<Particle> & particles,
-//     const SparseCluster2D & clusters, const ImageMeta2D & meta) {
-//   // Prepare an output image2d:
-//   Image2D out_image(meta);
+    // Append the output image2d:
+    ev_tensor2d_output.append(out_image);
+  }
 
-//   // std::set<std::string> processes;
-//   // std::set<int> interaction_types;
+  return true;
+}
 
-//   // Loop over the particles and get the cluster that matches:
-//   for (size_t particle_index = 0; particle_index < particles.size();
-//        ++particle_index) {
-//     // Deterime this particles PDG code and if it's in the list:
-//     auto const& particle = particles.at(particle_index);
-//     particleLabel pixel_label = kBackground;
-//     // processes.insert(particle.creation_process());
-//     // interaction_types.insert(particle.nu_interaction_type());
-//     if (particle.nu_interaction_type() == _neutrino_label){
-//       pixel_label = kNeutrino;
-//     }
-//     else if (particle.nu_interaction_type() == _cosmic_label) {
-//       pixel_label = kCosmic;
-//     }
-//     // If the label is not zero, go ahead and set the pixels to this label
-//     // in the output image:
-//     if (pixel_label != 0) {
-//       auto const& cluster = clusters.as_vector().at(particle_index);
-//       // Loop over the pixels in this cluster:
-//       for ( size_t voxel_index = 0;  
-//             voxel_index < cluster.as_vector().size();
-//             ++voxel_index) {
-//         auto const& voxel = cluster.as_vector().at(voxel_index);
+Image2D CosmicNeutrinoSegLabel::seg_image_creator(
+    const std::vector<Particle> & particles,
+    const SparseCluster2D & clusters, const ImageMeta2D & meta,
+    const int neutrino_label, const int cosmic_label) {
+  // Prepare an output image2d:
+  Image2D out_image(meta);
 
-//         // if (out_image.pixel(voxel.id()) != pixel_label){
-//         //   std::cout << "Changing pixel value from " << out_image.pixel(voxel.id())
-//         //             << " to " << pixel_label << std::endl;
-//         // }
+  // std::set<std::string> processes;
+  // std::set<int> interaction_types;
 
-//         // We have to make sure that we don't overwrite a neutrino pixel with a cosmic pixel.
-//         if (out_image.pixel(voxel.id()) == kNeutrino){
-//           continue;
-//         }
-//         else{
-//           out_image.set_pixel(voxel.id(), pixel_label);
-//         } 
-//       }
-//     }
-//   }
-//   // for (auto & process : processes){
-//   //   std::cout << "Process: " << process << std::endl;
-//   // }
-//   // for (auto & type : interaction_types){
-//   //   std::cout << "type: " << type << std::endl;
-//   // }
+  // Loop over the particles and get the cluster that matches:
+  for (size_t particle_index = 0; particle_index < particles.size();
+       ++particle_index) {
+    // Deterime this particles PDG code and if it's in the list:
+    auto const& particle = particles.at(particle_index);
+    particleLabel pixel_label = kBackground;
+    // processes.insert(particle.creation_process());
+    // interaction_types.insert(particle.nu_interaction_type());
+    if (particle.nu_interaction_type() == neutrino_label){
+      pixel_label = kNeutrino;
+      // std::cout << "Found a neutrino" << std::endl;
+    }
+    else if (particle.nu_interaction_type() == cosmic_label) {
+      pixel_label = kCosmic;
+    }
+    // If the label is not zero, go ahead and set the pixels to this label
+    // in the output image:
+    if (pixel_label != 0) {
+      auto const& cluster = clusters.as_vector().at(particle_index);
+      // Loop over the pixels in this cluster:
+      for ( size_t voxel_index = 0;  
+            voxel_index < cluster.as_vector().size();
+            ++voxel_index) {
+        auto const& voxel = cluster.as_vector().at(voxel_index);
+
+        // if (out_image.pixel(voxel.id()) != pixel_label){
+        //   std::cout << "Changing pixel value from " << out_image.pixel(voxel.id())
+        //             << " to " << pixel_label << std::endl;
+        // }
+
+        // We have to make sure that we don't overwrite a neutrino pixel with a cosmic pixel.
+        if (out_image.pixel(voxel.id()) == kNeutrino){
+          continue;
+        }
+        else{
+          out_image.set_pixel(voxel.id(), pixel_label);
+        } 
+      }
+    }
+  }
+  // for (auto & process : processes){
+  //   std::cout << "Process: " << process << std::endl;
+  // }
+  // for (auto & type : interaction_types){
+  //   std::cout << "type: " << type << std::endl;
+  // }
 
 
-//   return out_image;
-// }
+  return out_image;
+}
 
-// void CosmicNeutrinoSegLabel::finalize() {}
-// }
-// #endif
+void CosmicNeutrinoSegLabel::finalize() {}
+}
+#endif

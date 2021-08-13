@@ -6,6 +6,10 @@
 #include "larcv3/core/dataformat/EventSparseTensor.h"
 #include "larcv3/core/dataformat/EventSparseCluster.h"
 
+#ifdef LARCV_OPENMP
+#include <omp.h>
+#endif
+
 #include <numeric>
 
 namespace larcv3 {
@@ -131,9 +135,9 @@ bool Embed::process_sparse_product(IOManager& mgr, std::string producer,
 
   // Get the input data and the output holder.
   auto const & ev_input  = mgr.template get_data<EventSparseTensor<dimension>>(producer);
-  auto       & ev_output = mgr.template get_data<EventSparseTensor<dimension>>(output_producer);
 
 
+  std::vector<SparseTensor<dimension>> output_holder;
   // Loop over the projection IDs
   for (size_t i = 0; i < ev_input.as_vector().size(); i ++ ){
 
@@ -156,10 +160,15 @@ bool Embed::process_sparse_product(IOManager& mgr, std::string producer,
 
     // Loop throught the objects and put all the pixels/voxels into the new positions:
     auto new_voxel_set = SparseTensor<dimension>();
+    // Set the new meta:
+    new_voxel_set.meta(new_meta);
 
     auto original_values  = original_image.values_vec();
     auto original_indexes = original_image.indexes_vec();
 
+#ifdef LARCV_OPENMP
+#pragma omp parallel for 
+#endif
     for (size_t i_voxel = 0; i_voxel < original_indexes.size(); i_voxel ++){
       
       // For each pixel in the original image, we calculate it's original multi-index:
@@ -176,10 +185,14 @@ bool Embed::process_sparse_product(IOManager& mgr, std::string producer,
       // Update the new image:
       new_voxel_set.add(std::move(Voxel(new_index, original_values.at(i_voxel))));
     }
-
-    ev_output.emplace(std::move(new_voxel_set), std::move(new_meta));
+    output_holder.push_back(std::move(new_voxel_set));
   }
 
+  auto & ev_output = mgr.template get_data<EventSparseTensor<dimension>>(output_producer);
+  ev_output.clear();
+  for (size_t i = 0; i < output_holder.size(); i ++ ){
+    ev_output.emplace(std::move(output_holder.at(i)));
+  }
   return true;
 }
 
@@ -190,7 +203,8 @@ bool Embed::process_dense_product(IOManager& mgr, std::string producer,
 
   // Get the input data and the output holder.
   auto const & ev_input  = mgr.template get_data<EventTensor<dimension>>(producer);
-  auto       & ev_output = mgr.template get_data<EventTensor<dimension>>(output_producer);
+  
+  std::vector<Tensor<dimension>> output_holder;
 
 
   // Loop over the projection IDs
@@ -211,7 +225,9 @@ bool Embed::process_dense_product(IOManager& mgr, std::string producer,
 
     // Loop throught the objects and put all the pixels/voxels into the new positions:
     auto new_image = Tensor<dimension>(new_meta);
-
+#ifdef LARCV_OPENMP
+#pragma omp parallel for 
+#endif
     for (size_t i_pixel = 0; i_pixel < original_meta.total_voxels(); i_pixel ++){
       // Initializes to 0.0;  Skip if original is 0:
       if (original_image.pixel(i_pixel) == 0.0) continue;
@@ -226,9 +242,16 @@ bool Embed::process_dense_product(IOManager& mgr, std::string producer,
       // Update the new image:
       new_image.set_pixel(coords, original_image.pixel(i_pixel));
     }
-
-    ev_output.emplace(std::move(new_image));
+    output_holder.push_back(std::move(new_image));
   }
+
+  // Clear the output and add the new images:
+  auto       & ev_output = mgr.template get_data<EventTensor<dimension>>(output_producer);
+  ev_output.clear();
+  for (size_t i = 0; i < output_holder.size(); i ++ ){
+    ev_output.emplace(std::move(output_holder.at(i)));
+  }
+
 
   return true;
 }
