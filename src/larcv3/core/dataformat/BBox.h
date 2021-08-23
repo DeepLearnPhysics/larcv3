@@ -99,6 +99,11 @@ namespace larcv3 {
     std::array<double, dimension*dimension> _rotation;  
 
   public:
+    /**
+     * @brief      Gets the datatype.
+     *
+     * @return     The datatype.
+     */
     static hid_t get_datatype() {
       hid_t datatype;
       datatype = H5Tcreate (H5T_COMPOUND, sizeof (BBox));

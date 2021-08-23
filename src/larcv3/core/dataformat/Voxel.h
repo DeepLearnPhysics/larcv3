@@ -49,6 +49,7 @@ namespace larcv3 {
     //
     // uniry operators
     //
+    /// Add 
     inline Voxel& operator += (float value)
     { _value += value; return (*this); }
     inline Voxel& operator -= (float value)

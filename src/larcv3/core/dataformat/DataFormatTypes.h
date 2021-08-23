@@ -27,11 +27,17 @@ namespace larcv3 {
   /// Invalid projection id
   static const ProjectionID_t kINVALID_PROJECTIONID = kINVALID_USHORT;
 
+  /**
+   * @brief      Internal Structure to organize variable length objects
+   */
   struct Extents_t{
     unsigned long long int first;
     unsigned int n;
   };
 
+  /**
+   * @brief      Internal Structure to organize variable length objects, tied to an ID
+   */
   struct IDExtents_t{
     unsigned long long int first;
     unsigned int n;
@@ -92,6 +98,13 @@ namespace larcv3 {
   /// Invalid ProducerID_t
   static const ProducerID_t kINVALID_PRODUCER=kINVALID_SIZE;
 
+  /**
+   * @brief      Return a unique string for each dataproduct
+   *
+   * @tparam     T     larcv3 dataformat class and some default types
+   *
+   * @return     string value unique to each product type
+   */
   template <class T>
   std::string product_unique_name();
 
@@ -106,9 +119,23 @@ namespace larcv3 {
   // In this section, we define and specialize a number of cases for mapping
   // datatypes used in larcv3 to datatypes needed for hdf5 serialization.
 
+  /**
+   * @brief      Gets the datatype.
+   *
+   * @tparam     T     larcv3 serializable object
+   *
+   * @return     The HDF5 datatype, as an hdf5 ID.
+   */
   template <typename T>
   hid_t get_datatype();
 
+  /**
+   * @brief      Return a unique string for a type
+   *
+   * @tparam     T     built in type
+   *
+   * @return     string value unique to each product type
+   */
   template <typename T>
   std::string as_string();
 

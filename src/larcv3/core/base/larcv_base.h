@@ -92,7 +92,17 @@ namespace larcv3 {
       return j;
     };
     
-  protected:    
+  protected:
+    /**
+     * @brief      Augments the default configuration.
+     *
+     * @param[in]  default_config  The default configuration
+     * @param[in]  user_config     The user configuration
+     *
+     * @return     Recursively updates the default config (first argument)
+     *  with a user config (second argument).  ANy items in the user_config are either
+     *  added to the default config or replace the existing keys.
+     */
     json augment_default_config(const json& default_config, const json& user_config);
 
   private:

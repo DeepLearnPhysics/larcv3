@@ -23,6 +23,11 @@ if 'LARCV_WITHOUT_PYBIND' in os.environ and os.environ['LARCV_WITHOUT_PYBIND']:
 else:
     pybind_value='ON'
 
+if 'MAKE_DOCS' in os.environ and os.environ['MAKE_DOCS']:
+    docs_value='ON'
+else:
+    docs_value='OFF'
+
 
 setup(
     name="larcv",
@@ -37,6 +42,7 @@ setup(
         # '-DMPI_C_COMPILER={}'.format(mpicc),
         '-DMPI:BOOL={}'.format(mpi_value),
         '-DOPENMP:BOOL={}'.format(openmp_value),
+        '-DDOCS:BOOL={}'.format(docs_value),
     ],
     author=['Corey Adams', 'Kazuhiro Terao', 'Taritree Wongjirad', 'Marco del Tutto'],
     author_email='corey.adams@anl.gov',

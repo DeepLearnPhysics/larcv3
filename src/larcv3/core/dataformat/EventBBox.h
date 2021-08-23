@@ -36,12 +36,35 @@ namespace larcv3 {
     /// Default destructor
     ~EventBBox(){}
 
+    /**
+     * @brief      Get the bbox collection at projection index
+     *
+     * @param[in]  index  The index
+     *
+     * @return     All bboxes on this projection index
+     */
     inline larcv3::BBoxCollection<dimension> at(size_t index) {return _bbox_c_v.at(index);}
 
 
-
+    /**
+     * @brief      Set a collection of bboxes
+     *
+     * @param[in]  bbox_c_v  The bounding box c v
+     */
     void set(const std::vector<larcv3::BBoxCollection<dimension>>& bbox_c_v);
+
+    /**
+     * @brief      Append a collection of bboxes
+     *
+     * @param[in]  bbox_c  The bounding box c
+     */
     void append(const larcv3::BBoxCollection<dimension>& bbox_c);
+
+    /**
+     * @brief      Emplace a collection of bboxes to the end of the list
+     *
+     * @param      bbox_c  The bounding box c
+     */
     void emplace_back(larcv3::BBoxCollection<dimension>&& bbox_c);
     void emplace(std::vector<larcv3::BBoxCollection<dimension>>&& bbox_c_v);
 

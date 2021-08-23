@@ -27,8 +27,7 @@
 namespace larcv3 {
   /**
      \class BatchData
-     User defined class BatchData ... these comments are used to generate
-     doxygen documentation!
+     
   */
   template <class T>
   class BatchData {
@@ -44,6 +43,7 @@ namespace larcv3 {
     /// Default destructor
     ~BatchData() {}
 
+    /// Read access to the data:
     const std::vector<T>& data() const;
 
     // Writeable access to data:

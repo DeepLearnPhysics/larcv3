@@ -61,6 +61,11 @@ namespace larcv3 {
     /// Only for experts: allows a loose grouping for a set of ProcessBase inherit classes via true/false return to a "question".
     virtual bool is(const std::string question) const;
 
+    /**
+     * @brief      Default configuration
+     *
+     * @return     JSON default config
+     */
     static json default_config(){
       json c = {
           {"ProcessName", ""},

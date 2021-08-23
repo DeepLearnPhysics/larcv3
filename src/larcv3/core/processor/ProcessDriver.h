@@ -99,6 +99,7 @@ namespace larcv3 {
     /// Returns true if after any entry is processed (process_entry/batch_process) but not yet finalized
     inline bool processing() const { return _processing; }
 
+    /// Returns the default configuration for Process Driver
     static json default_config(){
         json c = {
             {"Verbosity", logger::default_level()},

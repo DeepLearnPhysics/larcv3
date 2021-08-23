@@ -135,5 +135,6 @@ endif(CMAKE_PYTHON_BINDINGS)
 add_subdirectory(larcv3)
 
 if(DOCS)
+  set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/docs" ${CMAKE_MODULE_PATH})
   add_subdirectory(docs)
 endif()

@@ -5,12 +5,9 @@
  *
  * \brief Class def header for a class QueueProcessor
  *
- * @author kazuhiro
+ * @author cadams
  */
 
-/** \addtogroup ThreadIO
-
-    @{*/
 #ifndef __LARCV3THREADIO_QUEUEPROCESSOR_H
 #define __LARCV3THREADIO_QUEUEPROCESSOR_H
 
@@ -41,13 +38,13 @@ namespace larcv3 {
     /// Default destructor
     ~QueueProcessor();
 
-    // Process a batch of entries, using _next_index_v to specify entries
+    /// Process a batch of entries, using _next_index_v to specify entries
     bool batch_process();
 
-    // Spawn a thread to batch process and return immediately
+    /// Spawn a thread to batch process and return immediately
     void prepare_next();
 
-    // Reset the state
+    /// Reset the state
     void reset();
 
 
