@@ -57,7 +57,9 @@ namespace larcv3 {
   /// Namespace for larcv3 message related types
   namespace msg {
 
-    /// Message level
+    /**
+     * @brief      Message Level
+     */
     enum Level_t { kDEBUG, kINFO, kNORMAL, kWARNING, kERROR, kCRITICAL, kMSG_TYPE_MAX };
 
     /// Formatted message prefix per message level

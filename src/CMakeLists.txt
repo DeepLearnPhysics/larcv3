@@ -40,7 +40,6 @@ project(larcv3)
 
 set(CMAKE_PACKAGE_DIR "larcv")
 
-set(PROJECT_SOURCE_DIR "./")
 
 
 include_directories("./")
@@ -134,3 +133,7 @@ endif(CMAKE_PYTHON_BINDINGS)
 
 
 add_subdirectory(larcv3)
+
+if(DOCS)
+  add_subdirectory(docs)
+endif()

@@ -35,30 +35,56 @@ namespace larcv3 {
 
   public:
 
-    /// Default constructor
+    /**
+     * @brief      Constructs a new instance.
+     *
+     * @param[in]  logger_name  The logger name
+     */
     larcv_base(const std::string logger_name="larcv_base")
       : _logger(nullptr)
     { _logger = &(::larcv3::logger::get(logger_name)); }
 
-    /// Default copy constructor
+    /**
+     * @brief      Constructs a new instance.
+     *
+     * @param[in]  original  The original
+     */
     larcv_base(const larcv_base &original) : _logger(original._logger) {}
 
-    /// Default destructor
+    /**
+     * @brief      Destroys the object.
+     */
     virtual ~larcv_base(){};
 
-    /// Logger getter
+    /**
+     * @brief      Get const reference to logger
+     *
+     * @return     { description_of_the_return_value }
+     */
     inline const larcv3::logger& logger() const
     { return *_logger; }
 
-    /// Verbosity level
+    /**
+     * @brief      Sets the verbosity.
+     *
+     * @param[in]  level  The level
+     */
     void set_verbosity(::larcv3::msg::Level_t level)
     { _logger->set(level); }
 
-    /// Name getter, defined in a logger instance attribute
+    /**
+     * @brief       Name getter, defined in a logger instance attribute
+     *
+     * @return     name of the logger
+     */
     const std::string& name() const
     { return logger().name(); }
 
-    /// Base config getter
+    /**
+     * @brief      Base config getter
+     *
+     * @return     json config
+     */
     static json default_config(){
       json j = {{ "larcv_base" ,
         {"", ""}

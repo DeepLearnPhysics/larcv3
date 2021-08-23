@@ -32,24 +32,57 @@ namespace larcv3 {
 
     BBox();
 
+    /**
+     * @brief Non default constructor
+     */
     BBox(const std::array<double, dimension>& centroid, 
          const std::array<double, dimension>& half_length,
          const std::array<double, dimension*dimension> & rotation = {});
 
-
+    
+    /**
+     * @brief      Return rotation, flattened
+     *
+     * @return     array of length dimension**2
+     */
     std::array<double, dimension*dimension > identity_rotation();
 
+    /**
+     * @brief      Return Centroid
+     *
+     */
     const std::array<double, dimension>& centroid() const {return _centroid;} 
+    /**
+     * @brief      Return half length
+     *
+     */
     const std::array<double, dimension>& half_length() const {return _half_length;}
+
+    /**
+     * @brief      Return rotation_matrix
+     *
+     * @return     array of size dimension**2
+     */
     const std::array<double, dimension*dimension> & rotation_matrix() const {return _rotation;}
 
+    /**
+     * @brief      Equality operator.
+     *
+     * @param[in]  rhs   The right hand side
+     *
+     * @return     The result of the equality
+     */
     inline bool operator== (const BBox<dimension>& rhs) const {
       return ( _centroid    == rhs._centroid && 
                _half_length == rhs._half_length && 
                _rotation    == rhs._rotation);
     }
 
-
+    /**
+     * @brief      Convert contents to readable string
+     *
+     * @return     Formatted string
+     */
     std::string dump() const;
 
 
@@ -108,11 +141,25 @@ namespace larcv3 {
 
     BBoxCollection(){};
 
-      /// Get # of BBox
+    /**
+     * @brief      Get number of BBox
+     *
+     * @return     Number of BBoxes
+     */
     inline size_t size() const { return _bbox_v.size(); }
-    /// Access specific BBox
+    /**
+     * @brief      Access specific BBox
+     *
+     * @param[in]  id    The identifier
+     *
+     * @return     larcv3::BBox
+     */
     const larcv3::BBox<dimension> & bbox(InstanceID_t id) const {return _bbox_v.at(id);}
-    /// Access all BBox as a vector
+    /**
+     * @brief      Access all BBox as immutable vector
+     *
+     * @return     Const ref to vector of bboxes
+     */
     inline const std::vector<larcv3::BBox<dimension> >& as_vector() const
     { return _bbox_v; }
 
@@ -120,22 +167,46 @@ namespace larcv3 {
     // Write-access
     //
 
-    /// Clear everything
+    /**
+     * @brief      Clear everything
+     */
     inline void clear_data() { _bbox_v.clear(); }
-    /// Resize voxel array
+    /**
+     * @brief      Resize bbox array
+     *
+     * @param[in]  num   The number of boxes
+     */
     inline void resize(const size_t num)
     { this->clear_data(); _bbox_v.resize(num); }
 
-    /// Access non-const reference of a specific BBox
+    /**
+     * @brief      Access non-const reference of a specific BBox
+     *
+     * @param[in]  id    The identifier
+     *
+     * @return     Mutable ref top bbox
+     */
     larcv3::BBox<dimension>& writeable_bbox(const InstanceID_t id) {return _bbox_v.at(id);}
 
-    /// Move a BBox into a collection.
+    /**
+     * @brief      Move a BBox into a collection.
+     *
+     * @param      bbox  The bounding box
+     */
     void emplace(larcv3::BBox<dimension> && bbox){_bbox_v.push_back(bbox);}
 
-    /// Set a BBox into a collection.
+    /**
+     * @brief      Set a BBox into a collection.
+     *
+     * @param[in]  bbox  The bounding box
+     */
     void append(const larcv3::BBox<dimension> & bbox) {_bbox_v.push_back(bbox);}
     
-    /// Mover
+    /**
+     * @brief      Move an entire collection of bboxes
+     *
+     * @param      orig  The original
+     */
     void move(larcv3::BBoxCollection<dimension> && orig)
     { _bbox_v = std::move(orig._bbox_v); }
 

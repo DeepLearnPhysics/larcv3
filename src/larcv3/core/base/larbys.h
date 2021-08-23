@@ -30,6 +30,11 @@ namespace larcv3 {
 
   public:
 
+    /**
+     * @brief      Constructs a new instance.
+     *
+     * @param[in]  msg   The message
+     */
     larbys(std::string msg="") : std::exception()
     {
       _msg = "\033[93m";

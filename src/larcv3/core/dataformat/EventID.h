@@ -43,7 +43,12 @@ class EventID {
   long subrun() const { return _subrun; }
   /// Event number getter
   long event() const { return _event; }
-  /// Run number setter
+
+  /**
+   * @brief      Set the run number
+   *
+   * @param[in]  _run  The run
+   */
   inline void run(long _run) { this->_run = _run; }
   /// SubRun number setter
   inline void subrun(long _subrun) { this->_subrun = _subrun; }

@@ -34,12 +34,19 @@ namespace larcv3 {
   public:
 
     /// Default constructor
+    /**
+     * @brief logger constructor
+     * @details Create a new logger with specified name
+     * 
+     */
     logger(const std::string& name="no_name")
       : _ostrm(&std::cout)
       , _name(name)
     {}
 
-    /// Default destructor
+    /**
+     * @brief      Destroys the object.
+     */
     virtual ~logger(){};
 
   private:
