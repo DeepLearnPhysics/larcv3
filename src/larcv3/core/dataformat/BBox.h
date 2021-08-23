@@ -1,14 +1,14 @@
 /**
  * \file BBox.h
  *
- * \ingroup core_DataFormat
+ * \ingroup DataFormat
  *
  * \brief Class def header for a class larcv3::BBox2D and larcv3::BBox3D
  *
  * @author kazuhiro, cadams
  */
 
-/** \addtogroup core_DataFormat
+/** \addtogroup DataFormat
 
     @{*/
 #ifndef __LARCV3DATAFORMAT_BBOX_H__

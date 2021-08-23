@@ -1,14 +1,14 @@
 /**
  * \file Tensor.h
  *
- * \ingroup core_DataFormat
+ * \ingroup DataFormat
  *
  * \brief Class def header for an tensor data holder larcv3::Tensor (was Image2D)
  *
  * @author tmw, kazu, cadams
  */
 
-/** \addtogroup core_DataFormat
+/** \addtogroup DataFormat
 
     @{*/
 

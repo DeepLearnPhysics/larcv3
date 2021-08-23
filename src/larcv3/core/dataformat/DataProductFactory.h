@@ -5,7 +5,7 @@
  *
  * \brief Class def header for a class DataProductFactory
  *
- * @author kazuhiro
+ * @author kazuhiro, cadams
  */
 
 /** \addtogroup DataFormat

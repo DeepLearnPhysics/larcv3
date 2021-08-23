@@ -1,7 +1,7 @@
 /**
  * \file ImageMeta.h
  *
- * \ingroup core_DataFormat
+ * \ingroup DataFormat
  *
  * \brief Class def header for a class larcv3::ImageMeta
  *
@@ -16,7 +16,7 @@
  * An "index" is a unique, single value for each coordinate.
  */
 
-/** \addtogroup core_DataFormat
+/** \addtogroup DataFormat
 
     @{*/
 #ifndef __LARCV3DATAFORMAT_IMAGEMETA_H__

@@ -1,3 +1,17 @@
+/**
+ * \file Vertex.h
+ *
+ * \ingroup DataFormat
+ *
+ * \brief Class def header for a class larcv3::Vertex
+ *
+ * @author cadams,
+ */
+
+/** \addtogroup DataFormat
+
+    @{*/
+
 #ifndef __LARCV3DATAFORMAT_VERTEX_H__
 #define __LARCV3DATAFORMAT_VERTEX_H__
 

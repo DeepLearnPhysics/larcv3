@@ -1,15 +1,14 @@
-
 /*
- * \file EventVoxel2D.h
+ * \file EventSparseTensor.h
  *
- * \ingroup core_DataFormat
+ * \ingroup DataFormat
  *
  * \brief Class def header for a class larcv3::EventSparseTensor and larcv3::EventClusterPixel2D
  *
  * @author kazuhiro
  * @author cadams
 
- * \addtogroup core_DataFormat
+ * \addtogroup DataFormat
 */
 
 #ifndef __LARCV3DATAFORMAT_EVENTSPARSETENSOR_H

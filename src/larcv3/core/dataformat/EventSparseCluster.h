@@ -1,7 +1,7 @@
 /*
  * \file EventSparseCluster.h
  *
- * \ingroup core_DataFormat
+ * \ingroup DataFormat
  *
  * \brief Class def header for a class larcv3::EventSparseCluster 2D and 3D
  *
@@ -9,7 +9,7 @@
  * @author cadams
 
 
- * \addtogroup core_DataFormat
+ * \addtogroup DataFormat
 
 */
 #ifndef __LARCV3DATAFORMAT_EVENTSPARSECLUSTER_H

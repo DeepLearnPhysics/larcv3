@@ -1,14 +1,14 @@
 /**
  * \file Voxel.h
  *
- * \ingroup core_DataFormat
+ * \ingroup DataFormat
  *
  * \brief Class def header for a class larcv3::Voxel
  *
- * @author kazuhiro
+ * @author cadams, kazuhiro
  */
 
-/** \addtogroup core_DataFormat
+/** \addtogroup DataFormat
 
     @{*/
 #ifndef __LARCV3DATAFORMAT_VOXEL_H

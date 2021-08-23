@@ -1,6 +1,16 @@
 #ifndef __LARCV3DATAFORMAT_DATAFORMATTYPES_H__
 #define __LARCV3DATAFORMAT_DATAFORMATTYPES_H__
 
+/**
+ * \file DataFormatTypes.h
+ *
+ * \ingroup DataFormat
+ *
+ * \brief Definition of many types for Dataformat
+ *
+ * @author cadams
+ */
+
 #include "larcv3/core/base/LArCVTypes.h"
 #include <vector>
 #include <set>
