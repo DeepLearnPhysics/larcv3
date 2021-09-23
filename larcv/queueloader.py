@@ -138,6 +138,7 @@ class queue_interface(object):
                 raise Exception("io_config for mode {} is missing required key {}".format(mode, req))
 
 
+
         start = time.time()
 
         # Initialize and configure a manager:
@@ -352,9 +353,9 @@ class larcv_queueio (object):
 
         # get QueueProcessor config file
         self._cfg_file = cfg['filler_cfg']
-        if not self._cfg_file or not os.path.isfile(self._cfg_file):
-            sys.stderr.write('filler_cfg file does not exist: %s\n' % self._cfg_file)
-            raise ValueError
+        # if not self._cfg_file or not os.path.isfile(self._cfg_file):
+        #     sys.stderr.write('filler_cfg file does not exist: %s\n' % self._cfg_file)
+        #     raise ValueError
 
         # set verbosity
         if 'verbosity' in cfg:
@@ -367,11 +368,12 @@ class larcv_queueio (object):
 
         # fetch batch filler info
         self._storage = {}
-        for i in range(len(self._proc.batch_fillers())):
-            pid = self._proc.batch_fillers()[i]
+        # Making a map between process names and data outputs:
+        for pid, datatype in zip(self._proc.batch_fillers(), self._proc.batch_types()):
+            # What's the name from the config?
             name = self._proc.storage_name(pid)
-            dtype = larcv.BatchDataTypeName(self._proc.batch_types()[i])
-            self._storage[name]=batch_pydata(dtype)
+            datatype = larcv.BatchDataTypeName(datatype)
+            self._storage[name]=batch_pydata(datatype)
             if 'make_copy' in cfg and cfg['make_copy']:
                 self._storage[name]._make_copy = True
 

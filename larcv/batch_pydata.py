@@ -87,10 +87,10 @@ class batch_pydata(object):
             # Create an array to hold the data if it does not exits:
             self._npy_data = numpy.ndarray(shape=(larcv_batchdata.data_size()), dtype=self._dtype)
          self._npy_data = self._npy_data.reshape(self.batch_data_size())
-         self._npy_data = numpy.copy(larcv_batchdata.pydata())
+         self._npy_data = numpy.copy(larcv_batchdata.data())
 
       else:
-         self._npy_data = larcv_batchdata.pydata()
+         self._npy_data = larcv_batchdata.data()
 
 
 
