@@ -175,7 +175,7 @@ namespace larcv3 {
       return;
     }
 
-    LARCV_INFO() << "Resetting batch data status to " << (int)(BatchDataState_t::kBatchStateEmpty) << std::endl;
+    LARCV_SINFO() << "Resetting batch data status to " << (int)(BatchDataState_t::kBatchStateEmpty) << std::endl;
     _data.resize(data_size(true));
     _current_size = 0;
     _state = BatchDataState_t::kBatchStateEmpty;
