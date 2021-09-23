@@ -43,19 +43,18 @@ int omp_thread_count() {
 
   const std::string& QueueProcessor::storage_name(size_t process_id) const
   {
-    if (process_id > _process_name_v.size()) {
-      LARCV_CRITICAL() << "Process ID " << process_id << " is invalid!" << std::endl;
-      throw larbys();
-    }
-    return _process_name_v[process_id];
+
+    return _driver.process_ptr(process_id)->name();
+
   }
 
   size_t QueueProcessor::process_id(const std::string& name) const
   {
-    for (size_t id = 0; id < _process_name_v.size(); ++id)
-      if (name == _process_name_v[id]) return id;
-    LARCV_ERROR() << "Could not locate process name: " << name << std::endl;
-    return kINVALID_SIZE;
+    return _driver.process_id(name);
+    // for (size_t id = 0; id < _process_name_v.size(); ++id)
+    //   if (name == _process_name_v[id]) return id;
+    // LARCV_ERROR() << "Could not locate process name: " << name << std::endl;
+    // return kINVALID_SIZE;
   }
 
 
@@ -135,27 +134,29 @@ int omp_thread_count() {
 
     bool ready = true;
 
-    for (size_t pid = 0; pid < _process_name_v.size(); ++pid) {
-      auto const& name = _process_name_v[pid];
+    for (auto const& process_name : _driver.process_names()) {
 
+      // Get the process ID by name lookup
+      ProcessID_t pid = _driver.process_id(process_name);
       auto proc_ptr = _driver.process_ptr(pid);
+
       if (!(proc_ptr->is("BatchFiller"))) continue;
       auto datatype = ((BatchHolder*)(proc_ptr))->data_type() ;
 
 
       switch ( datatype ) {
       case BatchDataType_t::kBatchDataShort:
-        ready = ready && BatchDataQueueFactory<short>::get().get_queue(name).is_next_ready(); break;
+        ready = ready && BatchDataQueueFactory<short>::get().get_queue(process_name).is_next_ready(); break;
       case BatchDataType_t::kBatchDataInt:
-        ready = ready && BatchDataQueueFactory<int>::get().get_queue(name).is_next_ready(); break;
+        ready = ready && BatchDataQueueFactory<int>::get().get_queue(process_name).is_next_ready(); break;
       case BatchDataType_t::kBatchDataFloat:
-        ready = ready && BatchDataQueueFactory<float>::get().get_queue(name).is_next_ready(); break;
+        ready = ready && BatchDataQueueFactory<float>::get().get_queue(process_name).is_next_ready(); break;
       case BatchDataType_t::kBatchDataDouble:
-        ready = ready && BatchDataQueueFactory<double>::get().get_queue(name).is_next_ready(); break;
+        ready = ready && BatchDataQueueFactory<double>::get().get_queue(process_name).is_next_ready(); break;
       case BatchDataType_t::kBatchDataParticle:
-        ready = ready && BatchDataQueueFactory<larcv3::Particle>::get().get_queue(name).is_next_ready(); break;
+        ready = ready && BatchDataQueueFactory<larcv3::Particle>::get().get_queue(process_name).is_next_ready(); break;
       default:
-        LARCV_CRITICAL() << "Process name " << name
+        LARCV_CRITICAL() << "Process name " << process_name
                          << " encountered none-supported BatchDataType_t: " << int(datatype) << std::endl;
         throw larbys();
       }
@@ -165,27 +166,30 @@ int omp_thread_count() {
       LARCV_ERROR() << "Can't pop current data because the next data is not yet ready." << std::endl;
     }
 
-    for (size_t pid = 0; pid < _process_name_v.size(); ++pid) {
-      auto const& name = _process_name_v[pid];
+    for (auto const& process_name : _driver.process_names()) {
 
+      // Get the process ID by name lookup
+      ProcessID_t pid = _driver.process_id(process_name);
       auto proc_ptr = _driver.process_ptr(pid);
+      
+
       if (!(proc_ptr->is("BatchFiller"))) continue;
-      // _batch_filler_id_v.push_back(pid);
+
       auto datatype = ((BatchHolder*)(proc_ptr))->data_type() ;
 
       switch ( datatype ) {
       case BatchDataType_t::kBatchDataShort:
-        BatchDataQueueFactory<short>::get_writeable().get_queue_writeable(name).pop(); break;
+        BatchDataQueueFactory<short>::get_writeable().get_queue_writeable(process_name).pop(); break;
       case BatchDataType_t::kBatchDataInt:
-        BatchDataQueueFactory<int>::get_writeable().get_queue_writeable(name).pop(); break;
+        BatchDataQueueFactory<int>::get_writeable().get_queue_writeable(process_name).pop(); break;
       case BatchDataType_t::kBatchDataFloat:
-        BatchDataQueueFactory<float>::get_writeable().get_queue_writeable(name).pop(); break;
+        BatchDataQueueFactory<float>::get_writeable().get_queue_writeable(process_name).pop(); break;
       case BatchDataType_t::kBatchDataDouble:
-        BatchDataQueueFactory<double>::get_writeable().get_queue_writeable(name).pop(); break;
+        BatchDataQueueFactory<double>::get_writeable().get_queue_writeable(process_name).pop(); break;
       case BatchDataType_t::kBatchDataParticle:
-        BatchDataQueueFactory<larcv3::Particle>::get_writeable().get_queue_writeable(name).pop(); break;
+        BatchDataQueueFactory<larcv3::Particle>::get_writeable().get_queue_writeable(process_name).pop(); break;
       default:
-        LARCV_CRITICAL() << "Process name " << name
+        LARCV_CRITICAL() << "Process name " << process_name
                          << " encountered none-supported BatchDataType_t: " << int(datatype) << std::endl;
         throw larbys();
       }
@@ -232,38 +236,6 @@ int omp_thread_count() {
 
 
 
-    // LARCV_INFO() << "Constructing Processor config: " << proc_name << std::endl;
-    // json proc_cfg;
-    // for (auto const& value_key : orig_cfg.value_keys()) {
-    //   if (value_key == "ProcessName") {
-    //     for (auto const& unit_name : orig_cfg.get<std::vector<std::string> >("ProcessName")) {
-    //       _process_name_v.push_back(unit_name);
-    //     }
-    //   }
-    //   if (value_key == "RandomAccess"){
-    //     continue;
-    //   }
-    //   proc_cfg.add_value(value_key, orig_cfg.get<std::string>(value_key));
-    // }
-    // proc_cfg.add_value("RandomAccess", "false");
-
-
-
-
-    // LARCV_INFO() << "Constructing IO configuration: " << io_cfg_name << std::endl;
-
-    // for (auto const& pset_key : orig_cfg.pset_keys()) {
-    //   if (pset_key == "IOManager") {
-    //     // auto const& orig_io_cfg = orig_cfg.get_pset(pset_key);
-    //     LARCV_NORMAL() << "IOManager configuration will be ignored..." << std::endl;
-    //   }
-    //   else if (pset_key == "ProcessList") {
-    //     auto const& orig_thread_plist = orig_cfg.get<larcv3::PSet>(pset_key);
-    //     proc_cfg.add_pset(orig_thread_plist);
-    //   }
-    //   else
-    //     proc_cfg.add_pset(orig_cfg.get_pset(pset_key));
-
 
     auto & proc_cfg = config["ProcessDriver"];
 
@@ -290,33 +262,36 @@ int omp_thread_count() {
     }
     _driver.initialize(color);
 
-    // Prepare P}
 
     // only-once-operation among all queueus: initialize storage
     _batch_filler_id_v.clear();
     _batch_data_type_v.clear();
-    for (size_t pid = 0; pid < _process_name_v.size(); ++pid) {
+    for (auto const& process_name : _driver.process_names()) {
 
+      // Get the process ID by name lookup
+      ProcessID_t id = _driver.process_id(process_name);
+      auto proc_ptr = _driver.process_ptr(id);
 
-      auto proc_ptr = _driver.process_ptr(pid);
+      // Skip non batch fillers
       if (!(proc_ptr->is("BatchFiller"))) continue;
-      _batch_filler_id_v.push_back(pid);
+      
+      // Save the id and datatype
       auto datatype = ((BatchHolder*)(proc_ptr))->data_type() ;
+      _batch_filler_id_v.push_back(id);
       _batch_data_type_v.push_back(datatype);
-      auto const& name = _process_name_v[pid];
       switch ( datatype ) {
       case BatchDataType_t::kBatchDataShort:
-        BatchDataQueueFactory<short>::get_writeable().make_queue(name); break;
+        BatchDataQueueFactory<short>::get_writeable().make_queue(process_name); break;
       case BatchDataType_t::kBatchDataInt:
-        BatchDataQueueFactory<int>::get_writeable().make_queue(name); break;
+        BatchDataQueueFactory<int>::get_writeable().make_queue(process_name); break;
       case BatchDataType_t::kBatchDataFloat:
-        BatchDataQueueFactory<float>::get_writeable().make_queue(name); break;
+        BatchDataQueueFactory<float>::get_writeable().make_queue(process_name); break;
       case BatchDataType_t::kBatchDataDouble:
-        BatchDataQueueFactory<double>::get_writeable().make_queue(name); break;
+        BatchDataQueueFactory<double>::get_writeable().make_queue(process_name); break;
       case BatchDataType_t::kBatchDataParticle:
-        BatchDataQueueFactory<larcv3::Particle>::get_writeable().make_queue(name); break;
+        BatchDataQueueFactory<larcv3::Particle>::get_writeable().make_queue(process_name); break;
       default:
-        LARCV_CRITICAL() << "Process name " << name
+        LARCV_CRITICAL() << "Process name " << process_name
                          << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(proc_ptr))->data_type()) << std::endl;
         throw larbys();
       }
@@ -421,41 +396,44 @@ int omp_thread_count() {
 
   bool QueueProcessor::set_batch_storage(){
 
+    for (auto const& process_name : _driver.process_names()) {
 
-    for (size_t pid = 0; pid < _process_name_v.size(); ++pid) {
+      // Get the process ID by name lookup
+      ProcessID_t pid = _driver.process_id(process_name);
       auto proc_ptr = _driver.process_ptr(pid);
+
+      // auto proc_ptr = _driver.process_ptr(pid);
       if (!(proc_ptr->is("BatchFiller"))) continue;
 
-      auto const& name = _process_name_v[pid];
       BatchDataState_t batch_state = BatchDataState_t::kBatchStateUnknown;
       switch ( ((BatchHolder*)(proc_ptr))->data_type() ) {
       case BatchDataType_t::kBatchDataShort:
         ((BatchFillerTemplate<short>*)proc_ptr)->_batch_data_ptr
-          = &(BatchDataQueueFactory<short>::get_writeable().get_queue_writeable(name).get_next_writeable());
+          = &(BatchDataQueueFactory<short>::get_writeable().get_queue_writeable(process_name).get_next_writeable());
         batch_state = ((BatchFillerTemplate<short>*)proc_ptr)->_batch_data_ptr->state();
         break;
       case BatchDataType_t::kBatchDataInt:
         ((BatchFillerTemplate<int>*)proc_ptr)->_batch_data_ptr
-          = &(BatchDataQueueFactory<int>::get_writeable().get_queue_writeable(name).get_next_writeable());
+          = &(BatchDataQueueFactory<int>::get_writeable().get_queue_writeable(process_name).get_next_writeable());
         batch_state = ((BatchFillerTemplate<int>*)proc_ptr)->_batch_data_ptr->state();
         break;
       case BatchDataType_t::kBatchDataFloat:
         ((BatchFillerTemplate<float>*)proc_ptr)->_batch_data_ptr
-          = &(BatchDataQueueFactory<float>::get_writeable().get_queue_writeable(name).get_next_writeable());
+          = &(BatchDataQueueFactory<float>::get_writeable().get_queue_writeable(process_name).get_next_writeable());
         batch_state = ((BatchFillerTemplate<float>*)proc_ptr)->_batch_data_ptr->state();
         break;
       case BatchDataType_t::kBatchDataDouble:
         ((BatchFillerTemplate<double>*)proc_ptr)->_batch_data_ptr
-          = &(BatchDataQueueFactory<double>::get_writeable().get_queue_writeable(name).get_next_writeable());
+          = &(BatchDataQueueFactory<double>::get_writeable().get_queue_writeable(process_name).get_next_writeable());
         batch_state = ((BatchFillerTemplate<double>*)proc_ptr)->_batch_data_ptr->state();
         break;
       case BatchDataType_t::kBatchDataParticle:
         ((BatchFillerTemplate<larcv3::Particle>*)proc_ptr)->_batch_data_ptr
-          = &(BatchDataQueueFactory<larcv3::Particle>::get_writeable().get_queue_writeable(name).get_next_writeable());
+          = &(BatchDataQueueFactory<larcv3::Particle>::get_writeable().get_queue_writeable(process_name).get_next_writeable());
         batch_state = ((BatchFillerTemplate<larcv3::Particle>*)proc_ptr)->_batch_data_ptr->state();
         break;
       default:
-        LARCV_CRITICAL() << "Process name " << name
+        LARCV_CRITICAL() << "Process process_name " << process_name
                          << " encountered none-supported BatchDataType_t: " << (int)(((BatchHolder*)(proc_ptr))->data_type()) << std::endl;
         throw larbys();
       }
