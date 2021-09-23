@@ -30,7 +30,7 @@ namespace larcv3 {
     config = augment_default_config(config, cfg);
 
 
-    // _tensor_producer = cfg.get<std::string>("TensorProducer");
+    // _tensor_producer = cfg.get<std::string>("Producer");
     auto _tensor_type     = config["TensorType"].template get<std::string>();
 
     if (_tensor_type != "dense" && _tensor_type != "sparse") {
@@ -180,7 +180,7 @@ namespace larcv3 {
 
     auto _allow_empty     = config["AllowEmpty"]. template get<bool>();
     auto _slice_v         = config["Channels"]. template get<std::vector<size_t> >();
-    auto _tensor_producer = config["TensorProducer"].template get<std::string>();
+    auto _tensor_producer = config["Producer"].template get<std::string>();
 
     auto const& image_data =
         mgr.get_data<larcv3::EventTensor<dimension>>(_tensor_producer);
@@ -280,7 +280,7 @@ namespace larcv3 {
 
     // auto _slice_v          = config["Channels"]. template get<std::vector<size_t> >();
     auto _voxel_base_value = config["EmptyVoxelValue"]. template get<float>();
-    auto _tensor_producer  = config["TensorProducer"].template get<std::string>();
+    auto _tensor_producer  = config["Producer"].template get<std::string>();
     auto _allow_empty      = config["AllowEmpty"]. template get<bool>();
     auto _slice_v          = config["Channels"]. template get<std::vector<size_t> >();
 
@@ -371,5 +371,39 @@ template class BatchFillerTensor<2>;
 template class BatchFillerTensor<3>;
 // template class BatchFillerTensor<4>;
 
+template<> std::string as_string<BatchFillerTensor<1>>() {return "BatchFillerTensor1D";}
+template<> std::string as_string<BatchFillerTensor<2>>() {return "BatchFillerTensor2D";}
+template<> std::string as_string<BatchFillerTensor<3>>() {return "BatchFillerTensor3D";}
+template<> std::string as_string<BatchFillerTensor<4>>() {return "BatchFillerTensor4D";}
+
+
 }
+
+
+void init_bf_tensor(pybind11::module m){
+
+  init_bf_tensor_<2>(m);
+  init_bf_tensor_<3>(m);
+
+}
+
+#include <typeinfo>
+#include <pybind11/stl.h>
+
+template <size_t dimension>
+void init_bf_tensor_(pybind11::module m){
+
+    using Class = larcv3::BatchFillerTensor<dimension>;
+    std::string classname = larcv3::as_string<larcv3::BatchFillerTensor<dimension>>();
+    pybind11::class_<Class> batch_filler(m, classname.c_str());
+    batch_filler.def(pybind11::init<>());
+
+    // batch_filler.def("pydata",             &Class::pydata);
+    batch_filler.def("default_config",     &Class::default_config);
+    batch_filler.def("process",            &Class::process);
+    
+
+}
+
+
 #endif

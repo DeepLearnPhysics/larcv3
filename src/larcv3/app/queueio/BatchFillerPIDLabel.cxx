@@ -51,7 +51,7 @@ namespace larcv3 {
   bool BatchFillerPIDLabel::process(IOManager & mgr)
   {
 
-    std::string producer = config["ParticleProducer"].get<std::string>();
+    std::string producer = config["Producer"].get<std::string>();
     auto const& event_part = mgr.get_data<larcv3::EventParticle>(producer);
     auto _pdg_list = config["PdgClassList"].get<std::vector<int> >();
 
@@ -93,4 +93,22 @@ namespace larcv3 {
   }
 
 }
+
+#include <typeinfo>
+#include <pybind11/stl.h>
+
+void init_bf_pid(pybind11::module m){
+
+    using Class = larcv3::BatchFillerPIDLabel;
+    std::string classname = "BatchFillerPIDLabel";
+    pybind11::class_<Class> batch_filler(m, classname.c_str());
+    batch_filler.def(pybind11::init<>());
+
+    // batch_filler.def("pydata",             &Class::pydata);
+    batch_filler.def("default_config",     &Class::default_config);
+    batch_filler.def("process",            &Class::process);
+    
+
+}
+
 #endif

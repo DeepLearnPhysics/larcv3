@@ -49,7 +49,7 @@ namespace larcv3 {
 
     static json default_config(){
       json c = {
-        {"ParticleProducer", std::string()},
+        {"Producer", std::string()},
       };
       return c;
     }
@@ -76,6 +76,11 @@ namespace larcv3 {
   };
 
 }
+
+#ifdef LARCV_INTERNAL
+
+void init_bf_particle(pybind11::module m);
+#endif
 
 #endif
 /** @} */ // end of doxygen group 

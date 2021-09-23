@@ -100,7 +100,7 @@ namespace larcv3 {
     [batch_size][num_channels][max_boxes][2*dimension]
     the [2] represents first the centroid, then the extents (half lengths)
     */
-    auto _bbox_producer      = config["ParticleProducer"].template get<std::string>();
+    auto _bbox_producer      = config["Producer"].template get<std::string>();
     auto _unfilled_box_value = config["UnfilledBoxValue"].template get<float>();
     auto _max_boxes          = config["MaxBoxes"].template         get<int>();
     auto _slice_v            = config["Channels"].template         get<std::vector<size_t>>();
@@ -194,4 +194,31 @@ namespace larcv3 {
 template class BatchFillerBBox<2>;
 template class BatchFillerBBox<3>;
 }
+
+void init_bf_bbox(pybind11::module m){
+
+  init_bf_bbox_<2>(m);
+  init_bf_bbox_<3>(m);
+
+}
+
+#include <typeinfo>
+#include <pybind11/stl.h>
+
+template <size_t dimension>
+void init_bf_bbox_(pybind11::module m){
+
+    using Class = larcv3::BatchFillerBBox<dimension>;
+    std::string classname = "BatchFillerBBox" + std::to_string(dimension) + "D";
+    pybind11::class_<Class> batch_filler(m, classname.c_str());
+    batch_filler.def(pybind11::init<>());
+
+    // batch_filler.def("pydata",             &Class::pydata);
+    batch_filler.def("default_config",     &Class::default_config);
+    batch_filler.def("process",            &Class::process);
+    
+
+}
+
+
 #endif

@@ -21,7 +21,7 @@ namespace larcv3 {
 
   bool BatchFillerParticle::process(IOManager& mgr){
 
-    std::string producer = config["ParticleProducer"].get<std::string>();
+    std::string producer = config["Producer"].get<std::string>();
     // Fetch the particles:
     auto const& event_part = mgr.get_data<larcv3::EventParticle>(producer);
 
@@ -63,6 +63,23 @@ namespace larcv3 {
   void BatchFillerParticle::_batch_end_(){}
 
   void BatchFillerParticle::finalize(){}
+
+}
+
+#include <typeinfo>
+#include <pybind11/stl.h>
+
+void init_bf_particle(pybind11::module m){
+
+    using Class = larcv3::BatchFillerParticle;
+    std::string classname = "BatchFillerParticle";
+    pybind11::class_<Class> batch_filler(m, classname.c_str());
+    batch_filler.def(pybind11::init<>());
+
+    // batch_filler.def("pydata",             &Class::pydata);
+    batch_filler.def("default_config",     &Class::default_config);
+    batch_filler.def("process",            &Class::process);
+    
 
 }
 

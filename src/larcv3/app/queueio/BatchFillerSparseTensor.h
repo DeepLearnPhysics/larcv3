@@ -47,7 +47,7 @@ namespace larcv3 {
 
     static json default_config(){
       json c = {
-        {"TensorProducer", std::string()},
+        {"Producer", std::string()},
         {"Augment", true},
         {"MaxVoxels", 0},
         {"UnfilledVoxelValue", -999.},
@@ -115,6 +115,15 @@ namespace larcv3 {
   };
 
 }
+
+
+#ifdef LARCV_INTERNAL
+template <size_t dimension>
+void init_bf_sparse_tensor_(pybind11::module m);
+
+void init_bf_sparse_tensor(pybind11::module m);
+#endif
+
 
 #endif
 /** @} */ // end of doxygen group

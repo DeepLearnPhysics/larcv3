@@ -25,7 +25,7 @@ namespace larcv3 {
     config = augment_default_config(config, cfg);
 
 
-    // _tensor_producer = cfg.get<std::string>("TensorProducer");
+    // _tensor_producer = cfg.get<std::string>("Producer");
     // _augment = cfg.get<bool>("Augment", true);
 
     // Max voxels imposes a limit to make the memory layout regular.  Assuming average sparsity of x% , it's safe to
@@ -127,7 +127,7 @@ namespace larcv3 {
     auto _unfilled_voxel_value  = config["UnfilledVoxelValue"].template get<float>();
     auto _slice_v               = config["Channels"].          template get<std::vector<int> >();
     auto _include_values        = config["IncludeValues"].     template get<bool>();
-    auto _tensor_producer       = config["TensorProducer"].    template get<std::string>();
+    auto _tensor_producer       = config["Producer"].    template get<std::string>();
     auto _augment               = config["Augment"].           template get<bool>();
 
     LARCV_DEBUG() << "start" << std::endl;
@@ -252,5 +252,39 @@ namespace larcv3 {
 
     return true;
   }
+
+template<> std::string as_string<BatchFillerSparseTensor<1>>() {return "BatchFillerSparseTensor1D";}
+template<> std::string as_string<BatchFillerSparseTensor<2>>() {return "BatchFillerSparseTensor2D";}
+template<> std::string as_string<BatchFillerSparseTensor<3>>() {return "BatchFillerSparseTensor3D";}
+template<> std::string as_string<BatchFillerSparseTensor<4>>() {return "BatchFillerSparseTensor4D";}
+
+
 }
+
+void init_bf_sparse_tensor(pybind11::module m){
+
+  init_bf_sparse_tensor_<2>(m);
+  init_bf_sparse_tensor_<3>(m);
+
+}
+
+#include <typeinfo>
+#include <pybind11/stl.h>
+
+template <size_t dimension>
+void init_bf_sparse_tensor_(pybind11::module m){
+
+    using Class = larcv3::BatchFillerSparseTensor<dimension>;
+    std::string classname = larcv3::as_string<larcv3::BatchFillerSparseTensor<dimension>>();
+    pybind11::class_<Class> batch_filler(m, classname.c_str());
+    batch_filler.def(pybind11::init<>());
+
+    // batch_filler.def("pydata",             &Class::pydata);
+    batch_filler.def("default_config",     &Class::default_config);
+    batch_filler.def("process",            &Class::process);
+    
+
+}
+
+
 #endif

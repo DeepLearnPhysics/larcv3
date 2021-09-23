@@ -1,4 +1,9 @@
 #include "queueio.h"
+#include "BatchFillerPIDLabel.h"
+#include "BatchFillerBBox.h"
+#include "BatchFillerParticle.h"
+#include "BatchFillerSparseTensor.h"
+#include "BatchFillerTensor.h"
 
 
 void init_queueio(pybind11::module m){
@@ -31,4 +36,11 @@ void init_queueio(pybind11::module m){
   init_batchdataqueue(m);
   init_batchdataqueuefactory(m);
   init_queueprocessor(m);
+
+  init_bf_pid(m);
+  init_bf_bbox(m);
+  init_bf_particle(m);
+  init_bf_sparse_tensor(m);
+  init_bf_tensor(m);
+
 }

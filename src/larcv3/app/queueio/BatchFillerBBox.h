@@ -47,7 +47,7 @@ namespace larcv3 {
 
     static json default_config(){
       json c = {
-        {"BBoxProducer", std::string()},
+        {"Producer", std::string()},
         {"MaxBoxes", 25},
         {"UnfilledBoxValue", 0.0},
         {"Channels", std::vector<int>()},
@@ -106,6 +106,13 @@ namespace larcv3 {
   };
 
 }
+
+#ifdef LARCV_INTERNAL
+template <size_t dimension>
+void init_bf_bbox_(pybind11::module m);
+
+void init_bf_bbox(pybind11::module m);
+#endif
 
 #endif
 /** @} */ // end of doxygen group
