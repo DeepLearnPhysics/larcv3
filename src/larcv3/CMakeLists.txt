@@ -15,6 +15,8 @@ add_library(larcv3 SHARED
     )
 
 
+# Define the location of the header files, for doc generation
+set(LARCV3_PUBLIC_HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 
 if (OpenMP_CXX_FOUND)

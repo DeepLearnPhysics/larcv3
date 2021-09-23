@@ -5,7 +5,7 @@
  *
  * \brief Class def header for a class EventBBox
  *
- * @author kazuhiro
+ * @author cadams
  */
 
 /** \addtogroup DataFormat
