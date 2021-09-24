@@ -14,7 +14,7 @@ namespace larcv3 {
     if (!_me) _me = new BatchDataQueueFactory<T>();
     return (*_me);
   }
-    
+
   // Pop all queues to promote next to current
   template <class T>
   void BatchDataQueueFactory<T>::pop_all(){
@@ -22,7 +22,7 @@ namespace larcv3 {
       batch_queue.second.pop();
     }
   }
-  
+
   template <class T>
   bool BatchDataQueueFactory<T>::is_next_ready() const{
     bool ready = true;
@@ -66,7 +66,7 @@ template<> larcv3::BatchDataQueueFactory<short>*  larcv3::BatchDataQueueFactory<
 template<> larcv3::BatchDataQueueFactory<int>*    larcv3::BatchDataQueueFactory<int>::_me    = nullptr;
 template<> larcv3::BatchDataQueueFactory<float>*  larcv3::BatchDataQueueFactory<float>::_me  = nullptr;
 template<> larcv3::BatchDataQueueFactory<double>* larcv3::BatchDataQueueFactory<double>::_me = nullptr;
-template<> larcv3::BatchDataQueueFactory<larcv3::Particle>* larcv3::BatchDataQueueFactory<larcv3::Particle>::_me = nullptr;
+template<> larcv3::BatchDataQueueFactory<larcv3::ParticleHolder>* larcv3::BatchDataQueueFactory<larcv3::ParticleHolder>::_me = nullptr;
 // template<> larcv3::BatchDataQueueFactory<larcv3::SparseTensor<2>>* larcv3::BatchDataQueueFactory<larcv3::SparseTensor<2>>::_me = nullptr;
 // template<> larcv3::BatchDataQueueFactory<std::string>* larcv3::BatchDataQueueFactory<std::string>::_me = nullptr;
 
@@ -75,7 +75,7 @@ template class larcv3::BatchDataQueueFactory<short>;
 template class larcv3::BatchDataQueueFactory<int>;
 template class larcv3::BatchDataQueueFactory<float>;
 template class larcv3::BatchDataQueueFactory<double>;
-template class larcv3::BatchDataQueueFactory<larcv3::Particle>;
+template class larcv3::BatchDataQueueFactory<larcv3::ParticleHolder>;
 // template class larcv3::BatchDataQueueFactory<larcv3::SparseTensor<2>>;
 // template class larcv3::BatchDataQueueFactory<std::string>;
 
@@ -100,7 +100,7 @@ void init_batchdataqueuefactory(pybind11::module m){
   init_batchdataqueuefactory<int>(m);
   init_batchdataqueuefactory<float>(m);
   init_batchdataqueuefactory<double>(m);
-  init_batchdataqueuefactory<larcv3::Particle>(m);
+  init_batchdataqueuefactory<larcv3::ParticleHolder>(m);
   // init_batchdataqueuefactory<larcv3::SparseTensor<2>>(m);
 
 }

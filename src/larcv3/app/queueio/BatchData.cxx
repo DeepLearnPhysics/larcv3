@@ -20,30 +20,24 @@ namespace larcv3 {
     return _data;
   }
 
-  // template<class T>
-  // pybind11::array_t<T> BatchData<T>::pydata()
-  // {
-  //   if (_state != BatchDataState_t::kBatchStateFilled) {
-  //     LARCV_SCRITICAL() << "Current batch state: " << (int)this->state()
-  //                       << " not ready to expose data!" << std::endl;
-  //     throw larbys();
-  //   }
+  // Return a numpy array of this object (no copy by default)
+  template<class T>
+  pybind11::array_t<T> BatchData<T>::pydata(){
+    if (_state != BatchDataState_t::kBatchStateFilled) {
+      LARCV_SCRITICAL() << "Current batch state: " << (int)this->state()
+                        << " not ready to expose data!" << std::endl;
+      throw larbys();
+    }
 
-  //   // First, create the buffer object:
-  //   // Cast the dimensions to std::array:
-  //   std::array<size_t, 1> dimensions;
-  //   dimensions[0] = _data.size();
-  //   // Allocate a spot to store the data:
-  //   auto array = pybind11::array_t<T>(
-  //       // _meta.number_of_voxels()[0],
-  //       dimensions,
-  //       {},
-  //       &(_data[0])
-  //     );
-  
-  //   return array;
-
-  // }
+    // Cast the dimensions to std::array:
+    std::array<size_t, 1> dimensions;
+    dimensions[0] = _data.size();
+    return pybind11::array_t<T>(
+        dimensions,
+        {},
+        &(_data[0])
+      );
+  }
 
   template<class T>
   size_t BatchData<T>::data_size(bool calculate) const
@@ -187,7 +181,7 @@ template class larcv3::BatchData<short>;
 template class larcv3::BatchData<int>;
 template class larcv3::BatchData<float>;
 template class larcv3::BatchData<double>;
-template class larcv3::BatchData<larcv3::Particle>;
+template class larcv3::BatchData<larcv3::ParticleHolder>;
 
 void init_batchdata(pybind11::module m){
 
@@ -195,6 +189,7 @@ void init_batchdata(pybind11::module m){
   init_batchdata_<int>(m);
   init_batchdata_<float>(m);
   init_batchdata_<double>(m);
+  init_batchdata_<larcv3::ParticleHolder>(m);
   // init_batchdata_<larcv3::SparseTensor<2>>(m);
 
 }
@@ -213,7 +208,7 @@ void init_batchdata_(pybind11::module m){
 
 
 
-    // batch_data.def("pydata",             &Class::pydata);
+    batch_data.def("pydata",             &Class::pydata);
     batch_data.def("data",               &Class::data);
     batch_data.def("dim",                &Class::dim);
     batch_data.def("dense_dim",          &Class::dense_dim);
@@ -229,13 +224,6 @@ void init_batchdata_(pybind11::module m){
     batch_data.def("is_filled",          &Class::is_filled);
     batch_data.def("state",              &Class::state);
 
-/*
-
-    // PyObject * pydata() const;
-    // PyObject * () const;
-    // pybind11::array_t<float> pydata();
-
-*/
 
 }
 

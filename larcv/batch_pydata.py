@@ -1,6 +1,6 @@
 import larcv
 import sys,time,os,signal
-import numpy 
+import numpy
 
 class batch_pydata(object):
 
@@ -21,27 +21,27 @@ class batch_pydata(object):
       self._dim_dense    = None
       self._time_copy    = None
       self._time_reshape = None
-      
+
    def batch_data_size(self):
       dsize=1
       for v in self._dim_data: dsize *= v
       return dsize
 
-   def dtype(self): 
+   def dtype(self):
       return self._dtype
 
-   def data(self, shape=None, channels="last"): 
+   def data(self, shape=None, channels="last"):
       '''Return the data of this batch
-      
+
       larcv is generally used to read sparse data and return in, often,
       a sparse format.  This is acheived by packing into a buffer and returning
       directly a buffer.  This function can quickly parse the buffer and expand
       to a dense or other popular sparse shape.  If shape is none, it's untouched.
-      
+
       Keyword Arguments:
          shape {str} -- Set to "dense", "scnsparse", or "torch_geometric" to expand the data (default: {None})
          channels {str} -- If shape is "dense", channels first or last? (default: {"last"})
-      
+
       Returns:
          [type] -- [description]
       '''
@@ -54,13 +54,13 @@ class batch_pydata(object):
       elif shape == "torch_geometric":
          return self.as_torch_geometric()
 
-   def dim(self):  
+   def dim(self):
       return self._dim_data
 
-   def time_copy(self): 
+   def time_copy(self):
       return self._time_copy
 
-   def time_reshape(self): 
+   def time_reshape(self):
       return self._time_reshape
 
    def set_data(self,storage_id,larcv_batchdata):
@@ -77,7 +77,6 @@ class batch_pydata(object):
       self._dense_dim = numpy.array([dense[i] for i in range(len(dense))]).astype(numpy.int32)
 
 
-               
       # copy data into numpy array
       ctime = time.time()
       if self._make_copy:
@@ -87,12 +86,9 @@ class batch_pydata(object):
             # Create an array to hold the data if it does not exits:
             self._npy_data = numpy.ndarray(shape=(larcv_batchdata.data_size()), dtype=self._dtype)
          self._npy_data = self._npy_data.reshape(self.batch_data_size())
-         self._npy_data = numpy.copy(larcv_batchdata.data())
-
+         self._npy_data = numpy.copy(larcv_batchdata.pydata())
       else:
-         self._npy_data = larcv_batchdata.data()
-
-
+         self._npy_data = larcv_batchdata.pydata()
 
       self._time_copy = time.time() - ctime
 
@@ -116,7 +112,7 @@ class batch_pydata(object):
       # where the 2 or 3 is if values are included or not.
 
       # If the data is from BatchFillerSparseTensor3D, it will have the
-      # shape (batchsize, n_elements, 3 or 4) where the 3 or 4 
+      # shape (batchsize, n_elements, 3 or 4) where the 3 or 4
       # is if values are included or not
 
 
@@ -138,10 +134,10 @@ class batch_pydata(object):
          x_coords = self._npy_data[:,:,:,0]
          y_coords = self._npy_data[:,:,:,1]
          val_coords = self._npy_data[:,:,:,2]
-         
+
          # Where are the non-zero locations?
          filled_locs = val_coords != -999
-         
+
          # Map the output locations based on non-zero locations:
          batch_index, plane_index, voxel_index = numpy.where(filled_locs)
 
@@ -173,10 +169,10 @@ class batch_pydata(object):
          y_coords   = self._npy_data[:,:,1]
          z_coords   = self._npy_data[:,:,2]
          val_coords = self._npy_data[:,:,3]
-         
+
          # Where are the non-zero locations?
          filled_locs = val_coords != -999
-         
+
          # Map the output locations based on non-zero locations:
          batch_index, voxel_index = numpy.where(filled_locs)
 
@@ -189,14 +185,14 @@ class batch_pydata(object):
 
          # Fill in the output tensor
 
-         output_array[batch_index, 0, x_index, y_index, z_index] = values    
+         output_array[batch_index, 0, x_index, y_index, z_index] = values
 
          if channels == "last":
             output_array[batch_index, x_index, y_index, z_index, 0 ] = values
          else:
             output_array[batch_index, 0, x_index, y_index, z_index ] = values
          return output_array
-       
+
 
 
 
@@ -212,7 +208,7 @@ class batch_pydata(object):
       # where the 2 or 3 is if values are included or not.
 
       # If the data is from BatchFillerSparseTensor3D, it will have the
-      # shape (batchsize, n_elements, 3 or 4) where the 3 or 4 
+      # shape (batchsize, n_elements, 3 or 4) where the 3 or 4
       # is if values are included or not
 
       if len(self._dim_data) == 4:
@@ -234,7 +230,7 @@ class batch_pydata(object):
       # where the 2 or 3 is if values are included or not.
 
       # If the data is from BatchFillerSparseTensor3D, it will have the
-      # shape (batchsize, n_elements, 3 or 4) where the 3 or 4 
+      # shape (batchsize, n_elements, 3 or 4) where the 3 or 4
       # is if values are included or not
 
       if len(self._dim_data) == 4:
@@ -333,6 +329,3 @@ class batch_pydata(object):
 #     output_list = [output_dimension, output_features, batch_size]
 
 #     return output_list
-
-
-

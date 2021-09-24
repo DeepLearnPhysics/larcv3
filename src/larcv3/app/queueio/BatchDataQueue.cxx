@@ -21,7 +21,7 @@ namespace larcv3 {
   template <class T>
   void BatchDataQueue<T>::reset()
   {
-    
+
   }
 
 
@@ -31,7 +31,7 @@ namespace larcv3 {
     return _data_next.is_filled();
   }
 
-  
+
   template <class T>
   const BatchData<T>& BatchDataQueue<T>::get_batch () const
   {
@@ -63,7 +63,7 @@ template class larcv3::BatchDataQueue<short>;
 template class larcv3::BatchDataQueue<int>;
 template class larcv3::BatchDataQueue<float>;
 template class larcv3::BatchDataQueue<double>;
-template class larcv3::BatchDataQueue<larcv3::Particle>;
+template class larcv3::BatchDataQueue<larcv3::ParticleHolder>;
 // template class larcv3::BatchDataQueue<larcv3::SparseTensor<2>>;
 
 
@@ -88,7 +88,7 @@ void init_batchdataqueue(pybind11::module m){
   init_batchdataqueue<int>(m);
   init_batchdataqueue<float>(m);
   init_batchdataqueue<double>(m);
-  init_batchdataqueue<larcv3::Particle>(m);
+  init_batchdataqueue<larcv3::ParticleHolder>(m);
 
 
 }

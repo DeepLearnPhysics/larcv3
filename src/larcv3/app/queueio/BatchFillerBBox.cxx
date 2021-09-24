@@ -19,7 +19,7 @@ namespace larcv3 {
 
   template<size_t dimension>
   void BatchFillerBBox<dimension>::configure(const json& cfg) {
-    
+
     config = this -> default_config();
     config = augment_default_config(config, cfg);
 
@@ -216,7 +216,7 @@ void init_bf_bbox_(pybind11::module m){
     // batch_filler.def("pydata",             &Class::pydata);
     batch_filler.def("default_config",     &Class::default_config);
     batch_filler.def("process",            &Class::process);
-    
+
 
 }
 

@@ -81,7 +81,7 @@ bool BBoxFromParticle::bbox_from_particle(IOManager& mgr, std::string producer, 
 
     // Create a new BBox3D
     BBox3D bb(
-      {vertex.x(), vertex.y(), vertex.z()}, 
+      {vertex.x(), vertex.y(), vertex.z()},
       {0.0, 0.0, 0.0});
 
     // Add to the collection:
@@ -91,7 +91,6 @@ bool BBoxFromParticle::bbox_from_particle(IOManager& mgr, std::string producer, 
 
   ev_output.emplace_back(std::move(bbox_set));
 
-  std::cout << "ev_output size: " << ev_output.as_vector().size() << std::endl;
 
   return true;
 

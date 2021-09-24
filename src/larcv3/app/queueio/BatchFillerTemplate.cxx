@@ -11,7 +11,7 @@ namespace larcv3 {
   template<> BatchDataType_t BatchFillerTemplate< int    >::data_type() const     { return BatchDataType_t::kBatchDataInt;    }
   template<> BatchDataType_t BatchFillerTemplate< float  >::data_type() const     { return BatchDataType_t::kBatchDataFloat;  }
   template<> BatchDataType_t BatchFillerTemplate< double >::data_type() const     { return BatchDataType_t::kBatchDataDouble; }
-  template<> BatchDataType_t BatchFillerTemplate< larcv3::Particle>::data_type() const { return BatchDataType_t::kBatchDataParticle;}
+  template<> BatchDataType_t BatchFillerTemplate< larcv3::ParticleHolder>::data_type() const { return BatchDataType_t::kBatchDataParticle;}
 
 
 
@@ -19,7 +19,7 @@ namespace larcv3 {
   template class BatchFillerTemplate<int>;
   template class BatchFillerTemplate<float>;
   template class BatchFillerTemplate<double>;
-  template class BatchFillerTemplate<larcv3::Particle>;
+  template class BatchFillerTemplate<larcv3::ParticleHolder>;
 
 
 

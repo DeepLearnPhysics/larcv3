@@ -2,7 +2,7 @@
  * \file BatchFillerParticle.h
  *
  * \ingroup ThreadIO
- * 
+ *
  * \brief Class def header for a class BatchFillerParticle
  *
  * @author kazuhiro
@@ -25,13 +25,13 @@ namespace larcv3 {
      User defined class BatchFillerParticle ... these comments are used to generate
      doxygen documentation!
   */
-  class BatchFillerParticle : public BatchFillerTemplate<larcv3::Particle> {
+  class BatchFillerParticle : public BatchFillerTemplate<larcv3::ParticleHolder> {
 
   public:
-    
+
     /// Default constructor
     BatchFillerParticle(const std::string name="BatchFillerParticle");
-    
+
     /// Default destructor
     ~BatchFillerParticle(){}
 
@@ -58,7 +58,7 @@ namespace larcv3 {
 
     json config;
 
-    std::vector<larcv3::Particle> _entry_data;
+    std::vector<larcv3::ParticleHolder> _entry_data;
   };
 
   /**
@@ -83,5 +83,4 @@ void init_bf_particle(pybind11::module m);
 #endif
 
 #endif
-/** @} */ // end of doxygen group 
-
+/** @} */ // end of doxygen group

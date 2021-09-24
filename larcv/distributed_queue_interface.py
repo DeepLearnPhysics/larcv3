@@ -130,7 +130,7 @@ class queue_interface(object):
 
         local_size = int(self._minibatch_size[mode] / comm_size)
 
-        if (self._minibatch_size[mode] % comm_size is not 0):
+        if (self._minibatch_size[mode] % comm_size != 0):
             print ('You have requested to scatter {} image(s) over {} ranks. This is not possible as the number are not divisible.'.format(self._minibatch_size[mode], comm_size))
             raise Exception("Please change either the minibatch size or the number or ranks to scatter to.")
 

@@ -9,7 +9,7 @@ namespace larcv3 {
   static BatchFillerParticleProcessFactory __global_BatchFillerParticleProcessFactory__;
 
   BatchFillerParticle::BatchFillerParticle(const std::string name)
-    : BatchFillerTemplate<larcv3::Particle>(name)
+    : BatchFillerTemplate<larcv3::ParticleHolder>(name)
   {}
 
   void BatchFillerParticle::configure(const json& cfg){
@@ -41,7 +41,7 @@ namespace larcv3 {
     // class
 
     _entry_data.resize(1);
-    _entry_data.at(0) = part_v.front();
+    _entry_data.at(0) = part_v.front()._particle_holder;
 
 
     set_entry_data(_entry_data);
@@ -79,7 +79,7 @@ void init_bf_particle(pybind11::module m){
     // batch_filler.def("pydata",             &Class::pydata);
     batch_filler.def("default_config",     &Class::default_config);
     batch_filler.def("process",            &Class::process);
-    
+
 
 }
 

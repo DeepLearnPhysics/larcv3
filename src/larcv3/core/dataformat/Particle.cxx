@@ -43,9 +43,9 @@ namespace larcv3 {
   {
     std::stringstream ss;
     std::stringstream buf;
-    ss  << "      \033[95m" << "Particle " << id() << " (PdgCode,TrackID) = (" 
+    ss  << "      \033[95m" << "Particle " << id() << " (PdgCode,TrackID) = ("
         << pdg_code() << "," << track_id() << ")\033[00m "
-	      << "... with Parent (" << parent_pdg_code() 
+	      << "... with Parent (" << parent_pdg_code()
         << "," << parent_track_id() << ")" << std::endl;
     buf << "      ";
 
@@ -72,17 +72,17 @@ namespace larcv3 {
     return ss.str();
   }
 
-  void Particle::creation_process (const std::string& proc) { 
+  void Particle::creation_process (const std::string& proc) {
     if (proc.size() < PARTICLE_PROCESS_STRLEN){
-      std::copy(proc.begin(), proc.end(),_particle_holder._process); 
+      std::copy(proc.begin(), proc.end(),_particle_holder._process);
     }
     else{
       LARCV_CRITICAL() << "Can not use a string longer than 64 characters in Particle creation_process!" << std::endl;
       throw larbys();
     }
   }
-  std::string Particle::creation_process() const { 
-    return std::string(_particle_holder._process); 
+  std::string Particle::creation_process() const {
+    return std::string(_particle_holder._process);
   }
 
   // Return a numpy array of this object (no copy by default)
@@ -97,10 +97,11 @@ namespace larcv3 {
         &(_particle_holder)
       );
   }
-  
+
 
 
 template<> std::string as_string<Particle>() {return "Particle";}
+template<> std::string as_string<ParticleHolder>() {return "ParticleHolder";}
 }
 
 #include <pybind11/numpy.h>
@@ -166,24 +167,24 @@ void init_particle(pybind11::module m){
 
     particle.def("nu_current_type", (short (larcv3::Particle::*)() const)(&larcv3::Particle::nu_current_type));
     particle.def("nu_current_type", (void (larcv3::Particle::*)(short))(&larcv3::Particle::nu_current_type));
-    
+
     particle.def("nu_interaction_type", (short (larcv3::Particle::*)() const)(&larcv3::Particle::nu_interaction_type));
     particle.def("nu_interaction_type", (void (larcv3::Particle::*)(short))(&larcv3::Particle::nu_interaction_type));
-    
+
     particle.def("track_id", (unsigned int (larcv3::Particle::*)() const)(&larcv3::Particle::track_id));
     particle.def("track_id", (void (larcv3::Particle::*)(unsigned int))(&larcv3::Particle::track_id));
 
 
     particle.def("pdg_code", (int (larcv3::Particle::*)() const)(&larcv3::Particle::pdg_code));
     particle.def("pdg_code", (void (larcv3::Particle::*)(int))(&larcv3::Particle::pdg_code));
-    
+
     particle.def("momentum", &larcv3::Particle::momentum);
 
     particle.def("px", &larcv3::Particle::px);
     particle.def("py", &larcv3::Particle::py);
     particle.def("pz", &larcv3::Particle::pz);
     particle.def("p",  &larcv3::Particle::p);
-    
+
     particle.def("position", (const larcv3::Vertex& (larcv3::Particle::*)() const)(&larcv3::Particle::position));
     particle.def("position", (void (larcv3::Particle::*)(const larcv3::Vertex&))(&larcv3::Particle::position));
     particle.def("position", (void (larcv3::Particle::*)(double,double,double,double))(&larcv3::Particle::position));
@@ -205,7 +206,7 @@ void init_particle(pybind11::module m){
     particle.def("last_step", (void (larcv3::Particle::*)(const larcv3::Vertex&))(&larcv3::Particle::last_step));
     particle.def("last_step", (void (larcv3::Particle::*)(double,double,double,double))(&larcv3::Particle::last_step));
 
-    
+
     particle.def("distance_travel", (double (larcv3::Particle::*)() const)(&larcv3::Particle::distance_travel));
     particle.def("distance_travel", (void (larcv3::Particle::*)(double))(&larcv3::Particle::distance_travel));
 
@@ -248,7 +249,7 @@ void init_particle(pybind11::module m){
     particle.def("ancestor_y", &larcv3::Particle::ancestor_y);
     particle.def("ancestor_z", &larcv3::Particle::ancestor_z);
     particle.def("ancestor_t", &larcv3::Particle::ancestor_t);
-    
+
 
     particle.def("dump",       &larcv3::Particle::dump);
     particle.def("__repr__",   &larcv3::Particle::dump);
