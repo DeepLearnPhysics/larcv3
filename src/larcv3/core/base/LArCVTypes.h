@@ -52,7 +52,7 @@ namespace larcv3 {
   /// Used as an invalid value identifier for double-point precision
   const double             kINVALID_DOUBLE    = std::numeric_limits< double             >::max();
   /// Used as an invalid value identifier for signed long precision
-  const double             kINVALID_LONG      = std::numeric_limits< long               >::max();
+  const long               kINVALID_LONG      = std::numeric_limits< long               >::max();
 
   /// Namespace for larcv3 message related types
   namespace msg {

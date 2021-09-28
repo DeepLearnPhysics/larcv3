@@ -66,7 +66,7 @@ namespace larcv3 {
   void BatchFillerBBox<dimension>::finalize() { _entry_data.clear(); }
 
   template<size_t dimension>
-  int BatchFillerBBox<dimension>::_check_projection(const int & projection_id) {
+  int BatchFillerBBox<dimension>::_check_projection(const size_t & projection_id) {
 
     if (dimension == 3) {
       return 0;

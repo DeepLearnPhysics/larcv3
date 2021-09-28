@@ -32,7 +32,7 @@ namespace larcv3 {
   //   // With that satisfied, create the meta object:
   //   for (size_t dim = 0; dim < dimension; ++dim)
   //     _meta.set_dimension(dim, (double)(buffer.shape[dim]), (double)(buffer.shape[dim]));
-    
+
 
   //   // Now, we copy the data from numpy into our own buffer:
   //   _img.resize(_meta.total_voxels());
@@ -76,7 +76,7 @@ namespace larcv3 {
     }
     _voxel_v = std::move(vox_v);
   }
-  
+
   void VoxelSet::threshold_min(float min)
   {
     std::vector<larcv3::Voxel> vox_v;
@@ -87,7 +87,7 @@ namespace larcv3 {
     }
     _voxel_v = std::move(vox_v);
   }
-  
+
   void VoxelSet::threshold_max(float max)
   {
     std::vector<larcv3::Voxel> vox_v;
@@ -196,12 +196,12 @@ namespace larcv3 {
 
     // First, check that we have the same dimension in each input:
     if ( values_buffer.ndim != 1){
-      LARCV_ERROR() << "ERROR: cannot convert values array of dimension " << index_buffer.ndim  
+      LARCV_ERROR() << "ERROR: cannot convert values array of dimension " << index_buffer.ndim
                     << " to VoxelSet\n";
       throw larbys();
     }
     if ( index_buffer.ndim != 1){
-      LARCV_ERROR() << "ERROR: cannot convert index array of dimension " << index_buffer.ndim  
+      LARCV_ERROR() << "ERROR: cannot convert index array of dimension " << index_buffer.ndim
                     << " to VoxelSet\n";
       throw larbys();
     }
@@ -218,7 +218,7 @@ namespace larcv3 {
     // Now, loop through the inputs and add voxels:
     this->_voxel_v.reserve(values_buffer.shape[0]);
 
-    for (size_t i = 0; i < values_buffer.shape[0]; ++ i){
+    for (pybind11::ssize_t i = 0; i < values_buffer.shape[0]; ++ i){
       this -> _voxel_v.push_back(Voxel(ind_ptr[i], val_ptr[i]));
     }
 
@@ -246,7 +246,7 @@ namespace larcv3 {
       buf[i] = vox.value();
       i += 1;
     }
-  
+
     return array;
   }
 
@@ -280,7 +280,7 @@ namespace larcv3 {
       buf[i] = vox.id();
       i += 1;
     }
-  
+
     return array;
   }
 
@@ -329,9 +329,9 @@ namespace larcv3 {
   { float res=0.; for(auto const& vox_v : _voxel_vv) res+=vox_v.sum(); return res;}
 
   float VoxelSetArray::mean() const
-  { 
-    size_t vox_ctr = 0; 
-    for(auto const& vox_v : _voxel_vv) vox_ctr += vox_v.size(); 
+  {
+    size_t vox_ctr = 0;
+    for(auto const& vox_v : _voxel_vv) vox_ctr += vox_v.size();
     return (vox_ctr<1 ? 0. : this->sum() / (float)vox_ctr);
   }
 
@@ -440,7 +440,7 @@ pybind11::array_t<float> SparseTensor<dimension>::dense(){
   // First, create the buffer object:
   // Cast the dimensions to std::array:
   std::array<size_t, dimension> dimensions;
-  for (short i = 0; i < dimension; ++i) dimensions[i] = _meta.number_of_voxels(i);
+  for (size_t i = 0; i < dimension; ++i) dimensions[i] = _meta.number_of_voxels(i);
 
   // Allocate a spot to store the data:
   auto array =  pybind11::array_t<float>(dimensions);
@@ -454,7 +454,7 @@ pybind11::array_t<float> SparseTensor<dimension>::dense(){
   for (auto & vox : _voxel_v){
     buf[vox.id()] = vox.value();
   }
-  
+
   return array;
 }
 
@@ -525,7 +525,7 @@ SparseTensor<dimension> SparseTensor<dimension>::compress(
         if (found_voxel.value() < voxel.value()){
           // Replace only if this new value is larger than the old
           output.insert(Voxel(new_index, voxel.value()));
-        } 
+        }
       }
     }
     else if ( pool_type == larcv3::kPoolAverage){
@@ -693,7 +693,7 @@ void init_sparse_tensor(pybind11::module m){
     sparsetensor.def("to_tensor",  &ST::to_tensor);
     sparsetensor.def("compress",
       (ST (ST::*)(std::array<size_t, dimension> compression, larcv3::PoolType_t)const)(&ST::compress));
-    sparsetensor.def("compress", 
+    sparsetensor.def("compress",
       (ST (ST::*)( size_t, larcv3::PoolType_t ) const)( &ST::compress));
 
 /*
