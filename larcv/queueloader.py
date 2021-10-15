@@ -205,7 +205,6 @@ class queue_interface(object):
 
         pass
 
-    @profile
     def prepare_next(self, mode, set_entries = None):
         '''Set in motion the processing of the next batch of data.
 
@@ -229,7 +228,6 @@ class queue_interface(object):
 
         # return
 
-    @profile
     def fetch_minibatch_data(self, mode, pop=False, fetch_meta_data=False, data_shape=None, channels="last"):
         # Return a dictionary object with keys 'image', 'label', and others as needed
         # self._queueloaders['train'].fetch_data(keyword_label).dim() as an example
@@ -404,7 +402,6 @@ class larcv_queueio (object):
         self._proc.prepare_next()
 
 
-    @profile
     def is_reading(self,storage_id=None):
 
         # ready = True
@@ -441,7 +438,6 @@ class larcv_queueio (object):
 
 
 
-    @profile
     def next(self,store_entries=False,store_event_ids=False):
 
         # Calling next will load the next set of data into batch_pydata.  It does not do any
