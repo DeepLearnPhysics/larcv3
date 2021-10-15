@@ -8,10 +8,11 @@ class ConfigBuilder:
         [ f"tensor{i+1}d" for i in range(4) ] + \
         [ f"sparse{i+2}d" for i in range(2) ] + \
         [ f"bbox{i+2}d" for i in range(2) ] + \
-        ["particle"]
-    
-    valid_preprocess = [ 
-        "Downsample", "DenseToSparse", "Embed", 
+        ["particle"] + \
+        ["PID"]
+
+    valid_preprocess = [
+        "Downsample", "DenseToSparse", "Embed",
         "SparseToDense", "TensorFromCluster", "Threshold",
         "BBoxFromParticle"
     ]
@@ -24,7 +25,7 @@ class ConfigBuilder:
     def set_parameter(self,value,*keys):
         """
         Sets the parameter to value, walking into the config dictionare in the order of keys
-        
+
         :param      value:  The value
         :type       value:  { type_description }
         :param      keys:   The keys
@@ -43,7 +44,7 @@ class ConfigBuilder:
     def validate_datatype(self, datatype : str):
         """
         Ensure datatype is viable
-        
+
         :param      datatype:  The datatype
         :type       datatype:  str
         """
@@ -54,7 +55,7 @@ class ConfigBuilder:
     def validate_preprocess(self, preprocess : str):
         """
         Ensure preprocess is viable
-        
+
         :param      preprocess:  The preprocess
         :type       preprocess:  str
         """
@@ -66,7 +67,7 @@ class ConfigBuilder:
     def add_preprocess(self, datatype : str, producer : str, process : str, name : str = "", **kwargs):
         """
         Adds a preprocess.
-        
+
         :param      datatype:  The datatype
         :type       datatype:  str
         :param      producer:  The producer
@@ -78,7 +79,7 @@ class ConfigBuilder:
         :param      kwargs:    The keywords arguments
         :type       kwargs:    dictionary
         """
-        
+
         # Validate the datatype:
         self.validate_datatype(datatype)
 
@@ -109,7 +110,7 @@ class ConfigBuilder:
         # Process Type is the 'process'
         self.config["ProcessDriver"]["ProcessType"].append(process)
         self.config["ProcessDriver"]["ProcessName"].append(name)
-    
+
         if self.config["ProcessDriver"]["ProcessList"] is None:
             self.config["ProcessDriver"]["ProcessList"] = { name : proc_config }
         else:
@@ -123,10 +124,10 @@ class ConfigBuilder:
     def select_filler(self, datatype : str):
         """
         Pick the batch filler base on datatype
-        
+
         :param      datatype:   The datatype
         :type       datatype:   str
-        
+
         """
 
         if datatype == "tensor2d": return "BatchFillerTensor2D"
@@ -135,7 +136,8 @@ class ConfigBuilder:
         elif datatype == "sparse3d": return "BatchFillerSparseTensor3D"
         elif datatype == "bbox2d": return "BatchFillerBBox2D"
         elif datatype == "bbox3d": return "BatchFillerBBox3D"
-        elif datatype == "particle": return "BatchFillerPIDLabel"
+        elif datatype == "PID": return "BatchFillerPIDLabel"
+        elif datatype == "particle": return "BatchFillerParticle"
         else:
             raise Exception(f"Batch Filler not found for datatype{datatype}")
 
@@ -143,7 +145,7 @@ class ConfigBuilder:
     def add_batch_filler(self, datatype : str, producer : str, name : str = "", **kwargs):
         """
         Adds a preprocess.
-        
+
         :param      datatype:  The datatype
         :type       datatype:  str
         :param      producer:  The producer
@@ -153,7 +155,7 @@ class ConfigBuilder:
         :param      kwargs:    The keywords arguments
         :type       kwargs:    dictionary
         """
-        
+
         # Similar to adding a preprocess, but the process is uniquely ID'd
         # by the datatype
 
@@ -179,7 +181,7 @@ class ConfigBuilder:
         # if the supplied name is empty, autogenerate a name:
         if name == "":
             name = f"{filler}_{producer}_" + str(uuid.uuid4())[:8]
-        
+
         proc_config["Producer"] = producer
 
         # Finally add this process to the configuration
@@ -187,7 +189,7 @@ class ConfigBuilder:
         # Process Type is the 'process'
         self.config["ProcessDriver"]["ProcessType"].append(filler)
         self.config["ProcessDriver"]["ProcessName"].append(name)
-    
+
         if self.config["ProcessDriver"]["ProcessList"] is None:
             self.config["ProcessDriver"]["ProcessList"] = { name : proc_config }
         else:
@@ -196,6 +198,3 @@ class ConfigBuilder:
             )
 
         return
-
-    
-

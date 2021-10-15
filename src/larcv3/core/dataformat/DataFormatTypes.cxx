@@ -95,10 +95,10 @@ namespace larcv3{
 
 
   // Wrapper functions and enumerations to make binding easier:
-  template<> std::string as_string<float>() {return "Float";}
-  template<> std::string as_string<int>()   {return "Int";}
-  template<> std::string as_string<double>(){return "Double";}
-  template<> std::string as_string<short>() {return "Short";}
+  template<> std::string as_string<float>() {return "float32";}
+  template<> std::string as_string<int>()   {return "int";}
+  template<> std::string as_string<double>(){return "float64";}
+  template<> std::string as_string<short>() {return "short";}
 
 }
 

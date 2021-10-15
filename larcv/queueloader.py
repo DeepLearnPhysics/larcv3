@@ -205,7 +205,7 @@ class queue_interface(object):
 
         pass
 
-
+    @profile
     def prepare_next(self, mode, set_entries = None):
         '''Set in motion the processing of the next batch of data.
 
@@ -229,6 +229,7 @@ class queue_interface(object):
 
         # return
 
+    @profile
     def fetch_minibatch_data(self, mode, pop=False, fetch_meta_data=False, data_shape=None, channels="last"):
         # Return a dictionary object with keys 'image', 'label', and others as needed
         # self._queueloaders['train'].fetch_data(keyword_label).dim() as an example
@@ -325,6 +326,7 @@ class larcv_queueio (object):
         self._storage = {}
         self._event_entries = None
         self._event_ids = None
+        self._queues_set = False
 
     def reset(self):
         while self.is_reading(): time.sleep(0.01)
@@ -377,9 +379,11 @@ class larcv_queueio (object):
             if 'make_copy' in cfg and cfg['make_copy']:
                 self._storage[name]._make_copy = True
 
+
         # all success?
         # register *this* instance
         self.__class__._instance_m[self._name] = self
+
 
     def set_next_batch(self, batch_indexes):
         # if type(batch_indexes) != larcv.VectorOfSizet:
@@ -399,35 +403,35 @@ class larcv_queueio (object):
     def prepare_next(self):
         self._proc.prepare_next()
 
+
+    @profile
     def is_reading(self,storage_id=None):
 
-        ready = True
+        # ready = True
+        #
+        # # if any storage items are not ready, it's still reading
+        # for name,storage in self._storage.items():
+        #     dtype = storage.dtype()
+        #     if dtype == "float32":
+        #         factory = larcv.BatchDataQueueFactoryFloat.get()
+        #     elif dtype == "float64":
+        #         factory = larcv.BatchDataQueueFactoryDouble.get()
+        #     elif dtype == "int":
+        #         factory = larcv.BatchDataQueueFactoryInt.get()
+        #     elif dtype == "particle":
+        #         factory = larcv.BatchDataQueueFactoryParticleHolder.get()
+        #     else:
+        #         factory = None
+        #     batch_storage = factory.get_queue(name)
+        #
+        #     ready = ready and batch_storage.is_next_ready()
+        #
+        # print(f"Queuefactory query ready: {ready} vs queueprocess next_ready: {self._proc.is_next_ready()}")
 
+        ready =  self._proc.is_next_ready() and not self._proc.is_reading()
 
-        # if any storage items are not ready, it's still reading
-        for name,storage in self._storage.items():
-            dtype = storage.dtype()
-            if dtype == "float32":
-                factory = larcv.BatchDataQueueFactoryFloat.get()
-            elif dtype == "float64":
-                factory = larcv.BatchDataQueueFactoryDouble.get()
-            elif dtype == "int":
-                factory = larcv.BatchDataQueueFactoryInt.get()
-            # These here below are NOT yet wrapped with swig.  Submit a ticket if you need them!
-            # elif dtype == "char":
-            #    factory = larcv.BatchDataQueueFactoryDouble.get()
-            # elif dtype == "short":
-            #    factory = larcv.BatchDataQueueFactoryDouble.get()
-            # elif dtype == "string":
-            #    factory = larcv.BatchDataQueueFactoryDouble.get()
-            else:
-                factory = None
-            batch_storage = factory.get_queue(name)
-
-
-            ready = ready and batch_storage.is_next_ready()
-
-        ready =  (ready) and not self._proc.is_reading()
+        # print(f"Overall ready? {ready}")
+        # print(f"QueueProcessor ready? {self._proc.is_next_ready()}")
 
         return not ready
 
@@ -435,6 +439,9 @@ class larcv_queueio (object):
         # Promote the "next" data to current in C++ and release current
         self._proc.pop_current_data()
 
+
+
+    @profile
     def next(self,store_entries=False,store_event_ids=False):
 
         # Calling next will load the next set of data into batch_pydata.  It does not do any
@@ -442,24 +449,22 @@ class larcv_queueio (object):
 
         for name,storage in self._storage.items():
             dtype = storage.dtype()
-            if dtype == "float32":
-                factory = larcv.BatchDataQueueFactoryFloat.get()
-            elif dtype == "float64":
-                factory = larcv.BatchDataQueueFactoryDouble.get()
-            elif dtype == "int":
-                factory = larcv.BatchDataQueueFactoryInt.get()
-            # These here below are NOT yet wrapped with swig.  Submit a ticket if you need them!
-            # elif dtype == "char":
-            #    factory = larcv.BatchDataQueueFactoryDouble.get()
-            # elif dtype == "short":
-            #    factory = larcv.BatchDataQueueFactoryDouble.get()
-            # elif dtype == "string":
-            #    factory = larcv.BatchDataQueueFactoryDouble.get()
-            else:
-                factory = None
-            batch_storage = factory.get_queue(name)
+            batch_storage = self._proc.__getattribute__(f"get_queue_{dtype}")(name)
+            # print(queue)
+            #
+            # if dtype == "float32":
+            #     factory = larcv.BatchDataQueueFactoryFloat.get()
+            # elif dtype == "float64":
+            #     factory = larcv.BatchDataQueueFactoryDouble.get()
+            # elif dtype == "int":
+            #     factory = larcv.BatchDataQueueFactoryInt.get()
+            # elif dtype == "particle":
+            #     factory = larcv.BatchDataQueueFactoryParticleHolder.get()
+            # else:
+            #     factory = None
+            # batch_storage = factory.get_queue(name)
 
-            batch_data = factory.get_queue(name).get_batch()
+            batch_data = batch_storage.get_batch()
             storage.set_data(storage_id=name, larcv_batchdata=batch_data)
 
         if not store_entries: self._event_entries = None

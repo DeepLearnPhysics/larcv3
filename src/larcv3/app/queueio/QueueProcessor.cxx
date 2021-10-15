@@ -103,6 +103,46 @@ int omp_thread_count() {
     }
   }
 
+  template<class T>
+  const BatchDataQueue<T> & QueueProcessor::get_queue(std::string process_name) const{
+      return BatchDataQueueFactory<T>::get().get_queue(process_name);
+  }
+
+  bool QueueProcessor::is_next_ready() const {
+
+      bool ready = true;
+
+      // Next, Check on all the factories:
+      for (auto const& process_name : _driver.process_names()) {
+
+        // Get the process ID by name lookup
+        ProcessID_t pid = _driver.process_id(process_name);
+        auto proc_ptr = _driver.process_ptr(pid);
+
+        if (!(proc_ptr->is("BatchFiller"))) continue;
+        auto datatype = ((BatchHolder*)(proc_ptr))->data_type() ;
+
+
+        switch ( datatype ) {
+        case BatchDataType_t::kBatchDataShort:
+          ready = ready && BatchDataQueueFactory<short>::get().get_queue(process_name).is_next_ready(); break;
+        case BatchDataType_t::kBatchDataInt:
+          ready = ready && BatchDataQueueFactory<int>::get().get_queue(process_name).is_next_ready(); break;
+        case BatchDataType_t::kBatchDataFloat:
+          ready = ready && BatchDataQueueFactory<float>::get().get_queue(process_name).is_next_ready(); break;
+        case BatchDataType_t::kBatchDataDouble:
+          ready = ready && BatchDataQueueFactory<double>::get().get_queue(process_name).is_next_ready(); break;
+        case BatchDataType_t::kBatchDataParticle:
+          ready = ready && BatchDataQueueFactory<larcv3::ParticleHolder>::get().get_queue(process_name).is_next_ready(); break;
+        default:
+          LARCV_CRITICAL() << "Process name " << process_name
+                           << " encountered none-supported BatchDataType_t: " << int(datatype) << std::endl;
+          throw larbys();
+        }
+      }
+      return ready;
+  }
+
   bool QueueProcessor::is_reading() const {
     return !(_preparation_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready);
   }
@@ -132,35 +172,7 @@ int omp_thread_count() {
   {
 
 
-    bool ready = true;
-
-    for (auto const& process_name : _driver.process_names()) {
-
-      // Get the process ID by name lookup
-      ProcessID_t pid = _driver.process_id(process_name);
-      auto proc_ptr = _driver.process_ptr(pid);
-
-      if (!(proc_ptr->is("BatchFiller"))) continue;
-      auto datatype = ((BatchHolder*)(proc_ptr))->data_type() ;
-
-
-      switch ( datatype ) {
-      case BatchDataType_t::kBatchDataShort:
-        ready = ready && BatchDataQueueFactory<short>::get().get_queue(process_name).is_next_ready(); break;
-      case BatchDataType_t::kBatchDataInt:
-        ready = ready && BatchDataQueueFactory<int>::get().get_queue(process_name).is_next_ready(); break;
-      case BatchDataType_t::kBatchDataFloat:
-        ready = ready && BatchDataQueueFactory<float>::get().get_queue(process_name).is_next_ready(); break;
-      case BatchDataType_t::kBatchDataDouble:
-        ready = ready && BatchDataQueueFactory<double>::get().get_queue(process_name).is_next_ready(); break;
-      case BatchDataType_t::kBatchDataParticle:
-        ready = ready && BatchDataQueueFactory<larcv3::ParticleHolder>::get().get_queue(process_name).is_next_ready(); break;
-      default:
-        LARCV_CRITICAL() << "Process name " << process_name
-                         << " encountered none-supported BatchDataType_t: " << int(datatype) << std::endl;
-        throw larbys();
-      }
-    }
+    bool ready = this->is_next_ready();
 
     if (! ready){
       LARCV_ERROR() << "Can't pop current data because the next data is not yet ready." << std::endl;
@@ -533,6 +545,7 @@ void init_queueprocessor(pybind11::module m){
   queueproc.def("set_next_batch",
     (void (Class::*)(pybind11::array_t <size_t> )) (&Class::set_next_batch));
 
+  queueproc.def("is_next_ready",                    &Class::is_next_ready);
   queueproc.def("is_reading",                       &Class::is_reading);
   queueproc.def("get_n_entries",                    &Class::get_n_entries);
   queueproc.def("processed_entries",                &Class::processed_entries);
@@ -543,6 +556,16 @@ void init_queueprocessor(pybind11::module m){
   queueproc.def("batch_fillers",                    &Class::batch_fillers);
   queueproc.def("batch_types",                      &Class::batch_types);
   queueproc.def("default_config",                   &Class::default_config);
+  std::string name = "get_queue_" + larcv3::as_string<short>();
+  queueproc.def(name.c_str(),                       &Class::get_queue<short>);
+  name = "get_queue_" + larcv3::as_string<int>();
+  queueproc.def(name.c_str(),                       &Class::get_queue<int>);
+  name = "get_queue_" + larcv3::as_string<float>();
+  queueproc.def(name.c_str(),                       &Class::get_queue<float>);
+  name = "get_queue_" + larcv3::as_string<double>();
+  queueproc.def(name.c_str(),                       &Class::get_queue<double>);
+  name = "get_queue_particle";
+  queueproc.def(name.c_str(),                       &Class::get_queue<larcv3::ParticleHolder>);
 
 
 }

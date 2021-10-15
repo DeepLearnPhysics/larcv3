@@ -19,6 +19,8 @@ namespace larcv3{
       return std::string("float64");
     case BatchDataType_t::kBatchDataString:
       return std::string("string");
+    case BatchDataType_t::kBatchDataParticle:
+      return std::string("particle");
     default:
       return std::string("");
     }
