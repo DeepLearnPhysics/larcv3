@@ -128,7 +128,7 @@ namespace larcv3 {
       H5Pset_deflate(extents_cparms, compression);
       // extents_cparms.setDeflate(compression);
     }
-    
+
     hid_t lcpl = H5Pcreate(H5P_LINK_CREATE);
     hid_t dapl = H5Pcreate(H5P_DATASET_ACCESS);
 
@@ -633,6 +633,10 @@ namespace larcv3 {
     }
     hid_t xfer_plist_id = H5Pcreate(H5P_DATASET_XFER);
 
+#ifdef LARCV_MPI
+    H5Pset_dxpl_mpio(xfer_plist_id, H5FD_MPIO_COLLECTIVE);
+#endif
+
     open_in_datasets(group);
     /////////////////////////////////////////////////////////
     // Step 1: Get the extents information from extents dataset
@@ -838,9 +842,7 @@ namespace larcv3 {
       );
       // std::cout << "temp_voxel_vector.size(): " << temp_voxel_vector.size() << std::endl;
 
-#ifdef LARCV_OPENMP
-#pragma omp parallel
-#endif
+
       for (auto & v : temp_voxel_vector){
         _tensor_v.at(voxel_set_index).emplace(v);
       }

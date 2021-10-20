@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3 -g")
 
+enable_language(C CXX)
+
 # We set a larcv compiler definition to build all of the python code
 # This is obviously not set if you are including headers, which protects
 # the need to install pybind11 outside of larcv (since it's header only,
@@ -14,24 +16,11 @@ add_definitions(-DLARCV_INTERNAL)
 
 
 if(MPI)
-    message (STATUS "MPI_CXX_COMPILER ${MPI_CXX_COMPILER}")
-    message (STATUS "MPI_CXX_COMPILER ${MPI_C_COMPILER}")
     set(MPI_ASSUME_NO_BUILTIN_MPI True)
-    find_package(MPI REQUIRED COMPONENTS C)
+    find_package(MPI REQUIRED COMPONENTS C CXX)
     include_directories(MPI_C_INCLUDE_DIRECTORIES)
     include_directories(MPI_CXX_INCLUDE_DIRECTORIES)
     add_definitions(-DLARCV_MPI)
-    MESSAGE (STATUS "MPI_FOUND ${MPI_FOUND}")
-    MESSAGE (STATUS "MPI_INCLUDE_PATH ${MPI_INCLUDE_PATH}")
-    MESSAGE (STATUS "MPI_CXX_FOUND ${MPI_CXX_FOUND}")
-    MESSAGE (STATUS "MPI_CXX_INCLUDE_DIRS ${MPI_CXX_INCLUDE_DIRS}")
-    MESSAGE (STATUS "MPI_CXX_LIBRARIES ${MPI_CXX_LIBRARIES}")
-    MESSAGE (STATUS "MPI_CXX_COMPILER ${MPI_CXX_COMPILER}")
-    MESSAGE (STATUS "MPI_C_FOUND ${MPI_C_FOUND}")
-    MESSAGE (STATUS "MPI_C_INCLUDE_DIRS ${MPI_C_INCLUDE_DIRS}")
-    MESSAGE (STATUS "MPI_C_LIBRARIES ${MPI_C_LIBRARIES}")
-    MESSAGE (STATUS "MPI_C_COMPILER ${MPI_C_COMPILER}")
-
 endif()
 
 
@@ -52,6 +41,7 @@ if(OPENMP)
   find_package(OpenMP)
   if(OpenMP_CXX_FOUND)
       MESSAGE(STATUS "OpenMP Include directories ${OpenMP_CXX_INCLUDE_DIRS}")
+      include_directories(${OpenMP_C_INCLUDE_DIRS})
       include_directories(${OpenMP_CXX_INCLUDE_DIRS})
       add_definitions(-DLARCV_OPENMP)
   endif()
@@ -119,7 +109,7 @@ if(CMAKE_PYTHON_BINDINGS)
   message("Adding pybind11")
   add_subdirectory(pybind11)
   include_directories(${PYBIND11_INCLUDE_DIR})
-  
+
   set(pybind11_DIR pybind11)
 
   # GIves bindings between json and python

@@ -51,7 +51,7 @@ namespace larcv3 {
         {"Producer", std::string()},
         {"TensorType", "sparse"},
         {"Augment", true},
-        {"EmptyVoxelValue", -999.},
+        {"EmptyVoxelValue", 0.0},
         {"Channels", std::vector<int>()},
         {"AllowEmpty", true}
       };
@@ -132,4 +132,3 @@ void init_bf_tensor(pybind11::module m);
 
 
 /** @} */ // end of doxygen group
-

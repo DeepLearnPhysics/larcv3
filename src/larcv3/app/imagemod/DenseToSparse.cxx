@@ -12,12 +12,12 @@ namespace larcv3 {
 
 static DenseToSparseProcessFactory __global_DenseToSparseProcessFactory__;
 
- 
+
 DenseToSparse::DenseToSparse(const std::string name)
     : ProcessBase(name) {}
 
 
- 
+
 void DenseToSparse::configure(const json& cfg) {
 
   std::cout << std::setw(4) << "cfg: " << cfg <<std::endl;
@@ -28,10 +28,10 @@ void DenseToSparse::configure(const json& cfg) {
 
 }
 
- 
+
 void DenseToSparse::initialize() {}
 
- 
+
 bool DenseToSparse::process(IOManager& mgr) {
 
   //We apply thresholding for each projection id.
@@ -43,7 +43,7 @@ bool DenseToSparse::process(IOManager& mgr) {
   auto const& ref_producer    = config["ReferenceProducer"].get<std::string>();
 
 
-  if (product == "image2d") 
+  if (product == "image2d")
     process_product<larcv3::EventTensor2D, larcv3::EventSparseTensor2D>(mgr, producer, output_producer, ref_producer);
   else if (product == "tensor3d")
     process_product<larcv3::EventTensor3D, larcv3::EventSparseTensor3D>(mgr, producer, output_producer, ref_producer);
@@ -58,7 +58,7 @@ bool DenseToSparse::process(IOManager& mgr) {
 template <class dataproduct_in, class dataproduct_out>
 bool DenseToSparse::process_product(
     IOManager& mgr,
-    std::string producer, 
+    std::string producer,
     std::string output_producer,
     std::string ref_producer){
 
@@ -83,15 +83,15 @@ bool DenseToSparse::process_product(
       auto const& ref_indexes = ev_ref.at(i).indexes_vec();
 
 #ifdef LARCV_OPENMP
-#pragma omp parallel for private(index) shared(object)
+#pragma omp parallel for shared(object)
 #endif
       for (auto const & index : ref_indexes){
         if (object.as_vector().at(index) != 0.0) vs.emplace(index, object.as_vector().at(index),true);
-      }  
+      }
     }
     else{
 #ifdef LARCV_OPENMP
-#pragma omp parallel for private(index) shared(object)
+#pragma omp parallel for shared(object)
 #endif
       for (size_t index = 0; index < object.as_vector().size(); index ++){
         if (object.as_vector().at(index) != 0.0) vs.emplace(index, object.as_vector().at(index),true);
@@ -106,7 +106,7 @@ bool DenseToSparse::process_product(
 }
 
 
- 
+
 void DenseToSparse::finalize() {}
 
 } //namespace larcv3
@@ -130,9 +130,3 @@ void init_dense_to_sparse(pybind11::module m){
 }
 
 #endif
-
-
-
-
-
-

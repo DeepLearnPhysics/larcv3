@@ -17,14 +17,7 @@
 #endif
 
 namespace larcv3 {
-#ifdef LARCV_OPENMP
-int omp_thread_count() {
-    int n = 0;
-    #pragma omp parallel reduction(+:n)
-    n += 1;
-    return n;
-}
-#endif
+
 
 
   QueueProcessor::QueueProcessor(std::string name)
@@ -362,19 +355,9 @@ int omp_thread_count() {
     LARCV_INFO() << "Entering process loop" << std::endl;
     // auto start = std::chrono::steady_clock::now();
 
-#ifdef LARCV_OPENMP
-    std::cout << "Number of threads: " << omp_thread_count() << std::endl;
-#endif
-    // size_t i(0),
     size_t i_entry(0);
 
-    // #pragma omp parallel
-    // {
-    //   #pragma omp single
-    //   {
         for(i_entry =0; i_entry < _next_index_v.size(); ++ i_entry){
-          // #pragma omp task
-          // {
             auto & entry = _next_index_v[i_entry];
             LARCV_INFO() << "Processing entry: " << entry << std::endl;
 
@@ -383,11 +366,7 @@ int omp_thread_count() {
             LARCV_INFO() << "Finished processing event id: " << _driver.event_id().event_key() << std::endl;
             _next_batch_entries_v.at(i_entry) = entry;
             _next_batch_events_v.at(i_entry) = _driver.event_id();
-          // }
         }
-    //   }
-    // }
-
 
     // auto duration = std::chrono::duration_cast< std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
 
@@ -566,7 +545,6 @@ void init_queueprocessor(pybind11::module m){
   queueproc.def(name.c_str(),                       &Class::get_queue<double>);
   name = "get_queue_particle";
   queueproc.def(name.c_str(),                       &Class::get_queue<larcv3::ParticleHolder>);
-
 
 }
 

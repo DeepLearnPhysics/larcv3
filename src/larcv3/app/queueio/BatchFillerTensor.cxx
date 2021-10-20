@@ -276,7 +276,7 @@ namespace larcv3 {
 
   template<size_t dimension>
   bool BatchFillerTensor<dimension>::_process_sparse(IOManager& mgr) {
-    
+
 
     // auto _slice_v          = config["Channels"]. template get<std::vector<size_t> >();
     auto _voxel_base_value = config["EmptyVoxelValue"]. template get<float>();
@@ -295,7 +295,9 @@ namespace larcv3 {
     }
 
 
+
     auto const& voxel_meta = voxel_data.as_vector().front().meta();
+
     std::vector<int> dim;
     dim.resize(dimension + 2);
     dim[0] = batch_size();
@@ -306,13 +308,11 @@ namespace larcv3 {
     this->set_dim(dim);
     this->set_dense_dim(dim);
 
-
     if (_entry_data.size() != batch_data().entry_data_size())
       _entry_data.resize(batch_data().entry_data_size(), 0.);
 
 
     for (auto& v : _entry_data) v = _voxel_base_value;
-
 
     for ( auto const& voxel_set : voxel_data.as_vector()){
       auto & meta = voxel_set.meta();
@@ -401,7 +401,7 @@ void init_bf_tensor_(pybind11::module m){
     // batch_filler.def("pydata",             &Class::pydata);
     batch_filler.def("default_config",     &Class::default_config);
     batch_filler.def("process",            &Class::process);
-    
+
 
 }
 

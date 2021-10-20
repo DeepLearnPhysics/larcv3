@@ -102,6 +102,8 @@ void IOManager::configure(const json& cfg) {
     H5Pset_fapl_core(_fapl, 1024, false);
   }
 
+
+
   // std::vector<std::string> store_only_name;
   // std::vector<std::string> store_only_type;
   auto store_only_name = config["Output"]["StoreOnlyName"].get<std::vector<std::string>>();
@@ -149,7 +151,6 @@ bool IOManager::initialize(int color) {
 
 #ifdef LARCV_MPI
 //Only one thread calls MPI
-#pragma omp critical
 
   int mpi_initialized;
   MPI_Initialized(&mpi_initialized);
@@ -187,6 +188,11 @@ bool IOManager::initialize(int color) {
     LARCV_CRITICAL() << "Only read only mode is compatible with MPI with more than one rank!" << std::endl;
     throw larbys();
   }
+
+  // If usign MPI, set the file access property list:
+  // MPI_Info info;
+  // MPI_Info_create(&info);
+  H5Pset_fapl_mpio(_fapl, _private_comm, MPI_INFO_NULL);
 
 #endif
 

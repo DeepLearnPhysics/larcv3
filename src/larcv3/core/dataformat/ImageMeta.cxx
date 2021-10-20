@@ -109,7 +109,7 @@ double ImageMeta<dimension>::origin(size_t axis)       const{
 
 template<size_t dimension>
 std::vector<size_t>  ImageMeta<dimension>::strides()          const{
-  
+
   if (_valid ){
 
     std::vector<size_t> strides(0,dimension);
@@ -239,9 +239,9 @@ void ImageMeta<dimension>::index( const std::vector<size_t> & coordinates, std::
     output_index.clear();
     output_index.resize(coordinates.size());
 
-#ifdef LARCV_OPENMP
-    #pragma omp parallel for
-#endif
+// #ifdef LARCV_OPENMP
+//     #pragma omp parallel for
+// #endif
     for (size_t i = 0; i < coordinates.size(); i ++){
       // size_t index = 0;
       size_t stride = 1;
@@ -299,9 +299,9 @@ void ImageMeta<dimension>::coordinates( const std::vector<size_t> & index,  std:
     output_coordinates.resize(index.size() * dimension);
 
     size_t i_index(0), axis, stride, index_copy, i;
-#ifdef LARCV_OPENMP
-    #pragma omp parallel for private(axis, stride, index_copy)
-#endif
+// #ifdef LARCV_OPENMP
+//     #pragma omp parallel for private(axis, stride, index_copy)
+// #endif
     for (i_index = 0; i_index < index.size(); ++ i_index){
       index_copy = index.at(i_index);
 
@@ -418,9 +418,9 @@ ImageMeta<dimension> ImageMeta<dimension>::compress(size_t compression) const{
   output.set_projection_id(this->_projection_id);
   for (size_t dim = 0; dim < dimension; dim ++){
     output.set_dimension(
-      dim, 
-      this -> _image_sizes[dim] / (float) compression, 
-      size_t (this -> _number_of_voxels[dim]/ (float) compression ), 
+      dim,
+      this -> _image_sizes[dim] / (float) compression,
+      size_t (this -> _number_of_voxels[dim]/ (float) compression ),
       this -> _origin[dim] / (float) compression);
   }
   return output;
@@ -434,9 +434,9 @@ ImageMeta<dimension> ImageMeta<dimension>::compress(std::array<size_t, dimension
   output.set_projection_id(this->_projection_id);
   for (size_t dim = 0; dim < dimension; dim ++){
     output.set_dimension(
-      dim, 
-      this -> _image_sizes[dim] / (float) compression[dim], 
-      size_t (this -> _number_of_voxels[dim]/ (float) compression[dim] ), 
+      dim,
+      this -> _image_sizes[dim] / (float) compression[dim],
+      size_t (this -> _number_of_voxels[dim]/ (float) compression[dim] ),
       this -> _origin[dim] / (float) compression[dim]);
   }
   return output;
@@ -670,7 +670,7 @@ void init_imagemeta_base(pybind11::module m){
     pybind11::class_<Class> imagemeta(m, larcv3::as_string<Class>().c_str());
     imagemeta.def(pybind11::init<>());
     imagemeta.def(pybind11::init<Class>());
-    imagemeta.def(pybind11::init<size_t, 
+    imagemeta.def(pybind11::init<size_t,
                                  const std::vector<size_t>,
                                  const std::vector<double>,
                                  const std::vector<double>,
@@ -685,17 +685,17 @@ void init_imagemeta_base(pybind11::module m){
 
     imagemeta.def("image_size",
       (double (Class::*)( size_t ) const)(&Class::image_size));
-    imagemeta.def("image_size", 
+    imagemeta.def("image_size",
       (const double * (Class::*)( )const)(&Class::image_size));
 
     imagemeta.def("number_of_voxels",
       (size_t (Class::*)( size_t ) const)(&Class::number_of_voxels));
-    imagemeta.def("number_of_voxels", 
+    imagemeta.def("number_of_voxels",
       (const size_t * (Class::*)( )const)(&Class::number_of_voxels));
 
     imagemeta.def("origin",
       (double (Class::*)( size_t ) const)(&Class::origin));
-    imagemeta.def("origin", 
+    imagemeta.def("origin",
       (const double * (Class::*)( )const)(&Class::origin));
 
 
@@ -707,7 +707,7 @@ void init_imagemeta_base(pybind11::module m){
 
     imagemeta.def("voxel_dimensions",
       (double (Class::*)( size_t ) const)(&Class::voxel_dimensions));
-    imagemeta.def("voxel_dimensions", 
+    imagemeta.def("voxel_dimensions",
       (std::vector<double> (Class::*)( )const)(&Class::voxel_dimensions));
 
 
@@ -715,47 +715,47 @@ void init_imagemeta_base(pybind11::module m){
 
     imagemeta.def("compress",
       (Class (Class::*)(std::array<size_t, dimension> ) const)(&Class::compress));
-    imagemeta.def("compress", 
+    imagemeta.def("compress",
       (Class (Class::*)(size_t)const)(&Class::compress));
- 
+
 
     imagemeta.def("index",
       (size_t (Class::*)( const std::vector<size_t> & ) const)(&Class::index));
-    imagemeta.def("index", 
+    imagemeta.def("index",
       (void (Class::*)(const std::vector<size_t> &, std::vector<size_t> & )const)(&Class::index));
- 
+
     imagemeta.def("coordinates",
       (std::vector<size_t> (Class::*)( size_t ) const)(&Class::coordinates));
-    imagemeta.def("coordinates", 
+    imagemeta.def("coordinates",
       (void (Class::*)(const std::vector<size_t> &, std::vector<size_t> & )const)(&Class::coordinates));
     imagemeta.def("coordinate", &Class::coordinate);
- 
+
     imagemeta.def("position",
       (std::vector<double> (Class::*)(size_t) const)(&Class::position));
-    imagemeta.def("position", 
-      (std::vector<double> (Class::*)(const std::vector<size_t> & )const)(&Class::position)); 
-   
+    imagemeta.def("position",
+      (std::vector<double> (Class::*)(const std::vector<size_t> & )const)(&Class::position));
+
     imagemeta.def("position",
       (double (Class::*)(size_t, size_t) const)(&Class::position));
-    imagemeta.def("position", 
-      (double (Class::*)(const std::vector<size_t> & , size_t)const)(&Class::position)); 
+    imagemeta.def("position",
+      (double (Class::*)(const std::vector<size_t> & , size_t)const)(&Class::position));
 
 
     imagemeta.def("min",
       (double (Class::*)( size_t ) const)(&Class::min));
-    imagemeta.def("min", 
+    imagemeta.def("min",
       (std::vector<double> (Class::*)( )const)(&Class::min));
 
     imagemeta.def("max",
       (double (Class::*)( size_t ) const)(&Class::max));
-    imagemeta.def("max", 
+    imagemeta.def("max",
       (std::vector<double> (Class::*)( )const)(&Class::max));
 
     imagemeta.def("position_to_index", &Class::position_to_index);
     imagemeta.def("position_to_coordinate",
       (std::vector<size_t> (Class::*)(const std::vector<double> &) const)(&Class::position_to_coordinate));
-    imagemeta.def("position_to_coordinate", 
-      (size_t (Class::*)(double, size_t  ) const)(&Class::position_to_coordinate)); 
+    imagemeta.def("position_to_coordinate",
+      (size_t (Class::*)(double, size_t  ) const)(&Class::position_to_coordinate));
 
     imagemeta.def("set_dimension", &Class::set_dimension,
       pybind11::arg("axis"),

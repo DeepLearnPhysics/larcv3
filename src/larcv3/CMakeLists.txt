@@ -23,7 +23,7 @@ if (OpenMP_CXX_FOUND)
     message("Linking against openmp")
     message("OpenMP_CXX_LIBRARY: " ${OpenMP_CXX_LIBRARIES})
     message("OpenMP_C_LIBRARY: " ${OpenMP_C_LIBRARIES})
-    target_link_libraries(larcv3 ${OpenMP_CXX_LIBRARIES} ${OpenMP_C_LIBRARIES})
+    target_link_libraries(larcv3 OpenMP::OpenMP_C)
 endif()
 
 if (MPI_FOUND)
@@ -32,6 +32,7 @@ if (MPI_FOUND)
     message("OpenMP_C_LIBRARY: " ${MPI_C_LIBRARIES})
     target_link_libraries(larcv3 ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES})
 endif()
+
 set(HDF5_PREFER_PARALLEL TRUE)
 message("Using hdf5 parallel: " ${HDF5_IS_PARALLEL})
 target_link_libraries(larcv3 ${HDF5_LIBRARIES})
@@ -95,4 +96,3 @@ if(CMAKE_PYTHON_BINDINGS)
         # INCLUDES DESTINATION ${CMAKE_PACKAGE_DIR}/include
         )
 endif(CMAKE_PYTHON_BINDINGS)
-
