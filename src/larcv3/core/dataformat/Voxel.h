@@ -241,6 +241,8 @@ namespace larcv3 {
     inline VoxelSet& operator /= (float factor)
     { for(auto& vox : _voxel_v) vox /= factor; return (*this); }
 
+    std::vector<larcv3::Voxel> & writeable_voxel_vector(){return _voxel_v;}
+
   protected:
     /// Instance ID
     InstanceID_t _id;
