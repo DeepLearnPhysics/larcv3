@@ -75,7 +75,7 @@ namespace larcv3 {
     bool found = false;
     int count = 0;
     for (auto & channel : _slice_v){
-      if (channel == projection_id){
+      if (int(channel) == projection_id){
         found = true;
         break;
       }
@@ -116,12 +116,12 @@ namespace larcv3 {
     //   throw larbys();
     // }
 
-    int _num_channels = dimension == 2 ? _slice_v.size() : 1;
+    size_t _num_channels = dimension == 2 ? _slice_v.size() : 1;
 
     std::vector<int> dim;
     dim.resize(4);
     dim.at(0) = batch_size();
-    dim.at(1) = _num_channels;
+    dim.at(1) = int(_num_channels);
     dim.at(2) = _max_boxes;
     dim.at(3) = 2*dimension;
     this->set_dim(dim);
@@ -149,7 +149,7 @@ namespace larcv3 {
 
       auto & bbox_collection = bbox_data.as_vector().at(_projection);
 
-      size_t max_bbox(bbox_collection.size());
+      int max_bbox(bbox_collection.size());
       if (max_bbox > _max_boxes) {
         max_bbox = _max_boxes;
         LARCV_CRITICAL() << "Truncating the number of boxes to " << _max_boxes << "!" << std::endl;
@@ -157,7 +157,7 @@ namespace larcv3 {
 
 
       size_t index(0);
-      for (size_t i_bbox = 0; i_bbox < max_bbox; i_bbox ++) {
+      for (int i_bbox = 0; i_bbox < max_bbox; i_bbox ++) {
 
 
         // Index is the first index for this bbox.

@@ -36,7 +36,7 @@ struct particle_node{
   int ancestorID;
   bool primary;
   bool is_virtual;
-  const Particle * reference; 
+  const Particle * reference;
   particle_node * parent;
   std::vector<const particle_node *> daughters;
 };
@@ -78,7 +78,7 @@ class ParentParticleSeg : public ProcessBase {
 
   json config;
 
-  void get_all_daughter_ids(std::vector<int> & ids, const particle_node * node);
+  void get_all_daughter_ids(std::vector<size_t> & ids, const particle_node * node);
 
 
   // std::string _cluster3d_producer;

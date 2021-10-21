@@ -203,12 +203,18 @@ namespace larcv3 {
       i_coord.resize(dimension);
       size_t index;
 
+#ifdef LARCV_OMP
+#pragma omp parallel
+#endif
       for (size_t i_voxel = 0; i_voxel < max_voxel; i_voxel ++) {
 
         auto coords = meta.coordinates(voxels[i_voxel].id());
-        
+
         index = count * (_max_voxels * point_dim) + i_voxel * point_dim;
 
+#ifdef LARCV_OMP
+#pragma omp parallel unroll
+#endif
         for (size_t i_d = 0; i_d < dimension; i_d ++){
           i_coord[i_d] = coords.at(i_d);
           if (flip[i_d]){
@@ -282,7 +288,7 @@ void init_bf_sparse_tensor_(pybind11::module m){
     // batch_filler.def("pydata",             &Class::pydata);
     batch_filler.def("default_config",     &Class::default_config);
     batch_filler.def("process",            &Class::process);
-    
+
 
 }
 
