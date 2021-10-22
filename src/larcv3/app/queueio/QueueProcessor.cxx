@@ -91,7 +91,7 @@ namespace larcv3 {
 
     _next_index_v.resize(buf.size);
     size_t * ptr = (size_t *) buf.ptr;
-    for (size_t i = 0; i < buf.size; i++ ){
+    for (pybind11::ssize_t i = 0; i < buf.size; i++ ){
       _next_index_v[i] = ptr[i];
     }
   }

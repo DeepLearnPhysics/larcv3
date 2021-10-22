@@ -341,7 +341,7 @@ namespace larcv3 {
   }
 
   template<size_t dimension>
-  int BatchFillerTensor<dimension>::_check_projection(const int & projection_id) {
+  int BatchFillerTensor<dimension>::_check_projection(const size_t & projection_id) {
 
     if (dimension == 3) {
       return 0;

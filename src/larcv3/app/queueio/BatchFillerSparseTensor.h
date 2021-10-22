@@ -127,4 +127,3 @@ void init_bf_sparse_tensor(pybind11::module m);
 
 #endif
 /** @} */ // end of doxygen group
-

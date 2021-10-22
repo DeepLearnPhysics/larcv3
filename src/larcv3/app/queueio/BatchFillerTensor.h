@@ -69,7 +69,7 @@ namespace larcv3 {
 
     bool _process_sparse(IOManager& mgr);
     bool _process_dense(IOManager& mgr);
-    int _check_projection(const int & projection_id);
+    int _check_projection(const size_t & projection_id);
     size_t _set_image_size(const EventTensor<dimension>& image_data);
     void _assert_dimension(const EventTensor<dimension>& image_data, const std::vector<size_t> &) const;
 
@@ -128,7 +128,6 @@ void init_bf_tensor(pybind11::module m);
 
 
 #endif
-
 
 
 /** @} */ // end of doxygen group

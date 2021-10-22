@@ -62,7 +62,7 @@ namespace larcv3 {
   private:
 
     size_t set_data_size(const EventBBox<dimension>& image_data);
-    int _check_projection(const int & projection_id);
+    int _check_projection(const size_t & projection_id);
 
     // std::string _bbox_producer;
     // size_t _max_boxes;
@@ -116,4 +116,3 @@ void init_bf_bbox(pybind11::module m);
 
 #endif
 /** @} */ // end of doxygen group
-
