@@ -27,7 +27,7 @@ else:
 setup(
     name="larcv",
     version="3.3.4",
-    cmake_source_dir='src/',
+    cmake_source_dir='.',
     use_scm_version=True,
     include_package_data=True,
     cmake_args=[
@@ -48,7 +48,7 @@ setup(
     },
     url='https://github.com/DeepLearnPhysics/larcv3',
     scripts=['bin/merge_larcv3_files.py', 'bin/run_processor.py'],
-    packages=['larcv','src/pybind11'],
+    packages=['larcv','include/pybind11'],
     install_requires=[
         'numpy',
         'scikit-build',

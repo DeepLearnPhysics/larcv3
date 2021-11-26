@@ -1,124 +1,92 @@
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+add_subdirectory(core)
+add_subdirectory(app)
 
 
-# general configuration for compilation:
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3 -g")
+# This is admittedly pretty clunky, but it gets the job done to make one object file:
 
-# We set a larcv compiler definition to build all of the python code
-# This is obviously not set if you are including headers, which protects
-# the need to install pybind11 outside of larcv (since it's header only,
-# there is no need to link to it.)
-add_definitions(-DLARCV_INTERNAL)
+add_library(larcv3 SHARED
+    $<TARGET_OBJECTS:base>
+    $<TARGET_OBJECTS:dataformat>
+    $<TARGET_OBJECTS:processor>
+    $<TARGET_OBJECTS:filter>
+    $<TARGET_OBJECTS:queueio>
+    $<TARGET_OBJECTS:imagemod>
+    $<TARGET_OBJECTS:sbnd_imagemod>
+    )
 
 
-if(MPI)
-    message (STATUS "MPI_CXX_COMPILER ${MPI_CXX_COMPILER}")
-    message (STATUS "MPI_CXX_COMPILER ${MPI_C_COMPILER}")
-    set(MPI_ASSUME_NO_BUILTIN_MPI True)
-    find_package(MPI REQUIRED COMPONENTS C)
-    include_directories(MPI_C_INCLUDE_DIRECTORIES)
-    include_directories(MPI_CXX_INCLUDE_DIRECTORIES)
-    add_definitions(-DLARCV_MPI)
-    MESSAGE (STATUS "MPI_FOUND ${MPI_FOUND}")
-    MESSAGE (STATUS "MPI_INCLUDE_PATH ${MPI_INCLUDE_PATH}")
-    MESSAGE (STATUS "MPI_CXX_FOUND ${MPI_CXX_FOUND}")
-    MESSAGE (STATUS "MPI_CXX_INCLUDE_DIRS ${MPI_CXX_INCLUDE_DIRS}")
-    MESSAGE (STATUS "MPI_CXX_LIBRARIES ${MPI_CXX_LIBRARIES}")
-    MESSAGE (STATUS "MPI_CXX_COMPILER ${MPI_CXX_COMPILER}")
-    MESSAGE (STATUS "MPI_C_FOUND ${MPI_C_FOUND}")
-    MESSAGE (STATUS "MPI_C_INCLUDE_DIRS ${MPI_C_INCLUDE_DIRS}")
-    MESSAGE (STATUS "MPI_C_LIBRARIES ${MPI_C_LIBRARIES}")
-    MESSAGE (STATUS "MPI_C_COMPILER ${MPI_C_COMPILER}")
 
+
+if (OpenMP_CXX_FOUND)
+    message("Linking against openmp")
+    message("OpenMP_CXX_LIBRARY: " ${OpenMP_CXX_LIBRARIES})
+    message("OpenMP_C_LIBRARY: " ${OpenMP_C_LIBRARIES})
+    target_link_libraries(larcv3 ${OpenMP_CXX_LIBRARIES} ${OpenMP_C_LIBRARIES})
 endif()
 
-
-# set(CMAKE_SKIP_RPATH TRUE)
-project(larcv3)
-
-set(CMAKE_PACKAGE_DIR "larcv")
-
-set(PROJECT_SOURCE_DIR "./")
-
-
-include_directories("./")
-
-# IO needs HDF5:
-find_package(HDF5 REQUIRED)
-include_directories(${HDF5_INCLUDE_DIR})
-
-if(OPENMP)
-  find_package(OpenMP)
-  if(OpenMP_CXX_FOUND)
-      add_definitions(-DLARCV_OPENMP)
-  endif()
+if (MPI_FOUND)
+    message("Linking against MPI")
+    message("OpenMP_CXX_LIBRARY: " ${MPI_CXX_LIBRARIES})
+    message("OpenMP_C_LIBRARY: " ${MPI_C_LIBRARIES})
+    target_link_libraries(larcv3 ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES})
 endif()
+set(HDF5_PREFER_PARALLEL TRUE)
+message("Using hdf5 parallel: " ${HDF5_IS_PARALLEL})
+target_link_libraries(larcv3 ${HDF5_LIBRARIES})
 
-# This package needs numpy::
-
-# Many packages need python:
-find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
-
-######################################
-# This is from https://github.com/Eyescale/CMake/blob/master/FindNumPy.cmake
-if(NOT PYTHON_EXECUTABLE)
-  if(NumPy_FIND_QUIETLY)
-    find_package(PythonInterp QUIET)
-  else()
-    find_package(PythonInterp)
-    set(__numpy_out 1)
-  endif()
-endif()
-
-if (PYTHON_EXECUTABLE)
-  # Find out the include path
-  execute_process(
-    COMMAND "${PYTHON_EXECUTABLE}" -c
-            "from __future__ import print_function\ntry: import numpy; print(numpy.get_include(), end='')\nexcept:pass\n"
-            OUTPUT_VARIABLE __numpy_path)
-  # And the version
-  execute_process(
-    COMMAND "${PYTHON_EXECUTABLE}" -c
-            "from __future__ import print_function\ntry: import numpy; print(numpy.__version__, end='')\nexcept:pass\n"
-    OUTPUT_VARIABLE __numpy_version)
-elseif(__numpy_out)
-  message(STATUS "Python executable not found.")
-endif(PYTHON_EXECUTABLE)
-
-find_path(PYTHON_NUMPY_INCLUDE_DIR numpy/arrayobject.h
-  HINTS "${__numpy_path}" "${PYTHON_INCLUDE_PATH}" NO_DEFAULT_PATH)
-
-if(PYTHON_NUMPY_INCLUDE_DIR)
-  set(PYTHON_NUMPY_FOUND 1 CACHE INTERNAL "Python numpy found")
-endif(PYTHON_NUMPY_INCLUDE_DIR)
-
-message(${PYTHON_NUMPY_FOUND})
-message(${PYTHON_NUMPY_INCLUDE_DIR})
-
-# include(FindPackageHandleStandardArgs)
-# find_package_handle_standard_args(NumPy REQUIRED_VARS PYTHON_NUMPY_INCLUDE_DIR
-#                                         VERSION_VAR __numpy_version)
-######################################
-
-include_directories(${PYTHON_NUMPY_INCLUDE_DIR})
+# Link against python:
+target_link_libraries(larcv3 ${PYTHON_LIBRARIES})
 
 
-# # Define a function that handles generating python bindings for a library:
-# macro(generate_python_bindings name)
+###############################
 
 
-
-# endmacro(generate_python_bindings)
 if(CMAKE_PYTHON_BINDINGS)
-  message("Adding pybind11")
-  add_subdirectory(pybind11)
-  include_directories(${PYBIND11_INCLUDE_DIR})
-  message(${PYBIND11_INCLUDE_DIR})
-else()
-  add_definitions(-DLARCV_NO_PYBIND)
+    pybind11_add_module(pylarcv SHARED larcv.cxx)
+
+    # Add a shared library
+    set_target_properties(pylarcv PROPERTIES SKIP_BUILD_RPATH FALSE)
+
+    # If building with setuptools, CMake will not be performing the install
+    set_target_properties(pylarcv PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE)
+
+    target_link_libraries(pylarcv PRIVATE larcv3)
+
+    if(UNIX AND NOT APPLE)
+        set_target_properties(pylarcv PROPERTIES INSTALL_RPATH "$ORIGIN/lib/")
+    elseif(APPLE)
+        set_target_properties(pylarcv PROPERTIES INSTALL_RPATH "@loader_path/lib/")
+    endif()
+
+    set_target_properties(pylarcv PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 endif(CMAKE_PYTHON_BINDINGS)
 
-add_subdirectory(larcv3)
+
+###############################
+
+if (MPI)
+    target_link_libraries(larcv3 ${MPI_LIBRARIES})
+endif()
+
+
+
+# Install larvc shared library
+install(TARGETS larcv3
+    LIBRARY DESTINATION ${CMAKE_PACKAGE_DIR}/lib
+    ARCHIVE DESTINATION ${CMAKE_PACKAGE_DIR}/lib
+    RUNTIME DESTINATION ${CMAKE_PACKAGE_DIR}/bin
+    INCLUDES DESTINATION ${CMAKE_PACKAGE_DIR}/include
+    )
+
+
+
+if(CMAKE_PYTHON_BINDINGS)
+    # Install larvc wrapper library
+    install(TARGETS pylarcv
+        LIBRARY DESTINATION ${CMAKE_PACKAGE_DIR}
+        ARCHIVE DESTINATION ${CMAKE_PACKAGE_DIR}
+        # RUNTIME DESTINATION ${CMAKE_PACKAGE_DIR}/bin
+        # INCLUDES DESTINATION ${CMAKE_PACKAGE_DIR}/include
+        )
+endif(CMAKE_PYTHON_BINDINGS)
