@@ -1,9 +1,9 @@
 #ifndef __CLUSTER2DFROMCLUSTER3D_CXX__
 #define __CLUSTER2DFROMCLUSTER3D_CXX__
 
-#include "Cluster2DFromCluster3D.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "Cluster2DFromCluster3D.hh"
+#include "larcv/core/DataFormat/EventVoxel2D.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 namespace larcv {
 
   static Cluster2DFromCluster3DProcessFactory __global_Cluster2DFromCluster3DProcessFactory__;

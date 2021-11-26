@@ -1,8 +1,8 @@
 #ifndef __BLURCLUSTER3D_CXX__
 #define __BLURCLUSTER3D_CXX__
 
-#include "BlurCluster3D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "BlurCluster3D.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 
 namespace larcv {
 

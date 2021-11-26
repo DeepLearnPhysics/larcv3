@@ -1,8 +1,6 @@
-#ifndef __LARCV3FILTER_MCSINGLEPARTICLEFILTER_CXX__
-#define __LARCV3FILTER_MCSINGLEPARTICLEFILTER_CXX__
+#include "MCSingleParticleFilter.hh"
+#include "EventParticle.hh"
 
-#include "MCSingleParticleFilter.h"
-#include "larcv3/core/dataformat/EventParticle.h"
 namespace larcv3 {
 
   static MCSingleParticleFilterProcessFactory __global_MCSingleParticleFilterProcessFactory__;
@@ -60,4 +58,3 @@ namespace larcv3 {
   {}
 
 }
-#endif

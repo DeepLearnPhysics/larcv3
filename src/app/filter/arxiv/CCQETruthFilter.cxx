@@ -1,9 +1,9 @@
 #ifndef __CCQETRUTHFILTER_CXX__
 #define __CCQETRUTHFILTER_CXX__
 
-#include "CCQETruthFilter.h"
-#include "DataFormat/EventROI.h"
-#include "DataFormat/ParticleMass.h"
+#include "CCQETruthFilter.hh"
+#include "EventROI.hh"
+#include "ParticleMass.hh"
 namespace larcv {
 
   static CCQETruthFilterProcessFactory __global_CCQETruthFilterProcessFactory__;

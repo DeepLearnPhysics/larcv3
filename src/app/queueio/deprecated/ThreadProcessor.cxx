@@ -1,12 +1,12 @@
 #ifndef __LARCV3THREADIO_THREADPROCESSOR_CXX
 #define __LARCV3THREADIO_THREADPROCESSOR_CXX
 
-#include "ThreadProcessor.h"
-#include "larcv3/core/base/LArCVBaseUtilFunc.h"
+#include "ThreadProcessor.hh"
+#include "larcv3/core/base/LArCVBaseUtilFunc.hh"
 #include <sstream>
 #include <unistd.h>
-#include "BatchFillerTemplate.h"
-#include "BatchDataStorageFactory.h"
+#include "BatchFillerTemplate.hh"
+#include "BatchDataStorageFactory.hh"
 //#include <TROOT.h>
 //#include <stdlib.h>
 #include <mutex>

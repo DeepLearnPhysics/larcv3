@@ -1,8 +1,8 @@
 #ifndef __NUFILTER_CXX__
 #define __NUFILTER_CXX__
 
-#include "NuFilter.h"
-#include "DataFormat/EventROI.h"
+#include "NuFilter.hh"
+#include "EventROI.hh"
 
 namespace larcv {
 

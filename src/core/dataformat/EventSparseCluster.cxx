@@ -1,7 +1,7 @@
 #ifndef __LARCV3DATAFORMAT_EVENTSPARSECLUSTER_CXX
 #define __LARCV3DATAFORMAT_EVENTSPARSECLUSTER_CXX
 
-#include "larcv3/core/dataformat/EventSparseCluster.h"
+#include "larcv3/core/dataformat/EventSparseCluster.hh"
 
 #define VOXEL_EXTENTS_CHUNK_SIZE 10
 #define VOXEL_IDEXTENTS_CHUNK_SIZE 100

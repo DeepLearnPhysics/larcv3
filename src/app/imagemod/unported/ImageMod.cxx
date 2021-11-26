@@ -1,9 +1,9 @@
 #ifndef __LARCV_IMAGEMOD_CXX__
 #define __LARCV_IMAGEMOD_CXX__
 
-#include "ImageMod.h"
-#include "larcv/core/Base/larcv_logger.h"
-#include "larcv/core/Base/larbys.h"
+#include "ImageMod.hh"
+#include "larcv/core/Base/larcv_logger.hh"
+#include "larcv/core/Base/larbys.hh"
 #include <set>
 namespace larcv {
 

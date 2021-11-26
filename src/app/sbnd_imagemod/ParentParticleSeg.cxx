@@ -1,10 +1,7 @@
-#ifndef __PARENTPARTICLESEG_CXX__
-#define __PARENTPARTICLESEG_CXX__
-
-#include "ParentParticleSeg.h"
-#include "larcv3/core/dataformat/EventTensor.h"
-#include "larcv3/core/dataformat/EventParticle.h"
-#include "larcv3/core/dataformat/EventSparseCluster.h"
+#include "ParentParticleSeg.hh"
+#include "EventTensor.hh"
+#include "EventParticle.hh"
+#include "EventSparseCluster.hh"
 
 namespace larcv3 {
 
@@ -384,4 +381,3 @@ larcv3::VoxelSet ParentParticleSeg::cluster_merger(
 
 void ParentParticleSeg::finalize() {}
 }
-#endif

@@ -1,7 +1,7 @@
 #ifndef __LARCV3BASE_PSET_CXX
 #define __LARCV3BASE_PSET_CXX
 
-#include "larcv3/core/base/PSet.h"
+#include "larcv3/core/base/PSet.hh"
 #include <sstream>
 namespace larcv3 {
 

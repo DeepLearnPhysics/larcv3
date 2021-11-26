@@ -1,10 +1,10 @@
 #ifndef __PARTICLEBBoxFROMCLUSTER_CXX__
 #define __PARTICLEBBoxFROMCLUSTER_CXX__
 
-#include "ParticleBBoxFromCluster.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
-#include "larcv/core/DataFormat/EventParticle.h"
+#include "ParticleBBoxFromCluster.hh"
+#include "larcv/core/DataFormat/EventVoxel2D.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
+#include "larcv/core/DataFormat/EventParticle.hh"
 namespace larcv {
 
   static ParticleBBoxFromClusterProcessFactory __global_ParticleBBoxFromClusterProcessFactory__;

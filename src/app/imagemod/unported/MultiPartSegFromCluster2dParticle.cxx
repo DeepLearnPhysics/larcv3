@@ -1,10 +1,10 @@
 #ifndef __MULTIPARTSEGFROMCLUSTER2DPARTICLE_CXX__
 #define __MULTIPARTSEGFROMCLUSTER2DPARTICLE_CXX__
 
-#include "MultiPartSegFromCluster2dParticle.h"
-#include "larcv/core/DataFormat/EventTensor.h"
-#include "larcv/core/DataFormat/EventParticle.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
+#include "MultiPartSegFromCluster2dParticle.hh"
+#include "larcv/core/DataFormat/EventTensor.hh"
+#include "larcv/core/DataFormat/EventParticle.hh"
+#include "larcv/core/DataFormat/EventVoxel2D.hh"
 
 namespace larcv {
 

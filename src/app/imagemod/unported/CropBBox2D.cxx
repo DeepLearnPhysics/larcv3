@@ -1,9 +1,9 @@
 #ifndef __CROPBBox2D_CXX__
 #define __CROPBBox2D_CXX__
 
-#include "CropBBox2D.h"
-#include "larcv/core/DataFormat/EventBBox.h"
-#include "larcv/core/DataFormat/EventTensor.h"
+#include "CropBBox2D.hh"
+#include "larcv/core/DataFormat/EventBBox.hh"
+#include "larcv/core/DataFormat/EventTensor.hh"
 namespace larcv {
 
   static CropBBox2DProcessFactory __global_CropBBox2DProcessFactory__;

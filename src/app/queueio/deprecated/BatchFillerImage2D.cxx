@@ -1,7 +1,7 @@
 #ifndef __LARCV3THREADIO_BATCHFILLERIMAGE2D_CXX__
 #define __LARCV3THREADIO_BATCHFILLERIMAGE2D_CXX__
 
-#include "BatchFillerImage2D.h"
+#include "BatchFillerImage2D.hh"
 
 #include <random>
 

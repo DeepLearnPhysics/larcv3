@@ -1,4 +1,4 @@
-#include "Watch.h"
+#include "Watch.hh"
 
 void init_Watch(pybind11::module m){
       pybind11::class_<larcv3::Watch>(m, "Watch")

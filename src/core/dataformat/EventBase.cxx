@@ -1,7 +1,7 @@
 #ifndef __LARCV_EVENTBASE_CXX
 #define __LARCV_EVENTBASE_CXX
 
-#include "EventBase.h"
+#include "EventBase.hh"
 // #include <sstream>
 // #include <iomanip>
 

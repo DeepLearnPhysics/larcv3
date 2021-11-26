@@ -1,9 +1,9 @@
 #ifndef __LARCV3DATAFORMAT_IMAGEMETA_CXX__
 #define __LARCV3DATAFORMAT_IMAGEMETA_CXX__
 
-#include "larcv3/core/dataformat/ImageMeta.h"
-#include "larcv3/core/base/larbys.h"
-#include "larcv3/core/base/larcv_logger.h"
+#include "larcv3/core/dataformat/ImageMeta.hh"
+#include "larcv3/core/base/larbys.hh"
+#include "larcv3/core/base/larcv_logger.hh"
 #include <sstream>
 namespace larcv3 {
 

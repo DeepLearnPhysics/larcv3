@@ -1,7 +1,4 @@
-#ifndef __LARCV3THREADIO_BATCHFILLERTEMPLATE_CXX__
-#define __LARCV3THREADIO_BATCHFILLERTEMPLATE_CXX__
-
-#include "BatchFillerTemplate.h"
+#include "BatchFillerTemplate.hh"
 #include <sstream>
 
 namespace larcv3 {
@@ -16,4 +13,3 @@ namespace larcv3 {
   template class BatchFillerTemplate<float>;
   template class BatchFillerTemplate<double>;
 }
-#endif

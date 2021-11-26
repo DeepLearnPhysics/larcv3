@@ -1,9 +1,7 @@
-#ifndef __LARCV_IMAGE2DFROMTENSOR2D_CXX__
-#define __LARCV_IMAGE2DFROMTENSOR2D_CXX__
+#include "Image2DFromTensor2D.hh"
+#include "EventSparseTensor.hh"
+#include "EventTensor.hh"
 
-#include "Image2DFromTensor2D.h"
-#include "larcv3/core/dataformat/EventSparseTensor.h"
-#include "larcv3/core/dataformat/EventTensor.h"
 namespace larcv3 {
 
   static Image2DFromTensor2DProcessFactory __global_Image2DFromTensor2DProcessFactory__;
@@ -128,4 +126,3 @@ namespace larcv3 {
   {}
 
 }
-#endif

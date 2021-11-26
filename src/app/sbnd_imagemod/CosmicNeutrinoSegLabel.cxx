@@ -1,11 +1,8 @@
-#ifndef __LARCV_COSMICNEUTRINOSEGLABEL_CXX__
-#define __LARCV_COSMICNEUTRINOSEGLABEL_CXX__
-
-#include "CosmicNeutrinoSegLabel.h"
-#include "larcv3/core/dataformat/EventTensor.h"
-#include "larcv3/core/dataformat/EventParticle.h"
-#include "larcv3/core/dataformat/EventSparseCluster.h"
-#include "larcv3/core/dataformat/EventSparseTensor.h"
+#include "CosmicNeutrinoSegLabel.hh"
+#include "EventTensor.hh"
+#include "EventParticle.hh"
+#include "EventSparseCluster.hh"
+#include "EventSparseTensor.hh"
 
 namespace larcv3 {
 
@@ -122,4 +119,3 @@ Image2D CosmicNeutrinoSegLabel::seg_image_creator(
 
 void CosmicNeutrinoSegLabel::finalize() {}
 }
-#endif

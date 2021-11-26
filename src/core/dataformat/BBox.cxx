@@ -1,11 +1,11 @@
 #ifndef __LARCV3DATAFORMAT_BBOX_CXX__
 #define __LARCV3DATAFORMAT_BBOX_CXX__
 
-#include "larcv3/core/dataformat/BBox.h"
+#include "larcv3/core/dataformat/BBox.hh"
 #include <cmath>
 #include <set>
 #include <sstream>
-#include "larcv3/core/base/larbys.h"
+#include "larcv3/core/base/larbys.hh"
 
 namespace larcv3 {
 

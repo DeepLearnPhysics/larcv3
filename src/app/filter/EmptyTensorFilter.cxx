@@ -1,8 +1,6 @@
-#ifndef __LARCV3FILTER_EMPTYTENSORFILTER_CXX__
-#define __LARCV3FILTER_EMPTYTENSORFILTER_CXX__
+#include "EmptyTensorFilter.hh"
+#include "EventSparseTensor.hh"
 
-#include "EmptyTensorFilter.h"
-#include "larcv3/core/dataformat/EventSparseTensor.h"
 // #include "larcv3/core/DataFormat/EventVoxel3D.h"
 namespace larcv3 {
 
@@ -118,4 +116,3 @@ namespace larcv3 {
   {}
 
 }
-#endif

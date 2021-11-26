@@ -1,9 +1,9 @@
 #ifndef __ONEPARTICLETENSOR_CXX__
 #define __ONEPARTICLETENSOR_CXX__
 
-#include "OneParticleTensor.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
-#include "larcv/core/DataFormat/EventParticle.h"
+#include "OneParticleTensor.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
+#include "larcv/core/DataFormat/EventParticle.hh"
 namespace larcv {
 
   static OneParticleTensorProcessFactory __global_OneParticleTensorProcessFactory__;

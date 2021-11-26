@@ -1,7 +1,7 @@
 #ifndef __LARCV3THREADIO_BATCHDATASTORAGEFACTORY_CXX
 #define __LARCV3THREADIO_BATCHDATASTORAGEFACTORY_CXX
 
-#include "BatchDataStorageFactory.h"
+#include "BatchDataStorageFactory.hh"
 
 namespace larcv3 {
 

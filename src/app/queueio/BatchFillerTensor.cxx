@@ -1,7 +1,4 @@
-#ifndef __LARCV3THREADIO_BATCHFILLERTENSOR_CXX__
-#define __LARCV3THREADIO_BATCHFILLERTENSOR_CXX__
-
-#include "BatchFillerTensor.h"
+#include "BatchFillerTensor.hh"
 
 #include <random>
 
@@ -353,4 +350,3 @@ namespace larcv3 {
     }
   }
 }
-#endif

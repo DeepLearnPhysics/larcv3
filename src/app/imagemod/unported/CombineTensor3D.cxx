@@ -1,8 +1,8 @@
 #ifndef __COMBINETENSOR3D_CXX__
 #define __COMBINETENSOR3D_CXX__
 
-#include "CombineTensor3D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "CombineTensor3D.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 namespace larcv {
 
   static CombineTensor3DProcessFactory __global_CombineTensor3DProcessFactory__;

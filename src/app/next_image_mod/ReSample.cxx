@@ -1,8 +1,5 @@
-#ifndef __RESAMPLE_CXX__
-#define __RESAMPLE_CXX__
-
-#include "ReSample.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "ReSample.hh"
+#include "EventVoxel3D.hh"
 
 namespace larcv {
 
@@ -124,4 +121,3 @@ namespace larcv {
   {}
 
 }
-#endif

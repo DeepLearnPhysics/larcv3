@@ -1,8 +1,8 @@
 #ifndef __MaskImage2D_CXX__
 #define __MaskImage2D_CXX__
 
-#include "MaskImage2D.h"
-#include "larcv/core/DataFormat/EventTensor.h"
+#include "MaskImage2D.hh"
+#include "larcv/core/DataFormat/EventTensor.hh"
 
 namespace larcv {
 

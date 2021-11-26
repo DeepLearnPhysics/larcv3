@@ -1,10 +1,10 @@
 #ifndef __LEPTONSEGLABEL_CXX__
 #define __LEPTONSEGLABEL_CXX__
 
-#include "LeptonSegLabel.h"
-#include "larcv3/core/dataformat/EventTensor.h"
-#include "larcv3/core/dataformat/EventParticle.h"
-#include "larcv3/core/dataformat/EventVoxel2D.h"
+#include "LeptonSegLabel.hh"
+#include "larcv3/core/dataformat/EventTensor.hh"
+#include "larcv3/core/dataformat/EventParticle.hh"
+#include "larcv3/core/dataformat/EventVoxel2D.hh"
 
 namespace larcv3 {
 

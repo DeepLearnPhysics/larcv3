@@ -1,10 +1,7 @@
-#ifndef __DATASTREAM_CXX__
-#define __DATASTREAM_CXX__
-
-#include "DataStream.h"
-#include "DataFormat/EventTensor.h"
-#include "DataFormat/EventChStatus.h"
-#include "DataFormat/EventROI.h"
+#include "DataStream.hh"
+#include "EventTensor.hh"
+#include "EventChStatus.hh"
+#include "EventROI.hh"
 
 namespace larcv {
 
@@ -99,4 +96,3 @@ namespace larcv {
   {}
 
 }
-#endif

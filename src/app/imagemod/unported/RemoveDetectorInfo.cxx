@@ -1,9 +1,9 @@
 #ifndef __REMOVEDETECTORINFO_CXX__
 #define __REMOVEDETECTORINFO_CXX__
 
-#include "RemoveDetectorInfo.h"
-#include "larcv/core/DataFormat/EventParticle.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "RemoveDetectorInfo.hh"
+#include "larcv/core/DataFormat/EventParticle.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 namespace larcv {
 
   static RemoveDetectorInfoProcessFactory

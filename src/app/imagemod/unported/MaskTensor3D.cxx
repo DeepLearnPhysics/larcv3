@@ -1,8 +1,8 @@
 #ifndef __MaskTensor3D_CXX__
 #define __MaskTensor3D_CXX__
 
-#include "MaskTensor3D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "MaskTensor3D.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 namespace larcv {
 
   static MaskTensor3DProcessFactory __global_MaskTensor3DProcessFactory__;

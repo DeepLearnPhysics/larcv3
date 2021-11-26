@@ -1,9 +1,9 @@
 #ifndef __BBoxFromCluster3D_CXX__
 #define __BBoxFromCluster3D_CXX__
 
-#include "BBoxFromCluster3D.h"
-#include "larcv/core/DataFormat/EventParticle.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "BBoxFromCluster3D.hh"
+#include "larcv/core/DataFormat/EventParticle.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 namespace larcv {
 
   static BBoxFromCluster3DProcessFactory

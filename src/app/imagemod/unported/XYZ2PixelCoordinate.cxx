@@ -1,10 +1,10 @@
 #ifndef __XYZ2PIXELCOORDINATE_CXX__
 #define __XYZ2PIXELCOORDINATE_CXX__
 
-#include "XYZ2PixelCoordinate.h"
-#include "larcv/core/DataFormat/EventParticle.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
-#include "larcv/core/DataFormat/BBox.h"
+#include "XYZ2PixelCoordinate.hh"
+#include "larcv/core/DataFormat/EventParticle.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
+#include "larcv/core/DataFormat/BBox.hh"
 namespace larcv {
 
   static XYZ2PixelCoordinateProcessFactory __global_XYZ2PixelCoordinateProcessFactory__;

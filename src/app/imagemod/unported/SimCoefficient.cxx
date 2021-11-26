@@ -1,9 +1,9 @@
 #ifndef __SIMCOEFFICIENT_CXX__
 #define __SIMCOEFFICIENT_CXX__
 
-#include "SimCoefficient.h"
-#include "larcv/core/DataFormat/EventParticle.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "SimCoefficient.hh"
+#include "larcv/core/DataFormat/EventParticle.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 
 namespace larcv {
 

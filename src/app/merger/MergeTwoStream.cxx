@@ -1,11 +1,8 @@
-#ifndef MERGETWOSTREAM_CXX
-#define MERGETWOSTREAM_CXX
-
-#include "MergeTwoStream.h"
-#include "Base/LArCVBaseUtilFunc.h"
-#include "DataFormat/EventTensor.h"
-#include "DataFormat/EventROI.h"
-#include "DataFormat/EventChStatus.h"
+#include "MergeTwoStream.hh"
+#include "LArCVBaseUtilFunc.hh"
+#include "EventTensor.hh"
+#include "EventROI.hh"
+#include "EventChStatus.hh"
 
 namespace larcv {
 
@@ -188,4 +185,3 @@ namespace larcv {
   }
 
 }
-#endif

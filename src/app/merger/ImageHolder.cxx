@@ -1,7 +1,4 @@
-#ifndef __IMAGEHOLDER_CXX__
-#define __IMAGEHOLDER_CXX__
-
-#include "ImageHolder.h"
+#include "ImageHolder.hh"
 
 namespace larcv {
 
@@ -25,4 +22,3 @@ namespace larcv {
   { dest = std::move(_roi_v); }
 
 }
-#endif

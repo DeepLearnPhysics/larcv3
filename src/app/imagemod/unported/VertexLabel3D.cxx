@@ -1,8 +1,8 @@
 #ifndef __VertexLabel3D_CXX__
 #define __VertexLabel3D_CXX__
 
-#include "VertexLabel3D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "VertexLabel3D.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 
 namespace larcv {
 

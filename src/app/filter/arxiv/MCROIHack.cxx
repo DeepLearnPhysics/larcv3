@@ -1,8 +1,8 @@
 #ifndef __MCROIHACK_CXX__
 #define __MCROIHACK_CXX__
 
-#include "MCROIHack.h"
-#include "DataFormat/EventROI.h"
+#include "MCROIHack.hh"
+#include "EventROI.hh"
 
 namespace larcv {
 

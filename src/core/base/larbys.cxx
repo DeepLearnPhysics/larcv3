@@ -1,4 +1,4 @@
-#include "larbys.h"
+#include "larbys.hh"
 
 void init_larbys(pybind11::module m){
       pybind11::class_<larcv3::larbys>(m, "larbys")

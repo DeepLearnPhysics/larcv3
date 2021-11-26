@@ -1,8 +1,6 @@
-#ifndef __LARCV3FILTER_QSUMFILTER_CXX__
-#define __LARCV3FILTER_QSUMFILTER_CXX__
+#include "QSumFilter.hh"
+#include "EventTensor.hh"
 
-#include "QSumFilter.h"
-#include "larcv3/core/dataformat/EventTensor.h"
 namespace larcv3 {
 
   static QSumFilterProcessFactory __global_QSumFilterProcessFactory__;
@@ -62,4 +60,3 @@ namespace larcv3 {
   {}
 
 }
-#endif

@@ -1,8 +1,8 @@
 #ifndef __Tensor3DFromCluster3D_CXX__
 #define __Tensor3DFromCluster3D_CXX__
 
-#include "Tensor3DFromCluster3D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "Tensor3DFromCluster3D.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 namespace larcv {
 
   static Tensor3DFromCluster3DProcessFactory

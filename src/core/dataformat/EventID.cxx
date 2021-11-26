@@ -1,7 +1,7 @@
 #ifndef __LARCV3DATAFORMAT_EVENTID_CXX
 #define __LARCV3DATAFORMAT_EVENTID_CXX
 
-#include "larcv3/core/dataformat/EventID.h"
+#include "larcv3/core/dataformat/EventID.hh"
 #include <sstream>
 #include <iomanip>
 namespace larcv3 {

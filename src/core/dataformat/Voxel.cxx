@@ -1,9 +1,9 @@
 #ifndef __LARCV3DATAFORMAT_VOXEL_CXX__
 #define __LARCV3DATAFORMAT_VOXEL_CXX__
 
-#include "larcv3/core/dataformat/Voxel.h"
-#include "larcv3/core/base/larbys.h"
-#include "larcv3/core/base/larcv_logger.h"
+#include "larcv3/core/dataformat/Voxel.hh"
+#include "larcv3/core/base/larbys.hh"
+#include "larcv3/core/base/larcv_logger.hh"
 #include <iostream>
 
 namespace larcv3 {

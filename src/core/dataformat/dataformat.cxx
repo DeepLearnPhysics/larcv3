@@ -1,4 +1,4 @@
-#include "dataformat.h"
+#include "dataformat.hh"
 
 #include <pybind11/stl_bind.h>
 

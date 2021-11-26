@@ -1,8 +1,8 @@
 #ifndef __IMAGECOMPRESSOR_CXX__
 #define __IMAGECOMPRESSOR_CXX__
 
-#include "ImageCompressor.h"
-#include "larcv/core/DataFormat/EventTensor.h"
+#include "ImageCompressor.hh"
+#include "larcv/core/DataFormat/EventTensor.hh"
 
 namespace larcv {
 

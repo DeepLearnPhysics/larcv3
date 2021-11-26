@@ -1,12 +1,9 @@
-#ifndef __LARCV3THREADIO_QueuePROCESSOR_CXX
-#define __LARCV3THREADIO_QueuePROCESSOR_CXX
-
-#include "QueueProcessor.h"
-#include "larcv3/core/base/LArCVBaseUtilFunc.h"
+#include "QueueProcessor.hh"
+#include "LArCVBaseUtilFunc.hh"
 #include <sstream>
 #include <unistd.h>
-#include "BatchFillerTemplate.h"
-#include "BatchDataQueueFactory.h"
+#include "BatchFillerTemplate.hh"
+#include "BatchDataQueueFactory.hh"
 #include <mutex>
 #include <chrono>
 
@@ -568,5 +565,3 @@ void init_queueprocessor(pybind11::module m){
 
 
 }
-
-#endif

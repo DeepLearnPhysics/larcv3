@@ -1,8 +1,8 @@
 #ifndef __ROISIZEFILTER_CXX__
 #define __ROISIZEFILTER_CXX__
 
-#include "ROISizeFilter.h"
-#include "DataFormat/EventROI.h"
+#include "ROISizeFilter.hh"
+#include "EventROI.hh"
 
 namespace larcv {
 

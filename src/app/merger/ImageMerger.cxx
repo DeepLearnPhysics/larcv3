@@ -1,10 +1,7 @@
-#ifndef __IMAGEMERGER_CXX__
-#define __IMAGEMERGER_CXX__
-
-#include "ImageMerger.h"
-#include "DataFormat/EventTensor.h"
-#include "DataFormat/EventROI.h"
-#include "DataFormat/EventChStatus.h"
+#include "ImageMerger.hh"
+#include "EventTensor.hh"
+#include "EventROI.hh"
+#include "EventChStatus.hh"
 
 namespace larcv {
 
@@ -209,4 +206,3 @@ namespace larcv {
   {}
 
 }
-#endif

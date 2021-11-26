@@ -1,10 +1,7 @@
-#ifndef __LARCV_COMPRESSANDEMBED_CXX__
-#define __LARCV_COMPRESSANDEMBED_CXX__
-
-#include "CompressAndEmbed.h"
-#include "larcv3/core/dataformat/EventTensor.h"
-#include "larcv3/core/dataformat/EventSparseTensor.h"
-#include "larcv3/core/dataformat/EventSparseCluster.h"
+#include "CompressAndEmbed.hh"
+#include "EventTensor.hh"
+#include "EventSparseTensor.hh"
+#include "EventSparseCluster.hh"
 
 namespace larcv3 {
 
@@ -322,4 +319,3 @@ namespace larcv3 {
   {}
 
 }
-#endif

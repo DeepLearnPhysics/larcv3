@@ -13,7 +13,7 @@
 #define VOXELS_DATASET 3
 #define N_DATASETS 4
 
-#include "larcv3/core/dataformat/EventSparseTensor.h"
+#include "larcv3/core/dataformat/EventSparseTensor.hh"
 
 
 namespace larcv3 {

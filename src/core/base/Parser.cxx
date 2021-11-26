@@ -1,8 +1,8 @@
 #ifndef __LARCV3BASE_PARSER_CXX__
 #define __LARCV3BASE_PARSER_CXX__
 
-#include "larcv3/core/base/LArCVBaseUtilFunc.h"
-#include "larcv3/core/base/larbys.h"
+#include "larcv3/core/base/LArCVBaseUtilFunc.hh"
+#include "larcv3/core/base/larbys.hh"
 namespace larcv3 {
   namespace parser{
     

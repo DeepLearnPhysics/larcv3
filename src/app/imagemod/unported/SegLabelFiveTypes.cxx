@@ -1,9 +1,9 @@
 #ifndef __SEGLABELFIVETYPES_CXX__
 #define __SEGLABELFIVETYPES_CXX__
 
-#include "SegLabelFiveTypes.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
-#include "larcv/core/DataFormat/EventParticle.h"
+#include "SegLabelFiveTypes.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
+#include "larcv/core/DataFormat/EventParticle.hh"
 
 namespace larcv {
 

@@ -1,8 +1,8 @@
 #ifndef __MCFILTER_CXX__
 #define __MCFILTER_CXX__
 
-#include "MCFilter.h"
-#include "DataFormat/EventROI.h"
+#include "MCFilter.hh"
+#include "EventROI.hh"
 
 namespace larcv {
 

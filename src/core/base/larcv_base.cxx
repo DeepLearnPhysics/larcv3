@@ -1,4 +1,4 @@
-#include "larcv_base.h"
+#include "larcv_base.hh"
 
 void init_larcv_base(pybind11::module m){
       pybind11::class_<larcv3::larcv_base>(m, "larcv_base")

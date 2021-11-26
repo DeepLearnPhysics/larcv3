@@ -1,9 +1,6 @@
-#ifndef __LARCV_TENSOR2DFROMIMAGE2D_CXX__
-#define __LARCV_TENSOR2DFROMIMAGE2D_CXX__
-
-#include "Tensor2DFromImage2D.h"
-#include "larcv3/core/dataformat/EventSparseTensor.h"
-#include "larcv3/core/dataformat/EventTensor.h"
+#include "Tensor2DFromImage2D.hh"
+#include "EventSparseTensor.hh"
+#include "EventTensor.hh"
 
 #include <math.h>
 
@@ -139,4 +136,3 @@ namespace larcv3 {
 
   void Tensor2DFromImage2D::finalize() {}
 }
-#endif

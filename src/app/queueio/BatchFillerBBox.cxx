@@ -1,7 +1,4 @@
-#ifndef __LARCV3THREADIO_BATCHFILLERBBOX_CXX__
-#define __LARCV3THREADIO_BATCHFILLERBBOX_CXX__
-
-#include "BatchFillerBBox.h"
+#include "BatchFillerBBox.hh"
 
 #include <random>
 
@@ -190,4 +187,3 @@ namespace larcv3 {
 template class BatchFillerBBox<2>;
 template class BatchFillerBBox<3>;
 }
-#endif

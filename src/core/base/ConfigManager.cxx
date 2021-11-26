@@ -1,8 +1,8 @@
-#ifndef __LARCV3BASE_CONFIGMANAGER_CXX__
-#define __LARCV3BASE_CONFIGMANAGER_CXX__
+// #ifndef __LARCV3BASE_CONFIGMANAGER_CXX__
+// #define __LARCV3BASE_CONFIGMANAGER_CXX__
 
-#include "larcv3/core/base/ConfigManager.h"
-#include "larcv3/core/base/LArCVBaseUtilFunc.h"
+#include "larcv3/core/base/ConfigManager.hh"
+#include "larcv3/core/base/LArCVBaseUtilFunc.hh"
 namespace larcv3 {
 
   ConfigManager* ConfigManager::_me = nullptr;
@@ -31,4 +31,4 @@ namespace larcv3 {
 
 }
 
-#endif
+//#endif

@@ -1,8 +1,8 @@
 #ifndef __CROPNEUTRINO3D_CXX__
 #define __CROPNEUTRINO3D_CXX__
 
-#include "CropNeutrino3D.h"
-#include "larcv3/core/DataFormat/EventVoxel3D.h"
+#include "CropNeutrino3D.hh"
+#include "larcv3/core/DataFormat/EventVoxel3D.hh"
 
 namespace larcv3 {
 

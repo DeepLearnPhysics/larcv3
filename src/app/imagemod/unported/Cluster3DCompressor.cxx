@@ -1,8 +1,8 @@
 #ifndef __Cluster3DCompressor_CXX__
 #define __Cluster3DCompressor_CXX__
 
-#include "Cluster3DCompressor.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "Cluster3DCompressor.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 
 namespace larcv {
 

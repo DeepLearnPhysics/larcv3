@@ -1,7 +1,7 @@
 #ifndef __LARCV3DATAFORMAT_EVENTPARTICLE_CXX
 #define __LARCV3DATAFORMAT_EVENTPARTICLE_CXX
 
-#include "larcv3/core/dataformat/EventParticle.h"
+#include "larcv3/core/dataformat/EventParticle.hh"
 
 #define PARTICLE_EXTENTS_CHUNK_SIZE 100
 #define PARTICLE_DATA_CHUNK_SIZE 500

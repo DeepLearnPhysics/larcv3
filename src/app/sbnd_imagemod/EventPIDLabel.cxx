@@ -1,9 +1,6 @@
-#ifndef __EVENTPIDLABEL_CXX__
-#define __EVENTPIDLABEL_CXX__
-
-#include "EventPIDLabel.h"
-#include "larcv3/core/dataformat/EventTensor.h"
-#include "larcv3/core/dataformat/EventParticle.h"
+#include "EventPIDLabel.hh"
+#include "EventTensor.hh"
+#include "EventParticle.hh"
 
 namespace larcv3 {
 
@@ -222,4 +219,3 @@ bool EventPIDLabel::process(IOManager& mgr) {
 
 void EventPIDLabel::finalize() {}
 }
-#endif

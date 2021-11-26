@@ -1,9 +1,9 @@
 #ifndef __HistTensor_CXX__
 #define __HistTensor_CXX__
 
-#include "HistTensor.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "HistTensor.hh"
+#include "EventVoxel2D.hh"
+#include "EventVoxel3D.hh"
 namespace larcv {
 
   static HistTensorProcessFactory __global_HistTensorProcessFactory__;

@@ -1,8 +1,8 @@
 #ifndef __CCINCFILTER_CXX__
 #define __CCINCFILTER_CXX__
 
-#include "CCIncFilter.h"
-#include "DataFormat/EventROI.h"
+#include "CCIncFilter.hh"
+#include "EventROI.hh"
 namespace larcv {
 
   static CCIncFilterProcessFactory __global_CCIncFilterProcessFactory__;

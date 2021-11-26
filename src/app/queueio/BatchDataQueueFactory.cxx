@@ -1,7 +1,4 @@
-#ifndef __LARCV3THREADIO_BATCHDATAQUEUEFACTORY_CXX
-#define __LARCV3THREADIO_BATCHDATAQUEUEFACTORY_CXX
-
-#include "BatchDataQueueFactory.h"
+#include "BatchDataQueueFactory.hh"
 
 namespace larcv3 {
 
@@ -99,6 +96,3 @@ void init_batchdataqueuefactory(pybind11::module m){
   // init_batchdataqueuefactory<larcv3::SparseTensor<2>>(m);
 
 }
-
-
-#endif

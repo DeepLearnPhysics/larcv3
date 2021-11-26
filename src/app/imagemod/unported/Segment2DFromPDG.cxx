@@ -1,11 +1,11 @@
 #ifndef __SEGMENT2DFROMPDG_CXX__
 #define __SEGMENT2DFROMPDG_CXX__
 
-#include "larcv/core/DataFormat/EventVoxel2D.h"
-#include "larcv/core/DataFormat/EventTensor.h"
-#include "larcv/core/DataFormat/EventParticle.h"
-#include "Segment2DFromPDG.h"
-#include "ImageMod.h"
+#include "larcv/core/DataFormat/EventVoxel2D.hh"
+#include "larcv/core/DataFormat/EventTensor.hh"
+#include "larcv/core/DataFormat/EventParticle.hh"
+#include "Segment2DFromPDG.hh"
+#include "ImageMod.hh"
 
 namespace larcv {
 

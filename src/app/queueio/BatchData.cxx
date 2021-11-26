@@ -1,9 +1,6 @@
-#ifndef __LARCV3THREADIO_BATCHDATA_CXX
-#define __LARCV3THREADIO_BATCHDATA_CXX
-
-#include "BatchData.h"
-#include "larcv3/core/base/larcv_logger.h"
-#include "larcv3/core/base/larbys.h"
+#include "BatchData.hh"
+#include "larcv_logger.hh"
+#include "larbys.hh"
 #include <sstream>
 
 namespace larcv3 {
@@ -235,5 +232,3 @@ void init_batchdata_(pybind11::module m){
 */
 
 }
-
-#endif

@@ -1,10 +1,6 @@
-#ifndef __LABELER_CXX__
-#define __LABELER_CXX__
-
-#include "Labeler.h"
-
-#include "larcv/core/DataFormat/EventParticle.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "Labeler.hh"
+#include "EventParticle.hh"
+#include "EventVoxel3D.hh"
 
 namespace larcv {
 
@@ -83,4 +79,3 @@ namespace larcv {
   {}
 
 }
-#endif

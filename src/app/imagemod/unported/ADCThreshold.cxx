@@ -1,8 +1,8 @@
 #ifndef __ADCTHRESHOLD_CXX__
 #define __ADCTHRESHOLD_CXX__
 
-#include "ADCThreshold.h"
-#include "larcv/core/DataFormat/EventTensor.h"
+#include "ADCThreshold.hh"
+#include "larcv/core/DataFormat/EventTensor.hh"
 namespace larcv {
 
   static ADCThresholdProcessFactory __global_ADCThresholdProcessFactory__;

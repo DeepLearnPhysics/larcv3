@@ -1,9 +1,9 @@
 #ifndef __WIREMASK_CXX__
 #define __WIREMASK_CXX__
 
-#include "WireMask.h"
-#include "larcv/core/DataFormat/EventTensor.h"
-#include "larcv/core/DataFormat/EventChStatus.h"
+#include "WireMask.hh"
+#include "larcv/core/DataFormat/EventTensor.hh"
+#include "larcv/core/DataFormat/EventChStatus.hh"
 namespace larcv {
 
   static WireMaskProcessFactory __global_WireMaskProcessFactory__;

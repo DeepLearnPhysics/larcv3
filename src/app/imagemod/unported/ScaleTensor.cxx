@@ -1,9 +1,9 @@
 #ifndef __ScaleTensor_CXX__
 #define __ScaleTensor_CXX__
 
-#include "ScaleTensor.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "ScaleTensor.hh"
+#include "larcv/core/DataFormat/EventVoxel2D.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 namespace larcv {
 
   static ScaleTensorProcessFactory __global_ScaleTensorProcessFactory__;

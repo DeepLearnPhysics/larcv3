@@ -1,16 +1,8 @@
-#ifndef __LARCV3THREADIO_BATCHDATAQUEUE_CXX
-#define __LARCV3THREADIO_BATCHDATAQUEUE_CXX
-
-#include "BatchDataQueue.h"
-#include "larcv3/core/base/larcv_logger.h"
-#include "larcv3/core/base/larbys.h"
+#include "BatchDataQueue.hh"
+#include "larcv_logger.hh"
+#include "larbys.hh"
 
 namespace larcv3 {
-
-
-
-
-
 
   template <class T>
   BatchDataQueue<T>::BatchDataQueue()
@@ -88,5 +80,3 @@ void init_batchdataqueue(pybind11::module m){
   init_batchdataqueue<double>(m);
 
 }
-
-#endif

@@ -1,9 +1,6 @@
-#ifndef __LARCV3THREADIO_BATCHFILLERPIDLABEL_CXX__
-#define __LARCV3THREADIO_BATCHFILLERPIDLABEL_CXX__
-
-#include "BatchFillerPIDLabel.h"
-#include "larcv3/core/dataformat/EventTensor.h"
-#include "larcv3/core/dataformat/EventParticle.h"
+#include "BatchFillerPIDLabel.hh"
+#include "EventTensor.hh"
+#include "EventParticle.hh"
 #include <random>
 
 namespace larcv3 {
@@ -105,4 +102,3 @@ namespace larcv3 {
   }
 
 }
-#endif

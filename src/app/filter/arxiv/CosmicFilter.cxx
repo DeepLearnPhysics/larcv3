@@ -1,9 +1,9 @@
 #ifndef __COSMICFILTER_CXX__
 #define __COSMICFILTER_CXX__
 
-#include "CosmicFilter.h"
-#include "DataFormat/EventROI.h"
-#include "TRandom3.h"
+#include "CosmicFilter.hh"
+#include "EventROI.hh"
+#include "TRandom3.hh"
 
 namespace larcv {
 

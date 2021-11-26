@@ -1,10 +1,7 @@
-#ifndef __DOWNSAMPLE_CXX__
-#define __DOWNSAMPLE_CXX__
-
-#include "Downsample.h"
-#include "larcv3/core/dataformat/EventTensor.h"
-#include "larcv3/core/dataformat/EventSparseTensor.h"
-#include "larcv3/core/dataformat/EventSparseCluster.h"
+#include "Downsample.hh"
+#include "EventTensor.hh"
+#include "EventSparseTensor.hh"
+#include "EventSparseCluster.hh"
 
 namespace larcv3 {
 
@@ -294,4 +291,4 @@ bool Downsample::process(IOManager& mgr) {
 
 void Downsample::finalize() {}
 }
-#endif
+

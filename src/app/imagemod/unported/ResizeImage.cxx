@@ -1,8 +1,8 @@
 #ifndef __RESIZEIMAGE_CXX__
 #define __RESIZEIMAGE_CXX__
 
-#include "ResizeImage.h"
-#include "larcv/core/DataFormat/EventTensor.h"
+#include "ResizeImage.hh"
+#include "larcv/core/DataFormat/EventTensor.hh"
 namespace larcv {
 
   static ResizeImageProcessFactory __global_ResizeImageProcessFactory__;

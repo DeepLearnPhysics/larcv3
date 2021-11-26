@@ -1,9 +1,9 @@
 #ifndef __LEPTONSEGLABEL3D_CXX__
 #define __LEPTONSEGLABEL3D_CXX__
 
-#include "LeptonSegLabel3D.h"
-#include "larcv/core/DataFormat/EventParticle.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "LeptonSegLabel3D.hh"
+#include "larcv/core/DataFormat/EventParticle.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 
 namespace larcv {
 

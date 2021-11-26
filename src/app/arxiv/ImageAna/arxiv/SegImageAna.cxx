@@ -1,9 +1,9 @@
 #ifndef __SEGIMAGEANA_CXX__
 #define __SEGIMAGEANA_CXX__
 
-#include "SegImageAna.h"
-#include "DataFormat/EventTensor.h"
-#include "DataFormat/EventROI.h"
+#include "SegImageAna.hh"
+#include "EventTensor.hh"
+#include "EventROI.hh"
 
 namespace larcv {
 

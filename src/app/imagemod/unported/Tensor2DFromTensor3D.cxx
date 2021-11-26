@@ -1,9 +1,9 @@
 #ifndef __TENSOR2DFROMTENSOR3D_CXX__
 #define __TENSOR2DFROMTENSOR3D_CXX__
 
-#include "Tensor2DFromTensor3D.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "Tensor2DFromTensor3D.hh"
+#include "larcv/core/DataFormat/EventVoxel2D.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 
 namespace larcv {
 

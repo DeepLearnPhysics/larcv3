@@ -1,9 +1,9 @@
 #ifndef __HISTADC_CXX__
 #define __HISTADC_CXX__
 
-#include "HistADC.h"
-#include "larcv/core/DataFormat/EventTensor.h"
-#include "larcv/core/DataFormat/EventParticle.h"
+#include "HistADC.hh"
+#include "EventTensor.hh"
+#include "EventParticle.hh"
 
 namespace larcv {
 

@@ -1,8 +1,8 @@
 #ifndef __ADCSCALE_CXX__
 #define __ADCSCALE_CXX__
 
-#include "ADCScale.h"
-#include "larcv/core/DataFormat/EventTensor.h"
+#include "ADCScale.hh"
+#include "larcv/core/DataFormat/EventTensor.hh"
 
 namespace larcv {
 

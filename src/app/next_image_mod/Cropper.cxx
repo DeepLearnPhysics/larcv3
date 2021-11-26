@@ -1,8 +1,5 @@
-#ifndef __CROPPER_CXX__
-#define __CROPPER_CXX__
-
-#include "Cropper.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "Cropper.hh"
+#include "EventVoxel3D.hh"
 
 namespace larcv {
 
@@ -293,4 +290,3 @@ namespace larcv {
   {}
 
 }
-#endif

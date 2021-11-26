@@ -1,9 +1,9 @@
 #ifndef __MCTRACKFIX_CXX__
 #define __MCTRACKFIX_CXX__
 
-#include "MCTrackFix.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
-#include "larcv/core/DataFormat/EventParticle.h"
+#include "MCTrackFix.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
+#include "larcv/core/DataFormat/EventParticle.hh"
 namespace larcv {
 
   static MCTrackFixProcessFactory __global_MCTrackFixProcessFactory__;

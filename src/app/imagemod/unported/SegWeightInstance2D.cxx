@@ -1,9 +1,9 @@
 #ifndef __SegWeightInstance2D_CXX__
 #define __SegWeightInstance2D_CXX__
 
-#include "SegWeightInstance2D.h"
-#include "larcv/core/DataFormat/EventTensor.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
+#include "SegWeightInstance2D.hh"
+#include "larcv/core/DataFormat/EventTensor.hh"
+#include "larcv/core/DataFormat/EventVoxel2D.hh"
 
 namespace larcv {
 

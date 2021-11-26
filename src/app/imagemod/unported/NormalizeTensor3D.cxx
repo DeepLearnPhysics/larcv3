@@ -1,8 +1,8 @@
 #ifndef __NORMALIZETENSOR3D_CXX__
 #define __NORMALIZETENSOR3D_CXX__
 
-#include "NormalizeTensor3D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "NormalizeTensor3D.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 namespace larcv {
 
   static NormalizeTensor3DProcessFactory __global_NormalizeTensor3DProcessFactory__;

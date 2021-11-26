@@ -1,8 +1,8 @@
 #ifndef __COMBINEIMAGES_CXX__
 #define __COMBINEIMAGES_CXX__
 
-#include "CombineImages.h"
-#include "larcv/core/DataFormat/EventTensor.h"
+#include "CombineImages.hh"
+#include "larcv/core/DataFormat/EventTensor.hh"
 
 namespace larcv {
 

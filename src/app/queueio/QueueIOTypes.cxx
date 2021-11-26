@@ -1,7 +1,4 @@
-#ifndef __LARCV3THREADIO_THREADIOTYPES_CXX
-#define __LARCV3THREADIO_THREADIOTYPES_CXX
-
-#include "QueueIOTypes.h"
+#include "QueueIOTypes.hh"
 
 namespace larcv3{
 
@@ -24,5 +21,3 @@ namespace larcv3{
     }
   }
 }
-
-#endif

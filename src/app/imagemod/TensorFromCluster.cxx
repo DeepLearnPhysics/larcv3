@@ -1,10 +1,6 @@
-#ifndef __LARCV_TENSORFROMCLUSTER_CXX__
-#define __LARCV_TENSORFROMCLUSTER_CXX__
-
-#include "TensorFromCluster.h"
-#include "larcv3/core/dataformat/EventSparseTensor.h"
-#include "larcv3/core/dataformat/EventSparseCluster.h"
-
+#include "TensorFromCluster.hh"
+#include "EventSparseTensor.hh"
+#include "EventSparseCluster.hh"
 
 namespace larcv3 {
 
@@ -206,4 +202,3 @@ namespace larcv3 {
   template class EventSparseTensor<2>;
   template class EventSparseTensor<3>;
 }
-#endif

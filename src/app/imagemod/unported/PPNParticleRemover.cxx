@@ -1,9 +1,9 @@
 #ifndef __PPNPARTICLEREMOVER_CXX__
 #define __PPNPARTICLEREMOVER_CXX__
 
-#include "PPNParticleRemover.h"
-#include "larcv/core/DataFormat/EventParticle.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "PPNParticleRemover.hh"
+#include "larcv/core/DataFormat/EventParticle.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 namespace larcv {
 
   static PPNParticleRemoverProcessFactory __global_PPNParticleRemoverProcessFactory__;

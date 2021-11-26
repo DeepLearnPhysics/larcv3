@@ -1,9 +1,9 @@
 #ifndef __SEGLABELFROMCLUSTER3D_CXX__
 #define __SEGLABELFROMCLUSTER3D_CXX__
 
-#include "SegLabelFromCluster3D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
-#include "larcv/core/DataFormat/EventParticle.h"
+#include "SegLabelFromCluster3D.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
+#include "larcv/core/DataFormat/EventParticle.hh"
 
 namespace larcv {
 

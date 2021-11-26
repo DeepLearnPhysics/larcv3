@@ -1,8 +1,8 @@
 #ifndef __ThresholdCluster3D_CXX__
 #define __ThresholdCluster3D_CXX__
 
-#include "ThresholdCluster3D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "ThresholdCluster3D.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 namespace larcv {
 
   static ThresholdCluster3DProcessFactory __global_ThresholdCluster3DProcessFactory__;

@@ -2,7 +2,7 @@
 #define __LARCV3THREADIO_RANDOMCROPPER_CXX
 
 #include <random>
-#include "RandomCropper.h"
+#include "RandomCropper.hh"
 
 namespace larcv3 {
 

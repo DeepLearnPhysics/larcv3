@@ -1,9 +1,9 @@
 #ifndef __CROPNEUTRINO2D_CXX__
 #define __CROPNEUTRINO2D_CXX__
 
-#include "CropNeutrino2D.h"
-#include "larcv3/core/dataformat/EventTensor.h"
-#include "larcv3/core/dataformat/EventSparseCluster.h"
+#include "CropNeutrino2D.hh"
+#include "larcv3/core/dataformat/EventTensor.hh"
+#include "larcv3/core/dataformat/EventSparseCluster.hh"
 
 namespace larcv3 {
 

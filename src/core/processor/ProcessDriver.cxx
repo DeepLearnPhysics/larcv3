@@ -1,12 +1,12 @@
 #ifndef __LARCV3PROCESSOR_PROCESSDRIVER_CXX
 #define __LARCV3PROCESSOR_PROCESSDRIVER_CXX
 
-#include "larcv3/core/processor/ProcessDriver.h"
+#include "larcv3/core/processor/ProcessDriver.hh"
 #include <iomanip>
 #include <random>
 #include <sstream>
-#include "larcv3/core/processor/ProcessFactory.h"
-#include "larcv3/core/base/LArCVBaseUtilFunc.h"
+#include "larcv3/core/processor/ProcessFactory.hh"
+#include "larcv3/core/base/LArCVBaseUtilFunc.hh"
 namespace larcv3 {
 
 ProcessDriver::ProcessDriver(std::string name)

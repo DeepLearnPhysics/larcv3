@@ -5,7 +5,7 @@
 #include <pybind11/operators.h>
 
 
-#include "larcv3/core/dataformat/Point.h"
+#include "larcv3/core/dataformat/Point.hh"
 
 
 namespace larcv3{

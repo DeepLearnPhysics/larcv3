@@ -1,8 +1,8 @@
 #ifndef __VERTEXWEIGHT3D_CXX__
 #define __VERTEXWEIGHT3D_CXX__
 
-#include "VertexWeight3D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "VertexWeight3D.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 
 namespace larcv {
 

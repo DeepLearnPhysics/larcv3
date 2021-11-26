@@ -1,8 +1,8 @@
 #ifndef __SEGWEIGHTINSTANCE3D_CXX__
 #define __SEGWEIGHTINSTANCE3D_CXX__
 
-#include "SegWeightInstance3D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "SegWeightInstance3D.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 
 namespace larcv {
 

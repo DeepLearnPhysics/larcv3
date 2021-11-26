@@ -1,8 +1,8 @@
 #ifndef __BINARIZE_CXX__
 #define __BINARIZE_CXX__
 
-#include "Binarize.h"
-#include "larcv/core/DataFormat/EventTensor.h"
+#include "Binarize.hh"
+#include "larcv/core/DataFormat/EventTensor.hh"
 
 namespace larcv {
 

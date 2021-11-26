@@ -1,9 +1,9 @@
 #ifndef __SPARCIFYIMAGE2D_CXX__
 #define __SPARCIFYIMAGE2D_CXX__
 
-#include "SparcifyImage2D.h"
-#include "larcv/core/DataFormat/EventVoxel2D.h"
-#include "larcv/core/DataFormat/EventTensor.h"
+#include "SparcifyImage2D.hh"
+#include "larcv/core/DataFormat/EventVoxel2D.hh"
+#include "larcv/core/DataFormat/EventTensor.hh"
 
 namespace larcv {
 

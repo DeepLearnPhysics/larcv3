@@ -1,8 +1,8 @@
 #ifndef __BLURTENSOR3D_CXX__
 #define __BLURTENSOR3D_CXX__
 
-#include "BlurTensor3D.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "BlurTensor3D.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 
 namespace larcv {
 

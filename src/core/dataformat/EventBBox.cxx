@@ -1,7 +1,7 @@
 #ifndef __LARCV3DATAFORMAT_EVENTBBOX_CXX
 #define __LARCV3DATAFORMAT_EVENTBBOX_CXX
 
-#include "larcv3/core/dataformat/EventBBox.h"
+#include "larcv3/core/dataformat/EventBBox.hh"
 
 #define BBOX_EXTENTS_CHUNK_SIZE 1
 #define BBOX_IDEXTENTS_CHUNK_SIZE 1

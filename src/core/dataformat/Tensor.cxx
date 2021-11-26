@@ -2,9 +2,9 @@
 #define __LARCV3DATAFORMAT_TENSOR_CXX__
 
 
-#include "larcv3/core/base/larbys.h"
-#include "larcv3/core/base/larcv_logger.h"
-#include "larcv3/core/dataformat/Tensor.h"
+#include "larcv3/core/base/larbys.hh"
+#include "larcv3/core/base/larcv_logger.hh"
+#include "larcv3/core/dataformat/Tensor.hh"
 #include <iostream>
 #include <string.h>
 #include <stdio.h>

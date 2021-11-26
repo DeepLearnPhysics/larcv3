@@ -1,8 +1,8 @@
 #ifndef __Tensor3DCompressor_CXX__
 #define __Tensor3DCompressor_CXX__
 
-#include "Tensor3DCompressor.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "Tensor3DCompressor.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 
 namespace larcv {
 

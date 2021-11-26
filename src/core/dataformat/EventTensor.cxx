@@ -1,7 +1,7 @@
 #ifndef __LARCV3DATAFORMAT_EVENTTENSOR_CXX
 #define __LARCV3DATAFORMAT_EVENTTENSOR_CXX
 
-#include "larcv3/core/dataformat/EventTensor.h"
+#include "larcv3/core/dataformat/EventTensor.hh"
 // #include "larcv3/core/Base/larbys.h"
 
 #define IMAGE_EXTENTS_CHUNK_SIZE 1

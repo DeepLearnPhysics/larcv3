@@ -1,9 +1,9 @@
 #ifndef __VTXINREGION_CXX__
 #define __VTXINREGION_CXX__
 
-#include "VtxInRegion.h"
+#include "VtxInRegion.hh"
 
-#include "DataFormat/EventParticle.h"
+#include "EventParticle.hh"
 
 namespace larcv {
 

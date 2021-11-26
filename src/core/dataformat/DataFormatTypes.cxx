@@ -1,12 +1,8 @@
-#ifndef __LARCV3DATAFORMAT_DATAFORMATTYPES_CXX
-#define __LARCV3DATAFORMAT_DATAFORMATTYPES_CXX
-
-#include "larcv3/core/dataformat/DataFormatTypes.h"
+#include "larcv3/core/dataformat/DataFormatTypes.hh"
 
 namespace larcv3{
 
-
-
+#ifdef USE_HDF5
   template<>
   hid_t get_datatype<int>()                {
     hid_t _copied_type(H5T_NATIVE_INT);
@@ -92,7 +88,7 @@ namespace larcv3{
                larcv3::get_datatype<unsigned int>());
     return datatype;
   }
-
+#endif
 
   // Wrapper functions and enumerations to make binding easier:
   template<> std::string as_string<float>() {return "Float";}
@@ -144,6 +140,3 @@ void init_dataformattypes(pybind11::module m){
   // };
 
 }
-
-
-#endif

@@ -1,7 +1,7 @@
 #ifndef __LARCV3PROCESSOR_PROCESSBASE_CXX
 #define __LARCV3PROCESSOR_PROCESSBASE_CXX
 
-#include "larcv3/core/processor/ProcessBase.h"
+#include "larcv3/core/processor/ProcessBase.hh"
 
 namespace larcv3 {
 

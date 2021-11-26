@@ -1,9 +1,6 @@
-#ifndef __THRESHOLD_CXX__
-#define __THRESHOLD_CXX__
-
-#include "Threshold.h"
-#include "larcv3/core/dataformat/EventSparseTensor.h"
-#include "larcv3/core/dataformat/EventSparseCluster.h"
+#include "Threshold.hh"
+#include "EventSparseTensor.hh"
+#include "EventSparseCluster.hh"
 
 namespace larcv3 {
 
@@ -275,4 +272,3 @@ bool Threshold::process(IOManager& mgr) {
 
 void Threshold::finalize() {}
 }
-#endif

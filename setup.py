@@ -23,6 +23,15 @@ if 'LARCV_WITHOUT_PYBIND' in os.environ and os.environ['LARCV_WITHOUT_PYBIND']:
 else:
     pybind_value='ON'
 
+if 'LARCV_WITH_HDF5' in os.environ and os.environ['LARCV_WITH_HDF5']:
+    hdf5_value='ON'
+else:
+    hdf5_value='OFF'
+
+if 'LARCV_WITH_PYTHON_EXECUTABLE' in os.environ and os.environ['LARCV_WITH_PYTHON_EXECUTABLE']:
+    python_executable='ON'
+else:
+    python_executable='OFF'
 
 setup(
     name="larcv",
@@ -35,8 +44,10 @@ setup(
         '-DCMAKE_PYTHON_BINDINGS={}'.format(pybind_value),
         # '-DMPI_CXX_COMPILER={}'.format(mpicxx),
         # '-DMPI_C_COMPILER={}'.format(mpicc),
-        '-DMPI:BOOL={}'.format(mpi_value),
-        '-DOPENMP:BOOL={}'.format(openmp_value),
+        '-DUSE_MPI:BOOL={}'.format(mpi_value),
+        '-DUSE_OPENMP:BOOL={}'.format(openmp_value),
+        '-DUSE_HDF5:BOOL={}'.format(hdf5_value),
+        '-DCREATE_PYTHON_EXECUTABLE:BOOL={}'.format(python_executable),
     ],
     author=['Corey Adams', 'Kazuhiro Terao', 'Taritree Wongjirad', 'Marco del Tutto'],
     author_email='corey.adams@anl.gov',

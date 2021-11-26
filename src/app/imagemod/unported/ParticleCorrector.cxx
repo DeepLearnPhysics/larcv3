@@ -1,9 +1,9 @@
 #ifndef __PARTICLECORRECTOR_CXX__
 #define __PARTICLECORRECTOR_CXX__
 
-#include "ParticleCorrector.h"
-#include "larcv/core/DataFormat/EventParticle.h"
-#include "larcv/core/DataFormat/EventVoxel3D.h"
+#include "ParticleCorrector.hh"
+#include "larcv/core/DataFormat/EventParticle.hh"
+#include "larcv/core/DataFormat/EventVoxel3D.hh"
 #include <ostream>
 namespace larcv {
 
