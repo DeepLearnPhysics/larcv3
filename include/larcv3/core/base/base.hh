@@ -4,7 +4,6 @@
  * @brief Class def header for exception classes for larcv3 framework
  * @author cadams
  */
-
 #pragma once
 
 #include "larbys.hh"

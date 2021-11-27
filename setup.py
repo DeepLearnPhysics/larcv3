@@ -46,7 +46,7 @@ setup(
         # '-DMPI_C_COMPILER={}'.format(mpicc),
         '-DUSE_MPI:BOOL={}'.format(mpi_value),
         '-DUSE_OPENMP:BOOL={}'.format(openmp_value),
-        '-DUSE_HDF5:BOOL={}'.format(hdf5_value),
+        '-DUSE_HDF5:BOOL={}'.format('ON'),
         '-DCREATE_PYTHON_EXECUTABLE:BOOL={}'.format(python_executable),
     ],
     author=['Corey Adams', 'Kazuhiro Terao', 'Taritree Wongjirad', 'Marco del Tutto'],

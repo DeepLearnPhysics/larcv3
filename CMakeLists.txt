@@ -1,4 +1,7 @@
+###############################################################################
+# currently requiring cmake >= 3.1
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+
 ###############################################################################
 # set(CMAKE_SKIP_RPATH TRUE)
 # set the project name to larcv3
@@ -6,6 +9,7 @@ project(larcv3)
 set(CMAKE_PACKAGE_DIR "larcv")
 set(PROJECT_SOURCE_DIR "src/")
 set(PROJECT_INCLUDE_DIR "include/")
+
 ###############################################################################
 # general configuration for compilation:
 enable_language(CXX)
@@ -14,12 +18,14 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -O3 -g")
 
 enable_language(C)
+
 ###############################################################################
 # We set a larcv compiler definition to build all of the python code
 # This is obviously not set if you are including headers, which protects
 # the need to install pybind11 outside of larcv (since it's header only,
 # there is no need to link to it.)
 add_definitions(-DLARCV_INTERNAL)
+
 ###############################################################################
 # set up headers
 file(GLOB headers 
@@ -46,7 +52,9 @@ file(GLOB sources
     ${PROJECT_SOURCE_DIR}/app/queueio/*.cxx
     #${PROJECT_SOURCE_DIR}/app/sbnd_imagemod/*.cxx
 )
+
 ###############################################################################
+# include directories for the project
 include_directories(
     "include"
     "include/larcv3/"
@@ -64,6 +72,7 @@ include_directories(
     "include/larcv3/app/sbnd_imagemod/"
     "include/pybind11/include/"
 )
+
 ###############################################################################
 # option for using MPI
 option(USE_MPI "Compile with MPI" OFF)
@@ -86,6 +95,7 @@ if(USE_MPI)
     MESSAGE (STATUS "MPI_C_LIBRARIES ${MPI_C_LIBRARIES}")
     MESSAGE (STATUS "MPI_C_COMPILER ${MPI_C_COMPILER}")
 endif()
+
 ###############################################################################
 # option for using OpenMP
 option(USE_OPENMP "Compile with OpenMP" OFF)
@@ -95,16 +105,19 @@ if(USE_OPENMP)
         add_definitions(-DLARCV_OPENMP)
     endif()
 endif()
+
 ###############################################################################
 # Many packages need python:
+# TODO: make this a compilation option
 message("Searching for python libraries...")
 find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
+
 ######################################
 # section for python/numpy/pybind11
 # This is from https://github.com/Eyescale/CMake/blob/master/FindNumPy.cmake
 option(PYTHON_EXECUTABLE "Creates python executable" ON)
-message("Adding python")
+message("Adding python...")
 if(NOT PYTHON_EXECUTABLE)
     message(STATUS "No python executable, searching for numpy quietly...")
     if(NumPy_FIND_QUIETLY)
@@ -130,8 +143,10 @@ if(PYTHON_EXECUTABLE)
 elseif(__numpy_out)
     message(STATUS "ERROR: Python executable not found.")
 endif(PYTHON_EXECUTABLE)
+
 ###############################################################################
 # IO needs HDF5:
+# TODO: finish making this optional
 option(USE_HDF5 "Compile LArCV to use HDF5 library" ON)
 if(USE_HDF5)
     add_definitions(-DUSE_HDF5)
@@ -148,8 +163,10 @@ if(USE_HDF5_PARALLEL)
         message(STATUS "ERROR: Can't use hdf5 parallel!")
     endif()
 endif()
+
 ###############################################################################
 # numpy library
+# TODO: make this an optional part
 message("Adding numpy")
 find_path(PYTHON_NUMPY_INCLUDE_DIR numpy/arrayobject.h
     HINTS "${__numpy_path}" "${PYTHON_INCLUDE_PATH}" NO_DEFAULT_PATH)
@@ -161,7 +178,10 @@ else()
     message(STATUS "ERROR: Numpy library not found!")
 endif(PYTHON_NUMPY_INCLUDE_DIR)
 include_directories(${PYTHON_NUMPY_INCLUDE_DIR})
+
 ###############################################################################
+# whether to make python bindings, 
+# TODO: make sure this is dependent on python and numpy settings
 if(CMAKE_PYTHON_BINDINGS)
     message("Adding pybind11")
     add_subdirectory(include/pybind11)
@@ -170,42 +190,46 @@ if(CMAKE_PYTHON_BINDINGS)
 else()
     add_definitions(-DLARCV_NO_PYBIND)
 endif(CMAKE_PYTHON_BINDINGS)
+
 ###############################################################################
 # add the src directory CMakeLists.txt
 # and recursively go through it.  This must be done before
 # the linked library is defined below.
 add_subdirectory(src)
+
 ###############################################################################
+# define the linked library for the project
 add_library(larcv3 SHARED
-    # $<TARGET_OBJECTS:base>
-    # $<TARGET_OBJECTS:dataformat>
-    # $<TARGET_OBJECTS:processor>
-    # $<TARGET_OBJECTS:filter>
-    # $<TARGET_OBJECTS:queueio>
-    # $<TARGET_OBJECTS:imagemod>
-    # $<TARGET_OBJECTS:sbnd_imagemod>
     ${sources}
     ${headers}
 )
+
 ###############################################################################
+# whether to compile with openmp
 if (OpenMP_CXX_FOUND)
     message("Linking against openmp")
     message("OpenMP_CXX_LIBRARY: " ${OpenMP_CXX_LIBRARIES})
     message("OpenMP_C_LIBRARY: " ${OpenMP_C_LIBRARIES})
     target_link_libraries(larcv3 ${OpenMP_CXX_LIBRARIES} ${OpenMP_C_LIBRARIES})
 endif()
+
 ###############################################################################
+# whether to compile with mpi
 if (MPI_FOUND)
     message("Linking against MPI")
     message("OpenMP_CXX_LIBRARY: " ${MPI_CXX_LIBRARIES})
     message("OpenMP_C_LIBRARY: " ${MPI_C_LIBRARIES})
     target_link_libraries(larcv3 ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES})
 endif()
+
 ###############################################################################
 # Link against python:
+# TODO: make this an optional part
 target_link_libraries(larcv3 ${PYTHON_LIBRARIES})
 target_link_libraries(larcv3 ${HDF5_LIBRARIES})
+
 ###############################################################################
+# whether to make python bindings
 if(CMAKE_PYTHON_BINDINGS)
     message("Building python bindings...")
     pybind11_add_module(pylarcv SHARED src/larcv.cc)
@@ -221,10 +245,13 @@ if(CMAKE_PYTHON_BINDINGS)
     endif()
     set_target_properties(pylarcv PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 endif(CMAKE_PYTHON_BINDINGS)
+
 ###############################################################################
+# link libraries if MPI is used
 if (MPI)
     target_link_libraries(larcv3 ${MPI_LIBRARIES})
 endif()
+
 ###############################################################################
 # Install larvc shared library
 install(TARGETS larcv3
@@ -233,7 +260,9 @@ install(TARGETS larcv3
     RUNTIME DESTINATION ${CMAKE_PACKAGE_DIR}/bin
     INCLUDES DESTINATION ${CMAKE_PACKAGE_DIR}/include
 )
+
 ###############################################################################
+# install python bindings
 if(CMAKE_PYTHON_BINDINGS)
     # Install larvc wrapper library
     install(TARGETS pylarcv
@@ -243,4 +272,3 @@ if(CMAKE_PYTHON_BINDINGS)
         INCLUDES DESTINATION ${CMAKE_PACKAGE_DIR}/include
     )
 endif()
-###############################################################################

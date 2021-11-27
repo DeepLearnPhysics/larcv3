@@ -19,7 +19,7 @@ python setup.py install [--user | -prefix ${INSTALLATION_DIR} ]
 To verify your larcv installation, after install has completed:
 ```
 cd larcv3/tests
-py.test .
+pytest
 ```
 
 
@@ -31,6 +31,7 @@ py.test .
 * cmake (for building)
 * scikit-build (for installation)
 * pytest (for continuous integration)
+* mpi4py (for testing)
 
 HDF5 and cmake can all be installed by package managers.  Conda will also work.
 
@@ -42,7 +43,7 @@ pip install numpy scikit-build pytest
 
 To install requirements on mac, you can do:
 sudo port install cmake hdf5
-pip install numpy scikit-build pytest
+pip install numpy scikit-build pytest mpi4py
 
 To install in a generic system, you can try conda or a virtual environment.  It has been shown to work on many linux distributions.
 

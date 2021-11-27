@@ -2,3 +2,4 @@ scikit-build
 numpy
 h5py
 cmake
+mpi4py
