@@ -6,7 +6,6 @@
  */
 #pragma once
 
-
 #ifdef LARCV_INTERNAL
 	#include <pybind11/pybind11.h>
 	template <size_t dimension>

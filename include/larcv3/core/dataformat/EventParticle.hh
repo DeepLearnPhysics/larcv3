@@ -1,109 +1,99 @@
 /**
- * \file EventParticle.h
- *
- * \ingroup DataFormat
- *
- * \brief Class def header for a class EventParticle
- *
+ * @file EventParticle.h
+ * @ingroup DataFormat
+ * @brief Class def header for a class EventParticle
  * @author kazuhiro
  */
+#pragma once
 
-/** \addtogroup DataFormat
-
-    @{*/
-#ifndef __LARCV3DATAFORMAT_EVENTPARTICLE_H
-#define __LARCV3DATAFORMAT_EVENTPARTICLE_H
+#ifdef LARCV_INTERNAL
+	#include <pybind11/pybind11.h>
+	void init_eventparticle(pybind11::module m);
+#endif
 
 #include "EventBase.hh"
 #include "Particle.hh"
 #include "DataProductFactory.hh"
 #include "IOManager.hh"
 
-namespace larcv3 {
-  /**
-    \class EventParticle
-    User-defined data product class (please comment!)
-  */
-  class EventParticle : public EventBase {
+/** @addtogroup DataFormat
+ * @{
+ */
+namespace larcv3 
+{
+	/**
+	 * @brief User-defined data product class (please comment!)
+	 * 
+	 */
+	class EventParticle : public EventBase 
+	{
+	public:
+		/// Default constructor
+		EventParticle();
 
-  public:
+		/// Default destructor
+		~EventParticle(){}
 
-    /// Default constructor
-    EventParticle();
+		inline larcv3::Particle at(size_t index) 
+		{ return _part_v.at(index); }
 
-    /// Default destructor
-    ~EventParticle(){}
+		void set(const std::vector<larcv3::Particle>& part_v);
+		void append(const larcv3::Particle& part);
+		void emplace_back(larcv3::Particle&& part);
+		void emplace(std::vector<larcv3::Particle>&& part_v);
 
-    inline larcv3::Particle at(size_t index) {return _part_v.at(index);}
+		inline const std::vector<larcv3::Particle>& as_vector() const
+		{ return _part_v; }
 
+		// inline const larcv3::Particle& at(size_t index) const 
+		// { return _part_v.at(index); }
 
+		inline size_t size() const 
+		{ return _part_v.size(); }
 
-    void set(const std::vector<larcv3::Particle>& part_v);
-    void append(const larcv3::Particle& part);
-    void emplace_back(larcv3::Particle&& part);
-    void emplace(std::vector<larcv3::Particle>&& part_v);
+		/// Data clear method
+		void clear      ();
+		void initialize (hid_t group, uint compression);
+		void serialize  (hid_t group);
+		void deserialize(hid_t group, size_t entry, bool reopen_groups=false);
+		void finalize   ();
 
-    inline const std::vector<larcv3::Particle>& as_vector() const
-    { return _part_v; }
+		// static EventParticle * to_particle(EventBase * e)
+		// { return (EventParticle *) e; }
 
-    // inline const larcv3::Particle& at(size_t index) const {return _part_v.at(index);}
+	private:
+		void open_in_datasets(hid_t group);
+		void open_out_datasets(hid_t group);
+		/// a collection of particles (index maintained)
+		std::vector<larcv3::Particle> _part_v; 
 
-    inline size_t size() const {return _part_v.size();}
+	};
 
-    /// Data clear method
-    void clear      ();
-    void initialize (hid_t group, uint compression);
-    void serialize  (hid_t group);
-    void deserialize(hid_t group, size_t entry, bool reopen_groups=false);
-    void finalize   ();
+	// Template instantiation for IO
+	template<>
+	inline std::string product_unique_name<larcv3::EventParticle>() 
+	{ return "particle"; }
 
-    // static EventParticle * to_particle(EventBase * e){
-    //   return (EventParticle *) e;
-    // }
+	// template<>
+	// inline EventParticle& IOManager::get_data(const std::string&);
 
-  private:
+	// template<>
+	// inline EventParticle& IOManager::get_data(const ProducerID_t);
 
-    void open_in_datasets(hid_t group);
-    void open_out_datasets(hid_t group);
-
-    std::vector<larcv3::Particle> _part_v; ///< a collection of particles (index maintained)
-
-  };
+	/**
+	 * @brief A concrete factory class for larcv3::EventParticle
+	 * 
+	 */
+	class EventParticleFactory : public DataProductFactoryBase 
+	{
+	public:
+		/// constructor
+		EventParticleFactory()
+		{ DataProductFactory::get().add_factory(product_unique_name<larcv3::EventParticle>(),this); }
+		/// destuctor
+		~EventParticleFactory() {}
+		/// create method
+		EventBase* create() { return new EventParticle; }
+	};
 }
-
-
-namespace larcv3 {
-
-  // Template instantiation for IO
-  template<>
-  inline std::string product_unique_name<larcv3::EventParticle>() { return "particle"; }
-  // template<>
-  // inline EventParticle& IOManager::get_data(const std::string&);
-  // template<>
-  // inline EventParticle& IOManager::get_data(const ProducerID_t);
-
-  /**
-     \class larcv3::EventParticle
-     \brief A concrete factory class for larcv3::EventParticle
-  */
-  class EventParticleFactory : public DataProductFactoryBase {
-  public:
-    /// ctor
-    EventParticleFactory()
-    { DataProductFactory::get().add_factory(product_unique_name<larcv3::EventParticle>(),this); }
-    /// dtor
-    ~EventParticleFactory() {}
-    /// create method
-    EventBase* create() { return new EventParticle; }
-  };
-
-
-}
-
-#ifdef LARCV_INTERNAL
-#include <pybind11/pybind11.h>
-void init_eventparticle(pybind11::module m);
-#endif
-
-#endif
 /** @} */ // end of doxygen group

@@ -114,7 +114,7 @@ if(NOT PYTHON_EXECUTABLE)
         set(__numpy_out 1)
     endif()
 endif()
-if (PYTHON_EXECUTABLE)
+if(PYTHON_EXECUTABLE)
     message(STATUS "Python executable: ${PYTHON_EXECUTABLE}")
     message(STATUS "Checking for Numpy path and version...")
     # Find out the include path

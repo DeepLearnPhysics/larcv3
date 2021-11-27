@@ -1,136 +1,138 @@
-/*
- * \file EventSparseCluster.h
- *
- * \ingroup core_DataFormat
- *
- * \brief Class def header for a class larcv3::EventSparseCluster 2D and 3D
- *
+/**
+ * @file EventSparseCluster.h
+ * @ingroup core_DataFormat
+ * @brief Class def header for a class larcv3::EventSparseCluster 2D and 3D
  * @author kazuhiro
  * @author cadams
+ */
+#pragma once
 
-
- * \addtogroup core_DataFormat
-
-*/
-#ifndef __LARCV3DATAFORMAT_EVENTSPARSECLUSTER_H
-#define __LARCV3DATAFORMAT_EVENTSPARSECLUSTER_H
+#ifdef LARCV_INTERNAL
+	#include <pybind11/pybind11.h>
+	template<size_t dimension>
+	void init_eventsparse_cluster_base(pybind11::module m);
+	void init_eventsparsecluster(pybind11::module m);
+#endif
 
 #include <iostream>
+
 #include "EventBase.hh"
 #include "DataProductFactory.hh"
 #include "Voxel.hh"
 #include "ImageMeta.hh"
 #include "IOManager.hh"
 
-namespace larcv3 {
+/** @addtogroup DataFormat
+ * @{
+ */
+namespace larcv3 
+{
+	/**
+	 * @brief Event-wise class to store a collection of VoxelSet 
+	 * (cluster) per projection id
+	 */
+	template<size_t dimension>
+	class EventSparseCluster : public EventBase 
+	{
+	public:
+		/// Default constructor
+		EventSparseCluster();
 
-  /**
-    \class EventSparseCluster2D
-    \brief Event-wise class to store a collection of VoxelSet (cluster) per projection id
-  */
-  template<size_t dimension>
-  class EventSparseCluster : public EventBase {
+		/// Default destructor
+		virtual ~EventSparseCluster() 
+		{}
 
-  public:
+		/// EventBase::clear() override
+		inline void clear() 
+		{ _cluster_v.clear(); }
 
-    /// Default constructor
-    EventSparseCluster();
+		inline larcv3::SparseCluster<dimension>  at(size_t index) 
+		{ return _cluster_v.at(index); }
 
-    /// Default destructor
-    virtual ~EventSparseCluster() {}
+		/// Access to all stores larcv3::SparseCluster
+		inline const std::vector<larcv3::SparseCluster<dimension>>& as_vector() const 
+		{ return _cluster_v; }
 
-    /// EventBase::clear() override
-    inline void clear() {_cluster_v.clear();}
+		/// Access SparseCluster of a specific projection ID
+		const larcv3::SparseCluster<dimension>& 
+			sparse_cluster(const ProjectionID_t id) const;
 
-    inline larcv3::SparseCluster<dimension>  at(size_t index) {return _cluster_v.at(index);}
+		/// Number of valid projection id
+		inline size_t size() const 
+		{ return _cluster_v.size(); }
 
-    /// Access to all stores larcv3::SparseCluster
-    inline const std::vector<larcv3::SparseCluster<dimension> >& as_vector() const { return _cluster_v; }
+		/// Emplace data
+		void emplace(larcv3::SparseCluster<dimension>&& clusters);
+		/// Set data
+		void set(const larcv3::SparseCluster<dimension>& clusters);
+		/// Emplace a new element
+		void emplace(larcv3::VoxelSetArray&& clusters, 
+			larcv3::ImageMeta<dimension>&& meta);
 
-    /// Access SparseCluster of a specific projection ID
-    const larcv3::SparseCluster<dimension> & sparse_cluster(const ProjectionID_t id) const;
+		// IO functions:
+		void initialize (hid_t group, uint compression);
+		void serialize  (hid_t group);
+		void deserialize(hid_t group, size_t entry, bool reopen_groups=false);
+		void finalize   ();
 
-    /// Number of valid projection id
-    inline size_t size() const { return _cluster_v.size(); }
+		static EventSparseCluster * to_sparse_cluster(EventBase * e)
+		{ return (EventSparseCluster *) e; }
 
-    //
-    // Write-access
-    //
-    /// Emplace data
-    void emplace(larcv3::SparseCluster<dimension>&& clusters);
-    /// Set data
-    void set(const larcv3::SparseCluster<dimension>& clusters);
-    /// Emplace a new element
-    void emplace(larcv3::VoxelSetArray&& clusters, larcv3::ImageMeta<dimension>&& meta);
+	private:
+		void open_in_datasets(hid_t group);
+		void open_out_datasets(hid_t group);
+		std::vector<larcv3::SparseCluster<dimension> > _cluster_v;
+	};
 
+	using EventSparseCluster2D = EventSparseCluster<2>;
+	using EventSparseCluster3D = EventSparseCluster<3>;
 
+	// Template instantiation for IO
+  	template<> inline std::string product_unique_name<larcv3::EventSparseCluster2D>() 
+	{ return "cluster2d"; }
+  	
+	template<> inline std::string product_unique_name<larcv3::EventSparseCluster3D>() 
+	{ return "cluster3d"; }
 
-    // IO functions:
-    void initialize (hid_t group, uint compression);
-    void serialize  (hid_t group);
-    void deserialize(hid_t group, size_t entry, bool reopen_groups=false);
-    void finalize   ();
+	/**
+	 * @brief A concrete factory class for larcv3::EventSparseCluster2D
+	 * 
+	 */
+	class EventSparseCluster2DFactory : public DataProductFactoryBase 
+	{
+	public:
+		/// constructor
+		EventSparseCluster2DFactory()
+		{ DataProductFactory::get().add_factory(product_unique_name<larcv3::EventSparseCluster2D>(), this); }
+		
+		/// destructor
+		~EventSparseCluster2DFactory() 
+		{}
 
+		/// create method
+		EventBase* create() 
+		{ return new EventSparseCluster2D; }
+	};
 
-    static EventSparseCluster * to_sparse_cluster(EventBase * e){
-      return (EventSparseCluster *) e;
-    }
+	/**
+	 * @brief A concrete factory class for larcv3::EventSparseCluster3D
+	 * 
+	 */
+	class EventSparseCluster3DFactory : public DataProductFactoryBase 
+	{
+	public:
+		/// constructor
+		EventSparseCluster3DFactory()
+		{ DataProductFactory::get().add_factory(product_unique_name<larcv3::EventSparseCluster3D>(), this); }
+		
+		/// destructor
+		~EventSparseCluster3DFactory() 
+		{}
 
-  private:
-    void open_in_datasets(hid_t group);
-    void open_out_datasets(hid_t group);
-    std::vector<larcv3::SparseCluster<dimension> > _cluster_v;
-
-  };
-
-typedef EventSparseCluster<2> EventSparseCluster2D;
-typedef EventSparseCluster<3> EventSparseCluster3D;
+		/// create method
+		EventBase* create() 
+		{ return new EventSparseCluster3D; }
+	};
 
 }
-
-namespace larcv3 {
-
-  // Template instantiation for IO
-  template<> inline std::string product_unique_name<larcv3::EventSparseCluster2D>() { return "cluster2d"; }
-  template<> inline std::string product_unique_name<larcv3::EventSparseCluster3D>() { return "cluster3d"; }
-
-
-  //    \class larcv3::EventSparseCluster
-  //    \brief A concrete factory class for larcv3::EventSparseCluster
-
-
-  class EventSparseCluster2DFactory : public DataProductFactoryBase {
-  public:
-    /// ctor
-    EventSparseCluster2DFactory()
-    { DataProductFactory::get().add_factory(product_unique_name<larcv3::EventSparseCluster2D>(), this); }
-    /// dtor
-    ~EventSparseCluster2DFactory() {}
-    /// create method
-    EventBase* create() { return new EventSparseCluster2D; }
-  };
-
-  class EventSparseCluster3DFactory : public DataProductFactoryBase {
-  public:
-    /// ctor
-    EventSparseCluster3DFactory()
-    { DataProductFactory::get().add_factory(product_unique_name<larcv3::EventSparseCluster3D>(), this); }
-    /// dtor
-    ~EventSparseCluster3DFactory() {}
-    /// create method
-    EventBase* create() { return new EventSparseCluster3D; }
-  };
-
-}
-
-
-#ifdef LARCV_INTERNAL
-#include <pybind11/pybind11.h>
-template<size_t dimension>
-void init_eventsparse_cluster_base(pybind11::module m);
-
-void init_eventsparsecluster(pybind11::module m);
-#endif
-
-#endif
 /** @} */ // end of doxygen group

@@ -1,33 +1,21 @@
 /**
- * \file larbys.h
- *
- * \ingroup core_Base
- *
- * \brief Class def header for exception classes for larcv3 framework
- *
- * @author cadams
+ * @file processor.hh
+ * @ingroup core_Processor
+ * @brief 
+ * @author 
  */
-
-/** \addtogroup core_Base
-
-    @{*/
-#ifndef __LARCV3PROCESSOR_PROCESSOR_H__
-#define __LARCV3PROCESSOR_PROCESSOR_H__
-
+#pragma once
 
 #include "ProcessBase.hh"
 #include "ProcessDriver.hh"
 
-
+/** @addtogroup core_Processor
+ * @{
+ */
 #ifndef LARCV_NO_PYBIND
-#ifdef LARCV_INTERNAL
-#include <pybind11/pybind11.h>
-__attribute__ ((visibility ("default"))) void init_processor(pybind11::module m);
+    #ifdef LARCV_INTERNAL
+        #include <pybind11/pybind11.h>
+        __attribute__ ((visibility ("default"))) void init_processor(pybind11::module m);
+    #endif
 #endif
-
-// bindings
-#endif
-
-
-// include guards
-#endif
+/** @} */ // end of group
