@@ -13,8 +13,10 @@
 #endif
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <map>
+#include <pybind11/operators.h>
 
 #include "larbys.hh"
 #include "Parser.hh"
@@ -196,6 +198,5 @@ namespace larcv3
 	};
 
 	template<> PSet PSet::get<larcv3::PSet>(const std::string& key) const;
-
 }
 /** @} */ // end of doxygen group
