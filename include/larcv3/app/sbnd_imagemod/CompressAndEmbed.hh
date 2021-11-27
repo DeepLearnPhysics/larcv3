@@ -1,23 +1,21 @@
 /**
- * \file CompressAndEmbed.h
- *
- * \ingroup Package_Name
- *
- * \brief Class def header for a class CompressAndEmbed
- *
+ * @file CompressAndEmbed.h
+ * @ingroup Package_Name
+ * @brief Class def header for a class CompressAndEmbed
  * @author cadams
  */
 
-/** \addtogroup Package_Name
+/** @addtogroup Package_Name
 
     @{*/
-#ifndef __LARCV_COMPRESSANDEMBED_H__
-#define __LARCV_COMPRESSANDEMBED_H__
+#pragma once
 
 #include "ProcessBase.hh"
 #include "ProcessFactory.hh"
 // #include "larcv3/core/dataformat/Tensor.h"
-namespace larcv3 {
+
+namespace larcv3 
+{
 
   /**
      \class ProcessBase
@@ -69,7 +67,5 @@ namespace larcv3 {
   };
 
 }
-
-#endif
 /** @} */ // end of doxygen group
 

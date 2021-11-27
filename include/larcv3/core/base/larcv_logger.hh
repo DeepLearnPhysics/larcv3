@@ -1,147 +1,123 @@
 /**
- * \file larcv_logger.h
- *
+ * \file larcv_logger.hh
  * \ingroup core_Base
- *
  * \brief larcv3::logger utility class definition header file.
- *
  * @author Kazu - Nevis 2015
  */
 
-/** \addtogroup core_Base
+#pragma once
 
-    @{*/
-#ifndef __LARCV3BASE_LOGGER_H__
-#define __LARCV3BASE_LOGGER_H__
+#ifdef LARCV_INTERNAL
+	#include <pybind11/pybind11.h>
+	void init_logger(pybind11::module m);
+#endif
 
 #include <cstdio>
 #include <iostream>
 #include <map>
 
-
 #include "LArCVTypes.hh"
 
-namespace larcv3 {
+/** \addtogroup core_Base
+ * @{
+ */
+namespace larcv3 
+{
+	/**
+	 * @brief Utility class used to show formatted 
+	 * message on the screen. A logger class for larcv3. 
+	 * Simply shows a formatted colored message on a screen.
+	 * A static getter method is provided to create a sharable 
+	 * logger instance (see larcv_base for useage). 
+	 */
+	class logger
+	{
+	public:
+		/// Default constructor
+		logger(const std::string& name="no_name")
+			: _ostrm(&std::cout)
+			, _name(name)
+		{}
 
-  /**
-     \class logger
-     \brief Utility class used to show formatted message on the screen.
-     A logger class for larcv3. Simply shows a formatted colored message on a screen. \n
-     A static getter method is provided to create a sharable logger instance (see larcv_base for useage). \n
-  */
-  class logger{
+		/// Default destructor
+		virtual ~logger(){};
 
-  public:
+	private:
+		std::ostream *_ostrm;	///< ostream
+		msg::Level_t _level;	///< Level
+		std::string _name;		///< Name
 
-    /// Default constructor
-    logger(const std::string& name="no_name")
-      : _ostrm(&std::cout)
-      , _name(name)
-    {}
+		static std::map<std::string,larcv3::logger> *_logger_m;	///< Set of loggers
+		static larcv3::logger* _shared_logger;	///< Shared logger
+		static msg::Level_t _level_default;		///< Default logger level
 
-    /// Default destructor
-    virtual ~logger(){};
+	public:
+		
+		const std::string& name() const 	///< Logger's name
+		{ return _name; }	
+		
+		void set(const msg::Level_t level) 	///< Verbosity level setter
+		{ _level = level; }	
 
-  private:
+		msg::Level_t level() const 			/// Verbosity level getter
+		{ return _level; }
 
-    /// ostream
-    std::ostream *_ostrm;
+		/// Comparison operator for static collection of loggers
+		inline bool operator<(const logger& rhs) const
+		{
+			if(_name < rhs.name()) return true;
+			if(_name > rhs.name()) return false;
+			return false;
+		}
 
-    /// Level
-    msg::Level_t _level;
+		/// Getter of a message instance
+		static logger& get(const std::string name)
+		{
+			if(!_logger_m) _logger_m = new std::map<std::string,larcv3::logger>();
+			auto iter = _logger_m->find(name);
+			if(iter == _logger_m->end()) {
+			iter = _logger_m->emplace(name,logger(name)).first;
+			iter->second.set(msg::kNORMAL);
+			}
+			return iter->second;
+		};
 
-    /// Name
-    std::string _name;
+		static logger& get_shared();
+		static msg::Level_t default_level() /// Default logger level getter
+		{ return _level_default; }
+		
+		static void default_level(msg::Level_t l) /// Default logger level setter 
+		{ _level_default = l; }					  /// (only affect future loggers)											
+		/// Force all loggers to change level
+		static void force_level(msg::Level_t l)
+		{
+			default_level(l);
+			for(auto& name_logger : *_logger_m) name_logger.second.set(l);
+		}
 
-    /// Set of loggers
-    static std::map<std::string,larcv3::logger> *_logger_m;
+		// Verbosity level checker
+		inline bool debug   () const { return _level <= msg::kDEBUG;   }
+		inline bool info    () const { return _level <= msg::kINFO;    }
+		inline bool normal  () const { return _level <= msg::kNORMAL;  }
+		inline bool warning () const { return _level <= msg::kWARNING; }
+		inline bool error   () const { return _level <= msg::kERROR;   }
+		/// Formatted message (simplest)
+		std::ostream& send(const msg::Level_t) const;
+		/// Formatted message (function name included)
+		std::ostream& send(const msg::Level_t level,
+							const std::string& function ) const;
+		/// Formatted message (function name + line number)
+		std::ostream& send(const msg::Level_t level,
+							const std::string& function,
+							const unsigned int line_num ) const;
+		/// Formatted message (function name + line number + file name)
+		std::ostream& send(const msg::Level_t level,
+							const std::string& function,
+							const unsigned int line_num,
+							const std::string& file_name) const;
 
-    /// Shared logger
-    static larcv3::logger* _shared_logger;
-
-    /// Default logger level
-    static msg::Level_t _level_default;
-
-  public:
-
-    /// Logger's name
-    const std::string& name() const { return _name; }
-
-    /// Verbosity level setter
-    void set(const msg::Level_t level) { _level = level; }
-
-    /// Verbosity level getter
-    msg::Level_t level() const { return _level; }
-
-    /// Comparison operator for static collection of loggers
-    inline bool operator<(const logger& rhs) const
-    {
-      if(_name < rhs.name()) return true;
-      if(_name > rhs.name()) return false;
-      return false;
-    }
-
-    /// Getter of a message instance
-    static logger& get(const std::string name)
-    {
-      if(!_logger_m) _logger_m = new std::map<std::string,larcv3::logger>();
-      auto iter = _logger_m->find(name);
-      if(iter == _logger_m->end()) {
-        iter = _logger_m->emplace(name,logger(name)).first;
-        iter->second.set(msg::kNORMAL);
-      }
-      return iter->second;
-    };
-
-    static logger& get_shared();
-
-    /// Default logger level getter
-    static msg::Level_t default_level() { return _level_default; }
-    /// Default logger level setter (only affect future loggers)
-    static void default_level(msg::Level_t l) { _level_default = l; }
-    /// Force all loggers to change level
-    static void force_level(msg::Level_t l)
-    {
-      default_level(l);
-      for(auto& name_logger : *_logger_m) name_logger.second.set(l);
-    }
-
-    //
-    // Verbosity level checker
-    //
-    inline bool debug   () const { return _level <= msg::kDEBUG;   }
-    inline bool info    () const { return _level <= msg::kINFO;    }
-    inline bool normal  () const { return _level <= msg::kNORMAL;  }
-    inline bool warning () const { return _level <= msg::kWARNING; }
-    inline bool error   () const { return _level <= msg::kERROR;   }
-    /// Formatted message (simplest)
-    std::ostream& send(const msg::Level_t) const;
-    /// Formatted message (function name included)
-    std::ostream& send(const msg::Level_t level,
-                       const std::string& function ) const;
-    /// Formatted message (function name + line number)
-    std::ostream& send(const msg::Level_t level,
-                       const std::string& function,
-                       const unsigned int line_num ) const;
-    /// Formatted message (function name + line number + file name)
-    std::ostream& send(const msg::Level_t level,
-                       const std::string& function,
-                       const unsigned int line_num,
-                       const std::string& file_name) const;
-
-  };
+	};
 }
-
-#ifdef LARCV_INTERNAL
-#include <pybind11/pybind11.h>
-// Wrapper init function:
-void init_logger(pybind11::module m);
-#endif
-
-
-//
-// Compiler macro for saving us from text typing
-//
 /// Compiler macro for DEBUG message
 #define LARCV_DEBUG()    if( logger().debug   () ) logger().send(::larcv3::msg::kDEBUG,    __FUNCTION__, __LINE__, __FILE__)
 /// Compiler macro for INFO message
@@ -161,6 +137,4 @@ void init_logger(pybind11::module m);
 #define LARCV_SWARNING()  if(larcv3::logger::get_shared().warning())  larcv3::logger::get_shared().send(::larcv3::msg::kWARNING,  __FUNCTION__                  )
 #define LARCV_SERROR()    if(larcv3::logger::get_shared().error())    larcv3::logger::get_shared().send(::larcv3::msg::kERROR,    __FUNCTION__,__LINE__         )
 #define LARCV_SCRITICAL() larcv3::logger::get_shared().send(::larcv3::msg::kCRITICAL, __FUNCTION__,__LINE__,__FILE__)
-
 /** @} */ // end of doxygen group logger
-#endif

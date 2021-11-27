@@ -1,23 +1,15 @@
 /**
- * \file larbys.h
- *
- * \ingroup core_Base
- *
- * \brief Class def header for exception classes for larcv3 framework
- *
+ * @file larbys.h
+ * @ingroup core_Base
+ * @brief Class def header for exception classes for larcv3 framework
  * @author cadams
  */
 
-/** \addtogroup core_Base
-
-    @{*/
-#ifndef __LARCV3DATAFORMAT_DATAFORMAT_H__
-#define __LARCV3DATAFORMAT_DATAFORMAT_H__
-
+#pragma once
 
 #include "DataFormatTypes.hh"
 #include "BBox.hh"
-// #include "DataProductFactory.h"
+// #include "DataProductFactory.hh"
 #include "EventBase.hh"
 #include "EventID.hh"
 #include "EventParticle.hh"
@@ -33,14 +25,13 @@
 #include "Vertex.hh"
 #include "Voxel.hh"
 
+/** @addtogroup core_Base
+ * @{
+ */
 #ifndef LARCV_NO_PYBIND
-#ifdef LARCV_INTERNAL
-#include <pybind11/pybind11.h>
-__attribute__ ((visibility ("default"))) void init_dataformat(pybind11::module m);
+    #ifdef LARCV_INTERNAL
+        #include <pybind11/pybind11.h>
+        __attribute__ ((visibility ("default"))) void init_dataformat(pybind11::module m);
+    #endif
 #endif
-// bindings
-#endif
-
-
-// include guards
-#endif
+/** @} */ // end of doxygen group

@@ -1,181 +1,201 @@
 /**
- * \file PSet.h
- *
- * \ingroup core_Base
- *
- * \brief Class def header for a class larcv3::PSet
- *
+ * @file PSet.hh
+ * @ingroup core_Base
+ * @brief Class def header for a class larcv3::PSet
  * @author kazuhiro
  */
 
-/** \addtogroup core_Base
+#pragma once
 
-    @{*/
-#ifndef __LARCV3BASE_PSET_H__
-#define __LARCV3BASE_PSET_H__
+#ifdef LARCV_INTERNAL
+	#include <pybind11/pybind11.h>
+	void init_PSet(pybind11::module m);
+#endif
 
 #include <iostream>
 #include <string>
 #include <map>
+
 #include "larbys.hh"
 #include "Parser.hh"
 #include "larcv_logger.hh"
 
-namespace larcv3 {
-  /**
-     \class PSet
-     \brief A nested configuration parameter set holder for larcv3 framework.
-  */
-  class PSet {
+/** @addtogroup core_Base
+ * @{
+ */
+namespace larcv3 
+{
+	/**
+	 * @brief A nested configuration parameter set holder for larcv3 framework.
+	 * 
+	 */
+	class PSet 
+	{
+	public:
+		/// Default constructor
+		PSet(const std::string name="",
+				const std::string data="");
 
-  public:
+		/// Default destructor
+		virtual ~PSet()
+		{}
 
-    /// Default constructor
-    PSet(const std::string name="",
-         const std::string data="");
+		/// Copy constructor
+		PSet(const PSet& orig) 
+		: _name       (orig._name)
+		, _data_value (orig._data_value)
+		, _data_pset  (orig._data_pset )
+		{}
 
-    /// Default destructor
-    virtual ~PSet(){};
+		/// name getter
+		inline const std::string& name() const 
+		{ return _name; }
 
-    /// Copy ctor
-    PSet(const PSet& orig) : _name       ( orig._name       )
-                           , _data_value ( orig._data_value )
-                           , _data_pset  ( orig._data_pset  )
-    {}
+		/// is equal operator
+		inline bool operator==(const PSet& rhs) const
+		{
+			if(_name != rhs.name()) {
+				return false;
+			}
+			auto const v_keys = this->value_keys();
+			// TODO: could just ask for the value of size directly
+			if(v_keys.size() != rhs.value_keys().size()) {
+				return false;
+			}
+			for(auto const& key : v_keys) 
+			{
+				if(!rhs.contains_value(key)) {
+					return false;
+				}
+				if(this->get<std::string>(key) != rhs.get<std::string>(key)) {
+					return false;
+				}
+			}
+			auto const p_keys = this->pset_keys();
+			// TODO: could just ask for the value of size directly
+			if(p_keys.size() != rhs.pset_keys().size()) {
+				return false;
+			}
+			for(auto const& key : p_keys) 
+			{
+				if(!rhs.contains_pset(key)) {
+					return false;
+				}
+				if(this->get_pset(key) != rhs.get_pset(key)) {
+					return false;
+				}
+			}
+			return true;
+		}
 
-    /// name getter
-    inline const std::string& name() const { return _name; }
+		/// is-unequal operator
+		inline bool operator!=(const PSet& rhs) const
+		{ return !((*this) == rhs); }
 
-    /// operator override
-    inline bool operator==(const PSet& rhs) const
-    {
-      if(_name != rhs.name()) return false;
-      auto const v_keys = this->value_keys();
-      if(v_keys.size() != rhs.value_keys().size()) return false;
-      for(auto const& key : v_keys) {
-        if(!rhs.contains_value(key))
-          return false;
-        if(this->get<std::string>(key) != rhs.get<std::string>(key))
-          return false;
-      }
-      auto const p_keys = this->pset_keys();
-      if(p_keys.size() != rhs.pset_keys().size()) return false;
-      for(auto const& key : p_keys) {
-        if(!rhs.contains_pset(key))
-          return false;
-        if(this->get_pset(key) != rhs.get_pset(key))
-          return false;
-      }
-      return true;
-    }
+		/// rename method
+		inline void rename(std::string name) 
+		{ _name = name; }
 
-    inline bool operator!=(const PSet& rhs) const
-    { return !((*this) == rhs); }
+		/// clear method
+		inline void clear()
+		{ _data_value.clear(); _data_pset.clear(); }
 
-    /// rename method
-    inline void rename(std::string name) { _name = name; }
+		/// Set data contents
+		void add(const std::string& data);
 
-    /// clear method
-    inline void clear()
-    { _data_value.clear(); _data_pset.clear(); }
+		/// Insert method for a simple param
+		void add_value(std::string key, std::string value);
 
-    /// Set data contents
-    void add(const std::string& data);
+		/// Insert method for a PSet rep
+		void add_pset(const PSet& p);
 
-    /// Insert method for a simple param
-    void add_value(std::string key, std::string value);
+		/// Insert method for a PSet rep
+		void add_pset(std::string key, std::string pset);
 
-    /// Insert method for a PSet rep
-    void add_pset(const PSet& p);
+		void update(std::string key, std::string value);
 
-    /// Insert method for a PSet rep
-    void add_pset(std::string key,
-                  std::string pset);
+		std::string & operator[] (std::string key);
 
-    void update(std::string key, std::string value);
+		/// Dump into a text format
+		std::string dump(size_t indent_size=0) const;
 
-    std::string & operator[] (std::string key);
+		/// Dump data string
+		std::string data_string() const;
 
-    /// Dump into a text format
-    std::string dump(size_t indent_size=0) const;
+		/// Template getter
+		template <class T>
+		T get(const std::string& key) const
+		{
+			auto iter = _data_value.find(key);
+			if( iter == _data_value.end() ) {
+				std::string msg;
+				msg = "Key does not exist: \"" + key + "\"";
+				std::cout<<dump()<<std::endl;
+				LARCV_CRITICAL() << msg << std::endl;
+				throw larbys(msg);
+			}
+			return parser::FromString<T>((*iter).second);
+		}
 
-    /// Dump data string
-    std::string data_string() const;
+		/// Template getter w/ default value
+		template <class T>
+		T get(const std::string& key, const T default_value) const
+		{
+			auto iter = _data_value.find(key);
+			if( iter == _data_value.end() ) {
+				return default_value;
+			}
+			return parser::FromString<T>((*iter).second);
+		}
 
-    /// Template getter
-    template <class T>
-    T get(const std::string& key) const{
-      auto iter = _data_value.find(key);
-      if( iter == _data_value.end() ) {
-        std::string msg;
-        msg = "Key does not exist: \"" + key + "\"";
-        std::cout<<dump()<<std::endl;
-        LARCV_CRITICAL() << msg << std::endl;
-        throw larbys(msg);
-      }
-      return parser::FromString<T>((*iter).second);
-    }
+		/// None-template function to retrieve parameter set (deprecated)
+		const PSet& get_pset(const std::string& key) const;
 
-    /// Template getter w/ default value
-    template <class T>
-    T get(const std::string& key, const T default_value) const{
-      auto iter = _data_value.find(key);
-      if( iter == _data_value.end() )
-        return default_value;
-      return parser::FromString<T>((*iter).second);
-    }
+		/// Returns # of parameters
+		size_t size() const;
 
-    /// None-template function to retrieve parameter set (deprecated)
-    const PSet& get_pset(const std::string& key) const;
+		/// Returns a vector of all parameter keys
+		const std::vector<std::string> keys() const;
 
-    /// Returns # of parameters
-    size_t size() const;
-    /// Returns a vector of all parameter keys
-    const std::vector<std::string> keys() const;
-    /// Returns a vector of keys for key-value pairs
-    const std::vector<std::string> value_keys () const;
-    /// Returns a vector of keys for key-PSet pairs
-    const std::vector<std::string> pset_keys  () const;
-    /// Check if a specified key exists for key-value pairs
-    bool  contains_value (const std::string& key) const;
-    /// Check if a specified key exists for key-PSet pairs
-    bool  contains_pset  (const std::string& key) const;
+		/// Returns a vector of keys for key-value pairs
+		const std::vector<std::string> value_keys () const;
 
+		/// Returns a vector of keys for key-PSet pairs
+		const std::vector<std::string> pset_keys  () const;
 
+		/// Check if a specified key exists for key-value pairs
+		bool  contains_value (const std::string& key) const;
 
-  private:
+		/// Check if a specified key exists for key-PSet pairs
+		bool  contains_pset  (const std::string& key) const;
 
-    enum KeyChar_t {
-      kParamDef,
-      kBlockStart,
-      kBlockEnd,
-      kString,
-      kNone
-    };
+	private:
+		enum KeyChar_t 
+		{
+			kParamDef,
+			kBlockStart,
+			kBlockEnd,
+			kString,
+			kNone
+		};
 
-    std::pair<PSet::KeyChar_t,size_t> search(const std::string& txt, const size_t start) const;
-    void strip(std::string& str, const std::string& key);
-    void rstrip(std::string& str, const std::string& key);
-    void trim_space(std::string& txt);
-    void no_space(std::string& txt);
+		std::pair<PSet::KeyChar_t,size_t> 
+			search(const std::string& txt, const size_t start) const;
+		void strip(std::string& str, const std::string& key);
+		void rstrip(std::string& str, const std::string& key);
+		void trim_space(std::string& txt);
+		void no_space(std::string& txt);
 
-    /// The name of this larcv3::PSet
-    std::string _name;
-    /// Key-Value pairs
-    std::map<std::string,std::string> _data_value;
-    /// Key-PSet pairs
-    std::map<std::string,::larcv3::PSet> _data_pset;
+		/// The name of this larcv3::PSet
+		std::string _name;
+		/// Key-Value pairs
+		std::map<std::string,std::string> _data_value;
+		/// Key-PSet pairs
+		std::map<std::string,::larcv3::PSet> _data_pset;
 
-  };
+	};
 
-  template<> PSet PSet::get<larcv3::PSet>(const std::string& key) const;
+	template<> PSet PSet::get<larcv3::PSet>(const std::string& key) const;
 
 }
-
-#ifdef LARCV_INTERNAL
-#include <pybind11/pybind11.h>
-void init_PSet(pybind11::module m);
-#endif
-
-#endif
 /** @} */ // end of doxygen group
