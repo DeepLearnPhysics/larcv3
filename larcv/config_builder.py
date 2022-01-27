@@ -92,7 +92,7 @@ class ConfigBuilder:
         # for all of the keyword args, make sure they are in the config:
         for kwarg in kwargs:
             if kwarg not in proc_config:
-                raise Exception(f"Config Parameter {kwarg} not available for"
+                raise Exception(f"Config Parameter {kwarg} not available for "
                                 f"{process}, available parameters: "
                                 f"{proc_config.keys()}")
 
