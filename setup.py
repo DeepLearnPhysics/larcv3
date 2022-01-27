@@ -7,6 +7,17 @@ this_directory = os.path.abspath(os.path.dirname(__file__))
 with io.open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+import re
+VERSIONFILE="larcv/_version.py"
+verstrline = open(VERSIONFILE, "rt").read()
+VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
+mo = re.search(VSRE, verstrline, re.M)
+if mo:
+    verstr = mo.group(1)
+else:
+    raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
+
+
 # Several environment variables control special build features:
 if 'LARCV_WITH_MPI' in os.environ and os.environ['LARCV_WITH_MPI']:
     mpi_value='ON'
@@ -31,7 +42,7 @@ else:
 
 setup(
     name="larcv",
-    version="3.4.0",
+    version=verstr,
     cmake_source_dir='src/',
     use_scm_version=True,
     include_package_data=True,
