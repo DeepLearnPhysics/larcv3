@@ -16,12 +16,12 @@ namespace larcv3 {
 
 static EmbedProcessFactory __global_EmbedProcessFactory__;
 
- 
+
 Embed::Embed(const std::string name)
     : ProcessBase(name) {}
 
 
- 
+
 void Embed::configure(const json& cfg) {
 
   config = this -> default_config();
@@ -48,10 +48,10 @@ void Embed::configure(const json& cfg) {
 
 }
 
- 
+
 void Embed::initialize() {}
 
- 
+
 bool Embed::process(IOManager& mgr) {
 
   //We apply thresholding for each projection id.
@@ -64,7 +64,7 @@ bool Embed::process(IOManager& mgr) {
   auto const& target_size     = config["TargetSize"].get<std::vector<int>>();
 
 
-  if (product == "sparse2d") 
+  if (product == "sparse2d")
     process_sparse_product<2>(mgr, producer, output_producer, target_size);
   else if (product == "sparse3d")
     process_sparse_product<3>(mgr, producer, output_producer, target_size);
@@ -86,25 +86,25 @@ bool Embed::process(IOManager& mgr) {
 
 template <size_t dimension>
 std::vector<int> Embed::create_new_image_meta_and_offsets(
-      const ImageMeta<dimension> & original_meta, 
+      const ImageMeta<dimension> & original_meta,
       const std::vector<int> & target_size,
       ImageMeta<dimension> & new_meta){
   // Returning the new meta by reference
 
   // How many pixels in the new meta?
-  int prod_target_size = std::accumulate(
-    target_size.begin(), target_size.end(), 1, std::multiplies<int>());
+  size_t prod_target_size = std::accumulate(
+    target_size.begin(), target_size.end(), 1, std::multiplies<size_t>());
 
   // Make sure the target size is the right dimension:
   if (target_size.size() != original_meta.n_dims()){
-    LARCV_CRITICAL() << "Can not embed image of dimension " << original_meta.n_dims() 
+    LARCV_CRITICAL() << "Can not embed image of dimension " << original_meta.n_dims()
                      << " into new image of dimension " << target_size.size() << std::endl;
     throw larbys();
   }
 
   // Validate that the new target size is larger than the old one
   if (original_meta.total_voxels() > prod_target_size){
-    LARCV_CRITICAL() << "Can not embed image of size " << original_meta.total_voxels() 
+    LARCV_CRITICAL() << "Can not embed image of size " << original_meta.total_voxels()
                      << " into new image of size " << prod_target_size << std::endl;
     throw larbys();
   }
@@ -129,7 +129,7 @@ std::vector<int> Embed::create_new_image_meta_and_offsets(
 }
 
 template< size_t dimension>
-bool Embed::process_sparse_product(IOManager& mgr, std::string producer, 
+bool Embed::process_sparse_product(IOManager& mgr, std::string producer,
                                       std::string output_producer,
                                       std::vector<int> target_size){
 
@@ -167,18 +167,18 @@ bool Embed::process_sparse_product(IOManager& mgr, std::string producer,
     auto original_indexes = original_image.indexes_vec();
 
 #ifdef LARCV_OPENMP
-#pragma omp parallel for 
+#pragma omp parallel for
 #endif
     for (size_t i_voxel = 0; i_voxel < original_indexes.size(); i_voxel ++){
-      
+
       // For each pixel in the original image, we calculate it's original multi-index:
 
       auto coords = original_meta.coordinates(original_indexes.at(i_voxel));
-      
+
       // Add the offset to the coordinate:
-      for (int i_coord = 0; i_coord < coords.size(); i_coord ++) 
+      for (size_t i_coord = 0; i_coord < coords.size(); i_coord ++)
         coords[i_coord] += offsets[i_coord];
-      
+
       // Get the new index:
       auto new_index = new_meta.index(coords);
 
@@ -197,13 +197,13 @@ bool Embed::process_sparse_product(IOManager& mgr, std::string producer,
 }
 
 template< size_t dimension>
-bool Embed::process_dense_product(IOManager& mgr, std::string producer, 
+bool Embed::process_dense_product(IOManager& mgr, std::string producer,
                                    std::string output_producer,
                                    std::vector<int> target_size){
 
   // Get the input data and the output holder.
   auto const & ev_input  = mgr.template get_data<EventTensor<dimension>>(producer);
-  
+
   std::vector<Tensor<dimension>> output_holder;
 
 
@@ -226,7 +226,7 @@ bool Embed::process_dense_product(IOManager& mgr, std::string producer,
     // Loop throught the objects and put all the pixels/voxels into the new positions:
     auto new_image = Tensor<dimension>(new_meta);
 #ifdef LARCV_OPENMP
-#pragma omp parallel for 
+#pragma omp parallel for
 #endif
     for (size_t i_pixel = 0; i_pixel < original_meta.total_voxels(); i_pixel ++){
       // Initializes to 0.0;  Skip if original is 0:
@@ -235,7 +235,7 @@ bool Embed::process_dense_product(IOManager& mgr, std::string producer,
       // For each pixel in the original image, we calculate it's original multi-index:
       auto coords = original_meta.coordinates(i_pixel);
       // Add the offset to the coordinate:
-      for (int i_coord = 0; i_coord < coords.size(); i_coord ++) 
+      for (size_t i_coord = 0; i_coord < coords.size(); i_coord ++)
         coords[i_coord] += offsets[i_coord];
 
 
@@ -255,7 +255,7 @@ bool Embed::process_dense_product(IOManager& mgr, std::string producer,
 
   return true;
 }
- 
+
 void Embed::finalize() {}
 
 } //namespace larcv3
@@ -279,9 +279,3 @@ void init_embed(pybind11::module m){
 }
 
 #endif
-
-
-
-
-
-

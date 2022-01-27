@@ -47,15 +47,15 @@ namespace larcv3 {
 
     std::vector<std::string> keys = {"TensorType", "MinVoxelCount", "MinVoxelValue"};
 
-    if ( config["TensorType"].get<std::vector<std::string>>().size() != size){    
+    if ( config["TensorType"].get<std::vector<std::string>>().size() != size){
       LARCV_CRITICAL() << "TensorType" << " size mismatch with other input parameters!" << std::endl;
       throw larbys();
     }
-    if ( config["MinVoxelCount"].get<std::vector<int>>().size() != size){    
+    if ( config["MinVoxelCount"].get<std::vector<int>>().size() != size){
       LARCV_CRITICAL() << "MinVoxelCount" << " size mismatch with other input parameters!" << std::endl;
       throw larbys();
     }
-    if ( config["MinVoxelValue"].get<std::vector<float>>().size() != size){    
+    if ( config["MinVoxelValue"].get<std::vector<float>>().size() != size){
       LARCV_CRITICAL() << "MinVoxelValue" << " size mismatch with other input parameters!" << std::endl;
       throw larbys();
     }
@@ -107,7 +107,7 @@ namespace larcv3 {
     // Get the data:
     auto const& event_tensor = mgr.get_data<EventTensor<dimension>>(producer);
     for (auto const& tensor : event_tensor.as_vector()) {
-      size_t ctr = 0;
+      int ctr = 0;
       for (auto const& vox_value : tensor.as_vector()) {
         if (vox_value < min_voxel_value) continue;
         ctr++;
@@ -123,7 +123,7 @@ namespace larcv3 {
     // Get the data:
     auto const& event_tensor = mgr.get_data<EventSparseTensor<dimension>>(producer);
     for (auto const& tensor : event_tensor.as_vector()) {
-      size_t ctr = 0;
+      int ctr = 0;
       for (auto const& vox_value : tensor.values_vec()) {
         if (vox_value < min_voxel_value) continue;
         ctr++;

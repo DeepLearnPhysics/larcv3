@@ -114,7 +114,7 @@ bool ParentParticleSeg::process(IOManager& mgr) {
                 << "parent ID " << particle.parent_track_id() << ", "
                 << "PDG " << particle.pdg_code() << ", "
                 << "track ID " << particle.track_id() << "." << std::endl;
-        // std::cout << "-> Primary " 
+        // std::cout << "-> Primary "
         //           << particle.track_id() << " - address: " << node << std::endl;
       }
       node->primary = true;
@@ -153,9 +153,9 @@ bool ParentParticleSeg::process(IOManager& mgr) {
       pn->trackID = trackID;
       pn->primary = trackID;
       pn->is_virtual = true;
-      pn->reference = &(new_ancestors[i_virtual]); 
+      pn->reference = &(new_ancestors[i_virtual]);
       pn->parent = NULL;
-     
+
       virtual_ancestors.push_back(pn);
 
 
@@ -174,9 +174,9 @@ bool ParentParticleSeg::process(IOManager& mgr) {
       // For Particles that don't *actually* exist, we care about the interaction
       // type for cosmic tagger.  Daughter particles have the same interaction type
       // so we pick that up below.
-      // std::cout << "Just created virtual primary particle " << trackID 
+      // std::cout << "Just created virtual primary particle " << trackID
       //           << ", reference: " << virtual_ancestors[i_virtual]->reference
-      //           << ", number of daughters: " << virtual_ancestors[i_virtual]->daughters.size() 
+      //           << ", number of daughters: " << virtual_ancestors[i_virtual]->daughters.size()
       //           << std::endl;
       i_virtual ++;
     }
@@ -272,7 +272,7 @@ bool ParentParticleSeg::process(IOManager& mgr) {
                 << ", id: " << ancestor_node->reference->id()
                 << ", number of daughers: "
                 << ancestor_node->daughters.size()
-                << ", is_virtual: " << ancestor_node->is_virtual 
+                << ", is_virtual: " << ancestor_node->is_virtual
                 << ", reference: " << ancestor_node->reference
                 // << ", interaction_type: " << ancestor_node->reference->nu_interaction_type()
                 << std::endl;
@@ -332,7 +332,7 @@ bool ParentParticleSeg::process(IOManager& mgr) {
       larcv3::SparseCluster2D new_clusters;
       new_clusters.meta(clusters.meta());
 
-      // if (debug) std::cout << "Meta created for projection_index " << projection_index << std::endl; 
+      // if (debug) std::cout << "Meta created for projection_index " << projection_index << std::endl;
       int i = 0;
       for (auto ancestor_node : primary_nodes) {
         auto out_cluster = cluster_merger(clusters, ancestor_node);
@@ -363,7 +363,7 @@ bool ParentParticleSeg::process(IOManager& mgr) {
     // Read in the original source of segmentation, the cluster indexes:
     auto const& ev_cluster3d =
         mgr.get_data<larcv3::EventSparseCluster3D>(cluster3d_producer);
-    
+
     // if (debug) {
     //   std::cout << "ev_cluster3d.size() " << ev_cluster3d.size() << std::endl;
     // }
@@ -425,7 +425,7 @@ bool ParentParticleSeg::process(IOManager& mgr) {
   return true;
 }
 
-void ParentParticleSeg::get_all_daughter_ids(std::vector<int> & ids, const particle_node * node){
+void ParentParticleSeg::get_all_daughter_ids(std::vector<size_t> & ids, const particle_node * node){
   if (node -> reference != NULL){
     // std::cout << "reference is " << node->reference << std::endl;
     ids.push_back(node->reference->id());
@@ -449,7 +449,7 @@ larcv3::VoxelSet ParentParticleSeg::cluster_merger(
   //   return output_set;
   // }
 
-  std::vector<int> cluster_indexes;
+  std::vector<size_t> cluster_indexes;
 
   get_all_daughter_ids(cluster_indexes, primary_node);
 
@@ -484,7 +484,7 @@ larcv3::VoxelSet ParentParticleSeg::cluster_merger(
     return output_set;
   }
 
-  std::vector<int> cluster_indexes;
+  std::vector<size_t> cluster_indexes;
 
   get_all_daughter_ids(cluster_indexes, primary_node);
 
