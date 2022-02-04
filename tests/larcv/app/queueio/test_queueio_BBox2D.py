@@ -32,8 +32,8 @@ from collections import OrderedDict
 
 
 def create_bbox2d_file(file_name, rand_num_events, n_projections):
-    bbox_list = data_generator.create_bbox_list(rand_num_events, n_projections = n_projections, dimension = 2)
-    data_generator.write_bboxes(file_name, bbox_list, dimension = 2, n_projections = n_projections)
+    bbox_list, meta_list = data_generator.create_bbox_list(rand_num_events, n_projections = n_projections, dimension = 2)
+    data_generator.write_bboxes(file_name, bbox_list, meta_list, dimension = 2, n_projections = n_projections)
 
 
 @pytest.mark.parametrize('make_copy', [True, False])
