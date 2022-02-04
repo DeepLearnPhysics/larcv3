@@ -17,12 +17,12 @@ def rand_num_events():
 @pytest.mark.parametrize('n_projections', [1, 2, 3])
 def test_write_bboxes(tmpdir, rand_num_events, dimension, n_projections):
 
-    bbox_list = data_generator.create_bbox_list(rand_num_events, n_projections = n_projections, dimension =dimension)
+    bbox_list, meta_list = data_generator.create_bbox_list(rand_num_events, n_projections = n_projections, dimension =dimension)
 
 
     random_file_name = str(tmpdir + "/test_write_bboxes.h5")
 
-    data_generator.write_bboxes(random_file_name, bbox_list, dimension, n_projections)
+    data_generator.write_bboxes(random_file_name, bbox_list, meta_list, dimension, n_projections)
 
 
 
@@ -37,10 +37,16 @@ def test_read_write_bboxes(tmpdir, rand_num_events, dimension, n_projections):
 
     random_file_name = str(tmpdir + "/test_write_read_bboxes.h5")
 
-    bbox_list = data_generator.create_bbox_list(rand_num_events, n_projections = n_projections, dimension =dimension)
+    bbox_list, meta_list = data_generator.create_bbox_list(rand_num_events, n_projections = n_projections, dimension =dimension)
 
-    data_generator.write_bboxes(random_file_name, bbox_list, dimension, n_projections)
+    print(meta_list)
+
+    data_generator.write_bboxes(random_file_name, bbox_list, meta_list, dimension, n_projections)
     read_bbox_list = data_generator.read_bboxes(random_file_name, dimension)
+
+    print(meta_list)
+    print(read_bbox_list[0][0].meta())
+    print([r.meta() for r in read_bbox_list])
 
     # print("Input BBoxes:")
     # for event in range(len(bbox_list)):

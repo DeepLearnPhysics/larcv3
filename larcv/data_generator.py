@@ -410,11 +410,26 @@ def create_bbox_list(rand_num_events, n_projections, dimension):
 
     bbox_list = []
 
+    # For this test, the meta is pretty irrelevant as long as it is consistent
+    meta_list = []
+    for projection in range(n_projections):
+        meta_list.append([])
+        if dimension == 2:
+            meta_list[-1].append(larcv.ImageMeta2D())
+        else:
+            meta_list[-1].append(larcv.ImageMeta3D())
+
+        for dim in range(dimension):
+            L = random.uniform(10, 1e4)
+            N = int(random.uniform(10,256))
+            meta_list[-1][-1].set_dimension(dim, L, N)
+
+        meta_list[-1][-1].set_projection_id(projection)
+
     for i_event in range(rand_num_events):
         bbox_list.append([])
         for i_projection in range(n_projections):
             n_bboxes = i_event + i_projection + 1
-
 
             bbox_list[i_event].append([])
             for i_box in range(n_bboxes):
@@ -423,11 +438,11 @@ def create_bbox_list(rand_num_events, n_projections, dimension):
                     'half_length': [ random.uniform(1., 1e4) for d in range(dimension)],
                     })
 
-    return bbox_list
+    return bbox_list, meta_list
 
 
 
-def write_bboxes(tempfile, bbox_list, dimension, n_projections):
+def write_bboxes(tempfile, bbox_list, meta_list, dimension, n_projections):
 
     io_manager = larcv.IOManager(larcv.IOManager.kWRITE)
     io_manager.set_out_file(tempfile)
@@ -452,11 +467,12 @@ def write_bboxes(tempfile, bbox_list, dimension, n_projections):
         
         ev_bbox = io_manager.get_data(datatype,"test")
 
+        meta_list_by_projection = meta_list[i_evt]
         for i_projection in range(n_projections):
             n_bboxes = len(bbox_list[i_evt][i_projection])
 
             bbox_collection = collection_constructor()
-
+            bbox_collection.meta(meta_list_by_projection[i_projection])
             for j in range(n_bboxes):
                 bbox = box_constructor(
                     centroid    = bbox_list[i_evt][i_projection][j]["centroid"],
@@ -501,7 +517,6 @@ def read_bboxes(tempfile, dimension, use_core_driver=False):
         event_id = io_manager.event_id()
         data = io_manager.get_data(product, 'test')
         collection = [data.at(i) for i in range(data.size())]
-
         bbox_list.append(collection)
 
     return bbox_list
