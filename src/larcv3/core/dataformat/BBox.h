@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include "larcv3/core/dataformat/DataFormatTypes.h"
+#include "larcv3/core/dataformat/ImageMeta.h"
 
 
 
@@ -145,6 +146,7 @@ namespace larcv3 {
   public:
 
     BBoxCollection(){};
+    BBoxCollection(ImageMeta<dimension> meta):_meta(meta){};
 
     /**
      * @brief      Get number of BBox
@@ -215,8 +217,16 @@ namespace larcv3 {
     void move(larcv3::BBoxCollection<dimension> && orig)
     { _bbox_v = std::move(orig._bbox_v); }
 
+
+    /// Meta setter
+    void meta(const larcv3::ImageMeta<dimension>& meta){_meta = meta;}
+
+    /// Meta getter
+    const ImageMeta<dimension>& meta() const{return _meta;}
+
   private:
     std::vector<BBox<dimension> > _bbox_v;
+    ImageMeta<dimension>          _meta;
   
   };
 
