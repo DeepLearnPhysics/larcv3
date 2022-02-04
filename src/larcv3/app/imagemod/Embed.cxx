@@ -5,6 +5,7 @@
 #include "larcv3/core/dataformat/EventTensor.h"
 #include "larcv3/core/dataformat/EventSparseTensor.h"
 #include "larcv3/core/dataformat/EventSparseCluster.h"
+#include "larcv3/core/dataformat/EventBBox.h"
 
 #ifdef LARCV_OPENMP
 #include <omp.h>
@@ -76,6 +77,11 @@ bool Embed::process(IOManager& mgr) {
     process_dense_product<3>(mgr, producer, output_producer, target_size);
   else if (product == "tensor4d")
     process_dense_product<4>(mgr, producer, output_producer, target_size);
+  else if (product == "bbox2d") {
+    auto const& ref_producer = config["ReferenceProducer"].get<std::string>();
+    auto const& ref_product = config["ReferenceProduct"].get<std::string>();
+    process_bbox_product<2>(mgr, producer, output_producer, ref_producer, ref_product, target_size);
+  }
   else{
     LARCV_CRITICAL() << "Can't apply embedding to product " << product << std::endl;
     throw larbys();
@@ -252,6 +258,82 @@ bool Embed::process_dense_product(IOManager& mgr, std::string producer,
     ev_output.emplace(std::move(output_holder.at(i)));
   }
 
+
+  return true;
+}
+
+template< size_t dimension>
+bool Embed::process_bbox_product(IOManager& mgr, std::string producer,
+                                 std::string output_producer,
+                                 std::string ref_producer,
+                                 std::string ref_product,
+                                 std::vector<int> target_size){
+
+  // Get the reference
+  auto const & ref_ev_input  = mgr.template get_data<EventTensor<dimension>>(ref_producer);
+
+  // Get the input data and the output holder.
+  auto const & ev_input  = mgr.template get_data<EventBBox<dimension>>(producer);
+
+  if (ref_ev_input.as_vector().size() != ev_input.as_vector().size()) {
+    LARCV_CRITICAL() << "Reference and BBox should have the same dimension." << std::endl;
+    throw larbys();
+  }
+
+  std::vector<BBoxCollection<dimension>> output_holder;
+
+
+  // Loop over the projection IDs
+  for (size_t i = 0; i < ev_input.as_vector().size(); i ++ ){
+
+    BBoxCollection<dimension> out_bbox_collection;
+
+    // Get the old image:
+    const auto& original_bbox_collection = ev_input.as_vector().at(i);
+
+    // Get the ref image
+    const auto& ref_image = ref_ev_input.as_vector().at(i);
+    const auto& ref_meta = ref_image.meta();
+
+    std::cout << "-----------------" << original_bbox_collection.bbox(0).centroid()[0]
+      << ", " << original_bbox_collection.bbox(0).centroid()[1] << std::endl;
+
+    // The new meta will have the same voxel size and dimensions as the old meta.
+    auto new_meta = ref_meta;
+    auto offsets = create_new_image_meta_and_offsets<dimension>(
+      ref_meta, target_size, new_meta);
+
+    for (auto o : offsets) {
+      std::cout << "Offset: " << o << std::endl;
+    }
+
+    if (std::accumulate(std::begin(offsets), std::end(offsets), 0) == 0) {
+      LARCV_WARNING() << "Reference image is already of the correct size. No embedding will be performed." << std::endl;
+    }
+
+    for (size_t j = 0; j < original_bbox_collection.size(); j++) {
+      auto original_centroid = original_bbox_collection.bbox(j).centroid();
+      auto original_half_length = original_bbox_collection.bbox(j).half_length();
+      std::array<double, dimension> new_centroid;
+      for (size_t d = 0; d < dimension; d++) {
+        new_centroid[d] = original_centroid[d] + offsets[d] * ref_meta.voxel_dimensions(d);
+      }
+
+      BBox<dimension> bb(new_centroid, original_half_length);
+      out_bbox_collection.append(bb);
+
+
+    }
+
+    output_holder.push_back(std::move(out_bbox_collection));
+  }
+
+  // Clear the output and add the new images:
+  auto       & ev_output = mgr.template get_data<EventBBox<dimension>>(output_producer);
+  ev_output.clear();
+  for (size_t i = 0; i < output_holder.size(); i ++ ){
+    ev_output.emplace_back(std::move(output_holder.at(i)));
+  }
 
   return true;
 }
