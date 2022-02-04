@@ -133,6 +133,11 @@ void init_bbox_collection(pybind11::module m){
     bbox_c.def("writeable_bbox", &Class::writeable_bbox);
     bbox_c.def("append",         &Class::append);
     bbox_c.def("size",           &Class::size);
+    bbox_c.def("meta", (const larcv3::ImageMeta<dimension>& (Class::*)() const )(&Class::meta), 
+      pybind11::return_value_policy::reference);
+    bbox_c.def("meta", (void (Class::*)(const larcv3::ImageMeta<dimension>& )  )(&Class::meta), 
+      pybind11::arg("meta"), 
+      pybind11::return_value_policy::reference);
 
 }
 
