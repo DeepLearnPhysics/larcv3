@@ -426,7 +426,24 @@ def create_bbox_list(rand_num_events, n_projections, dimension):
 
         meta_list[-1][-1].set_projection_id(projection)
 
+
     for i_event in range(rand_num_events):
+        
+
+        meta_list.append([]) # Start a list for this event
+        for projection in range(n_projections):
+            if dimension == 2:
+                meta_list[-1].append(larcv.ImageMeta2D()) # add a new meta
+            else:
+                meta_list[-1].append(larcv.ImageMeta3D()) # add a new meta
+
+            for dim in range(dimension):
+                L = random.uniform(10, 1e4)
+                N = int(random.uniform(10,256))
+                meta_list[-1][-1].set_dimension(dim, L, N)
+
+            meta_list[-1][-1].set_projection_id(projection)
+
         bbox_list.append([])
         for i_projection in range(n_projections):
             n_bboxes = i_event + i_projection + 1
