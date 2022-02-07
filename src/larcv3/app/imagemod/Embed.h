@@ -51,8 +51,6 @@ namespace larcv3 {
           {"Product", std::string()},
           {"OutputProducer", std::string()},
           {"TargetSize", std::vector<int>()},
-          {"ReferenceProducer", std::string()},
-          {"ReferenceProduct", std::string()},
         };
         return c;
     }
@@ -79,8 +77,6 @@ namespace larcv3 {
         IOManager& mgr,
         std::string producer, 
         std::string output_producer,
-        std::string ref_producer, 
-        std::string ref_product,
         const std::vector<int> target_size);
 
     template< size_t dimension>
