@@ -5,6 +5,7 @@
 #include "larcv3/core/dataformat/EventTensor.h"
 #include "larcv3/core/dataformat/EventSparseTensor.h"
 #include "larcv3/core/dataformat/EventSparseCluster.h"
+#include "larcv3/core/dataformat/EventBBox.h"
 
 namespace larcv3 {
 
@@ -71,6 +72,10 @@ bool Downsample::process(IOManager& mgr) {
     process_data_product<larcv3::EventTensor3D>(mgr, producer, output_producer, downsample, pool);
   else if (product == "tensor4d")
     process_data_product<larcv3::EventTensor4D>(mgr, producer, output_producer, downsample, pool);
+  else if (product == "bbox2d")
+    process_data_product<larcv3::EventBBox2D>(mgr, producer, output_producer, downsample, pool);
+  else if (product == "bbox3d")
+    process_data_product<larcv3::EventBBox3D>(mgr, producer, output_producer, downsample, pool);
   else{
     LARCV_CRITICAL() << "Can't apply downsampling to product " << product << std::endl;
     throw larbys();
