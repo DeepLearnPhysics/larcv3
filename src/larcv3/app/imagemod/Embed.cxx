@@ -77,9 +77,10 @@ bool Embed::process(IOManager& mgr) {
     process_dense_product<3>(mgr, producer, output_producer, target_size);
   else if (product == "tensor4d")
     process_dense_product<4>(mgr, producer, output_producer, target_size);
-  else if (product == "bbox2d") {
+  else if (product == "bbox2d")
     process_bbox_product<2>(mgr, producer, output_producer, target_size);
-  }
+  else if (product == "bbox3d")
+    process_bbox_product<3>(mgr, producer, output_producer, target_size);
   else{
     LARCV_CRITICAL() << "Can't apply embedding to product " << product << std::endl;
     throw larbys();
