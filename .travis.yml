@@ -18,6 +18,7 @@ before_install:
 install:
 - pip install scikit-build
 - pip install mpi4py
+- export MAKEFLAGS="-j8"
 - pip install -e .
 - echo $PYTHONPATH
 - echo $LD_LIBRARY_PATH
