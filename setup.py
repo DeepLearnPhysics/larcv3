@@ -41,7 +41,7 @@ else:
     
 # Speed up the build if not directly set:    
 if 'MAKEFLAGS' not in os.environ: 
-    os.environ['MAKEFLAGS'] = "-j
+    os.environ['MAKEFLAGS'] = "-j"
     
 setup(
     name="larcv",
