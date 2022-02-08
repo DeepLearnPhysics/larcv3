@@ -26,7 +26,6 @@ branches:
   - develop
 script:
 - pytest -m "not distributed_test" tests/
-- mpiexec -n 2 pytest -m distributed_test tests/
 
 jobs:
   allow_failures:
