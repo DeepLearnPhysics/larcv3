@@ -286,16 +286,10 @@ bool Embed::process_bbox_product(IOManager& mgr, std::string producer,
 
     for (size_t j = 0; j < original_bbox_collection.size(); j++) {
       const auto& original_bbox = original_bbox_collection.bbox(j);
-      // const auto& original_meta = original_bbox.meta();
-
       const auto& original_centroid = original_bbox.centroid();
       const auto& original_half_length = original_bbox.half_length();
-      std::array<double, dimension> new_centroid;
-      for (size_t d = 0; d < dimension; d++) {
-        new_centroid[d] = original_centroid[d] + offsets[d] * original_meta.voxel_dimensions(d);
-      }
 
-      BBox<dimension> bb(new_centroid, original_half_length);
+      BBox<dimension> bb(original_centroid, original_half_length);
       out_bbox_collection.append(bb);
     }
 
