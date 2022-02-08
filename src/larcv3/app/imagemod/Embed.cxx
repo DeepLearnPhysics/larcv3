@@ -5,6 +5,7 @@
 #include "larcv3/core/dataformat/EventTensor.h"
 #include "larcv3/core/dataformat/EventSparseTensor.h"
 #include "larcv3/core/dataformat/EventSparseCluster.h"
+#include "larcv3/core/dataformat/EventBBox.h"
 
 #ifdef LARCV_OPENMP
 #include <omp.h>
@@ -76,6 +77,10 @@ bool Embed::process(IOManager& mgr) {
     process_dense_product<3>(mgr, producer, output_producer, target_size);
   else if (product == "tensor4d")
     process_dense_product<4>(mgr, producer, output_producer, target_size);
+  else if (product == "bbox2d")
+    process_bbox_product<2>(mgr, producer, output_producer, target_size);
+  else if (product == "bbox3d")
+    process_bbox_product<3>(mgr, producer, output_producer, target_size);
   else{
     LARCV_CRITICAL() << "Can't apply embedding to product " << product << std::endl;
     throw larbys();
@@ -252,6 +257,57 @@ bool Embed::process_dense_product(IOManager& mgr, std::string producer,
     ev_output.emplace(std::move(output_holder.at(i)));
   }
 
+
+  return true;
+}
+
+template< size_t dimension>
+bool Embed::process_bbox_product(IOManager& mgr, std::string producer,
+                                 std::string output_producer,
+                                 std::vector<int> target_size){
+
+  // Get the input data and the output holder.
+  auto const & ev_input  = mgr.template get_data<EventBBox<dimension>>(producer);
+
+  std::vector<BBoxCollection<dimension>> output_holder;
+
+  // Loop over the projection IDs
+  for (size_t i = 0; i < ev_input.as_vector().size(); i ++ ){
+
+    // Get the old bbox:
+    const auto& original_bbox_collection = ev_input.as_vector().at(i);
+    // Get the old meta:
+    const auto& original_meta = original_bbox_collection.meta();
+
+    auto new_meta = original_meta;
+    auto offsets = create_new_image_meta_and_offsets<dimension>(original_meta, target_size, new_meta);
+
+    BBoxCollection<dimension> out_bbox_collection(new_meta);
+
+    for (size_t j = 0; j < original_bbox_collection.size(); j++) {
+      const auto& original_bbox = original_bbox_collection.bbox(j);
+      // const auto& original_meta = original_bbox.meta();
+
+      const auto& original_centroid = original_bbox.centroid();
+      const auto& original_half_length = original_bbox.half_length();
+      std::array<double, dimension> new_centroid;
+      for (size_t d = 0; d < dimension; d++) {
+        new_centroid[d] = original_centroid[d] + offsets[d] * original_meta.voxel_dimensions(d);
+      }
+
+      BBox<dimension> bb(new_centroid, original_half_length);
+      out_bbox_collection.append(bb);
+    }
+
+    output_holder.push_back(std::move(out_bbox_collection));
+  }
+
+  // Clear the output and add the new images:
+  auto & ev_output = mgr.template get_data<EventBBox<dimension>>(output_producer);
+  ev_output.clear();
+  for (size_t i = 0; i < output_holder.size(); i ++ ){
+    ev_output.emplace_back(std::move(output_holder.at(i)));
+  }
 
   return true;
 }

@@ -66,6 +66,7 @@ namespace larcv3 {
      * @param      bbox_c  The bounding box c
      */
     void emplace_back(larcv3::BBoxCollection<dimension>&& bbox_c);
+    void emplace(larcv3::BBoxCollection<dimension>&& bbox_c);
     void emplace(std::vector<larcv3::BBoxCollection<dimension>>&& bbox_c_v);
 
     inline const std::vector<larcv3::BBoxCollection<dimension>>& as_vector() const

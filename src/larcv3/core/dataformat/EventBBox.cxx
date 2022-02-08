@@ -55,6 +55,12 @@ namespace larcv3 {
   }
 
   template<size_t dimension>
+  void EventBBox<dimension>::emplace(BBoxCollection<dimension>&& img)
+  {
+    _bbox_c_v.emplace_back(std::move(img));
+  }
+
+  template<size_t dimension>
   void EventBBox<dimension>::emplace(std::vector<larcv3::BBoxCollection<dimension>>&& image_v)
   {
     _bbox_c_v = std::move(image_v);
