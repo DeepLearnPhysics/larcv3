@@ -419,9 +419,9 @@ ImageMeta<dimension> ImageMeta<dimension>::compress(size_t compression) const{
   for (size_t dim = 0; dim < dimension; dim ++){
     output.set_dimension(
       dim,
-      this -> _image_sizes[dim] / (float) compression,
+      this -> _image_sizes[dim],
       size_t (this -> _number_of_voxels[dim]/ (float) compression ),
-      this -> _origin[dim] / (float) compression);
+      this -> _origin[dim]);
   }
   return output;
 }
@@ -435,9 +435,9 @@ ImageMeta<dimension> ImageMeta<dimension>::compress(std::array<size_t, dimension
   for (size_t dim = 0; dim < dimension; dim ++){
     output.set_dimension(
       dim,
-      this -> _image_sizes[dim] / (float) compression[dim],
+      this -> _image_sizes[dim],
       size_t (this -> _number_of_voxels[dim]/ (float) compression[dim] ),
-      this -> _origin[dim] / (float) compression[dim]);
+      this -> _origin[dim]);
   }
   return output;
 }
