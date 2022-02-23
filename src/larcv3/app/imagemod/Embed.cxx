@@ -158,9 +158,9 @@ bool Embed::process_sparse_product(IOManager& mgr, std::string producer,
     auto offsets = create_new_image_meta_and_offsets<dimension>(
       original_meta, target_size, new_meta);
 
-
-    std::cout << original_meta.dump() << std::endl;
-    std::cout << new_meta.dump() << std::endl;
+    //
+    // std::cout << original_meta.dump() << std::endl;
+    // std::cout << new_meta.dump() << std::endl;
 
 
     // Loop throught the objects and put all the pixels/voxels into the new positions:
