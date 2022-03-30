@@ -191,6 +191,6 @@ def test_compress(dimension, execution_number):
 
     # Verify that the same coordinates get raveled to the same index as numpy:
     for i in range(dimension):
-        assert compressed_meta.image_size(i) == im.image_size(i) / compression[i]
+        assert compressed_meta.image_size(i) == im.image_size(i)
         assert compressed_meta.number_of_voxels(i) == int(im.number_of_voxels(i) / compression[i])
         assert compressed_meta.origin(i) == im.origin(i) / compression[i]
