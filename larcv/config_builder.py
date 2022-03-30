@@ -104,6 +104,7 @@ class ConfigBuilder:
             name = f"{process}_{producer}_{datatype}_" + str(uuid.uuid4())[:8]
 
         proc_config["Producer"] = producer
+        proc_config["Product"]  = datatype
 
         # Finally add this process to the configuration
 
