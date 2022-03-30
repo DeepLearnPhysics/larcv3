@@ -210,6 +210,9 @@ namespace larcv3 {
 
         index = count * (_max_voxels * point_dim) + i_voxel * point_dim;
 
+#ifdef LARCV_OMP
+#pragma omp parallel unroll
+#endif
         for (size_t i_d = 0; i_d < dimension; i_d ++){
           i_coord[i_d] = coords.at(i_d);
           if (flip[i_d]){

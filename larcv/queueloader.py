@@ -404,27 +404,6 @@ class larcv_queueio (object):
 
     def is_reading(self,storage_id=None):
 
-        # ready = True
-        #
-        # # if any storage items are not ready, it's still reading
-        # for name,storage in self._storage.items():
-        #     dtype = storage.dtype()
-        #     if dtype == "float32":
-        #         factory = larcv.BatchDataQueueFactoryFloat.get()
-        #     elif dtype == "float64":
-        #         factory = larcv.BatchDataQueueFactoryDouble.get()
-        #     elif dtype == "int":
-        #         factory = larcv.BatchDataQueueFactoryInt.get()
-        #     elif dtype == "particle":
-        #         factory = larcv.BatchDataQueueFactoryParticleHolder.get()
-        #     else:
-        #         factory = None
-        #     batch_storage = factory.get_queue(name)
-        #
-        #     ready = ready and batch_storage.is_next_ready()
-        #
-        # print(f"Queuefactory query ready: {ready} vs queueprocess next_ready: {self._proc.is_next_ready()}")
-
         ready =  self._proc.is_next_ready() and not self._proc.is_reading()
 
         # print(f"Overall ready? {ready}")
@@ -445,22 +424,11 @@ class larcv_queueio (object):
 
         for name,storage in self._storage.items():
             dtype = storage.dtype()
-            batch_storage = self._proc.__getattribute__(f"get_queue_{dtype}")(name)
-            # print(queue)
-            #
-            # if dtype == "float32":
-            #     factory = larcv.BatchDataQueueFactoryFloat.get()
-            # elif dtype == "float64":
-            #     factory = larcv.BatchDataQueueFactoryDouble.get()
-            # elif dtype == "int":
-            #     factory = larcv.BatchDataQueueFactoryInt.get()
-            # elif dtype == "particle":
-            #     factory = larcv.BatchDataQueueFactoryParticleHolder.get()
-            # else:
-            #     factory = None
-            # batch_storage = factory.get_queue(name)
+            batch_data = self._proc.__getattribute__(f"get_batch_{dtype}")(name)
 
-            batch_data = batch_storage.get_batch()
+            # print(type(batch_storage), " at ", batch_storage)
+            # batch_data = batch_storage.get_batch()
+            # print(type(batch_data), " at ", batch_data)
             storage.set_data(storage_id=name, larcv_batchdata=batch_data)
 
         if not store_entries: self._event_entries = None

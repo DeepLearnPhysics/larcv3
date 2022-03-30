@@ -846,6 +846,9 @@ namespace larcv3 {
       );
       // std::cout << "temp_voxel_vector.size(): " << temp_voxel_vector.size() << std::endl;
 
+      // for (auto & v : temp_voxel_vector){
+      //   _tensor_v.at(voxel_set_index).emplace(v);
+      // }
 
 
       _tensor_v.at(voxel_set_index).id(voxel_set_index);
@@ -884,8 +887,6 @@ void init_eventsparse_tensor_base(pybind11::module m){
   ev_sparse_tensor.def(pybind11::init<>());
 
 
-  // ev_sparse_tensor.def("emplace_back",    &Class::emplace_back);
-  // ev_sparse_tensor.def("emplace",         &Class::emplace);
   ev_sparse_tensor.def("as_vector",          &Class::as_vector, pybind11::return_value_policy::reference);
   ev_sparse_tensor.def("at",                 &Class::at, pybind11::return_value_policy::reference);
   ev_sparse_tensor.def("size",               &Class::size);
@@ -895,13 +896,7 @@ void init_eventsparse_tensor_base(pybind11::module m){
   ev_sparse_tensor.def("clear",              &Class::clear);
 
 
-/*
 
-Not wrapped:
-    void emplace(larcv3::SparseTensor<dimension> && voxels);
-    void emplace(larcv3::VoxelSet&& voxels, larcv3::ImageMeta<dimension>&& meta);
-
-*/
 
 
 }
@@ -912,3 +907,4 @@ void init_eventsparsetensor(pybind11::module m){
 }
 
 #endif
+                                     

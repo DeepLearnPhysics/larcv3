@@ -277,7 +277,6 @@ namespace larcv3 {
   template<size_t dimension>
   bool BatchFillerTensor<dimension>::_process_sparse(IOManager& mgr) {
 
-
     // auto _slice_v          = config["Channels"]. template get<std::vector<size_t> >();
     auto _voxel_base_value = config["EmptyVoxelValue"]. template get<float>();
     auto _tensor_producer  = config["Producer"].template get<std::string>();
@@ -295,7 +294,6 @@ namespace larcv3 {
     }
 
 
-
     auto const& voxel_meta = voxel_data.as_vector().front().meta();
 
     std::vector<int> dim;
@@ -309,10 +307,10 @@ namespace larcv3 {
     this->set_dense_dim(dim);
 
     if (_entry_data.size() != batch_data().entry_data_size())
-      _entry_data.resize(batch_data().entry_data_size(), 0.);
+      _entry_data.resize(batch_data().entry_data_size(), _voxel_base_value);
 
-
-    for (auto& v : _entry_data) v = _voxel_base_value;
+    // Set all values to the base value:
+    std::fill(_entry_data.begin(), _entry_data.end(), _voxel_base_value);
 
     for ( auto const& voxel_set : voxel_data.as_vector()){
       auto & meta = voxel_set.meta();

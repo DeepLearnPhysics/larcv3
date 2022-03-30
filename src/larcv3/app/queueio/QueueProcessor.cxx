@@ -546,6 +546,17 @@ void init_queueprocessor(pybind11::module m){
   name = "get_queue_particle";
   queueproc.def(name.c_str(),                       &Class::get_queue<larcv3::ParticleHolder>);
 
+  name = "get_batch_" + larcv3::as_string<short>();
+  queueproc.def(name.c_str(),                       &Class::get_batch<short>);
+  name = "get_batch_" + larcv3::as_string<int>();
+  queueproc.def(name.c_str(),                       &Class::get_batch<int>);
+  name = "get_batch_" + larcv3::as_string<float>();
+  queueproc.def(name.c_str(),                       &Class::get_batch<float>, pybind11::return_value_policy::reference);
+  name = "get_batch_" + larcv3::as_string<double>();
+  queueproc.def(name.c_str(),                       &Class::get_batch<double>);
+  name = "get_batch_particle";
+  queueproc.def(name.c_str(),                       &Class::get_batch<larcv3::ParticleHolder>);
+
 }
 
 #endif
