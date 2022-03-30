@@ -71,6 +71,34 @@ namespace larcv3 {
     return ss.str();
   }
 
+  template<size_t dimension>
+  larcv3::BBoxCollection<dimension> BBoxCollection<dimension>::compress(size_t compression, PoolType_t pool_type) const
+  {
+
+    std::array<size_t, dimension> comp;
+    for (size_t i = 0; i < dimension; ++i ) comp[i] = compression;
+
+    return this->compress(comp, pool_type);
+  }
+
+  template<size_t dimension>
+  larcv3::BBoxCollection<dimension> BBoxCollection<dimension>::compress(std::array<size_t, dimension> compression, PoolType_t pool_type) const
+  {
+    ImageMeta<dimension> compressed_meta = this->meta().compress(compression);
+
+    BBoxCollection<dimension> output(compressed_meta);
+
+    // Centroid and legth are in absolute coordinates, so not affected by downsampling
+    for (size_t i = 0; i < this->size(); i++) {
+      BBox<dimension> bbox(this->bbox(i).centroid(),
+                           this->bbox(i).half_length(),
+                           this->bbox(i).rotation_matrix());
+      output.append(bbox);
+    }
+
+    return output;
+  }
+
 template class BBox<2>;
 template class BBox<3>;
 
@@ -133,6 +161,11 @@ void init_bbox_collection(pybind11::module m){
     bbox_c.def("writeable_bbox", &Class::writeable_bbox);
     bbox_c.def("append",         &Class::append);
     bbox_c.def("size",           &Class::size);
+    bbox_c.def("meta", (const larcv3::ImageMeta<dimension>& (Class::*)() const )(&Class::meta), 
+      pybind11::return_value_policy::reference);
+    bbox_c.def("meta", (void (Class::*)(const larcv3::ImageMeta<dimension>& )  )(&Class::meta), 
+      pybind11::arg("meta"), 
+      pybind11::return_value_policy::reference);
 
 }
 

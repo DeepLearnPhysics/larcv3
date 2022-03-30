@@ -6,11 +6,13 @@
 #define BBOX_EXTENTS_CHUNK_SIZE 1
 #define BBOX_IDEXTENTS_CHUNK_SIZE 1
 #define BBOX_CHUNK_SIZE 1000
+#define IMAGE_META_CHUNK_SIZE 100
 
 #define BBOX_DATASET 0
 #define EXTENTS_DATASET 1
-#define BBOX_EXTENTS_DATASET 2
-#define N_DATASETS 3
+#define IMAGE_META_DATASET 2
+#define BBOX_EXTENTS_DATASET 3
+#define N_DATASETS 4
 
 
 namespace larcv3 {
@@ -24,9 +26,12 @@ namespace larcv3 {
 
     _data_types.resize(N_DATASETS);
 
+    _data_types[BBOX_DATASET]          = larcv3::BBox<dimension>::get_datatype();
     _data_types[EXTENTS_DATASET]       = larcv3::get_datatype<Extents_t>();
+    _data_types[IMAGE_META_DATASET]    = larcv3::ImageMeta<dimension>::get_datatype();
     _data_types[BBOX_EXTENTS_DATASET]  = larcv3::get_datatype<IDExtents_t>();
-    _data_types[BBOX_DATASET]        = larcv3::BBox<dimension>::get_datatype();
+
+
 
   }
 
@@ -45,6 +50,12 @@ namespace larcv3 {
 
   template<size_t dimension>
   void EventBBox<dimension>::emplace_back(BBoxCollection<dimension>&& img)
+  {
+    _bbox_c_v.emplace_back(std::move(img));
+  }
+
+  template<size_t dimension>
+  void EventBBox<dimension>::emplace(BBoxCollection<dimension>&& img)
   {
     _bbox_c_v.emplace_back(std::move(img));
   }
@@ -75,6 +86,9 @@ namespace larcv3 {
        _open_in_datasets[EXTENTS_DATASET]         = H5Dopen(group,"extents", H5P_DEFAULT);
        _open_in_dataspaces[EXTENTS_DATASET]       = H5Dget_space(_open_in_datasets[EXTENTS_DATASET]);
 
+       _open_in_datasets[IMAGE_META_DATASET]      = H5Dopen(group, "image_meta", H5P_DEFAULT);
+       _open_in_dataspaces[IMAGE_META_DATASET]    = H5Dget_space(_open_in_datasets[IMAGE_META_DATASET]);
+
        _open_in_datasets[BBOX_EXTENTS_DATASET]    = H5Dopen(group,"bbox_extents", H5P_DEFAULT);
        _open_in_dataspaces[BBOX_EXTENTS_DATASET]  = H5Dget_space(_open_in_datasets[BBOX_EXTENTS_DATASET]);
 
@@ -95,6 +109,9 @@ namespace larcv3 {
 
        _open_out_datasets[EXTENTS_DATASET]         = H5Dopen(group,"extents", H5P_DEFAULT);
        _open_out_dataspaces[EXTENTS_DATASET]       = H5Dget_space(_open_out_datasets[EXTENTS_DATASET]);
+
+       _open_out_datasets[IMAGE_META_DATASET]      = H5Dopen(group,"image_meta", H5P_DEFAULT);
+       _open_out_dataspaces[IMAGE_META_DATASET]    = H5Dget_space(_open_out_datasets[IMAGE_META_DATASET]);
 
        _open_out_datasets[BBOX_EXTENTS_DATASET]    = H5Dopen(group,"bbox_extents", H5P_DEFAULT);
        _open_out_dataspaces[BBOX_EXTENTS_DATASET]  = H5Dget_space(_open_out_datasets[BBOX_EXTENTS_DATASET]);
@@ -173,6 +190,42 @@ namespace larcv3 {
       dapl                          // hid_t dapl_id IN: Dataset access property list
     );
 
+
+    /////////////////////////////////////////////////////////
+    // Create the meta dataset (ImageMeta<dimension>)
+    /////////////////////////////////////////////////////////
+
+    // Get the starting size (0) and dimensions (unlimited)
+    hsize_t image_meta_starting_dim[] = {0};
+    hsize_t image_meta_maxsize_dim[]  = {H5S_UNLIMITED};
+
+    // Create a dataspace
+    hid_t image_meta_dataspace = H5Screate_simple(1, image_meta_starting_dim, image_meta_maxsize_dim);
+
+    /*
+     * Modify dataset creation properties, i.e. enable chunking.
+     */
+
+    hid_t image_meta_cparms = H5Pcreate( H5P_DATASET_CREATE );
+    hsize_t      image_meta_chunk_dims[1] ={IMAGE_META_CHUNK_SIZE};
+    H5Pset_chunk(image_meta_cparms, 1, image_meta_chunk_dims );
+    if (compression){
+      H5Pset_deflate(image_meta_cparms, compression);
+      // extents_cparms.setDeflate(compression);
+    }
+
+
+    // Create the meta dataset:
+    H5Dcreate(
+      group,                           // hid_t loc_id  IN: Location identifier
+      "image_meta",                    // const char *name      IN: Dataset name
+      _data_types[IMAGE_META_DATASET], // hid_t dtype_id  IN: Datatype identifier
+      image_meta_dataspace,            // hid_t space_id  IN: Dataspace identifier
+      lcpl,                            // hid_t lcpl_id IN: Link creation property list
+      image_meta_cparms,               // hid_t dcpl_id IN: Dataset creation property list
+      dapl                             // hid_t dapl_id IN: Dataset access property list
+    );
+
     /////////////////////////////////////////////////////////
     // Create the bbox_extents dataset
     /////////////////////////////////////////////////////////
@@ -245,7 +298,7 @@ namespace larcv3 {
 
 
 
-    // Sparse cluster write one meta per projection ID.  So, the formatting of
+    // BBox writes one meta per projection ID.  So, the formatting of
     // the datasets is:
     // Overall extents table indicates the right entries (projection IDs) in the bboxes_extents table
     // bboxes_extents table contains a list of projection IDs in order, as well as the
@@ -258,6 +311,8 @@ namespace larcv3 {
     // 3) Using the dimensions of the bbox_extents table, and the dimensions of this event's bbox_extents,
     //    update the extents table
     // 4) Update the bbox_extents table with the projection info for this event
+    // 4b) Using the dimensions of the bbox_extents table, and the dimensions of this event's bbox_extents,
+    //    update the imagemeta table   
     // 5) Update the bboxes table with the bboxes from this event, using the bboxes vector
     open_out_datasets(group);
 
@@ -273,6 +328,10 @@ namespace larcv3 {
     hsize_t extents_dims_current[1];
     H5Sget_simple_extent_dims(_open_out_dataspaces[EXTENTS_DATASET], extents_dims_current, NULL);
 
+
+    // Get the imagemeta dataset current size
+    hsize_t image_meta_dims_current[1];
+    H5Sget_simple_extent_dims(_open_out_dataspaces[IMAGE_META_DATASET], image_meta_dims_current, NULL);
 
     // Get the dataset current size
     hsize_t bbox_extents_dims_current[1];
@@ -399,6 +458,58 @@ namespace larcv3 {
 
 
 
+
+
+    /////////////////////////////////////////////////////////
+    // Step 4b(a): Build the image_meta object
+    /////////////////////////////////////////////////////////
+
+    std::vector<ImageMeta<dimension> > image_meta;
+
+    for (size_t projection_id = 0; projection_id < _bbox_c_v.size(); projection_id ++){
+      image_meta.push_back(_bbox_c_v.at(projection_id).meta());
+    }
+
+     /////////////////////////////////////////////////////////
+    // Step 4b: Write image meta
+    /////////////////////////////////////////////////////////
+    
+    // Create a dimension for the data to add (which is the hyperslab data)
+    hsize_t image_meta_slab_dims[1];
+    image_meta_slab_dims[0] = image_meta.size();
+
+
+    // Create a size vector for the FULL dataset: previous + current
+    hsize_t image_meta_size[1];
+    image_meta_size[0] = image_meta_dims_current[0] + image_meta_slab_dims[0];
+
+    // Extend the dataset to accomodate the new data
+    H5Dset_extent(_open_out_datasets[IMAGE_META_DATASET], image_meta_size);
+
+
+    // Select as a hyperslab the last section of data for writing:
+    _open_out_dataspaces[IMAGE_META_DATASET] = H5Dget_space(_open_out_datasets[IMAGE_META_DATASET]);
+    H5Sselect_hyperslab(_open_out_dataspaces[IMAGE_META_DATASET],
+      H5S_SELECT_SET,
+      image_meta_dims_current, // start
+      NULL ,                   // stride
+      image_meta_slab_dims,    // count
+      NULL                     // block
+    );
+
+    // Define memory space:
+    hid_t image_meta_memspace = H5Screate_simple(1, image_meta_slab_dims, NULL);
+
+    // Write the new data
+
+    H5Dwrite(_open_out_datasets[IMAGE_META_DATASET],   // dataset_id,
+             _data_types[IMAGE_META_DATASET],          // hit_t mem_type_id,
+             image_meta_memspace,                      // hid_t mem_space_id,
+             _open_out_dataspaces[IMAGE_META_DATASET], // hid_t file_space_id,
+             xfer_plist_id,                            // hid_t xfer_plist_id,
+             &(image_meta[0])                          // const void * buf
+           );
+
     /////////////////////////////////////////////////////////
     // Write the new bboxes to the dataset
     /////////////////////////////////////////////////////////
@@ -494,6 +605,7 @@ namespace larcv3 {
     // The function implementation is:
     // 1) Read the extents table entry for this event
     // 2) Use the entry information to get the bbox_extents table information
+    // 2b) Use extents table to get the image_meta
     // 3) Use the bbox_extents information to get the bboxes
 
 
@@ -592,6 +704,45 @@ namespace larcv3 {
 
 
     /////////////////////////////////////////////////////////
+    // Step 2: Get the image_meta information
+    /////////////////////////////////////////////////////////
+
+
+    // Create a dimension for the data to add (which is the hyperslab data)
+    hsize_t image_meta_slab_dims[1];
+    image_meta_slab_dims[0] = input_extents.n;
+
+    hsize_t image_meta_offset[1];
+    image_meta_offset[0] = input_extents.first;
+
+    // Now, select as a hyperslab the last section of data for writing:
+    // extents_dataspace = extents_dataset.getSpace();
+    H5Sselect_hyperslab(_open_in_dataspaces[IMAGE_META_DATASET],
+      H5S_SELECT_SET,
+      image_meta_offset,    // start
+      NULL ,                // stride
+      image_meta_slab_dims, // count
+      NULL                  // block
+    );
+
+    hid_t image_meta_memspace = H5Screate_simple(1, image_meta_slab_dims, NULL);
+
+    std::vector<larcv3::ImageMeta<dimension> > image_meta;
+
+    // Reserve space for reading in image_meta:
+    image_meta.resize(input_extents.n);
+
+    H5Dread(
+      _open_in_datasets[IMAGE_META_DATASET],    // hid_t dataset_id  IN: Identifier of the dataset read from.
+      _data_types[IMAGE_META_DATASET],          // hid_t mem_type_id IN: Identifier of the memory datatype.
+      image_meta_memspace,                      // hid_t mem_space_id  IN: Identifier of the memory dataspace.
+      _open_in_dataspaces[IMAGE_META_DATASET],  // hid_t file_space_id IN: Identifier of the dataset's dataspace in the file.
+      xfer_plist_id,                            // hid_t xfer_plist_id     IN: Identifier of a transfer property list for this I/O operation.
+      &(image_meta[0])                          // void * buf  OUT: Buffer to receive data read from file.
+    );
+    // std::cout << "image_meta.size(): " << image_meta.size() << std::endl;
+
+    /////////////////////////////////////////////////////////
     // Step 3: Read the bboxes
     /////////////////////////////////////////////////////////
 
@@ -602,6 +753,12 @@ namespace larcv3 {
 
     _bbox_c_v.clear();
     _bbox_c_v.resize(bbox_extents.size());
+
+    // Set the meta for each bbox:
+    for (size_t bbox_index = 0; bbox_index < bbox_extents.size(); bbox_index ++){
+      _bbox_c_v[bbox_index].meta(image_meta.at(bbox_index));
+    }
+
 
     // Offset of the first read
     hsize_t offset = bbox_extents.front().first;

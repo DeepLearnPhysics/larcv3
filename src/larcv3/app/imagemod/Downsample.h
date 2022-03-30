@@ -64,6 +64,13 @@ namespace larcv3 {
         int downsample,
         PoolType_t pool);
 
+    template< class dataproduct>
+    bool process_bbox_product(
+        IOManager& mgr,
+        std::string producer, 
+        std::string output_producer,
+        int downsample);
+
     json config;
 
   };

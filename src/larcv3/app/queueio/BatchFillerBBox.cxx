@@ -102,7 +102,7 @@ namespace larcv3 {
     */
     auto _bbox_producer      = config["Producer"].template get<std::string>();
     auto _unfilled_box_value = config["UnfilledBoxValue"].template get<float>();
-    auto _max_boxes          = config["MaxBoxes"].template         get<int>();
+    auto _max_boxes          = config["MaxBoxes"].template         get<size_t>();
     auto _slice_v            = config["Channels"].template         get<std::vector<size_t>>();
 
 

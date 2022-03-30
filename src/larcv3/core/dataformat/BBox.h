@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include "larcv3/core/dataformat/DataFormatTypes.h"
+#include "larcv3/core/dataformat/ImageMeta.h"
 
 
 
@@ -145,6 +146,7 @@ namespace larcv3 {
   public:
 
     BBoxCollection(){};
+    BBoxCollection(ImageMeta<dimension> meta):_meta(meta){};
 
     /**
      * @brief      Get number of BBox
@@ -215,8 +217,32 @@ namespace larcv3 {
     void move(larcv3::BBoxCollection<dimension> && orig)
     { _bbox_v = std::move(orig._bbox_v); }
 
+    /**
+     * @brief      Return a new BBoxCollection that is this one, but compressed/downsampled
+     *
+     * @param      compression  The compression level (one value per dimension)
+     * @param      pool_type  The pool type
+     */
+    larcv3::BBoxCollection<dimension> compress(size_t compression, PoolType_t pool_type) const;
+
+    /**
+     * @brief      Return a new BBoxCollection that is this one, but compressed/downsampled
+     *
+     * @param      compression  The compression level (one value per dimension)
+     * @param      pool_type  The pool type
+     */
+    larcv3::BBoxCollection<dimension> compress(std::array<size_t, dimension> compression, PoolType_t pool_type) const;
+
+
+    /// Meta setter
+    void meta(const larcv3::ImageMeta<dimension>& meta){_meta = meta;}
+
+    /// Meta getter
+    const ImageMeta<dimension>& meta() const{return _meta;}
+
   private:
     std::vector<BBox<dimension> > _bbox_v;
+    ImageMeta<dimension>          _meta;
   
   };
 
