@@ -130,5 +130,4 @@ void init_bf_tensor(pybind11::module m);
 #endif
 
 
-
 /** @} */ // end of doxygen group

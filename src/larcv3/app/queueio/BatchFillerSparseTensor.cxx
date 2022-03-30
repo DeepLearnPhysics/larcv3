@@ -203,9 +203,7 @@ namespace larcv3 {
       i_coord.resize(dimension);
       size_t index;
 
-#ifdef LARCV_OMP
-#pragma omp parallel
-#endif
+
       for (size_t i_voxel = 0; i_voxel < max_voxel; i_voxel ++) {
 
         auto coords = meta.coordinates(voxels[i_voxel].id());
