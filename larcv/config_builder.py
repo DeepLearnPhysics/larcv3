@@ -91,13 +91,8 @@ class ConfigBuilder:
 
         # for all of the keyword args, make sure they are in the config:
         for kwarg in kwargs:
-<<<<<<< HEAD
             if kwarg != "Profile" and kwarg not in proc_config:
                 raise Exception(f"Config Parameter {kwarg} not available for"
-=======
-            if kwarg not in proc_config:
-                raise Exception(f"Config Parameter {kwarg} not available for "
->>>>>>> develop
                                 f"{process}, available parameters: "
                                 f"{proc_config.keys()}")
 
