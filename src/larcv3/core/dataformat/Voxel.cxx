@@ -218,7 +218,8 @@ namespace larcv3 {
     // Now, loop through the inputs and add voxels:
     this->_voxel_v.reserve(values_buffer.shape[0]);
 
-    for (long int i = 0; i < values_buffer.shape[0]; ++ i){
+
+    for (pybind11::ssize_t i = 0; i < values_buffer.shape[0]; ++ i){
       this -> _voxel_v.push_back(Voxel(ind_ptr[i], val_ptr[i]));
     }
 

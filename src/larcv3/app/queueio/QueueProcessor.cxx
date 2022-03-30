@@ -91,7 +91,7 @@ namespace larcv3 {
 
     _next_index_v.resize(buf.size);
     size_t * ptr = (size_t *) buf.ptr;
-    for (size_t i = 0; i < buf.size; i++ ){
+    for (pybind11::ssize_t i = 0; i < buf.size; i++ ){
       _next_index_v[i] = ptr[i];
     }
   }
@@ -545,6 +545,17 @@ void init_queueprocessor(pybind11::module m){
   queueproc.def(name.c_str(),                       &Class::get_queue<double>);
   name = "get_queue_particle";
   queueproc.def(name.c_str(),                       &Class::get_queue<larcv3::ParticleHolder>);
+
+  name = "get_batch_" + larcv3::as_string<short>();
+  queueproc.def(name.c_str(),                       &Class::get_batch<short>);
+  name = "get_batch_" + larcv3::as_string<int>();
+  queueproc.def(name.c_str(),                       &Class::get_batch<int>);
+  name = "get_batch_" + larcv3::as_string<float>();
+  queueproc.def(name.c_str(),                       &Class::get_batch<float>, pybind11::return_value_policy::reference);
+  name = "get_batch_" + larcv3::as_string<double>();
+  queueproc.def(name.c_str(),                       &Class::get_batch<double>);
+  name = "get_batch_particle";
+  queueproc.def(name.c_str(),                       &Class::get_batch<larcv3::ParticleHolder>);
 
 }
 

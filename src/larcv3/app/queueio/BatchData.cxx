@@ -203,9 +203,8 @@ void init_batchdata_(pybind11::module m){
     using Class = larcv3::BatchData<T>;
     std::string classname = "BatchData" + larcv3::as_string<T>();
     pybind11::class_<Class> batch_data(m, classname.c_str());
-    batch_data.def(pybind11::init<>());
-
-
+    batch_data.def(pybind11::init<>(),
+        pybind11::return_value_policy::reference);
 
 
     batch_data.def("pydata",             &Class::pydata);

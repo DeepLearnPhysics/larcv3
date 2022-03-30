@@ -88,8 +88,16 @@ namespace larcv3 {
 
     bool is_next_ready() const;
 
+    /// Direct access to a queue
     template<class T>
     const BatchDataQueue<T> & get_queue(std::string process_name) const;
+
+    /// direct access to a batch of data
+    template<class T>
+    const BatchData<T> get_batch(std::string process_name) const{
+        return this->get_queue<T>(process_name).get_batch();
+    };
+
 
     // Get number of entries possible to read
     size_t get_n_entries() const;

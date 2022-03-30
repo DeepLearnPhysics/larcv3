@@ -827,10 +827,14 @@ namespace larcv3 {
       // This implementation is not ideal.
       // It copies from disk, then is copying into a vector
 
-      std::vector<larcv3::Voxel> temp_voxel_vector;
-      temp_voxel_vector.resize(voxels_slab_dims[0]);
+      // std::vector<larcv3::Voxel> temp_voxel_vector;
 
       // Reserve space for reading in voxels:
+
+      // Directly get the vector object for the voxels:
+      std::vector<Voxel> & voxel_ref = _tensor_v.at(voxel_set_index).writeable_voxel_vector();
+      voxel_ref.resize(voxels_slab_dims[0]);
+
 
       H5Dread(
         _open_in_datasets[VOXELS_DATASET],    // hid_t dataset_id  IN: Identifier of the dataset read from.
@@ -838,14 +842,13 @@ namespace larcv3 {
         voxels_memspace,                      // hid_t mem_space_id  IN: Identifier of the memory dataspace.
         _open_in_dataspaces[VOXELS_DATASET],  // hid_t file_space_id IN: Identifier of the dataset's dataspace in the file.
         xfer_plist_id,                        // hid_t xfer_plist_id     IN: Identifier of a transfer property list for this I/O operation.
-        &(temp_voxel_vector[0])               // void * buf  OUT: Buffer to receive data read from file.
+        &(voxel_ref[0])               // void * buf  OUT: Buffer to receive data read from file.
       );
       // std::cout << "temp_voxel_vector.size(): " << temp_voxel_vector.size() << std::endl;
 
-
-      for (auto & v : temp_voxel_vector){
-        _tensor_v.at(voxel_set_index).emplace(v);
-      }
+      // for (auto & v : temp_voxel_vector){
+      //   _tensor_v.at(voxel_set_index).emplace(v);
+      // }
 
 
       _tensor_v.at(voxel_set_index).id(voxel_set_index);
@@ -884,8 +887,6 @@ void init_eventsparse_tensor_base(pybind11::module m){
   ev_sparse_tensor.def(pybind11::init<>());
 
 
-  // ev_sparse_tensor.def("emplace_back",    &Class::emplace_back);
-  // ev_sparse_tensor.def("emplace",         &Class::emplace);
   ev_sparse_tensor.def("as_vector",          &Class::as_vector, pybind11::return_value_policy::reference);
   ev_sparse_tensor.def("at",                 &Class::at, pybind11::return_value_policy::reference);
   ev_sparse_tensor.def("size",               &Class::size);
@@ -895,13 +896,7 @@ void init_eventsparse_tensor_base(pybind11::module m){
   ev_sparse_tensor.def("clear",              &Class::clear);
 
 
-/*
 
-Not wrapped:
-    void emplace(larcv3::SparseTensor<dimension> && voxels);
-    void emplace(larcv3::VoxelSet&& voxels, larcv3::ImageMeta<dimension>&& meta);
-
-*/
 
 
 }
