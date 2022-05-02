@@ -7,6 +7,7 @@ class ConfigBuilder:
     valid_datatypes = \
         [ f"tensor{i+1}d" for i in range(4) ] + \
         [ f"sparse{i+2}d" for i in range(2) ] + \
+        [ f"cluster{i+2}d" for i in range(2) ] + \
         [ f"bbox{i+2}d" for i in range(2) ] + \
         ["particle"] + \
         ["PID"]
@@ -14,7 +15,7 @@ class ConfigBuilder:
     valid_preprocess = [
         "Downsample", "DenseToSparse", "Embed",
         "SparseToDense", "TensorFromCluster", "Threshold",
-        "BBoxFromParticle"
+        "BBoxFromParticle", "BBoxFromCluster"
     ]
 
     def __init__(self):
@@ -104,6 +105,7 @@ class ConfigBuilder:
             name = f"{process}_{producer}_{datatype}_" + str(uuid.uuid4())[:8]
 
         proc_config["Producer"] = producer
+        proc_config["Product"]  = datatype
 
         # Finally add this process to the configuration
 

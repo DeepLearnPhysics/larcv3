@@ -41,7 +41,7 @@ namespace larcv3 {
     /// EventBase::clear() override
     inline void clear() {_cluster_v.clear();}
 
-    inline larcv3::SparseCluster<dimension>  at(size_t index) {return _cluster_v.at(index);}
+    inline larcv3::SparseCluster<dimension>  at(size_t index) const {return _cluster_v.at(index);}
 
     /// Access to all stores larcv3::SparseCluster
     inline const std::vector<larcv3::SparseCluster<dimension> >& as_vector() const { return _cluster_v; }
