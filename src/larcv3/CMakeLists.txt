@@ -38,7 +38,7 @@ message("Using hdf5 parallel: " ${HDF5_IS_PARALLEL})
 target_link_libraries(larcv3 ${HDF5_LIBRARIES})
 
 # Link against python:
-target_link_libraries(larcv3 ${PYTHON_LIBRARIES})
+target_link_libraries(larcv3 ${Python_LIBRARIES})
 
 
 ###############################

@@ -2,7 +2,7 @@ from skbuild import setup  # This line replaces 'from setuptools import setup'
 import argparse
 
 import io
-import os
+import sys, os
 this_directory = os.path.abspath(os.path.dirname(__file__))
 with io.open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
@@ -16,6 +16,12 @@ if mo:
     verstr = mo.group(1)
 else:
     raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
+
+
+
+v = sys.version_info
+py_version = ".".join([str(v.major), str(v.minor), str(v.micro)])
+print(py_version)
 
 
 # Several environment variables control special build features:
@@ -57,6 +63,7 @@ setup(
         '-DMPI:BOOL={}'.format(mpi_value),
         '-DOPENMP:BOOL={}'.format(openmp_value),
         '-DDOCS:BOOL={}'.format(docs_value),
+        f'-DCMAKE_PYVERSION={py_version}'
     ],
     author=['Corey Adams', 'Kazuhiro Terao', 'Taritree Wongjirad', 'Marco del Tutto'],
     author_email='corey.adams@anl.gov',
