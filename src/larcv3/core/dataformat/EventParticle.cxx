@@ -516,16 +516,6 @@ void init_eventparticle(pybind11::module m){
   ev_particle.def("clear",           &Class::clear);
 
 
-/*
-
-
-
-    static EventParticle * to_particle(EventBase * e){
-      return (EventParticle *) e;
-    }
-
-*/
-
 }
 
 

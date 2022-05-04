@@ -81,6 +81,10 @@ bool Embed::process(IOManager& mgr) {
     process_bbox_product<2>(mgr, producer, output_producer, target_size);
   else if (product == "bbox3d")
     process_bbox_product<3>(mgr, producer, output_producer, target_size);
+  else if (product == "cluster2d")
+    process_cluster_product<2>(mgr, producer, output_producer, target_size);
+  else if (product == "cluster3d")
+    process_cluster_product<3>(mgr, producer, output_producer, target_size);
   else{
     LARCV_CRITICAL() << "Can't apply embedding to product " << product << std::endl;
     throw larbys();
@@ -135,8 +139,8 @@ std::vector<int> Embed::create_new_image_meta_and_offsets(
 
 template< size_t dimension>
 bool Embed::process_sparse_product(IOManager& mgr, std::string producer,
-                                      std::string output_producer,
-                                      std::vector<int> target_size){
+                                   std::string output_producer,
+                                   const std::vector<int>& target_size){
 
   // Get the input data and the output holder.
   auto const & ev_input  = mgr.template get_data<EventSparseTensor<dimension>>(producer);
@@ -202,9 +206,92 @@ bool Embed::process_sparse_product(IOManager& mgr, std::string producer,
 }
 
 template< size_t dimension>
+bool Embed::process_cluster_product(IOManager& mgr, std::string producer,
+                                    std::string output_producer,
+                                    const std::vector<int>& target_size){
+
+  // Get the input data and the output holder.
+  auto const & ev_input  = mgr.template get_data<EventSparseCluster<dimension>>(producer);
+
+
+  // One sparse cluster per projection index
+  std::vector<SparseCluster<dimension>> output_holder;
+  // Loop over the projection IDs
+  for (size_t i = 0; i < ev_input.as_vector().size(); i ++ ){
+
+    // Get the old image:
+    const auto& original_clusters = ev_input.as_vector().at(i) ;
+    // Get the old meta:
+    const auto& original_meta = original_clusters.meta();
+
+
+
+    // The new meta will have the same voxel size and dimensions as the old meta.
+    auto new_meta = original_meta;
+    auto offsets = create_new_image_meta_and_offsets<dimension>(
+      original_meta, target_size, new_meta);
+
+
+    // Loop throught the objects and put all the pixels/voxels into the new positions:
+    auto new_cluster_set = SparseCluster<dimension>();
+    // Set the new meta:
+    new_cluster_set.meta(new_meta);
+
+    // Create a new cluster object for the output clusters:
+    std::vector<VoxelSet> cluster_array;
+    cluster_array.resize(original_clusters.size());
+
+
+    // Loop over the original clusters, and move them all pixel-by-pixel
+    for (size_t i_cluster = 0; i_cluster < original_clusters.size(); i_cluster++){
+
+      auto original_voxel_set = original_clusters.voxel_set(i_cluster);
+
+      auto original_values  = original_voxel_set.values_vec();
+      auto original_indexes = original_voxel_set.indexes_vec();
+
+
+      // Loop over all the original voxels
+      for (size_t i_voxel = 0; i_voxel < original_voxel_set.size(); i_voxel ++){
+
+        // Get the coordinates in the original meta:
+        auto coords = original_meta.coordinates(original_indexes.at(i_voxel));
+
+        // Add the offset to the coordinate:
+#ifdef LARCV_OPENMP
+#pragma omp parallel for
+#endif
+        for (size_t i_coord = 0; i_coord < coords.size(); i_coord ++)
+          coords[i_coord] += offsets[i_coord];
+
+        // Get the new index:
+        auto new_index = new_meta.index(coords);
+
+        // Update the new image:
+        cluster_array.at(i_cluster).add(std::move(Voxel(new_index, original_values.at(i_voxel))));
+      } // loop over voxels
+
+    } // loop over clusters
+
+    // // Add the updated cluster to the new cluster set:
+    new_cluster_set.emplace(std::move(cluster_array));
+
+    // Add the updated clusters for this projection ID to the event output:
+    output_holder.push_back(std::move(new_cluster_set));
+  }
+
+  auto & ev_output = mgr.template get_data<EventSparseCluster<dimension>>(output_producer);
+  ev_output.clear();
+  for (size_t i = 0; i < output_holder.size(); i ++ ){
+    ev_output.emplace(std::move(output_holder.at(i)));
+  }
+  return true;
+}
+
+template< size_t dimension>
 bool Embed::process_dense_product(IOManager& mgr, std::string producer,
                                    std::string output_producer,
-                                   std::vector<int> target_size){
+                                   const std::vector<int>& target_size){
 
   // Get the input data and the output holder.
   auto const & ev_input  = mgr.template get_data<EventTensor<dimension>>(producer);
@@ -264,7 +351,7 @@ bool Embed::process_dense_product(IOManager& mgr, std::string producer,
 template< size_t dimension>
 bool Embed::process_bbox_product(IOManager& mgr, std::string producer,
                                  std::string output_producer,
-                                 std::vector<int> target_size){
+                                 const std::vector<int>& target_size){
 
   // Get the input data and the output holder.
   auto const & ev_input  = mgr.template get_data<EventBBox<dimension>>(producer);
