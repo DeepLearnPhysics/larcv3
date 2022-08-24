@@ -24,7 +24,7 @@
 
 namespace larcv3 {
 
-  class EventBase;
+  // class EventBase;
   /**
      \class DataProductFactoryBase
      \brief Abstract base class for factory (to be implemented per data product)
@@ -36,7 +36,7 @@ namespace larcv3 {
     /// Default dtor (virtual)
     virtual ~DataProductFactoryBase(){}
     /// Abstract constructor method
-    virtual EventBase* create() = 0;
+    virtual AbstractEventBase* create() = 0;
   };
 
   /**
@@ -63,12 +63,12 @@ namespace larcv3 {
     void add_factory(std::string type, larcv3::DataProductFactoryBase* factory);
 
     /// Factory creation method (should åbe called by clients, possibly you!)
-    inline EventBase* create(const std::string& type, const std::string& producer) {
+    inline AbstractEventBase* create(const std::string& type, const std::string& producer) {
       return create(ProducerName_t(type,producer));
     }
 
     /// Factory creation method (should be called by clients, possibly you!)
-    EventBase* create(const ProducerName_t& id);
+    AbstractEventBase* create(const ProducerName_t& id);
 
     /// List registered products
     void list() const;

@@ -31,7 +31,7 @@ namespace larcv3 {
     _id_to_type.push_back(type);
   }
 
-  EventBase* DataProductFactory::create(const ProducerName_t& id) {
+  AbstractEventBase* DataProductFactory::create(const ProducerName_t& id) {
     auto iter = _factory_map.find(id.first);
     if(iter == _factory_map.end() || !((*iter).second)) {
       LARCV_ERROR() << "Found no registered class " << id.first << std::endl;

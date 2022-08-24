@@ -1,12 +1,7 @@
-#ifndef __LARCV3DATAFORMAT_EVENTPARTICLE_CXX
-#define __LARCV3DATAFORMAT_EVENTPARTICLE_CXX
-
 #include "larcv3/core/dataformat/EventParticle.h"
 
 #define PARTICLE_EXTENTS_CHUNK_SIZE 100
 #define PARTICLE_DATA_CHUNK_SIZE 500
-
-
 #define EXTENTS_DATASET 0
 #define PARTICLES_DATASET 1
 #define N_DATASETS 2
@@ -15,59 +10,12 @@ namespace larcv3{
 
   static EventParticleFactory __global_EventParticleFactory__;
 
-  EventParticle::EventParticle(){
+  template <>
+  EventBase<Particle>::~EventBase(){};
 
-    _data_types.resize(N_DATASETS);
-    _data_types[EXTENTS_DATASET] = larcv3::get_datatype<Extents_t>();
-    _data_types[PARTICLES_DATASET] = larcv3::Particle::get_datatype();
-
-
-  }
-
-
-
-  void EventParticle::set(const std::vector<larcv3::Particle>& part_v)
-  {
-    _part_v = part_v;
-    for(size_t i=0; i<_part_v.size(); ++i)
-      _part_v[i].id(i);
-  }
-
-  void EventParticle::append(const larcv3::Particle& part)
-  {
-    _part_v.push_back(part);
-    _part_v.back().id(_part_v.size()-1);
-  }
-
-  void EventParticle::emplace_back(larcv3::Particle&& part)
-  {
-    _part_v.emplace_back(std::move(part));
-    _part_v.back().id(_part_v.size()-1);
-  }
-
-  void EventParticle::emplace(std::vector<larcv3::Particle>&& part_v)
-  {
-    _part_v = std::move(part_v);
-    for(size_t i=0; i<_part_v.size(); ++i)
-      _part_v[i].id(i);
-  }
-
-  void EventParticle::clear(){
-    _part_v.clear();
-  }
-
-
-
-  void EventParticle::finalize(){
-    for (size_t i =0; i < _open_in_datasets.size(); i ++){
-      H5Dclose(_open_in_datasets[i]);
-    }
-    for (size_t i =0; i < _open_out_datasets.size(); i ++){
-      H5Dclose(_open_out_datasets[i]);
-    }
-  }
-
-  void EventParticle::open_in_datasets(hid_t group){
+  // Specialization
+  template <>
+  void EventBase<Particle>::open_in_datasets(hid_t group){
 
     if (_open_in_datasets.size() < N_DATASETS ){
        _open_in_datasets.resize(N_DATASETS);
@@ -84,7 +32,8 @@ namespace larcv3{
     return;
   }
 
-  void EventParticle::open_out_datasets(hid_t group){
+  template <>
+  void EventBase<Particle>::open_out_datasets(hid_t group){
 
     if (_open_out_datasets.size() < N_DATASETS ){
        _open_out_datasets.resize(N_DATASETS);
@@ -100,6 +49,23 @@ namespace larcv3{
 
     return;
   }
+
+
+
+  // // Can't use type def in the constructor!
+  // template <>
+  // EventBase<larcv3::Particle>::EventBase(){
+
+  //   _data_types.resize(N_DATASETS);
+  //   _data_types[EXTENTS_DATASET] = larcv3::get_datatype<Extents_t>();
+  //   _data_types[PARTICLES_DATASET] = EventBase<Particle>::get_datatype();
+
+
+  // }
+
+
+
+
 
   void EventParticle::serialize(hid_t group){
 
@@ -413,10 +379,10 @@ namespace larcv3{
 
     H5Sselect_hyperslab(_open_in_dataspaces[EXTENTS_DATASET],
       H5S_SELECT_SET,
-      extents_offset, // start
-      NULL ,  // stride
-      extents_slab_dims, //count
-      NULL // block
+      extents_offset,    // start
+      NULL ,             // stride
+      extents_slab_dims, // count
+      NULL               // block
       );
 
     // Define memory space:
@@ -498,35 +464,53 @@ namespace larcv3{
     return;
   }
 
+  template class EventBase<Particle>;
+  typedef EventBase<Particle>  EventParticle;
 
-} // larcv3
+// } // larcv3
 
-void init_eventparticle(pybind11::module m){
+// void init_eventparticle(pybind11::module m){
 
-  using Class = larcv3::EventParticle;
-  pybind11::class_<Class, std::shared_ptr<Class>> ev_particle(m, "EventParticle");
-  ev_particle.def(pybind11::init<>());
+//   using Class = larcv3::EventParticle;
+//   pybind11::class_<Class, std::shared_ptr<Class>> ev_particle(m, "EventParticle");
+//   ev_particle.def(pybind11::init<>());
 
-  ev_particle.def("set",             &Class::set);
-  ev_particle.def("append",          &Class::append);
-  // ev_particle.def("emplace_back", &Class::emplace_back);
-  ev_particle.def("at",              &Class::at);
-  ev_particle.def("as_vector",       &Class::as_vector);
-  ev_particle.def("size",            &Class::size);
-  ev_particle.def("clear",           &Class::clear);
-
-
-/*
-
+//   ev_particle.def("set",             &Class::set);
+//   ev_particle.def("append",          &Class::append);
+//   // ev_particle.def("emplace_back", &Class::emplace_back);
+//   ev_particle.def("at",              &Class::at);
+//   ev_particle.def("as_vector",       &Class::as_vector);
+//   ev_particle.def("size",            &Class::size);
+//   ev_particle.def("clear",           &Class::clear);
 
 
-    static EventParticle * to_particle(EventBase * e){
-      return (EventParticle *) e;
-    }
+// // 
 
-*/
+// // THis is a specialiation that should really just be instantiation.  Ugh.
+// template <> void init_eventbase<larcv3::Particle>(pybind11::module m)
+// {
+//     using Class = larcv3::EventBase<larcv3::Particle>;
 
-}
+//     pybind11::class_<Class> event_base(
+//         m, larcv3::product_unique_name<Class>());
+
+//     event_base.def(pybind11::init<>());
+
+//     event_base.def("set",             &Class::set);
+//     event_base.def("append",          &Class::append);
+//     // event_base.def("emplace_back", &Class::emplace_back);
+//     event_base.def("at",              &Class::at);
+//     event_base.def("as_vector",       &Class::as_vector);
+//     event_base.def("size",            &Class::size);
+//     event_base.def("clear",           &Class::clear);
+
+// }
 
 
-#endif
+//     static EventParticle * to_particle(EventBase * e){
+//       return (EventParticle *) e;
+//     }
+
+
+
+} // namespace larcv3

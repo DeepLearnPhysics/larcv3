@@ -24,6 +24,9 @@ namespace larcv3 {
     \class EventParticle
     User-defined data product class (please comment!)
   */
+
+
+/*
   class EventParticle : public EventBase {
 
   public:
@@ -69,8 +72,8 @@ namespace larcv3 {
     std::vector<larcv3::Particle> _part_v; ///< a collection of particles (index maintained)
 
   };
+  */
 }
-
 
 #include "IOManager.h"
 namespace larcv3 {
@@ -95,7 +98,7 @@ namespace larcv3 {
     /// dtor
     ~EventParticleFactory() {}
     /// create method
-    EventBase* create() { return new EventParticle; }
+    AbstractEventBase* create() { return new EventParticle; }
   };
 
 
@@ -103,7 +106,7 @@ namespace larcv3 {
 
 #ifdef LARCV_INTERNAL
 #include <pybind11/pybind11.h>
-void init_eventparticle(pybind11::module m);
+// template void init_eventbase<larcv3::Particle>(pybind11::module m);
 #endif
 
 #endif

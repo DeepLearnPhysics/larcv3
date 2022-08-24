@@ -16,7 +16,7 @@
 
 #include <iostream>
 #include "larcv3/core/dataformat/Vertex.h"
-// #include "BBox.h"
+#include "larcv3/core/dataformat/DataProduct.h"
 #include "larcv3/core/dataformat/DataFormatTypes.h"
 
 // In hdf5, strings are fixed length so we set the maximum length here:
@@ -69,7 +69,7 @@ namespace larcv3 {
      \class Particle
      \brief Particle/Interaction-wise truth information data
   */
-  class Particle{
+  class Particle : public DataProduct {
 
   public:
 
