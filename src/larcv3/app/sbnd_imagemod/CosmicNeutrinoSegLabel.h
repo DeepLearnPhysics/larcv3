@@ -48,14 +48,16 @@ class CosmicNeutrinoSegLabel : public ProcessBase {
 
   void finalize();
 
-  Image2D seg_image_creator(const std::vector<Particle> & particles,
-                            const SparseCluster2D & clusters,
-                            const ImageMeta2D & meta,
+  template <size_t dimension>
+  SparseTensor<dimension> seg_image_creator(const std::vector<Particle> & particles,
+                            const SparseCluster<dimension> & clusters,
+                            const ImageMeta<dimension> & meta,
                             const int neutrino_label,
                             const int cosmic_label);
   static json default_config(){
       json c = {
         {"Cluster2dProducer", ""},
+        {"Cluster3dProducer", ""},
         {"OutputProducer",    ""},
         {"ParticleProducer",  ""},
         {"NeutrinoLabel", 1},

@@ -44,53 +44,92 @@ void CosmicNeutrinoSegLabel::initialize() {}
 bool CosmicNeutrinoSegLabel::process(IOManager& mgr) {
 
   auto _cluster2d_producer = config["Cluster2dProducer"].get<std::string>();
+  auto _cluster3d_producer = config["Cluster3dProducer"].get<std::string>();
   auto _output_producer    = config["OutputProducer"].get<std::string>();
   auto _particle_producer  = config["ParticleProducer"].get<std::string>();
-  auto cosmic_label       = config["CosmicLabel"].get<int>();
-  auto neutrino_label     = config["NeutrinoLabel"].get<int>();
+  auto cosmic_label        = config["CosmicLabel"].get<int>();
+  auto neutrino_label      = config["NeutrinoLabel"].get<int>();
 
-  // Read in the original source of segmentation, the cluster indexes:
-  auto const& ev_cluster2d =
-      mgr.get_data<larcv3::EventSparseCluster2D>(_cluster2d_producer);
 
   // Read in the particles that define the pdg types:
   auto const& ev_particle =
       mgr.get_data<larcv3::EventParticle>(_particle_producer);
 
-  // The output is an instance of image2D, so prepare that:
-  auto& ev_tensor2d_output = mgr.get_data<larcv3::EventTensor2D>(_output_producer);
-  ev_tensor2d_output.clear();
-  // Next, loop over the particles and clusters per projection_ID
-  // and set the values in the output image to the label specified by
-  // the pdg
+  if (_cluster2d_producer != ""){
+    // Read in the original source of segmentation, the cluster indexes:
+    auto const& ev_cluster2d =
+        mgr.get_data<larcv3::EventSparseCluster2D>(_cluster2d_producer);
 
-  auto const& particles = ev_particle.as_vector();
-  for (size_t projection_index = 0;
-       projection_index < ev_cluster2d.size(); ++projection_index) {
-    // For each projection index, get the list of clusters
-    auto const& clusters = ev_cluster2d.sparse_cluster(projection_index);
+    // The output is an instance of image2D, so prepare that:
+    auto& ev_tensor2d_output = mgr.get_data<larcv3::EventSparseTensor2D>(_output_producer);
+    ev_tensor2d_output.clear();
+    // Next, loop over the particles and clusters per projection_ID
+    // and set the values in the output image to the label specified by
+    // the pdg
 
-    auto const& out_image =
-        seg_image_creator(particles, clusters,
-                          ev_cluster2d.sparse_cluster(projection_index).meta(),
-                          neutrino_label, cosmic_label);
+    auto const& particles = ev_particle.as_vector();
+    for (size_t projection_index = 0;
+         projection_index < ev_cluster2d.size(); ++projection_index) {
+      // For each projection index, get the list of clusters
+      auto const& clusters = ev_cluster2d.sparse_cluster(projection_index);
 
-    // Append the output image2d:
-    ev_tensor2d_output.append(out_image);
+      auto const& out_image =
+          seg_image_creator<2>(particles, clusters,
+                            ev_cluster2d.sparse_cluster(projection_index).meta(),
+                            neutrino_label, cosmic_label);
+
+      // Append the output image2d:
+      ev_tensor2d_output.set(out_image);
+    }
+  }
+
+
+  if (_cluster3d_producer != ""){
+    // Read in the original source of segmentation, the cluster indexes:
+    auto const& ev_cluster3d =
+      mgr.get_data<larcv3::EventSparseCluster3D>(_cluster3d_producer);
+
+    // The output is an instance of image2D, so prepare that:
+    auto& ev_tensor3d_output = mgr.get_data<larcv3::EventSparseTensor3D>(_output_producer);
+    ev_tensor3d_output.clear();
+    // Next, loop over the particles and clusters per projection_ID
+    // and set the values in the output image to the label specified by
+    // the pdg
+
+    auto const& particles = ev_particle.as_vector();
+    for (size_t projection_index = 0;
+         projection_index < ev_cluster3d.size(); ++projection_index) {
+      // For each projection index, get the list of clusters
+      auto const& clusters = ev_cluster3d.sparse_cluster(projection_index);
+
+      auto const& out_image =
+          seg_image_creator<3>(particles, clusters,
+                            ev_cluster3d.sparse_cluster(projection_index).meta(),
+                            neutrino_label, cosmic_label);
+
+      // Append the output image3d:
+      ev_tensor3d_output.set(out_image);
+    }
   }
 
   return true;
 }
 
-Image2D CosmicNeutrinoSegLabel::seg_image_creator(
+template <size_t dimension>
+SparseTensor<dimension> CosmicNeutrinoSegLabel::seg_image_creator(
     const std::vector<Particle> & particles,
-    const SparseCluster2D & clusters, const ImageMeta2D & meta,
+    const SparseCluster<dimension> & clusters, 
+    const ImageMeta<dimension> & meta,
     const int neutrino_label, const int cosmic_label) {
-  // Prepare an output image2d:
-  Image2D out_image(meta);
+  // Prepare an output SparseTensor<dimension>:
+  SparseTensor<dimension> out_image;
+  // Set the meta:
+  out_image.meta(meta);
 
   // std::set<std::string> processes;
   // std::set<int> interaction_types;
+
+  Voxel invalid_voxel = kINVALID_VOXEL::getInstance();
 
   // Loop over the particles and get the cluster that matches:
   for (size_t particle_index = 0; particle_index < particles.size();
@@ -123,11 +162,14 @@ Image2D CosmicNeutrinoSegLabel::seg_image_creator(
         // }
 
         // We have to make sure that we don't overwrite a neutrino pixel with a cosmic pixel.
-        if (out_image.pixel(voxel.id()) == kNeutrino){
-          continue;
-        }
-        else{
-          out_image.set_pixel(voxel.id(), pixel_label);
+        // We do that by writing in two cases:
+        // 1) There is no pixel currently set at that ID
+        // 2) The current label is neutrino, so write no matter what.
+        
+        auto current_voxel = out_image.find(voxel.id());
+        if (current_voxel == invalid_voxel || pixel_label == kNeutrino){
+          // Then, this voxel wasn't found, add it:
+          out_image.emplace(Voxel(voxel.id(), pixel_label), false);
         } 
       }
     }
