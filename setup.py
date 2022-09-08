@@ -45,6 +45,10 @@ if 'MAKE_DOCS' in os.environ and os.environ['MAKE_DOCS']:
 else:
     docs_value='OFF'
     
+# This is specific to the `docs` branch: force the docs value on!
+docs_value='ON'
+
+    
 # Speed up the build if not directly set:    
 if 'MAKEFLAGS' not in os.environ: 
     os.environ['MAKEFLAGS'] = "-j"
