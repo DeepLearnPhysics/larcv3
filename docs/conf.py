@@ -1,5 +1,13 @@
 import subprocess, os
 
+#...
+extensions = [ "breathe" ]
+#...
+
+# Breathe Configuration
+breathe_default_project = "larcv3"
+html_theme = 'sphinx_rtd_theme'
+
 def configureDoxyfile(input_dir, output_dir):
     with open('Doxyfile.in', 'r') as file :
         filedata = file.read()
