@@ -1,6 +1,0 @@
-scikit-build
-numpy
-h5py
-cmake
-sphinx
-breathe

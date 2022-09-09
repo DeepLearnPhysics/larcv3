@@ -40,13 +40,6 @@ if 'LARCV_WITHOUT_PYBIND' in os.environ and os.environ['LARCV_WITHOUT_PYBIND']:
 else:
     pybind_value='ON'
 
-if 'MAKE_DOCS' in os.environ and os.environ['MAKE_DOCS']:
-    docs_value='ON'
-else:
-    docs_value='OFF'
-    
-# This is specific to the `docs` branch: force the docs value on!
-docs_value='ON'
 
     
 # Speed up the build if not directly set:    
@@ -66,7 +59,6 @@ setup(
         # '-DMPI_C_COMPILER={}'.format(mpicc),
         '-DMPI:BOOL={}'.format(mpi_value),
         '-DOPENMP:BOOL={}'.format(openmp_value),
-        '-DDOCS:BOOL={}'.format(docs_value),
         f'-DCMAKE_PYVERSION={py_version}'
     ],
     author=['Corey Adams', 'Kazuhiro Terao', 'Taritree Wongjirad', 'Marco del Tutto'],

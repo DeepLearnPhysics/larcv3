@@ -28,11 +28,11 @@ PYBIND11_MODULE(pylarcv, m) {
          :toctree: _generate
          base
   )pbdoc";
+  
   init_base(m);
-
   init_dataformat(m);
-  // init_processor(m);
-  // init_queueio(m);
-  // init_imagemod(m);
-  // init_sbnd_imagemod(m);
+  init_processor(m);
+  init_queueio(m);
+  init_imagemod(m);
+  init_sbnd_imagemod(m);
 }
