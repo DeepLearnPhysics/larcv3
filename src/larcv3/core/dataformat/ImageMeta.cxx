@@ -668,6 +668,18 @@ template<size_t dimension>
 void init_imagemeta_base(pybind11::module m){
     using Class = larcv3::ImageMeta<dimension>;
     pybind11::class_<Class> imagemeta(m, larcv3::as_string<Class>().c_str());
+    imagemeta.doc() = R"pbdoc(
+      Image Meta
+      ===========
+
+      Generalized class for interpreting sparse (or dense) images from their in-memory
+      layout to physical values.  An ImageMeta object is defined by it's origin, size, and number
+      of voxels as well as a unique index, representing an identifier in a multi-view image, for example.
+
+      Optionally, a unit can be provided to convert pixel locations to real-space coordinates, if desired.
+
+
+    )pbdoc";
     imagemeta.def(pybind11::init<>());
     imagemeta.def(pybind11::init<Class>());
     imagemeta.def(pybind11::init<size_t,
@@ -684,89 +696,155 @@ void init_imagemeta_base(pybind11::module m){
     imagemeta.def(pybind11::self != pybind11::self);
 
     imagemeta.def("image_size",
-      (double (Class::*)( size_t ) const)(&Class::image_size));
+      (double (Class::*)( size_t ) const)(&Class::image_size), pybind11::arg("axis"), 
+      "Return the size of the image on specified ``axis``.");
     imagemeta.def("image_size",
-      (const double * (Class::*)( )const)(&Class::image_size));
+      (const double * (Class::*)( )const)(&Class::image_size),
+      "Return the size of the image on all axes.");
 
     imagemeta.def("number_of_voxels",
-      (size_t (Class::*)( size_t ) const)(&Class::number_of_voxels));
+      (size_t (Class::*)( size_t ) const)(&Class::number_of_voxels), pybind11::arg("axis"),
+      "Return the number of voxels on the specified ``axis``.");
     imagemeta.def("number_of_voxels",
-      (const size_t * (Class::*)( )const)(&Class::number_of_voxels));
+      (const size_t * (Class::*)( )const)(&Class::number_of_voxels),
+      "Return the number of voxels on all axes.");
 
     imagemeta.def("origin",
-      (double (Class::*)( size_t ) const)(&Class::origin));
+      (double (Class::*)( size_t ) const)(&Class::origin), pybind11::arg("axis"),
+      "Return the origin on the specified ``axis``");
     imagemeta.def("origin",
-      (const double * (Class::*)( )const)(&Class::origin));
+      (const double * (Class::*)( )const)(&Class::origin),
+      "Return the origin on all axes");
 
 
-    imagemeta.def("projection_id", &Class::projection_id);
-    imagemeta.def("id",            &Class::id);
-    imagemeta.def("n_dims",        &Class::n_dims);
-    imagemeta.def("total_voxels",  &Class::total_voxels);
-    imagemeta.def("total_volume",  &Class::total_volume);
+    imagemeta.def("projection_id", &Class::projection_id, "Return the projection ID.");
+    imagemeta.def("id",            &Class::id, "Same as projection_id.");
+    imagemeta.def("n_dims",        &Class::n_dims, "Return the total number of dimensions.");
+    imagemeta.def("total_voxels",  &Class::total_voxels, "Return the total number of voxels in this ImageMeta.");
+    imagemeta.def("total_volume",  &Class::total_volume, "Return the total volume of this ImageMeta.");
 
     imagemeta.def("voxel_dimensions",
-      (double (Class::*)( size_t ) const)(&Class::voxel_dimensions));
+      (double (Class::*)( size_t ) const)(&Class::voxel_dimensions), pybind11::arg("axis"),
+      "Return the voxel dimension along ``axis``.");
     imagemeta.def("voxel_dimensions",
-      (std::vector<double> (Class::*)( )const)(&Class::voxel_dimensions));
+      (std::vector<double> (Class::*)( )const)(&Class::voxel_dimensions),
+      "Return the voxel dimensions along all axes.");
 
 
-    imagemeta.def("unit",         &Class::unit);
+    imagemeta.def("unit",         &Class::unit, "Return the unit of this ImageMeta.");
 
     imagemeta.def("compress",
-      (Class (Class::*)(std::array<size_t, dimension> ) const)(&Class::compress));
+      (Class (Class::*)(std::array<size_t, dimension> ) const)(&Class::compress), 
+      pybind11::arg("compression"),
+      R"pbdoc(
+      Compress the image meta by a unique ``compression`` factor along each axis. 
+      Compession only affects voxel size. Compression factor must be an integer > 0.
+      )pbdoc");
     imagemeta.def("compress",
-      (Class (Class::*)(size_t)const)(&Class::compress));
+      (Class (Class::*)(size_t)const)(&Class::compress),
+      pybind11::arg("compression"),
+      R"pbdoc(
+      Compress the image meta by the same ``compression`` factor along each axis. 
+      Compession only affects voxel size. Compression factor must be an integer > 0.
+      )pbdoc");
+
 
 
     imagemeta.def("index",
-      (size_t (Class::*)( const std::vector<size_t> & ) const)(&Class::index));
+      (size_t (Class::*)( const std::vector<size_t> & ) const)(&Class::index),
+      pybind11::arg("coordinate"),
+      "Convert the 1D ``coordinate`` vector to a single index location.  Similar to `numpy.ravel`.");
     imagemeta.def("index",
-      (void (Class::*)(const std::vector<size_t> &, std::vector<size_t> & )const)(&Class::index));
+      (void (Class::*)(const std::vector<size_t> &, std::vector<size_t> & )const)(&Class::index),
+      R"pbdoc(
+      "Convert the flattened, multi-coordinate vector to a single index 
+      location.  Similar to ``numpy.ravel``.  Coordinates is flattened 
+      here as [x0, y0, z0, x1, y1, z1, x2, y2, z2, x3 ....]."
+      )pbdoc");
+
 
     imagemeta.def("coordinates",
-      (std::vector<size_t> (Class::*)( size_t ) const)(&Class::coordinates));
+      (std::vector<size_t> (Class::*)( size_t ) const)(&Class::coordinates),
+      pybind11::arg("index"),
+      "Convert single-value index to coordinates vector. Similar to ``numpy.unravel``.");
     imagemeta.def("coordinates",
-      (void (Class::*)(const std::vector<size_t> &, std::vector<size_t> & )const)(&Class::coordinates));
-    imagemeta.def("coordinate", &Class::coordinate);
+      (void (Class::*)(const std::vector<size_t> &, std::vector<size_t> & )const)(&Class::coordinates),
+      pybind11::arg("index"), pybind11::arg("output_coordinates"),
+      R"pbdoc(
+      "Convert a vector of indexes to coordinate 
+      location.  Similar to `numpy.unravel`.  Coordinates is flattened 
+      here as [x0, y0, z0, x1, y1, z1, x2, y2, z2, x3 ....]."
+      )pbdoc");
+    imagemeta.def("coordinate", &Class::coordinate,
+      pybind11::arg("index"), pybind11::arg("axis"),
+      "Convert single-value index to coordinate along specified ``axis``.");
 
     imagemeta.def("position",
-      (std::vector<double> (Class::*)(size_t) const)(&Class::position));
+      (std::vector<double> (Class::*)(size_t) const)(&Class::position),
+      pybind11::arg("index"),
+      "Provide absolute position of the center of a specified pixel ``index``.");
     imagemeta.def("position",
-      (std::vector<double> (Class::*)(const std::vector<size_t> & )const)(&Class::position));
+      (std::vector<double> (Class::*)(const std::vector<size_t> & )const)(&Class::position),
+      pybind11::arg("coordinates"),
+      "Provide absolute position of the center of a specified pixel ``coordinates``.");
+
 
     imagemeta.def("position",
-      (double (Class::*)(size_t, size_t) const)(&Class::position));
+      (double (Class::*)(size_t, size_t) const)(&Class::position),
+      pybind11::arg("index"), pybind11::arg("axis"),
+      "Provide absolute position of the center of a specified pixel ``index`` along ``axis``.");
+
     imagemeta.def("position",
-      (double (Class::*)(const std::vector<size_t> & , size_t)const)(&Class::position));
+      (double (Class::*)(const std::vector<size_t> & , size_t)const)(&Class::position),
+      pybind11::arg("coordinates"), pybind11::arg("axis"),
+      "Provide absolute position of the center of a specified pixel ``coordinates`` along ``axis``.");
 
 
     imagemeta.def("min",
-      (double (Class::*)( size_t ) const)(&Class::min));
+      (double (Class::*)( size_t ) const)(&Class::min),
+      pybind11::arg("axis"),
+      "Return the minimum of the ImageMeta space along specified ``axis``.");
     imagemeta.def("min",
-      (std::vector<double> (Class::*)( )const)(&Class::min));
+      (std::vector<double> (Class::*)( )const)(&Class::min),
+      "Return the minimum of the ImageMeta space across all axes.");
 
     imagemeta.def("max",
-      (double (Class::*)( size_t ) const)(&Class::max));
+      (double (Class::*)( size_t ) const)(&Class::max),
+      pybind11::arg("axis"),
+      "Return the maximum of the ImageMeta space along specified ``axis``."
+      );
     imagemeta.def("max",
-      (std::vector<double> (Class::*)( )const)(&Class::max));
+      (std::vector<double> (Class::*)( )const)(&Class::max),
+      "Return the maximum of the ImageMeta space across all axes.");
 
-    imagemeta.def("position_to_index", &Class::position_to_index);
+    imagemeta.def("position_to_index", &Class::position_to_index,
+      pybind11::arg("position"),
+      "Return the index of the voxel that contains specified ``position``.");
     imagemeta.def("position_to_coordinate",
-      (std::vector<size_t> (Class::*)(const std::vector<double> &) const)(&Class::position_to_coordinate));
+      (std::vector<size_t> (Class::*)(const std::vector<double> &) const)(&Class::position_to_coordinate),
+      pybind11::arg("position"),
+      "Return the coordinates of the voxel that contains specified ``position``.");
     imagemeta.def("position_to_coordinate",
-      (size_t (Class::*)(double, size_t  ) const)(&Class::position_to_coordinate));
+      (size_t (Class::*)(double, size_t  ) const)(&Class::position_to_coordinate),
+      pybind11::arg("position"),
+      pybind11::arg("axis"),
+      "Return the coordinate of the voxel that contains specified ``position``, along specified ``axis``.");
 
     imagemeta.def("set_dimension", &Class::set_dimension,
       pybind11::arg("axis"),
       pybind11::arg("image_size"),
       pybind11::arg("number_of_voxels"),
-      pybind11::arg("origin")=0);
-    imagemeta.def("set_projection_id", &Class::set_projection_id);
-    imagemeta.def("is_valid", &Class::is_valid);
+      pybind11::arg("origin")=0,
+      "Set the dimension properties of ``image_size``, ``number_of_voxels``, and ``origin`` for the specified ``axis``.");
+    imagemeta.def("set_projection_id", &Class::set_projection_id, 
+      pybind11::arg("id"), "Set the projection ID for this ImageMeta.");
+    imagemeta.def("is_valid", &Class::is_valid,
+      "Check if this ImageMeta is valid.");
 
-    imagemeta.def("dump",     &Class::dump);
-    imagemeta.def("__repr__", &Class::dump);
+    imagemeta.def("dump",     &Class::dump,
+      "Return a string representation of this ImageMeta.");
+    imagemeta.def("__repr__", &Class::dump,
+      "Return a string representation of this ImageMeta.");
 
 }
 

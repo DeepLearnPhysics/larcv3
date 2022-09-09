@@ -365,6 +365,40 @@ void init_tensor_base(pybind11::module m){
 
   using Class = larcv3::Tensor<dimension>;
   pybind11::class_<Class> tensor(m, larcv3::as_string<Class>().c_str());
+
+  tensor.doc() = R"pbdoc(
+  Tensor
+  =======
+
+  A Tensor is a densely stored, memory-contiguous representation of image-like data.
+  Tensors have ImageMeta associated to them to provide external context for the image.
+  In this case, the coordinates of a pixel (X/Y/Z ...) map to a 1D index through the ImageMeta
+  interface, and are identical to the indexing required in various array interfaces.
+
+  For example, a set of coordinates in 2D (for example) x and y might map to an index through
+  the ImageMeta object.  In that case, the following techniques should provide identical data:
+
+  >>> # Access directly:
+  >>> tensor.pixel((x,y)) # use the pixel method of the tensor.
+
+  >>> # Same as numpy:
+  >>> tensor.as_array[x][y] # convert this tensor to numpy and access with numpy's array indexing.
+  
+  >>> # Using indexes:
+  >>> index = tensor.meta().index((x,y)) # get the index from the image meta
+  >>> tensor.pixel(index) # access the pixel via the index
+
+  >>> # Using numpy methods:
+  >>> dims = tensor.meta.number_of_voxels()
+  >>> index = numpy.ravel_multi_index((x,y), dims)
+  >>> tensor.pixel(index) # use numpy constructed index to get the data directly
+
+
+  The availablitity of both interfaces is to serve as a bridge between ``numpy.ndarray`` and
+  SparseTensors, which have only the ``index``-style access (through Voxel IDs).  
+
+  )pbdoc";
+
   tensor.def(pybind11::init<>());
   tensor.def(pybind11::init<const std::vector<size_t> &> ());
   tensor.def(pybind11::init<const larcv3::ImageMeta<dimension>& > ());
@@ -372,26 +406,55 @@ void init_tensor_base(pybind11::module m){
   tensor.def(pybind11::init<const larcv3::Tensor<dimension>&> ());
   tensor.def(pybind11::init<pybind11::array_t<float, pybind11::array::c_style>> ());
 
-  tensor.def("reset",                                      &Class::reset);
-  tensor.def("size",                                       &Class::size);
+  tensor.def("reset",                                      &Class::reset,
+    "Reset the Tensor to an empty state.");
+  tensor.def("size",                                       &Class::size,
+   "Return the total number of points in the data array." );
   tensor.def("pixel",
-    (float (Class::*)(const std::vector<size_t> & ) const)(&Class::pixel));
+    (float (Class::*)(const std::vector<size_t> & ) const)(&Class::pixel),
+    pybind11::arg("coordinates"),
+    "Access a pixel via a list of coordinates.");
   tensor.def("pixel", 
-    (float (Class::*)(size_t ) const)(                     &Class::pixel));
-  tensor.def("meta",                                       &Class::meta);
-  tensor.def("as_vector",                                  &Class::as_vector);
+    (float (Class::*)(size_t ) const)(                     &Class::pixel),
+    pybind11::arg("index"),
+    "Access the pixel at a specified index.");
+  tensor.def("meta",                                       &Class::meta,
+    "Get the meta of this tensor.");
+  tensor.def("as_vector",                                  &Class::as_vector,
+    "Get the single-dimensioned array of memory-contiguous data.");
   tensor.def("set_pixel",
-    (void (Class::*)(const std::vector<size_t> &, float ))(&Class::set_pixel));
+    (void (Class::*)(const std::vector<size_t> &, float ))(&Class::set_pixel),
+    pybind11::arg("coordinates"), pybind11::arg("value"),
+    "Set an individual pixel's ``value`` at ``coordinates``. ");
   tensor.def("set_pixel", 
-    (void (Class::*)( size_t, float  ))(                   &Class::set_pixel));
-  tensor.def("paint",                                      &Class::paint);
-  tensor.def("threshold",                                  &Class::threshold);
-  tensor.def("binarize",                                   &Class::binarize);
-  tensor.def("clear_data",                                 &Class::clear_data);
+    (void (Class::*)( size_t, float  ))(                   &Class::set_pixel),
+    pybind11::arg("index"), pybind11::arg("value"),
+    "Set an individual pixel's ``value`` at ``index``. "
+    );
+  tensor.def("paint",                                      &Class::paint,
+    pybind11::arg("value"),
+    "Set ALL pixels to the specified ``value``.");
+  tensor.def("threshold",                                  &Class::threshold,
+    pybind11::arg("threshold"), pybind11::arg("lower")=true,
+    "If ``lower`` is true, this is minimum threshold.  Otherwise, this is a maximum threshold.");
+
+  tensor.def("binarize",                                   &Class::binarize,
+    pybind11::arg("threshold"), pybind11::arg("lower"), pybind11::arg("upper"),
+    "Replace all pixels with either the ``lower`` or ``upper`` value, based on ``threshold``.");
+  tensor.def("clear_data",                                 &Class::clear_data,
+    "Set the image data to 0."
+    );
   tensor.def("compress",
-    (Class (Class::*)(std::array<size_t, dimension> compression, larcv3::PoolType_t)const)(&Class::compress));
+    (Class (Class::*)(std::array<size_t, dimension> compression, larcv3::PoolType_t)const)(&Class::compress),
+      pybind11::arg("compression"), pybind11::arg("pooltype"),
+      "Return a new tensor that is compressed/downsampled according to the PoolType, with ``compression`` unique per axis.");
+
+
   tensor.def("compress", 
-    (Class (Class::*)( size_t, larcv3::PoolType_t ) const)( &Class::compress));
+    (Class (Class::*)( size_t, larcv3::PoolType_t ) const)( &Class::compress),
+    pybind11::arg("compression"), pybind11::arg("pool_type"),
+    "Return a new tensor that is compressed/downsampled equally along all axes."
+    );
 
   tensor.def(pybind11::self += float());
   tensor.def(pybind11::self + float());
@@ -406,11 +469,16 @@ void init_tensor_base(pybind11::module m){
   tensor.def(pybind11::self += pybind11::self);
 
   tensor.def("eltwise",
-    (void (Class::*)(const Class& rhs ))(&Class::eltwise));
+    (void (Class::*)(const Class& rhs ))(&Class::eltwise),
+    pybind11::arg("other"),
+    "Element wise multiplication with another array.  Equivalent to dot product in 1D.");
   tensor.def("eltwise", 
-    (void (Class::*)( const std::vector<float>&, bool  ))(&Class::eltwise));
+    (void (Class::*)( const std::vector<float>&, bool  ))(&Class::eltwise),
+    pybind11::arg("other"), pybind11::arg("allow_longer") = false,
+    "Element wise multiplication with another array.  Equivalent to dot product in 1D.");
 
-  tensor.def("as_array", &Class::as_array);
+  tensor.def("as_array", &Class::as_array,
+    "Return the numpy view of this tensor.");
   
 
 }

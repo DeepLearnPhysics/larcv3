@@ -64,64 +64,36 @@ namespace larcv3 {
 
 
 void init_logger(pybind11::module m){
-      pybind11::class_<larcv3::logger>(m, "logger")
-        .def(pybind11::init<const std::string &>(),pybind11::arg("name")="no_name")
-             // pybind11::arg("name")="no_name")
-        // .def("logger", &larcv3::logger::logger)
-        // .def("set_verbosity", &larcv3::logger::set_verbosity)
-        .def("name", &larcv3::logger::name)
-        .def("set", &larcv3::logger::set)
-        .def("level", &larcv3::logger::level)
-        .def(pybind11::self < pybind11::self)
-        .def("get", &larcv3::logger::get)
-        .def("get_shared", &larcv3::logger::get_shared)
-        // .def("default_level", (larcv3::msg::Level_t (larcv3::logger::*)()) &larcv3::logger::default_level)
-        // .def("default_level", (void (larcv3::logger::*)(larcv3::msg::Level_t)) &larcv3::logger::default_level)
-        ;
+      pybind11::class_<larcv3::logger> logger(m, "logger");
 
-        ///TODO Finish the implementation of the functions here
+      logger.doc() = 
+      R"pbdoc(
+        logger
+        ------
+
+        C++ native logger utility, used to manage log messages from the C++ application code.
+
+        For python logging, use the standard `logging` utilities.
+      )pbdoc";
+
+      logger.def(pybind11::init<const std::string &>(),pybind11::arg("name")="no_name",
+      R"pbdoc(
+        Construct a logger with a specified name.
+      )pbdoc");
+      logger.def("name", &larcv3::logger::name,
+      R"pbdoc(
+        Get the name associated with this logger.
+      )pbdoc");
+      logger.def("set", &larcv3::logger::set, pybind11::arg("level"),
+      R"pbdoc(
+          Set the level of this logger.
+      )pbdoc");
+      logger.def("level", &larcv3::logger::level,
+      R"pbdoc(
+          Get the level of this logger.
+      )pbdoc");
+
 }
-
-/*
-
-    
-
-
-    /// Default logger level getter
-    static msg::Level_t default_level() { return _level_default; }
-    /// Default logger level setter (only affect future loggers)
-    static void default_level(msg::Level_t l) { _level_default = l; }
-    /// Force all loggers to change level
-    static void force_level(msg::Level_t l)
-    {
-      default_level(l);
-      for(auto& name_logger : *_logger_m) name_logger.second.set(l);
-    }
-  
-    //
-    // Verbosity level checker
-    //
-    inline bool debug   () const { return _level <= msg::kDEBUG;   }
-    inline bool info    () const { return _level <= msg::kINFO;    }
-    inline bool normal  () const { return _level <= msg::kNORMAL;  }
-    inline bool warning () const { return _level <= msg::kWARNING; }
-    inline bool error   () const { return _level <= msg::kERROR;   }
-    /// Formatted message (simplest)
-    std::ostream& send(const msg::Level_t) const;
-    /// Formatted message (function name included)
-    std::ostream& send(const msg::Level_t level,
-           const std::string& function ) const;
-    /// Formatted message (function name + line number)
-    std::ostream& send(const msg::Level_t level,
-           const std::string& function,
-           const unsigned int line_num ) const;
-    /// Formatted message (function name + line number + file name)
-    std::ostream& send(const msg::Level_t level,
-           const std::string& function,
-           const unsigned int line_num,
-           const std::string& file_name) const;
-    
-*/
 
 
 #endif

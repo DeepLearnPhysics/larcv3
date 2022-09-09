@@ -593,12 +593,29 @@ void init_voxel_core(pybind11::module m){
     using VSA = larcv3::VoxelSetArray;
 
     pybind11::class_<V> voxel(m, "Voxel");
+
+    voxel.doc() = R"pbdoc(
+    Voxel
+    -------
+
+    A pair of (id, value) that represents a single point of sparse data.
+    The ID is unraveled into spatial coordinates or positions via an ImageMeta
+    object, and ImageMeta can be used to determine the correct ID for a specified position.
+
+    Value can be any floating point value; by default, IDs without voxels are interpreted as 0.0,
+    but you may also store 0.0 directly if the empty voxels will have a different interpretation.
+
+    )pbdoc";
+
     voxel.def(pybind11::init<larcv3::VoxelID_t, float>(),
       pybind11::arg("id")    = larcv3::kINVALID_VOXELID,
-      pybind11::arg("value") = larcv3::kINVALID_FLOAT);
-    voxel.def("id",    &V::id);
-    voxel.def("value", &V::value);
-    voxel.def("set",   &V::set);
+      pybind11::arg("value") = larcv3::kINVALID_FLOAT,
+      "Construct a new voxel.  If no arguments are supplied, default (invalid) values are used.");
+    voxel.def("id",    &V::id, "Get the ID of this voxel.");
+    voxel.def("value", &V::value, "Get the value of this voxel.");
+    voxel.def("set",   &V::set,
+      pybind11::arg("id"), pybind11::arg("value"),
+      "Set the ``id`` and ``value`` of this voxel.");
     voxel.def(pybind11::self += float());
     voxel.def(pybind11::self -= float());
     voxel.def(pybind11::self *= float());
@@ -616,27 +633,62 @@ void init_voxel_core(pybind11::module m){
     voxel.def(pybind11::self >= float());
 
     pybind11::class_<VS> voxelset(m, "VoxelSet");
+
+    voxelset.doc() =  R"pbdoc(
+    VoxelSet
+    ----------
+
+    A VoxelSet is a sorted collection of Voxels that belong together.  There is no ImageMeta associated
+    with a VoxelSet, but when combined with an ImageMeta it is a SparseTensor (with a dimension).
+
+    VoxelSet implements several convienence methods for manipulating all voxels in the collection at once,
+    for thresholding, reductions (min/max/sum), and adding voxels.
+
+    )pbdoc";
+
+
     voxelset.def(pybind11::init<>());
 
-    voxelset.def("id",             (larcv3::InstanceID_t (VS::*)() const)(&VS::id));
-    voxelset.def("id",             (void (VS::*)(const larcv3::InstanceID_t))(&VS::id));
-    voxelset.def("as_vector",      &VS::as_vector);
-    voxelset.def("find",           &VS::find);
-    voxelset.def("sum",            &VS::sum);
-    voxelset.def("mean",           &VS::mean);
-    voxelset.def("max",            &VS::max);
-    voxelset.def("min",            &VS::min);
-    voxelset.def("size",           &VS::size);
-    voxelset.def("set",            &VS::set);
-    voxelset.def("values",         &VS::values);
-    voxelset.def("indexes",        &VS::indexes);
-    voxelset.def("clear_data",     &VS::clear_data);
-    voxelset.def("reserve",        &VS::reserve);
-    voxelset.def("threshold",      &VS::threshold);
-    voxelset.def("threshold_min",  &VS::threshold_min);
-    voxelset.def("threshold_max",  &VS::threshold_max);
-    voxelset.def("add",            &VS::add);
-    voxelset.def("insert",         &VS::insert);
+    voxelset.def("id",             (larcv3::InstanceID_t (VS::*)() const)(&VS::id),
+      "Return the ID Of this VoxelSet");
+    voxelset.def("id",             (void (VS::*)(const larcv3::InstanceID_t))(&VS::id),
+      "Set the ID Of this VoxelSet");
+    voxelset.def("as_vector",      &VS::as_vector,
+      "Return the vector of ``voxels`` held by this set.");
+    voxelset.def("find",           &VS::find,
+      pybind11::arg("id"),
+      "Find the voxel in the set with specified ``id``.  If no matching voxel is found, the Invalid Voxel is returned."
+      );
+    voxelset.def("sum",            &VS::sum, "Return the sum of the voxel set.");
+    voxelset.def("mean",           &VS::mean, "Return the mean of the voxel set.");
+    voxelset.def("max",            &VS::max, "Return the max of the voxel set.");
+    voxelset.def("min",            &VS::min, "Return the min of the voxel set.");
+    voxelset.def("size",           &VS::size, "Return the size of the voxel set.");
+    voxelset.def("set",            &VS::set,
+      pybind11::arg("indexes"), pybind11::arg("values"),
+      R"pbdoc(
+      Set the indexes and values of this VoxelSet in one step.
+      ``indexes`` and ``values`` are expected to be ``numpy`` arrays of the same length
+      and suitable dtypes.
+      )pbdoc"
+      );
+    voxelset.def("values",         &VS::values, "Get the values of all voxels in this set.");
+    voxelset.def("indexes",        &VS::indexes, "Get the indexes of all voxels in this set.");
+    voxelset.def("clear_data",     &VS::clear_data, "Remove all voxels from this set.");
+    voxelset.def("reserve",        &VS::reserve, 
+      pybind11::arg("num"),
+      "Reserve space for ``num`` voxels in this set.");
+    voxelset.def("threshold",      &VS::threshold,
+      pybind11::arg("min"), pybind11::arg("max"),
+      "Remove all voxels from this set where value < ``min`` or ``value`` > max.");
+    voxelset.def("threshold_min",  &VS::threshold_min,
+      pybind11::arg("min"),
+      "Remove all voxels from this set where value < ``min``");
+    voxelset.def("threshold_max",  &VS::threshold_max,
+      pybind11::arg("min"),
+      "Remove all voxels from this set where value > ``max``");
+    voxelset.def("add",            &VS::add, "Add a new voxel.  If voxel already exists at that id, values are **added**");
+    voxelset.def("insert",         &VS::insert, "Insert a new voxel.  If voxel already exists at that id, value **updated** with new value.");
     voxelset.def("emplace",        (void (VS::*)(larcv3::VoxelID_t, float, const bool))(&VS::emplace));
 
 
@@ -648,21 +700,56 @@ void init_voxel_core(pybind11::module m){
     /// Voxel Set Array
 
     pybind11::class_<VSA> voxelsetarray(m, "VoxelSetArray");
+
+    voxelsetarray.doc() = R"pbdoc(
+    VoxelSetArray
+    --------------
+
+    A VoxelSetArray is a collection of VoxelSets that belong together.  There is no ImageMeta associated
+    with a VoxelSetArray, but when combined with an ImageMeta it is a SparseCluster (with a dimension).
+
+    VoxelSetArray implements several convienence methods for manipulating all voxels in the collection at once,
+    for thresholding, reductions (min/max/sum), and adding voxels.
+
+    )pbdoc";
+
     voxelsetarray.def(pybind11::init<>());
-    voxelsetarray.def("size",                 &VSA::size);
-    voxelsetarray.def("voxel_set",            &VSA::voxel_set);
-    voxelsetarray.def("as_vector",            &VSA::as_vector);
-    voxelsetarray.def("sum",                  &VSA::sum);
-    voxelsetarray.def("mean",                 &VSA::mean);
-    voxelsetarray.def("max",                  &VSA::max);
-    voxelsetarray.def("min",                  &VSA::min);
-    voxelsetarray.def("clear_data",           &VSA::clear_data);
-    voxelsetarray.def("resize",               &VSA::resize);
-    voxelsetarray.def("threshold",            &VSA::threshold);
-    voxelsetarray.def("threshold_min",        &VSA::threshold_min);
-    voxelsetarray.def("threshold_max",        &VSA::threshold_max);
-    voxelsetarray.def("writeable_voxel_set",  &VSA::writeable_voxel_set);
-    voxelsetarray.def("insert",               &VSA::insert);
+    voxelsetarray.def("size",                 &VSA::size,
+      "Return the total number of VoxelSets in this VoxelSetArray.");
+    voxelsetarray.def("voxel_set",            &VSA::voxel_set,
+      pybind11::arg("id"),
+      "Return the VoxelSet at specified ``id``.");
+    voxelsetarray.def("as_vector",            &VSA::as_vector,
+      "Return all the VoxelSets as a vector.");
+    voxelsetarray.def("sum",                  &VSA::sum,
+      "Return the sum of all voxels in all voxel sets");
+    voxelsetarray.def("mean",                 &VSA::mean,
+      "Return the mean of all voxels in all voxel sets");
+    voxelsetarray.def("max",                  &VSA::max,
+      "Return the max of all voxels in all voxel sets");
+    voxelsetarray.def("min",                  &VSA::min,
+      "Return the min of all voxels in all voxel sets");
+    voxelsetarray.def("clear_data",           &VSA::clear_data,
+      "Clear all data.");
+    voxelsetarray.def("resize",               &VSA::resize,
+      "Change the size of this VoxelSetArray.");
+    voxelsetarray.def("threshold",            &VSA::threshold,
+      pybind11::arg("min"), pybind11::arg("max"),
+      "Remove all voxels from this array where value < ``min`` or ``value`` > max.");
+    voxelsetarray.def("threshold_min",        &VSA::threshold_min,
+      pybind11::arg("min"),
+      "Remove all voxels from this set where value < ``min``");
+    voxelsetarray.def("threshold_max",        &VSA::threshold_max,
+      pybind11::arg("min"),
+      "Remove all voxels from this set where value > ``max``");
+
+    voxelsetarray.def("writeable_voxel_set",  &VSA::writeable_voxel_set,
+      pybind11::arg("id"),
+      "Access a modifiable VoxelSet at ``id``");
+    voxelsetarray.def("insert",               &VSA::insert,
+      pybind11::arg("voxel_set"),
+      "Insert a VoxelSet into the array."
+      );
 
 /*
   Not wrapped:
@@ -684,18 +771,49 @@ void init_sparse_tensor(pybind11::module m){
     using ST = larcv3::SparseTensor<dimension>;
     std::string classname = larcv3::as_string<larcv3::SparseTensor<dimension>>();
     pybind11::class_<ST, larcv3::VoxelSet> sparsetensor(m, classname.c_str());
+
+    sparsetensor.doc() = R"pbdoc(
+    SparseTensor
+    ==============
+
+    A SparseTensor is a VoxelSet + an ImageMeta to map voxel ids to spatial locations. Available
+    in 2D and 3D.
+
+    SparseTensor inherits from VoxelSet and has an ImageMeta attribute, so any methods available
+    in VoxelSet to manipulate the voxels are available here.
+
+    )pbdoc";
+
     sparsetensor.def(pybind11::init<>());
-    sparsetensor.def("meta", (const larcv3::ImageMeta<dimension>& (ST::*)() const )(&ST::meta), pybind11::return_value_policy::reference);
-    sparsetensor.def("meta", (void (ST::*)(const larcv3::ImageMeta<dimension>&, bool )  )(&ST::meta), pybind11::arg("meta"), pybind11::arg("check") = true, pybind11::return_value_policy::reference);
-    sparsetensor.def("emplace", (void (ST::*)(const larcv3::Voxel &, const bool))(&ST::emplace));
-    sparsetensor.def("set",        &ST::set);
-    sparsetensor.def("clear_data", &ST::clear_data);
-    sparsetensor.def("dense",      &ST::dense);
-    sparsetensor.def("to_tensor",  &ST::to_tensor);
+    sparsetensor.def("meta", 
+      (const larcv3::ImageMeta<dimension>& (ST::*)() const )(&ST::meta), 
+      pybind11::return_value_policy::reference,
+      "Get the meta for this SparseTensor.");
+    sparsetensor.def("meta", (void (ST::*)(const larcv3::ImageMeta<dimension>&, bool )  )(&ST::meta), 
+      pybind11::arg("meta"), pybind11::arg("check") = true, 
+      pybind11::return_value_policy::reference,
+      "Set the image meta, optionally check if it is valid (default ``true``.");
+    sparsetensor.def("emplace", (void (ST::*)(const larcv3::Voxel &, const bool))(&ST::emplace),
+      "Add a new voxel.");
+    sparsetensor.def("set",        &ST::set,
+      pybind11::arg("voxel_set"), pybind11::arg("meta"),
+      "Set the ``voxel_set`` and the ``meta`` simultaneously. ");
+    sparsetensor.def("clear_data", &ST::clear_data,
+      "Clear all voxels and reset the ImageMeta.");
+    sparsetensor.def("dense",      &ST::dense,
+      "Convert this data to a dense representation and return as a ``numpy.ndarray``.");
+    sparsetensor.def("to_tensor",  &ST::to_tensor,
+      "Return the data in this SparseTensor as a corresponding dense Tensor.");
     sparsetensor.def("compress",
-      (ST (ST::*)(std::array<size_t, dimension> compression, larcv3::PoolType_t)const)(&ST::compress));
+      (ST (ST::*)(std::array<size_t, dimension> compression, larcv3::PoolType_t)const)(&ST::compress),
+      pybind11::arg("compression"), pybind11::arg("pooltype"),
+      "Return a new sparse tensor that is compressed/downsampled according to the PoolType, with ``compression`` unique per axis."
+      );
     sparsetensor.def("compress",
-      (ST (ST::*)( size_t, larcv3::PoolType_t ) const)( &ST::compress));
+      (ST (ST::*)( size_t, larcv3::PoolType_t ) const)( &ST::compress),
+      pybind11::arg("compression"), pybind11::arg("pooltype"),
+      "Return a new sparse tensor that is compressed/downsampled equally along all axes."
+      );
 
 /*
   Not wrapped:

@@ -112,6 +112,16 @@ void init_vertex(pybind11::module m){
 
     // using larcv3::Vertex = larcv3::Vertex;
     pybind11::class_<larcv3::Vertex> vertex(m, "Vertex");
+    
+    vertex.doc() = R"pbdoc(
+    Vertex
+    ======
+
+    A ``vertex`` is a 3+1 dimensional object representing a point in 3D space, at a particular time.
+
+
+    )pbdoc";
+
     vertex.def(pybind11::init<>());
     vertex.def(pybind11::init<double, double, double, double>());
     vertex.def("reset", (void (larcv3::Vertex::*)())(&larcv3::Vertex::reset), "Reset");
@@ -120,13 +130,17 @@ void init_vertex(pybind11::module m){
     vertex.def("y", &larcv3::Vertex::y);
     vertex.def("z", &larcv3::Vertex::z);
     vertex.def("t", &larcv3::Vertex::t);
-    vertex.def("as_point2d", &larcv3::Vertex::as_point2d);
-    vertex.def("as_point3d", &larcv3::Vertex::as_point3d);
+    vertex.def("as_point2d", &larcv3::Vertex::as_point2d,
+      pybind11::arg("PointType"), "Convert 2 coordinates to a Point2D.");
+    vertex.def("as_point3d", &larcv3::Vertex::as_point3d,
+      "Convert x/y/z coordinates to a Point3D.");
     vertex.def(pybind11::self == pybind11::self);
     vertex.def(pybind11::self != pybind11::self);
     vertex.def(pybind11::self < pybind11::self);
-    vertex.def("dump", &larcv3::Vertex::dump);
-    vertex.def("__repr__",&larcv3::Vertex::dump);
+    vertex.def("dump", &larcv3::Vertex::dump,
+      "Return the string representation.");
+    vertex.def("__repr__",&larcv3::Vertex::dump,
+      "Return the string representation.");
 
 
 /*
