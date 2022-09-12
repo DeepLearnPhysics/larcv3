@@ -18,17 +18,20 @@ jobs:
         sudo apt-get install libhdf5-serial-dev
         pip install -r requirements.txt
         git submodule update --init
+    - name: Build manylinux Python wheels
+      uses: RalfG/python-wheels-manylinux-build@v0.5.0-manylinux2014_x86_64
+      with:
+        python-versions: 'cp36-cp36m cp37-cp37m'
+        build-requirements: 'scikit-build numpy h5py cmake'
+        system-packages: 'lrzip-devel zlib-devel'
+        # pre-build-command: 'sh pre-build-script.sh'
+        # package-path: 'my_project'
+        # pip-wheel-args: '-w ./dist --no-deps'
     - name: Build and publish Source Dist
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        python setup.py build -j 1
         python setup.py sdist
         twine upload dist/*
-    - name: build and upload manylinux wheels
-      env:
-        TWINE_USERNAME: coreyjadams
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      uses: Niraj-Kamdar/manylinux-wheel-builder@master
 
