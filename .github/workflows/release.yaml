@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: actions/setup-python@v2
     - name: Install dependencies
       run: |
@@ -26,3 +26,4 @@ jobs:
         python setup.py build -j 1
         python setup.py sdist
         twine upload dist/*
+

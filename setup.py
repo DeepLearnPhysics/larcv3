@@ -44,13 +44,12 @@ else:
     
 # Speed up the build if not directly set:    
 if 'MAKEFLAGS' not in os.environ: 
-    os.environ['MAKEFLAGS'] = "-j"
+    os.environ['MAKEFLAGS'] = "-j 1" # This lets builds on CI work better.
     
 setup(
     name="larcv",
     version=verstr,
     cmake_source_dir='src/',
-    use_scm_version=True,
     include_package_data=True,
     cmake_args=[
         '-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.9',
@@ -73,8 +72,10 @@ setup(
     scripts=['bin/merge_larcv3_files.py', 'bin/run_processor.py'],
     packages=['larcv','src/pybind11'],
     install_requires=[
-        'numpy',
-        'scikit-build',
+        "numpy",
+        "scikit-build",
+        "h5py",
+        "cmake",
     ],
     long_description=long_description,
     long_description_content_type='text/markdown',
