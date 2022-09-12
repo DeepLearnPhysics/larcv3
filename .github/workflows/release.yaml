@@ -21,9 +21,9 @@ jobs:
     - name: Build manylinux Python wheels
       uses: RalfG/python-wheels-manylinux-build@v0.5.0-manylinux2014_x86_64
       with:
-        python-versions: 'cp36-cp36m cp37-cp37m'
+        python-versions: 'cp37-cp37m'
         build-requirements: 'scikit-build numpy h5py cmake'
-        system-packages: 'hdf5-devel python-devel'
+        system-packages: 'hdf5-devel python37-devel'
         # pre-build-command: 'sh pre-build-script.sh'
         # package-path: 'my_project'
         # pip-wheel-args: '-w ./dist --no-deps'
