@@ -18,7 +18,7 @@ jobs:
         sudo apt-get install libhdf5-serial-dev
         pip install -r requirements.txt
         git submodule update --init
-    - name: Build and publish
+    - name: Build and publish Source Dist
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
@@ -26,4 +26,9 @@ jobs:
         python setup.py build -j 1
         python setup.py sdist
         twine upload dist/*
+    - name: build and upload manylinux wheels
+      env:
+        TWINE_USERNAME: coreyjadams
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      uses: Niraj-Kamdar/manylinux-wheel-builder@master
 
