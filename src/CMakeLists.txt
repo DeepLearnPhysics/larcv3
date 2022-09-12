@@ -63,7 +63,7 @@ include_directories(json/include)
 if(CMAKE_PYTHON_BINDINGS)
   
   # Many packages need python:
-  find_package(Python ${CMAKE_PYVERSION} EXACT REQUIRED COMPONENTS  Interpreter Development)
+  find_package(Python ${CMAKE_PYVERSION} REQUIRED COMPONENTS  Interpreter Development)
   include_directories(${Python_INCLUDE_DIRS})
 
   message("Adding pybind11")
