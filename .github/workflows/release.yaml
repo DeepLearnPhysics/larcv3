@@ -23,7 +23,7 @@ jobs:
       with:
         python-versions: 'cp36-cp36m cp37-cp37m'
         build-requirements: 'scikit-build numpy h5py cmake'
-        system-packages: 'hdf5-devel'
+        system-packages: 'hdf5-devel python-devel'
         # pre-build-command: 'sh pre-build-script.sh'
         # package-path: 'my_project'
         # pip-wheel-args: '-w ./dist --no-deps'
