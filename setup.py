@@ -41,7 +41,6 @@ else:
     pybind_value='ON'
 
 
-    
 # Speed up the build if not directly set:    
 if 'MAKEFLAGS' not in os.environ: 
     os.environ['MAKEFLAGS'] = "-j 1" # This lets builds on CI work better.
