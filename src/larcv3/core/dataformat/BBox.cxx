@@ -122,29 +122,39 @@ template<size_t dimension>
 void init_bbox_instance(pybind11::module m){
     using Class = larcv3::BBox<dimension>;
     pybind11::class_<Class> bbox(m, larcv3::as_string<Class>().c_str());
-    bbox.def(pybind11::init<>());
+
+    bbox.doc() = R"pbdoc(
+      Represents a bounding box in N dimensions, defined by a centroid and half_length in each axis from the centroid.
+      The rotation component is currently not used but provided in the data store implementation for future use.
+      Used to represent, for example, the location of a particle interaction, a bounding box for an instance of an object,
+      etc.
+    )pbdoc";
+
+    bbox.def(pybind11::init<>(), "Default Constructor");
     bbox.def(pybind11::init<const std::array<double, dimension>&, 
                             const std::array<double, dimension>&,
                             const std::array<double, dimension*dimension>
                            > (),
              pybind11::arg("centroid"),
              pybind11::arg("half_length"),
-             pybind11::arg("rotation")
+             pybind11::arg("rotation"),
+             "Constructor using centroid, half_length, and rotation."
     );
     bbox.def(pybind11::init<const std::array<double, dimension>&, 
                             const std::array<double, dimension>&
                            > (),
              pybind11::arg("centroid"),
-             pybind11::arg("half_length")
+             pybind11::arg("half_length"),
+             "Constructor using centroid and half_length."
     );
 
-    bbox.def("centroid",           &Class::centroid);
-    bbox.def("half_length",        &Class::half_length);
-    bbox.def("rotation_matrix",    &Class::rotation_matrix);
-    bbox.def("identity_rotation",  &Class::identity_rotation);
+    bbox.def("centroid",           &Class::centroid, "Get the value of the centroid.");
+    bbox.def("half_length",        &Class::half_length, "Get the value of the half_length.");
+    bbox.def("rotation_matrix",    &Class::rotation_matrix, "Get the value of the rotation matrix.");
+    bbox.def("identity_rotation",  &Class::identity_rotation, "Get the value of the identity rotation.");
 
-    bbox.def("dump",               &Class::dump);
-    bbox.def("__repr__",           &Class::dump);
+    bbox.def("dump",               &Class::dump, "Return a string representation of the BBox");
+    bbox.def("__repr__",           &Class::dump, "Return a string representation of the BBox");
 
 }
 
@@ -153,6 +163,11 @@ void init_bbox_collection(pybind11::module m){
     using Class = larcv3::BBoxCollection<dimension>;
     pybind11::class_<Class> bbox_c(m, larcv3::as_string<Class>().c_str());
     bbox_c.def(pybind11::init<>());
+
+    bbox_c.doc() = R"pbdoc(
+      A collection of Bounding Boxes in N dimensions.  Generally used to represent a sequence of Bounding
+      Boxes all within the same image.
+    )pbdoc";
 
     bbox_c.def("bbox",           &Class::bbox);
     bbox_c.def("as_vector",      &Class::as_vector);

@@ -151,110 +151,227 @@ void init_particle(pybind11::module m){
 
     pybind11::class_<larcv3::Particle> particle(m, "Particle");
 
+    particle.doc() = R"pbdoc(
+
+    A Particle represents an abstract label more relevant to experimental data.  Typically created 
+    from simulation data, there are fields to hold a variety of per-particle information as well as 
+    reconstructing hierarchy information.
+
+    Technically, for storage reasons, there is an underlying "ParticleHolder" that stores the data
+    in a contiguous memory region with appropriate data types.  You can access this object directly 
+    by calling ``as_array`` and get a ``numpy`` structured array data object.
+
+    )pbdoc";
+
     particle.def(pybind11::init<>());
 
-    particle.def("id", (larcv3::ParticleIndex_t (larcv3::Particle::*)() const)(&larcv3::Particle::id));
-    particle.def("id", (void (larcv3::Particle::*)(larcv3::InstanceID_t))(&larcv3::Particle::id));
+    particle.def("id", (larcv3::ParticleIndex_t (larcv3::Particle::*)() const)(&larcv3::Particle::id),
+      "Get the id for this particle.");
+    particle.def("id", (void (larcv3::Particle::*)(larcv3::InstanceID_t))(&larcv3::Particle::id),
+      pybind11::arg("id"),
+      "Set the ``id`` for this particle.");
 
-    particle.def("shape", (larcv3::ShapeType_t (larcv3::Particle::*)() const)(&larcv3::Particle::shape));
-    particle.def("shape", (void (larcv3::Particle::*)(larcv3::ShapeType_t))(&larcv3::Particle::shape));
+    particle.def("shape", (larcv3::ShapeType_t (larcv3::Particle::*)() const)(&larcv3::Particle::shape),
+      "Get the shape for this particle.");
+    particle.def("shape", (void (larcv3::Particle::*)(larcv3::ShapeType_t))(&larcv3::Particle::shape),
+      pybind11::arg("shape"),
+      "Set the ``shape`` for this particle.");
 
-    particle.def("mcst_index", (larcv3::MCSTIndex_t (larcv3::Particle::*)() const)(&larcv3::Particle::mcst_index));
-    particle.def("mcst_index", (void (larcv3::Particle::*)(larcv3::MCSTIndex_t))(&larcv3::Particle::mcst_index));
+    particle.def("mcst_index", (larcv3::MCSTIndex_t (larcv3::Particle::*)() const)(&larcv3::Particle::mcst_index),
+      "Get the mcst_index for this particle.");
+    particle.def("mcst_index", (void (larcv3::Particle::*)(larcv3::MCSTIndex_t))(&larcv3::Particle::mcst_index),
+      pybind11::arg("mcst_index"),
+      "Set the ``mcst_index`` for this particle.");
 
-    particle.def("mct_index", (larcv3::MCTIndex_t (larcv3::Particle::*)() const)(&larcv3::Particle::mct_index));
-    particle.def("mct_index", (void (larcv3::Particle::*)(larcv3::MCTIndex_t))(&larcv3::Particle::mct_index));
+    particle.def("mct_index", (larcv3::MCTIndex_t (larcv3::Particle::*)() const)(&larcv3::Particle::mct_index),
+      "Get the mct_index for this particle.");
+    particle.def("mct_index", (void (larcv3::Particle::*)(larcv3::MCTIndex_t))(&larcv3::Particle::mct_index),
+      pybind11::arg("mct_index"),
+      "Set the ``mct_index`` for this particle.");
 
-    particle.def("nu_current_type", (short (larcv3::Particle::*)() const)(&larcv3::Particle::nu_current_type));
-    particle.def("nu_current_type", (void (larcv3::Particle::*)(short))(&larcv3::Particle::nu_current_type));
+    particle.def("nu_current_type", (short (larcv3::Particle::*)() const)(&larcv3::Particle::nu_current_type),
+      "Get the nu_current_type for this particle.");
+    particle.def("nu_current_type", (void (larcv3::Particle::*)(short))(&larcv3::Particle::nu_current_type),
+      pybind11::arg("nu_current_type"),
+      "Set the ``nu_current_type`` for this particle.");
 
-    particle.def("nu_interaction_type", (short (larcv3::Particle::*)() const)(&larcv3::Particle::nu_interaction_type));
-    particle.def("nu_interaction_type", (void (larcv3::Particle::*)(short))(&larcv3::Particle::nu_interaction_type));
+    particle.def("nu_interaction_type", (short (larcv3::Particle::*)() const)(&larcv3::Particle::nu_interaction_type),
+      "Get the nu_interaction_type for this particle.");
+    particle.def("nu_interaction_type", (void (larcv3::Particle::*)(short))(&larcv3::Particle::nu_interaction_type),
+      pybind11::arg("nu_interaction_type"),
+      "Set the ``nu_interaction_type`` for this particle.");
 
-    particle.def("track_id", (unsigned int (larcv3::Particle::*)() const)(&larcv3::Particle::track_id));
-    particle.def("track_id", (void (larcv3::Particle::*)(unsigned int))(&larcv3::Particle::track_id));
+    particle.def("track_id", (unsigned int (larcv3::Particle::*)() const)(&larcv3::Particle::track_id),
+      "Get the track_id for this particle.");
+    particle.def("track_id", (void (larcv3::Particle::*)(unsigned int))(&larcv3::Particle::track_id),
+      pybind11::arg("track_id"),
+      "Set the ``track_id`` for this particle.");
 
 
-    particle.def("pdg_code", (int (larcv3::Particle::*)() const)(&larcv3::Particle::pdg_code));
-    particle.def("pdg_code", (void (larcv3::Particle::*)(int))(&larcv3::Particle::pdg_code));
+    particle.def("pdg_code", (int (larcv3::Particle::*)() const)(&larcv3::Particle::pdg_code),
+      "Get the pdg_code for this particle.");
+    particle.def("pdg_code", (void (larcv3::Particle::*)(int))(&larcv3::Particle::pdg_code),
+      pybind11::arg("pdg_code"),
+      "Set the ``pdg_code`` for this particle.");
 
-    particle.def("momentum", &larcv3::Particle::momentum);
+    particle.def("momentum", &larcv3::Particle::momentum,
+      "Get the momentum of this particle.");
 
-    particle.def("px", &larcv3::Particle::px);
-    particle.def("py", &larcv3::Particle::py);
-    particle.def("pz", &larcv3::Particle::pz);
-    particle.def("p",  &larcv3::Particle::p);
+    particle.def("px", &larcv3::Particle::px,
+      "Get the px of this particle.");
+    particle.def("py", &larcv3::Particle::py,
+      "Get the py of this particle.");
+    particle.def("pz", &larcv3::Particle::pz,
+      "Get the pz of this particle.");
+    particle.def("p",  &larcv3::Particle::p,
+      "Get the p of this particle.");
 
     particle.def("position", (const larcv3::Vertex& (larcv3::Particle::*)() const)(&larcv3::Particle::position));
-    particle.def("position", (void (larcv3::Particle::*)(const larcv3::Vertex&))(&larcv3::Particle::position));
-    particle.def("position", (void (larcv3::Particle::*)(double,double,double,double))(&larcv3::Particle::position));
+    particle.def("position", (void (larcv3::Particle::*)(const larcv3::Vertex&))(&larcv3::Particle::position),
+      pybind11::arg("vertex"),
+      "Set the position of the particle with a ``Vertex`` object.");
+    particle.def("position", (void (larcv3::Particle::*)(double,double,double,double))(&larcv3::Particle::position),
+      pybind11::arg("x"), pybind11::arg("y"), pybind11::arg("z"), pybind11::arg("t"),
+      "Set the position of the particle with ``x``, ``y``, ``z``, ``t`` object.");
 
-    particle.def("x", &larcv3::Particle::x);
-    particle.def("y", &larcv3::Particle::y);
-    particle.def("z", &larcv3::Particle::z);
-    particle.def("t", &larcv3::Particle::t);
+    particle.def("x", &larcv3::Particle::x,
+      "Get the x of this particle.");
+    particle.def("y", &larcv3::Particle::y,
+      "Get the y of this particle.");
+    particle.def("z", &larcv3::Particle::z,
+      "Get the z of this particle.");
+    particle.def("t", &larcv3::Particle::t,
+      "Get the t of this particle.");
 
-    particle.def("end_position", (const larcv3::Vertex& (larcv3::Particle::*)() const)(&larcv3::Particle::end_position));
-    particle.def("end_position", (void (larcv3::Particle::*)(const larcv3::Vertex&))(&larcv3::Particle::end_position));
-    particle.def("end_position", (void (larcv3::Particle::*)(double,double,double,double))(&larcv3::Particle::end_position));
+    particle.def("end_position", (const larcv3::Vertex& (larcv3::Particle::*)() const)(&larcv3::Particle::end_position),
+      "Get the value of end_position for this particle.");
+    particle.def("end_position", (void (larcv3::Particle::*)(const larcv3::Vertex&))(&larcv3::Particle::end_position),
+      pybind11::arg("end_position"),
+      "Set the value of end_position with a ``Vertex`` object.");
+    particle.def("end_position", (void (larcv3::Particle::*)(double,double,double,double))(&larcv3::Particle::end_position),
+      pybind11::arg("x"), pybind11::arg("y"), pybind11::arg("z"), pybind11::arg("t"),
+      "Set the value of end_position with ``x``, ``y``, ``z``, and ``t``.");
 
-    particle.def("first_step", (const larcv3::Vertex& (larcv3::Particle::*)() const)(&larcv3::Particle::first_step));
-    particle.def("first_step", (void (larcv3::Particle::*)(const larcv3::Vertex&))(&larcv3::Particle::first_step));
-    particle.def("first_step", (void (larcv3::Particle::*)(double,double,double,double))(&larcv3::Particle::first_step));
+    particle.def("first_step", (const larcv3::Vertex& (larcv3::Particle::*)() const)(&larcv3::Particle::first_step),
+      "Get the value of first_step for this particle.");
+    particle.def("first_step", (void (larcv3::Particle::*)(const larcv3::Vertex&))(&larcv3::Particle::first_step),
+      pybind11::arg("first_step"),
+      "Set the value of first_step with a ``Vertex`` object.");
+    particle.def("first_step", (void (larcv3::Particle::*)(double,double,double,double))(&larcv3::Particle::first_step),
+      pybind11::arg("x"), pybind11::arg("y"), pybind11::arg("z"), pybind11::arg("t"),
+      "Set the value of first_step with ``x``, ``y``, ``z``, and ``t``.");
 
-    particle.def("last_step", (const larcv3::Vertex& (larcv3::Particle::*)() const)(&larcv3::Particle::last_step));
-    particle.def("last_step", (void (larcv3::Particle::*)(const larcv3::Vertex&))(&larcv3::Particle::last_step));
-    particle.def("last_step", (void (larcv3::Particle::*)(double,double,double,double))(&larcv3::Particle::last_step));
-
-
-    particle.def("distance_travel", (double (larcv3::Particle::*)() const)(&larcv3::Particle::distance_travel));
-    particle.def("distance_travel", (void (larcv3::Particle::*)(double))(&larcv3::Particle::distance_travel));
-
-    particle.def("energy_init", (double (larcv3::Particle::*)() const)(&larcv3::Particle::energy_init));
-    particle.def("energy_init", (void (larcv3::Particle::*)(double))(&larcv3::Particle::energy_init));
-
-    particle.def("energy_deposit", (double (larcv3::Particle::*)() const)(&larcv3::Particle::energy_deposit));
-    particle.def("energy_deposit", (void (larcv3::Particle::*)(double))(&larcv3::Particle::energy_deposit));
-
-    particle.def("creation_process", (std::string (larcv3::Particle::*)() const)(&larcv3::Particle::creation_process));
-    particle.def("creation_process", (void (larcv3::Particle::*)(const std::string & ))(&larcv3::Particle::creation_process));
-
-    particle.def("parent_track_id", (unsigned int (larcv3::Particle::*)() const)(&larcv3::Particle::parent_track_id));
-    particle.def("parent_track_id", (void (larcv3::Particle::*)( unsigned int  ))(&larcv3::Particle::parent_track_id));
-
-    particle.def("parent_pdg_code", (int (larcv3::Particle::*)() const)(&larcv3::Particle::parent_pdg_code));
-    particle.def("parent_pdg_code", (void (larcv3::Particle::*)( int  ))(&larcv3::Particle::parent_pdg_code));
-
-
-    particle.def("parent_position", (const larcv3::Vertex& (larcv3::Particle::*)() const)(&larcv3::Particle::parent_position));
-    particle.def("parent_position", (void (larcv3::Particle::*)(const larcv3::Vertex&))(&larcv3::Particle::parent_position));
-    particle.def("parent_position", (void (larcv3::Particle::*)(double,double,double,double))(&larcv3::Particle::parent_position));
-
-
-    particle.def("ancestor_track_id", (unsigned int (larcv3::Particle::*)() const)(&larcv3::Particle::ancestor_track_id));
-    particle.def("ancestor_track_id", (void (larcv3::Particle::*)( unsigned int  ))(&larcv3::Particle::ancestor_track_id));
-
-    particle.def("ancestor_pdg_code", (int (larcv3::Particle::*)() const)(&larcv3::Particle::ancestor_pdg_code));
-    particle.def("ancestor_pdg_code", (void (larcv3::Particle::*)( int  ))(&larcv3::Particle::ancestor_pdg_code));
-
-    particle.def("ancestor_position", (const larcv3::Vertex& (larcv3::Particle::*)() const)(&larcv3::Particle::ancestor_position));
-    particle.def("ancestor_position", (void (larcv3::Particle::*)(const larcv3::Vertex&))(&larcv3::Particle::ancestor_position));
-    particle.def("ancestor_position", (void (larcv3::Particle::*)(double,double,double,double))(&larcv3::Particle::ancestor_position));
-
-    particle.def("parent_x",   &larcv3::Particle::parent_x);
-    particle.def("parent_y",   &larcv3::Particle::parent_y);
-    particle.def("parent_z",   &larcv3::Particle::parent_z);
-    particle.def("parent_t",   &larcv3::Particle::parent_t);
-    particle.def("ancestor_x", &larcv3::Particle::ancestor_x);
-    particle.def("ancestor_y", &larcv3::Particle::ancestor_y);
-    particle.def("ancestor_z", &larcv3::Particle::ancestor_z);
-    particle.def("ancestor_t", &larcv3::Particle::ancestor_t);
+    particle.def("last_step", (const larcv3::Vertex& (larcv3::Particle::*)() const)(&larcv3::Particle::last_step),
+      "Get the value of last_step for this particle.");
+    particle.def("last_step", (void (larcv3::Particle::*)(const larcv3::Vertex&))(&larcv3::Particle::last_step),
+      pybind11::arg("last_step"),
+      "Set the value of last_step with a ``Vertex`` object.");
+    particle.def("last_step", (void (larcv3::Particle::*)(double,double,double,double))(&larcv3::Particle::last_step),
+      pybind11::arg("x"), pybind11::arg("y"), pybind11::arg("z"), pybind11::arg("t"),
+      "Set the value of last_step with ``x``, ``y``, ``z``, and ``t``.");
 
 
-    particle.def("dump",       &larcv3::Particle::dump);
-    particle.def("__repr__",   &larcv3::Particle::dump);
+    particle.def("distance_travel", (double (larcv3::Particle::*)() const)(&larcv3::Particle::distance_travel),
+      "Get the value of distance_travel for this particle.");
+    particle.def("distance_travel", (void (larcv3::Particle::*)(double))(&larcv3::Particle::distance_travel),
+      pybind11::arg("distance_travel"),
+      "Set the value of ``distance_travel`` for this particle.");
 
-    particle.def("as_array",   &larcv3::Particle::as_array);
+    particle.def("energy_init", (double (larcv3::Particle::*)() const)(&larcv3::Particle::energy_init),
+      "Get the value of energy_init for this particle.");
+    particle.def("energy_init", (void (larcv3::Particle::*)(double))(&larcv3::Particle::energy_init),
+      pybind11::arg("energy_init"),
+      "Set the value of ``energy_init`` for this particle.");
+
+    particle.def("energy_deposit", (double (larcv3::Particle::*)() const)(&larcv3::Particle::energy_deposit),
+      "Get the value of energy_deposit for this particle.");
+    particle.def("energy_deposit", (void (larcv3::Particle::*)(double))(&larcv3::Particle::energy_deposit),
+      pybind11::arg("energy_deposit"),
+      "Set the value of ``energy_deposit`` for this particle.");
+
+    particle.def("creation_process", (std::string (larcv3::Particle::*)() const)(&larcv3::Particle::creation_process),
+      "Get the value of creation_process for this particle.");
+    particle.def("creation_process", (void (larcv3::Particle::*)(const std::string & ))(&larcv3::Particle::creation_process),
+      pybind11::arg("creation_process"),
+      "Set the value of ``creation_process`` for this particle.");
+
+    particle.def("parent_track_id", (unsigned int (larcv3::Particle::*)() const)(&larcv3::Particle::parent_track_id),
+      "Get the value of parent_track_id for this particle.");
+    particle.def("parent_track_id", (void (larcv3::Particle::*)( unsigned int  ))(&larcv3::Particle::parent_track_id),
+      pybind11::arg("parent_track_id"),
+      "Set the value of ``parent_track_id`` for this particle.");
+
+    particle.def("parent_pdg_code", (int (larcv3::Particle::*)() const)(&larcv3::Particle::parent_pdg_code),
+      "Get the value of parent_pdg_code for this particle.");
+    particle.def("parent_pdg_code", (void (larcv3::Particle::*)( int  ))(&larcv3::Particle::parent_pdg_code),
+      pybind11::arg("parent_pdg_code"),
+      "Set the value of ``parent_pdg_code`` for this particle.");
+
+
+    particle.def("parent_position", (const larcv3::Vertex& (larcv3::Particle::*)() const)(&larcv3::Particle::parent_position),
+      "Get the value of parent_position for this particle.");
+    particle.def("parent_position", (void (larcv3::Particle::*)(const larcv3::Vertex&))(&larcv3::Particle::parent_position),
+      pybind11::arg("parent_position"),
+      "Set the value of ``parent_position`` for this particle.");
+    particle.def("parent_position", (void (larcv3::Particle::*)(double,double,double,double))(&larcv3::Particle::parent_position),
+      pybind11::arg("x"), pybind11::arg("y"), pybind11::arg("z"), pybind11::arg("t"),
+      "Set the value of parent_position with ``x``, ``y``, ``z``, and ``t``.");
+
+
+    particle.def("ancestor_track_id", (unsigned int (larcv3::Particle::*)() const)(&larcv3::Particle::ancestor_track_id),
+      "Get the value of ancestor_track_id for this particle.");
+    particle.def("ancestor_track_id", (void (larcv3::Particle::*)( unsigned int  ))(&larcv3::Particle::ancestor_track_id),
+      pybind11::arg("ancestor_track_id"),
+      "Set the value of ``ancestor_track_id`` for this particle.");
+
+    particle.def("ancestor_pdg_code", (int (larcv3::Particle::*)() const)(&larcv3::Particle::ancestor_pdg_code),
+      "Get the value of ancestor_pdg_code for this particle.");
+    particle.def("ancestor_pdg_code", (void (larcv3::Particle::*)( int  ))(&larcv3::Particle::ancestor_pdg_code),
+      pybind11::arg("ancestor_pdg_code"),
+      "Set the value of ``ancestor_pdg_code`` for this particle.");
+
+    particle.def("ancestor_position", (const larcv3::Vertex& (larcv3::Particle::*)() const)(&larcv3::Particle::ancestor_position),
+      R"pbdoc(
+        Return the ancestor position of this particle.
+      )pbdoc");
+    particle.def("ancestor_position", (void (larcv3::Particle::*)(const larcv3::Vertex&))(&larcv3::Particle::ancestor_position),
+      pybind11::arg("vertex"),
+      R"pbdoc(
+        Set the ancestor position of this particle.
+      )pbdoc");
+    particle.def("ancestor_position", (void (larcv3::Particle::*)(double,double,double,double))(&larcv3::Particle::ancestor_position),
+      pybind11::arg("x"), pybind11::arg("y"), pybind11::arg("z"), pybind11::arg("t"), 
+      R"pbdoc(
+        Set the ancestor position of this particle.
+      )pbdoc");
+
+    particle.def("parent_x",   &larcv3::Particle::parent_x,
+      "Get the parent_x of this particle.");
+    particle.def("parent_y",   &larcv3::Particle::parent_y,
+      "Get the parent_y of this particle.");
+    particle.def("parent_z",   &larcv3::Particle::parent_z,
+      "Get the parent_z of this particle.");
+    particle.def("parent_t",   &larcv3::Particle::parent_t,
+      "Get the parent_t of this particle.");
+    particle.def("ancestor_x", &larcv3::Particle::ancestor_x,
+      "Get the ancestor_x of this particle.");
+    particle.def("ancestor_y", &larcv3::Particle::ancestor_y,
+      "Get the ancestor_y of this particle.");
+    particle.def("ancestor_z", &larcv3::Particle::ancestor_z,
+      "Get the ancestor_z of this particle.");
+    particle.def("ancestor_t", &larcv3::Particle::ancestor_t,
+      "Get the ancestor_t of this particle.");
+
+
+    particle.def("dump",       &larcv3::Particle::dump,
+      "Return a string representation for this particle.");
+    particle.def("__repr__",   &larcv3::Particle::dump,
+      "Return a string representation for this particle.");
+
+    particle.def("as_array",   &larcv3::Particle::as_array,
+      "Return the underlying ``ParticleHolder`` object of this particle as a ``numpy`` structured array.");
+
+
   /*
 
 

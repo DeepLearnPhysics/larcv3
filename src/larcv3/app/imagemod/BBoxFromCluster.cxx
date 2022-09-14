@@ -182,6 +182,13 @@ void init_bbox_from_cluster(pybind11::module m){
   pybind11::class_<Class> BBoxFromCluster(m, "BBoxFromCluster");
   // pybind11::class_<Class, std::shared_ptr<Class>> ev_sparse_tensor(m, classname.c_str());
 
+  BBoxFromCluster.doc() = R"pbdoc(
+      Create a set of Bounding Boxes from a set of Sparse Clusters by enclosing each
+      cluster in a minimally sized box along each axis.
+
+      In other words, draw a box around each cluster as small as possible.
+    )pbdoc";
+
   BBoxFromCluster.def(pybind11::init<std::string>(),
     pybind11::arg("name") = "BBoxFromCluster");
 

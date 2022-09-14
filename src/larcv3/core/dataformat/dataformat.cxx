@@ -8,9 +8,21 @@ void wrap_vector(pybind11::module m){
     std::string name = "VectorOf"+larcv3::as_string<T>();
     using Class = std::vector<T>;
     pybind11::class_<Class> vect(m, name.c_str());
-    vect.def(pybind11::init<>());
-    vect.def("clear", &Class::clear);
-    vect.def("pop_back", &Class::pop_back);
+
+    vect.doc() = "Wrapper around std::vector<" + larcv3::as_string<T>() +">." + "\n Please see the C++ std::vector documentation for more details.";
+
+    vect.def(pybind11::init<>(),
+    R"pbdoc(
+        Construct an empty vector of this type.
+    )pbdoc");
+    vect.def("clear", &Class::clear,
+    R"pbdoc(
+        Clear the vector.
+    )pbdoc");
+    vect.def("pop_back", &Class::pop_back,
+    R"pbdoc(
+        Pop back the vector.
+    )pbdoc");
     vect.def("__len__", [](const Class &v) { return v.size(); });
     vect.def("__iter__", [](Class &v) {
        return pybind11::make_iterator(v.begin(), v.end());

@@ -155,6 +155,12 @@ void init_threshold(pybind11::module m){
   pybind11::class_<Class> threshold(m, "Threshold");
   // pybind11::class_<Class, std::shared_ptr<Class>> ev_sparse_tensor(m, classname.c_str());
 
+  threshold.doc() = R"pbdoc(
+      Process that applies a threshold to specified products.  Output product is 
+      the same as input product.  Can be applied to dense tensors, sparse tensors, 
+      or sparse clusters.
+    )pbdoc";
+
   threshold.def(pybind11::init<std::string>(),
     pybind11::arg("name") = "Threshold");
 

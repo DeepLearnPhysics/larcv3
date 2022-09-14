@@ -1,0 +1,3 @@
+
+[build-system]
+requires = ["numpy", "scikit-build", "h5py", "cmake"]

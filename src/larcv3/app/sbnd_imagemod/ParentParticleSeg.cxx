@@ -520,6 +520,16 @@ void init_parent_particle_seg(pybind11::module m){
   pybind11::class_<Class> parent_particle_seg(m, "ParentParticleSeg");
   // pybind11::class_<Class, std::shared_ptr<Class>> ev_sparse_tensor(m, classname.c_str());
 
+  parent_particle_seg.doc() = R"pbdoc(
+      Reconstructs the particle hierarchy, and then merges the particles into their highest parent.
+
+      Assumes a 1 to 1 match of larcv::Particle to clusters in 2D and 3D (across all projection ids)
+      and also merges the clusters into their highest level parent.
+
+      Useful to merge the segmentation labels of an initial state particle to contain all of its children.
+    )pbdoc";
+
+
   parent_particle_seg.def(pybind11::init<std::string>(),
     pybind11::arg("name") = "ParentParticleSeg");
 

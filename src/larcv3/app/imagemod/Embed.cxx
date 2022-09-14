@@ -409,6 +409,12 @@ void init_embed(pybind11::module m){
   pybind11::class_<Class> Embed(m, "Embed");
   // pybind11::class_<Class, std::shared_ptr<Class>> ev_sparse_tensor(m, classname.c_str());
 
+  Embed.doc() = R"pbdoc(
+      Embed a dataproduct into a larger space of the same dimension.
+    )pbdoc";
+
+
+
   Embed.def(pybind11::init<std::string>(),
     pybind11::arg("name") = "Embed");
 

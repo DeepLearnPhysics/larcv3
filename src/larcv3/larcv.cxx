@@ -20,6 +20,15 @@ PYBIND11_MAKE_OPAQUE(std::vector<larcv3::ImageMeta   <4> >);
 
 
 PYBIND11_MODULE(pylarcv, m) {
+  m.doc() = R"pbdoc(
+      larcv
+      -----------------------
+      .. currentmodule:: larcv
+      .. autosummary::
+         :toctree: _generate
+         base
+  )pbdoc";
+  
   init_base(m);
   init_dataformat(m);
   init_processor(m);

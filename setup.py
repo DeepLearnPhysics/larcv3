@@ -40,20 +40,15 @@ if 'LARCV_WITHOUT_PYBIND' in os.environ and os.environ['LARCV_WITHOUT_PYBIND']:
 else:
     pybind_value='ON'
 
-if 'MAKE_DOCS' in os.environ and os.environ['MAKE_DOCS']:
-    docs_value='ON'
-else:
-    docs_value='OFF'
 
 # Speed up the build if not directly set:    
 if 'MAKEFLAGS' not in os.environ: 
-    os.environ['MAKEFLAGS'] = "-j"
+    os.environ['MAKEFLAGS'] = "-j 1" # This lets builds on CI work better.
     
 setup(
     name="larcv",
     version=verstr,
     cmake_source_dir='src/',
-    use_scm_version=True,
     include_package_data=True,
     cmake_args=[
         '-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.9',
@@ -62,7 +57,6 @@ setup(
         # '-DMPI_C_COMPILER={}'.format(mpicc),
         '-DMPI:BOOL={}'.format(mpi_value),
         '-DOPENMP:BOOL={}'.format(openmp_value),
-        '-DDOCS:BOOL={}'.format(docs_value),
         f'-DCMAKE_PYVERSION={py_version}'
     ],
     author=['Corey Adams', 'Kazuhiro Terao', 'Taritree Wongjirad', 'Marco del Tutto'],
@@ -77,8 +71,10 @@ setup(
     scripts=['bin/merge_larcv3_files.py', 'bin/run_processor.py'],
     packages=['larcv','src/pybind11'],
     install_requires=[
-        'numpy',
-        'scikit-build',
+        "numpy",
+        "scikit-build",
+        "h5py",
+        "cmake",
     ],
     long_description=long_description,
     long_description_content_type='text/markdown',

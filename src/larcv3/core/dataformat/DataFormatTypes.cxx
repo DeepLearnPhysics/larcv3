@@ -128,6 +128,12 @@ void init_dataformattypes(pybind11::module m){
   m.attr("kINVALID_PRODUCER")     = larcv3::kINVALID_PRODUCER;
 
   pybind11::enum_<larcv3::PoolType_t> pooltype_t(m,"PoolType_t");
+  // pooltype_t.doc() = R"pbdoc(
+  // PoolType
+  // *************
+
+  // Pooling specification for some algorithms: sum, average, or max are available.
+  // )pbdoc";
   pooltype_t.value("kPoolSum",      larcv3::PoolType_t::kPoolSum);
   pooltype_t.value("kPoolAverage",  larcv3::PoolType_t::kPoolAverage);
   pooltype_t.value("kPoolMax",      larcv3::PoolType_t::kPoolMax);

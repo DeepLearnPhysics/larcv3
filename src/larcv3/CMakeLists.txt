@@ -15,9 +15,6 @@ add_library(larcv3 SHARED
     )
 
 
-# Define the location of the header files, for doc generation
-set(LARCV3_PUBLIC_HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-
 
 if (OpenMP_CXX_FOUND)
     message("Linking against openmp")
@@ -45,7 +42,6 @@ target_link_libraries(larcv3 ${Python_LIBRARIES})
 
 # Link against the json library:
 target_link_libraries(larcv3 nlohmann_json::nlohmann_json)
-
 
 
 if(CMAKE_PYTHON_BINDINGS)
@@ -85,6 +81,11 @@ install(TARGETS larcv3
     INCLUDES DESTINATION ${CMAKE_PACKAGE_DIR}/include
     )
 
+
+# Define the location of the header files, for doc generation
+set(LARCV3_PUBLIC_HEADER_DIR ${CMAKE_PACKAGE_DIR}/include)
+message("Header dir ${CMAKE_PACKAGE_DIR}/include")
+# set(LARCV3_PUBLIC_HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 
 if(CMAKE_PYTHON_BINDINGS)
