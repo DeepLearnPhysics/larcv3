@@ -30,18 +30,38 @@ void init_eventid(pybind11::module m){
 
     using Class = larcv3::EventID;
     pybind11::class_<Class> eventid(m, "EventID");
+
+
+    eventid.doc() =  R"pbdoc(
+      EventID
+      ******************************
+
+      An object to track run / subrun / event identification of a single event.
+      Used for information / data management only; all events are stored with a unique
+      index and do not need a unique EventID.
+    )pbdoc";
+
     eventid.def(pybind11::init<>());
     eventid.def(pybind11::init<const Class& > ());
     eventid.def(pybind11::self == pybind11::self);
     eventid.def(pybind11::self != pybind11::self);
     eventid.def(pybind11::self < pybind11::self);
 
-    eventid.def("run",    (long (Class::*)(    ) const)(&Class::run));
-    eventid.def("run",    (void (Class::*)(long))(&Class::run));
-    eventid.def("subrun", (long (Class::*)(    ) const)(&Class::subrun));
-    eventid.def("subrun", (void (Class::*)(long))(&Class::subrun));
-    eventid.def("event",  (long (Class::*)(    ) const)(&Class::event));
-    eventid.def("event",  (void (Class::*)(long))(&Class::event));
+    eventid.def("run",    (long (Class::*)(    ) const)(&Class::run),
+      "Get the ``run`` value.");
+    eventid.def("run",    (void (Class::*)(long))(&Class::run),
+      pybind11::arg("run"),
+      "Set the ``run`` value.");
+    eventid.def("subrun", (long (Class::*)(    ) const)(&Class::subrun),
+      "Get the ``subrun`` value.");
+    eventid.def("subrun", (void (Class::*)(long))(&Class::subrun),
+      pybind11::arg("subrun"),
+      "Set the ``subrun`` value.");
+    eventid.def("event",  (long (Class::*)(    ) const)(&Class::event),
+      "Get the ``event`` value.");
+    eventid.def("event",  (void (Class::*)(long))(&Class::event),
+      pybind11::arg("event"),
+      "Set the ``event`` value.");
 
     eventid.def("clear",     &Class::clear);
     eventid.def("valid",     &Class::valid);

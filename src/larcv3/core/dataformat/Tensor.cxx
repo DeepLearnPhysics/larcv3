@@ -368,7 +368,7 @@ void init_tensor_base(pybind11::module m){
 
   tensor.doc() = R"pbdoc(
   Tensor
-  =======
+  ******************************
 
   A Tensor is a densely stored, memory-contiguous representation of image-like data.
   Tensors have ImageMeta associated to them to provide external context for the image.
@@ -434,6 +434,10 @@ void init_tensor_base(pybind11::module m){
   tensor.def("paint",                                      &Class::paint,
     pybind11::arg("value"),
     "Set ALL pixels to the specified ``value``.");
+  tensor.def("set_projection_id",                          &Class::set_projection_id,
+    pybind11::arg("id"),
+    "Set the projection id of the meta for this tensor to ``id``.");
+
   tensor.def("threshold",                                  &Class::threshold,
     pybind11::arg("threshold"), pybind11::arg("lower")=true,
     "If ``lower`` is true, this is minimum threshold.  Otherwise, this is a maximum threshold.");

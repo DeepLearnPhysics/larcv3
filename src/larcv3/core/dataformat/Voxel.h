@@ -150,7 +150,7 @@ namespace larcv3 {
 
   /**
      \class VoxelSet
-     @brief Container of multiple voxels consisting of ordered sparse vector and meta data
+     @brief Container of multiple voxels
    */
   class VoxelSet {
   public:

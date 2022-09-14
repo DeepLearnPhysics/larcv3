@@ -940,7 +940,11 @@ std::shared_ptr<EventBase> IOManager::get_data(const std::string& type,
                                const std::string& producer) {
   LARCV_DEBUG() << "start" << std::endl;
 
-  auto prod_name = ProducerName_t(type, producer);
+  // Catch this historical edge case.
+  std::string used_type = type;
+  if (type == "tensor2d") used_type = "image2d";
+
+  auto prod_name = ProducerName_t(used_type, producer);
   auto id = producer_id(prod_name);
 
   if (id == kINVALID_SIZE) {

@@ -153,7 +153,7 @@ void init_particle(pybind11::module m){
 
     particle.doc() = R"pbdoc(
     Particle
-    =========
+    ******************************
 
     A Particle represents an abstract label more relevant to experimental data.  Typically created 
     from simulation data, there are fields to hold a variety of per-particle information as well as 

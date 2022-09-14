@@ -115,7 +115,7 @@ void init_vertex(pybind11::module m){
     
     vertex.doc() = R"pbdoc(
     Vertex
-    ======
+    ******************************
 
     A ``vertex`` is a 3+1 dimensional object representing a point in 3D space, at a particular time.
 

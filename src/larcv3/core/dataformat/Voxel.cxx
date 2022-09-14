@@ -596,7 +596,7 @@ void init_voxel_core(pybind11::module m){
 
     voxel.doc() = R"pbdoc(
     Voxel
-    -------
+    ******************************
 
     A pair of (id, value) that represents a single point of sparse data.
     The ID is unraveled into spatial coordinates or positions via an ImageMeta
@@ -636,7 +636,7 @@ void init_voxel_core(pybind11::module m){
 
     voxelset.doc() =  R"pbdoc(
     VoxelSet
-    ----------
+    ******************************
 
     A VoxelSet is a sorted collection of Voxels that belong together.  There is no ImageMeta associated
     with a VoxelSet, but when combined with an ImageMeta it is a SparseTensor (with a dimension).
@@ -689,7 +689,9 @@ void init_voxel_core(pybind11::module m){
       "Remove all voxels from this set where value > ``max``");
     voxelset.def("add",            &VS::add, "Add a new voxel.  If voxel already exists at that id, values are **added**");
     voxelset.def("insert",         &VS::insert, "Insert a new voxel.  If voxel already exists at that id, value **updated** with new value.");
-    voxelset.def("emplace",        (void (VS::*)(larcv3::VoxelID_t, float, const bool))(&VS::emplace));
+    voxelset.def("emplace",        (void (VS::*)(larcv3::VoxelID_t, float, const bool))(&VS::emplace),
+        pybind11::arg("id"), pybind11::arg("value"), pybind11::arg("add"),
+        "Create and insert a new voxel.");
 
 
     voxelset.def(pybind11::self += float());
@@ -703,7 +705,7 @@ void init_voxel_core(pybind11::module m){
 
     voxelsetarray.doc() = R"pbdoc(
     VoxelSetArray
-    --------------
+    ******************************
 
     A VoxelSetArray is a collection of VoxelSets that belong together.  There is no ImageMeta associated
     with a VoxelSetArray, but when combined with an ImageMeta it is a SparseCluster (with a dimension).
@@ -774,7 +776,7 @@ void init_sparse_tensor(pybind11::module m){
 
     sparsetensor.doc() = R"pbdoc(
     SparseTensor
-    ==============
+    ******************************
 
     A SparseTensor is a VoxelSet + an ImageMeta to map voxel ids to spatial locations. Available
     in 2D and 3D.
