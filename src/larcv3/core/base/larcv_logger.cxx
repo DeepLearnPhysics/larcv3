@@ -68,9 +68,6 @@ void init_logger(pybind11::module m){
 
       logger.doc() = 
       R"pbdoc(
-        logger
-        ------
-
         C++ native logger utility, used to manage log messages from the C++ application code.
 
         For python logging, use the standard `logging` utilities.

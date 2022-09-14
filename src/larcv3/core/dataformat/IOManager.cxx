@@ -1135,6 +1135,18 @@ void init_iomanager(pybind11::module m){
   using Class = larcv3::IOManager;
   pybind11::class_<Class> iomanager(m, "IOManager");
 
+  iomanager.doc() =  R"pbdoc(
+      Class for managing read/write patterns when using data products.
+
+      Data products are registered with pairs of producer/product strings, and accessed
+      with the ``get_data`` functions.  When a producer/product pair is requested that doesn't 
+      exist, it is created.  If the IOMode is kWRITE or kBOTH, created products are saved when
+      ``save_entry`` is called.  In kREAD mode, created products live in memory only until 
+      ``read_entry`` is called.
+
+      
+    )pbdoc";
+
   pybind11::enum_<Class::IOMode_t> iomode(iomanager, "IOMode_t");
   iomode.value("kREAD",  Class::kREAD);
   iomode.value("kWRITE", Class::kWRITE);

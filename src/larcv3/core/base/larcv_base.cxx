@@ -62,9 +62,6 @@ json larcv3::larcv_base::augment_default_config(const json& default_config, cons
 void init_larcv_base(pybind11::module m){
     pybind11::class_<larcv3::larcv_base> base(m, "larcv_base");
     base.doc() = R"pbdoc(
-        larcv_base
-        ----------
-
         Base class from which many, though not all, objects are derived in larcv.
     )pbdoc";
     base.def(pybind11::init<const std::string &>(), pybind11::arg("name")="larcv_base");

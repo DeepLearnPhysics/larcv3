@@ -367,8 +367,6 @@ void init_tensor_base(pybind11::module m){
   pybind11::class_<Class> tensor(m, larcv3::as_string<Class>().c_str());
 
   tensor.doc() = R"pbdoc(
-  Tensor
-  ******************************
 
   A Tensor is a densely stored, memory-contiguous representation of image-like data.
   Tensors have ImageMeta associated to them to provide external context for the image.

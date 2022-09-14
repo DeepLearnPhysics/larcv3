@@ -4,9 +4,6 @@ void init_Watch(pybind11::module m){
       pybind11::class_<larcv3::Watch> watch(m, "Watch");
 
       watch.doc() = R"pbdoc(
-        Watch
-        =====
-
         Basic C++ timer object, used to track algorithm performance.
       )pbdoc";
 

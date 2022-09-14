@@ -85,6 +85,12 @@ void init_sparse_to_dense(pybind11::module m){
   pybind11::class_<Class> SparseToDense(m, "SparseToDense");
   // pybind11::class_<Class, std::shared_ptr<Class>> ev_sparse_tensor(m, classname.c_str());
 
+  SparseToDense.doc() = R"pbdoc(
+      Convert Sparse Products to their corresponding dense products.
+    )pbdoc";
+
+
+
   SparseToDense.def(pybind11::init<std::string>(),
     pybind11::arg("name") = "SparseToDense");
 

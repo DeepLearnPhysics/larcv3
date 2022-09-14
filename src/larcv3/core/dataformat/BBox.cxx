@@ -124,9 +124,6 @@ void init_bbox_instance(pybind11::module m){
     pybind11::class_<Class> bbox(m, larcv3::as_string<Class>().c_str());
 
     bbox.doc() = R"pbdoc(
-      Bounding Box 
-      ******************************
-
       Represents a bounding box in N dimensions, defined by a centroid and half_length in each axis from the centroid.
       The rotation component is currently not used but provided in the data store implementation for future use.
       Used to represent, for example, the location of a particle interaction, a bounding box for an instance of an object,
@@ -168,9 +165,6 @@ void init_bbox_collection(pybind11::module m){
     bbox_c.def(pybind11::init<>());
 
     bbox_c.doc() = R"pbdoc(
-      Bounding Box Collection
-      ******************************
-
       A collection of Bounding Boxes in N dimensions.  Generally used to represent a sequence of Bounding
       Boxes all within the same image.
     )pbdoc";

@@ -595,8 +595,6 @@ void init_voxel_core(pybind11::module m){
     pybind11::class_<V> voxel(m, "Voxel");
 
     voxel.doc() = R"pbdoc(
-    Voxel
-    ******************************
 
     A pair of (id, value) that represents a single point of sparse data.
     The ID is unraveled into spatial coordinates or positions via an ImageMeta
@@ -635,8 +633,6 @@ void init_voxel_core(pybind11::module m){
     pybind11::class_<VS> voxelset(m, "VoxelSet");
 
     voxelset.doc() =  R"pbdoc(
-    VoxelSet
-    ******************************
 
     A VoxelSet is a sorted collection of Voxels that belong together.  There is no ImageMeta associated
     with a VoxelSet, but when combined with an ImageMeta it is a SparseTensor (with a dimension).
@@ -704,8 +700,6 @@ void init_voxel_core(pybind11::module m){
     pybind11::class_<VSA> voxelsetarray(m, "VoxelSetArray");
 
     voxelsetarray.doc() = R"pbdoc(
-    VoxelSetArray
-    ******************************
 
     A VoxelSetArray is a collection of VoxelSets that belong together.  There is no ImageMeta associated
     with a VoxelSetArray, but when combined with an ImageMeta it is a SparseCluster (with a dimension).
@@ -775,14 +769,14 @@ void init_sparse_tensor(pybind11::module m){
     pybind11::class_<ST, larcv3::VoxelSet> sparsetensor(m, classname.c_str());
 
     sparsetensor.doc() = R"pbdoc(
-    SparseTensor
-    ******************************
 
     A SparseTensor is a VoxelSet + an ImageMeta to map voxel ids to spatial locations. Available
     in 2D and 3D.
 
     SparseTensor inherits from VoxelSet and has an ImageMeta attribute, so any methods available
     in VoxelSet to manipulate the voxels are available here.
+
+    This can be used for storing sparse image data, in 2D or 3D, include segmentation labels.
 
     )pbdoc";
 
@@ -839,10 +833,29 @@ void init_sparse_cluster(pybind11::module m){
     using SC = larcv3::SparseCluster<dimension>;
     std::string classname = larcv3::as_string<larcv3::SparseCluster<dimension>>();
     pybind11::class_<SC, larcv3::VoxelSetArray> sparsecluster(m, classname.c_str());
+    sparsecluster.doc() = R"pbdoc(
+
+    A SparseCluster is a VoxelSetArray + an ImageMeta to map voxel ids to spatial locations. Available
+    in 2D and 3D.
+
+    SparseCluster inherits from VoxelSetArray and has an ImageMeta attribute, so any methods available
+    in VoxelSetArray to manipulate the voxels are available here.
+
+    In a way, SparseCluster is aset of SparseTensors that all share an ImageMeta.  This can be used
+    for instance segmentation labels in particular.
+
+    )pbdoc";
+
     sparsecluster.def(pybind11::init<>());
-    sparsecluster.def("meta", (const larcv3::ImageMeta<dimension>& (SC::*)() const )(&SC::meta), pybind11::return_value_policy::reference);
-    sparsecluster.def("meta", (void (SC::*)(const larcv3::ImageMeta<dimension>& )  )(&SC::meta), pybind11::return_value_policy::reference);
-    sparsecluster.def("clear_data", &SC::clear_data);
+    sparsecluster.def("meta", (const larcv3::ImageMeta<dimension>& (SC::*)() const )(&SC::meta), 
+      pybind11::return_value_policy::reference,
+      "Get the meta");
+    sparsecluster.def("meta", (void (SC::*)(const larcv3::ImageMeta<dimension>& )  )(&SC::meta), 
+      pybind11::return_value_policy::reference,
+      "Set the meta");
+    sparsecluster.def("clear_data", &SC::clear_data,
+      "Clear all data");
+
     std::string vecname = "VectorOf" + larcv3::as_string<larcv3::SparseCluster<dimension>>();
     pybind11::bind_vector<std::vector<larcv3::SparseCluster<dimension> > >(m, vecname);
 

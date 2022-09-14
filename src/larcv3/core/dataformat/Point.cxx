@@ -19,8 +19,6 @@ void init_point_base(pybind11::module m){
     pybind11::class_<larcv3::Point<dimension>> point(m, classname.c_str());
 
     point.doc() = R"pbdoc(
-    Point
-    ******************************
 
     A point is a not-very-novel implementation of a multi-value vector
     object, implemented again here to enable storage and ease-of-use

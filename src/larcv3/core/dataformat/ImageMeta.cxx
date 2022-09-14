@@ -669,16 +669,11 @@ void init_imagemeta_base(pybind11::module m){
     using Class = larcv3::ImageMeta<dimension>;
     pybind11::class_<Class> imagemeta(m, larcv3::as_string<Class>().c_str());
     imagemeta.doc() = R"pbdoc(
-      Image Meta
-      ******************************
-
       Generalized class for interpreting sparse (or dense) images from their in-memory
       layout to physical values.  An ImageMeta object is defined by it's origin, size, and number
       of voxels as well as a unique index, representing an identifier in a multi-view image, for example.
 
       Optionally, a unit can be provided to convert pixel locations to real-space coordinates, if desired.
-
-
     )pbdoc";
     imagemeta.def(pybind11::init<>());
     imagemeta.def(pybind11::init<Class>());

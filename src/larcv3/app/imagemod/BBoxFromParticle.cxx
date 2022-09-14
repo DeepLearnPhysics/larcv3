@@ -110,6 +110,10 @@ void init_bbox_from_particle(pybind11::module m){
   pybind11::class_<Class> BBoxFromParticle(m, "BBoxFromParticle");
   // pybind11::class_<Class, std::shared_ptr<Class>> ev_sparse_tensor(m, classname.c_str());
 
+  BBoxFromParticle.doc() = R"pbdoc(
+      Create a bounding box from a particle by inspecting the particles vertex.
+    )pbdoc";
+
   BBoxFromParticle.def(pybind11::init<std::string>(),
     pybind11::arg("name") = "BBoxFromParticle");
 

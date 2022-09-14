@@ -4,8 +4,6 @@ void init_larbys(pybind11::module m){
       pybind11::class_<larcv3::larbys> larbys(m, "larbys");
 
       larbys.doc() = R"pbdoc(
-        larbys
-        ----------
 
         Base expection for larcv.
       )pbdoc";
