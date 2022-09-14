@@ -1,4 +1,4 @@
-[![Build Status](https://app.travis-ci.com/DeepLearnPhysics/larcv3.svg?branch=develop)](https://travis-ci.com/DeepLearnPhysics/larcv3) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://raw.githubusercontent.com/DeepLearnPhysics/larcv2/develop/LICENSE) 
+[![Tests](https://github.com/DeepLearnPhysics/larcv3/actions/workflows/test.yaml/badge.svg)](https://github.com/DeepLearnPhysics/larcv3/actions/workflows/test.yaml) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://raw.githubusercontent.com/DeepLearnPhysics/larcv2/develop/LICENSE) 
 
 # LArCV (Version 3)
 Software framework for image(2D)/volumetric(3D) data processing with APIs to interface deep neural network open-source softwares, written in C++ with extensive Python supports.  Originally developed for analyzing data from [time-projection-chamber (TPC)](https://en.wikipedia.org/wiki/Time_projection_chamber). It is now converted to be a generic tool to handle 2D-projected images and 3D-voxelized data. LArCV is particularly suitable for sparse data processing.
