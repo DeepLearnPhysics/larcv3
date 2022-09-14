@@ -1,4 +1,4 @@
-name: Test Larcv
+name: Tests
 
 on: [push]
 

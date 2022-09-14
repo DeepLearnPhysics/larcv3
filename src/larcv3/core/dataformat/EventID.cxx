@@ -33,9 +33,6 @@ void init_eventid(pybind11::module m){
 
 
     eventid.doc() =  R"pbdoc(
-      EventID
-      ******************************
-
       An object to track run / subrun / event identification of a single event.
       Used for information / data management only; all events are stored with a unique
       index and do not need a unique EventID.
