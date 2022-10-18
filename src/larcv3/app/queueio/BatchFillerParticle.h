@@ -50,6 +50,7 @@ namespace larcv3 {
     static json default_config(){
       json c = {
         {"Producer", std::string()},
+        {"MaxParticles", size_t(30)}
       };
       return c;
     }

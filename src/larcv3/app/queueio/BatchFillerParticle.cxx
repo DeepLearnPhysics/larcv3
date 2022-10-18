@@ -22,26 +22,36 @@ namespace larcv3 {
   bool BatchFillerParticle::process(IOManager& mgr){
 
     std::string producer = config["Producer"].get<std::string>();
+    size_t max_particles = config["MaxParticles"].get<size_t>();
     // Fetch the particles:
     auto const& event_part = mgr.get_data<larcv3::EventParticle>(producer);
 
     // Refresh the dimension:
     std::vector<int> dim(2);
     dim[0] = batch_size();
-    dim[1] = event_part.size();
+    dim[1] = max_particles;
     set_dim(dim);
 
 
-    // labels
-    auto const& part_v = event_part.as_vector();
-    if (part_v.size() != 1) {
-      LARCV_CRITICAL() << "Only support single particle label now: EventParticle size != 1" << std::endl;
-      throw larbys();
-    }
-    // class
+    // // labels
+    // auto const& part_v = event_part.as_vector();
+    // if (part_v.size() != 1) {
+    //   LARCV_CRITICAL() << "Only support single particle label now: EventParticle size != 1" << std::endl;
+    //   throw larbys();
+    // }
+    // // class
 
-    _entry_data.resize(1);
-    _entry_data.at(0) = part_v.front()._particle_holder;
+    _entry_data.resize(max_particles);
+    size_t i = 0;
+    for (auto const& part : event_part.as_vector()){
+      if (i < max_particles){
+        _entry_data.at(i) = part._particle_holder;
+      }
+      else{
+        break;
+      }
+      i ++;
+    }
 
 
     set_entry_data(_entry_data);
