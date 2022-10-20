@@ -2,7 +2,7 @@ from skbuild import setup  # This line replaces 'from setuptools import setup'
 import argparse
 
 import io
-import os
+import sys, os
 this_directory = os.path.abspath(os.path.dirname(__file__))
 with io.open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
@@ -16,6 +16,12 @@ if mo:
     verstr = mo.group(1)
 else:
     raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
+
+
+
+v = sys.version_info
+py_version = ".".join([str(v.major), str(v.minor), str(v.micro)])
+print(py_version)
 
 
 # Several environment variables control special build features:
@@ -34,20 +40,15 @@ if 'LARCV_WITHOUT_PYBIND' in os.environ and os.environ['LARCV_WITHOUT_PYBIND']:
 else:
     pybind_value='ON'
 
-if 'MAKE_DOCS' in os.environ and os.environ['MAKE_DOCS']:
-    docs_value='ON'
-else:
-    docs_value='OFF'
-    
+
 # Speed up the build if not directly set:    
 if 'MAKEFLAGS' not in os.environ: 
-    os.environ['MAKEFLAGS'] = "-j"
+    os.environ['MAKEFLAGS'] = "-j 1" # This lets builds on CI work better.
     
 setup(
     name="larcv",
     version=verstr,
     cmake_source_dir='src/',
-    use_scm_version=True,
     include_package_data=True,
     cmake_args=[
         '-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.9',
@@ -56,7 +57,7 @@ setup(
         # '-DMPI_C_COMPILER={}'.format(mpicc),
         '-DMPI:BOOL={}'.format(mpi_value),
         '-DOPENMP:BOOL={}'.format(openmp_value),
-        '-DDOCS:BOOL={}'.format(docs_value),
+        f'-DCMAKE_PYVERSION={py_version}'
     ],
     author=['Corey Adams', 'Kazuhiro Terao', 'Taritree Wongjirad', 'Marco del Tutto'],
     author_email='corey.adams@anl.gov',
@@ -70,8 +71,10 @@ setup(
     scripts=['bin/merge_larcv3_files.py', 'bin/run_processor.py'],
     packages=['larcv','src/pybind11'],
     install_requires=[
-        'numpy',
-        'scikit-build',
+        "numpy",
+        "scikit-build",
+        "h5py",
+        "cmake",
     ],
     long_description=long_description,
     long_description_content_type='text/markdown',

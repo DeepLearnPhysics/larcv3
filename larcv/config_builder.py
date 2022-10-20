@@ -3,10 +3,15 @@ import json
 import uuid
 
 class ConfigBuilder:
+    """
+    Front-end to create configuration objects step by step.
+    """
+
 
     valid_datatypes = \
         [ f"tensor{i+1}d" for i in range(4) ] + \
         [ f"sparse{i+2}d" for i in range(2) ] + \
+        [ f"cluster{i+2}d" for i in range(2) ] + \
         [ f"bbox{i+2}d" for i in range(2) ] + \
         ["particle"] + \
         ["PID"]
@@ -14,17 +19,24 @@ class ConfigBuilder:
     valid_preprocess = [
         "Downsample", "DenseToSparse", "Embed",
         "SparseToDense", "TensorFromCluster", "Threshold",
-        "BBoxFromParticle"
+        "BBoxFromParticle", "BBoxFromCluster"
     ]
 
     def __init__(self):
         self.config = larcv.QueueProcessor.default_config()
 
-    def get_config(self): return self.config
+    def get_config(self):
+        """
+        Gets the configuration.
+        
+        :returns:   The configuration.
+        
+        """
+        return self.config
 
     def set_parameter(self,value,*keys):
         """
-        Sets the parameter to value, walking into the config dictionare in the order of keys
+        Sets the parameter to value, walking into the config dictionary in the order of keys
 
         :param      value:  The value
         :type       value:  { type_description }
@@ -39,6 +51,10 @@ class ConfigBuilder:
         return
 
     def print_config(self):
+        """
+        Prints a configuration using json to format it.
+        
+        """
         return json.dumps(self.config, indent=2)
 
     def validate_datatype(self, datatype : str):
@@ -68,15 +84,15 @@ class ConfigBuilder:
         """
         Adds a preprocess.
 
-        :param      datatype:  The datatype
+        :param      datatype:  The datatype of the input
         :type       datatype:  str
-        :param      producer:  The producer
+        :param      producer:  The producer of the input
         :type       producer:  str
-        :param      process:   The process
+        :param      process:   The process name
         :type       process:   str
-        :param      name:      The name
+        :param      name:      The name of the process in the config (optional)
         :type       name:      str
-        :param      kwargs:    The keywords arguments
+        :param      kwargs:    The keywords arguments to override and parameters in the preprocess
         :type       kwargs:    dictionary
         """
 
@@ -147,13 +163,13 @@ class ConfigBuilder:
         """
         Adds a preprocess.
 
-        :param      datatype:  The datatype
+        :param      datatype:  The datatype to load into memory
         :type       datatype:  str
-        :param      producer:  The producer
+        :param      producer:  The producer of the datatype
         :type       producer:  str
-        :param      name:      The name
+        :param      name:      The name of the process in the config file (optional)
         :type       name:      str
-        :param      kwargs:    The keywords arguments
+        :param      kwargs:    Any override arguments to the configuration
         :type       kwargs:    dictionary
         """
 

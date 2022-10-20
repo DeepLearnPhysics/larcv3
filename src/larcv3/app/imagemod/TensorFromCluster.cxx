@@ -109,6 +109,12 @@ void init_tensor_from_cluster(pybind11::module m){
   pybind11::class_<Class> tensorfromcluster(m, "TensorFromCluster");
   // pybind11::class_<Class, std::shared_ptr<Class>> ev_sparse_tensor(m, classname.c_str());
 
+  tensorfromcluster.doc() = R"pbdoc(
+      Convert SparseCluster objects (2D or 3D) into SparseTensor objects by merging
+      all of the clusters together.  Voxels are added where necessary.
+    )pbdoc";
+
+
   tensorfromcluster.def(pybind11::init<std::string>(),
     pybind11::arg("name") = "TensorFromCluster");
 

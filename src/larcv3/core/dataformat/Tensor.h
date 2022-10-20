@@ -75,6 +75,7 @@ namespace larcv3 {
     /// larcv3::ImageMeta const reference getter
     const ImageMeta<dimension>& meta() const { return _meta; }
 
+
     /// Mem-copy: insert num_pixel many data from src 1D array @ data index starting from (row,col)
     void copy(const std::vector<size_t> & coords, const float* src, size_t num_pixel);
     /// Mem-copy: insert num_pixel many data from src 1D array @ data index starting from (row,col)
@@ -140,8 +141,8 @@ namespace larcv3 {
     Tensor& operator -=(const std::vector<float>& rhs);
     Tensor& operator +=(const larcv3::Tensor<dimension>& rhs);
 
-
-
+    // Set the projection ID for this tensor
+    inline void set_projection_id(size_t projection_id){_meta.set_projection_id(projection_id);}
 
     /// Element-wise pixel value multiplication
     void eltwise( const Tensor& rhs );

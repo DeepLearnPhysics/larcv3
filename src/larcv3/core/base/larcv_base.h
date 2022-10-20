@@ -6,6 +6,7 @@
  * \brief Class definition file of larcv3::larcv_base
  *
  * @author Kazu - Nevis 2015
+ * @author Corey - ANL 2019
  */
 
 /** \addtogroup core_Base

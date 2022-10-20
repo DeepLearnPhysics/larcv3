@@ -940,7 +940,11 @@ std::shared_ptr<EventBase> IOManager::get_data(const std::string& type,
                                const std::string& producer) {
   LARCV_DEBUG() << "start" << std::endl;
 
-  auto prod_name = ProducerName_t(type, producer);
+  // Catch this historical edge case.
+  std::string used_type = type;
+  if (type == "tensor2d") used_type = "image2d";
+
+  auto prod_name = ProducerName_t(used_type, producer);
   auto id = producer_id(prod_name);
 
   if (id == kINVALID_SIZE) {
@@ -1130,6 +1134,18 @@ void init_iomanager(pybind11::module m){
 
   using Class = larcv3::IOManager;
   pybind11::class_<Class> iomanager(m, "IOManager");
+
+  iomanager.doc() =  R"pbdoc(
+      Class for managing read/write patterns when using data products.
+
+      Data products are registered with pairs of producer/product strings, and accessed
+      with the ``get_data`` functions.  When a producer/product pair is requested that doesn't 
+      exist, it is created.  If the IOMode is kWRITE or kBOTH, created products are saved when
+      ``save_entry`` is called.  In kREAD mode, created products live in memory only until 
+      ``read_entry`` is called.
+
+      
+    )pbdoc";
 
   pybind11::enum_<Class::IOMode_t> iomode(iomanager, "IOMode_t");
   iomode.value("kREAD",  Class::kREAD);

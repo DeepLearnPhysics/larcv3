@@ -159,27 +159,11 @@ class ImageMeta {
   bool is_valid() const;
 
 
-  // These functions are mostly for historical compatibility and consistence:
-  // inline size_t std::enable_if<dimension == 2>::type cols ()
-  // {
-  // }
 
   inline size_t cols() const {return _number_of_voxels[0];}
   size_t rows() const;
 
-  // inline void update(size_t row_count, size_t col_count) {
-  //   _row_count = row_count;
-  //   _col_count = col_count;
-  // }
-  // /// Reset origin coordinate
-  // inline void reset_origin(double x, double y) {
-  //   BBox2D::update(x, y, max_x(), max_y());
-  // }
 
-  // /// Check if there's an overlap. If so return overlapping bounding box
-  // ImageMeta overlap(const ImageMeta& meta) const;
-  // /// Construct a union bounding box
-  // ImageMeta inclusive(const ImageMeta& meta) const;
 
   /// Dump info in text
   std::string dump() const;

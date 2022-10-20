@@ -63,21 +63,28 @@ namespace larcv3 {
         IOManager& mgr,
         std::string producer, 
         std::string output_producer,
-        const std::vector<int> target_size);
+        const std::vector<int>& target_size);
 
     template< size_t dimension>
     bool process_sparse_product(
         IOManager& mgr,
         std::string producer, 
         std::string output_producer,
-        const std::vector<int> target_size);
+        const std::vector<int>&  target_size);
 
     template< size_t dimension>
     bool process_bbox_product(
         IOManager& mgr,
         std::string producer, 
         std::string output_producer,
-        const std::vector<int> target_size);
+        const std::vector<int>& target_size);
+
+    template< size_t dimension>
+    bool process_cluster_product(
+        IOManager& mgr, 
+        std::string producer,
+        std::string output_producer,
+        const std::vector<int>& target_size);
 
     template< size_t dimension>
     std::vector<int> create_new_image_meta_and_offsets(

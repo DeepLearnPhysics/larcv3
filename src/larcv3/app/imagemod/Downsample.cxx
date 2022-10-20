@@ -119,6 +119,12 @@ void init_downsample(pybind11::module m){
   pybind11::class_<Class> downsample(m, "Downsample");
   // pybind11::class_<Class, std::shared_ptr<Class>> ev_sparse_tensor(m, classname.c_str());
 
+  downsample.doc() = R"pbdoc(
+      Reduce the dataproduct by downsampling with either Sum, Max, or Average Pooling.
+    )pbdoc";
+
+
+
   downsample.def(pybind11::init<std::string>(),
     pybind11::arg("name") = "Downsample");
 

@@ -60,12 +60,30 @@ json larcv3::larcv_base::augment_default_config(const json& default_config, cons
 
 
 void init_larcv_base(pybind11::module m){
-    pybind11::class_<larcv3::larcv_base>(m, "larcv_base")
-    .def(pybind11::init<const std::string &>(), pybind11::arg("name")="larcv_base")
-    .def("logger", &larcv3::larcv_base::logger)
-    .def("set_verbosity", &larcv3::larcv_base::set_verbosity)
-    .def("name", &larcv3::larcv_base::name)
-    .def("default_config", &larcv3::larcv_base::default_config)
-    ;
+    pybind11::class_<larcv3::larcv_base> base(m, "larcv_base");
+    base.doc() = R"pbdoc(
+        Base class from which many, though not all, objects are derived in larcv.
+    )pbdoc";
+    base.def(pybind11::init<const std::string &>(), pybind11::arg("name")="larcv_base");
+    base.def("logger", &larcv3::larcv_base::logger, 
+    R"pbdoc(
+        Get the logger associated with this class.
+    )pbdoc");
+    base.def("set_verbosity", &larcv3::larcv_base::set_verbosity, pybind11::arg("level"),
+    R"pbdoc(
+        Set the verbosity of the associated logger.
+    )pbdoc");
+    base.def("name", &larcv3::larcv_base::name,
+    R"pbdoc(
+        Get the name associated with this class.
+    )pbdoc");
+    base.def("default_config", &larcv3::larcv_base::default_config,
+    R"pbdoc(
+        Get the default configuration (dict) associated with this class.
+    )pbdoc");
 
 }
+
+// name
+//            set_verbosity
+//            degault_config
