@@ -19,7 +19,7 @@ namespace larcv3 {
 
   template<size_t dimension>
   void BatchFillerSparseTensor<dimension>::configure(const json& cfg) {
-    LARCV_DEBUG() << "start" << std::endl;
+    LARCV_SDEBUG() << "start" << std::endl;
 
     config = this -> default_config();
     config = augment_default_config(config, cfg);
@@ -33,16 +33,16 @@ namespace larcv3 {
 
 
     if (config["MaxVoxels"].template get<int>() == 0){
-      LARCV_CRITICAL() << "Maximum number of voxels must be non zero!" << std::endl;
+      LARCV_SCRITICAL() << "Maximum number of voxels must be non zero!" << std::endl;
       throw larbys();
     }
 
     if (dimension == 3 && config["Channels"].template get<std::vector<int>>().size()) {
-      LARCV_WARNING() << "BatchFillerSparseTensor3D is only supported with one channel!" << std::endl;
+      LARCV_SWARNING() << "BatchFillerSparseTensor3D is only supported with one channel!" << std::endl;
     }
 
 
-    LARCV_DEBUG() << "done" << std::endl;
+    LARCV_SDEBUG() << "done" << std::endl;
   }
 
   template<size_t dimension>
@@ -51,7 +51,7 @@ namespace larcv3 {
   template<size_t dimension>
   void BatchFillerSparseTensor<dimension>::_batch_begin_() {
     if(!batch_data().dim().empty() && (int)(batch_size()) != batch_data().dim().front()) {
-      LARCV_INFO() << "Batch size changed " << batch_data().dim().front() << "=>" << batch_size() << std::endl;
+      LARCV_SINFO() << "Batch size changed " << batch_data().dim().front() << "=>" << batch_size() << std::endl;
       auto dim = batch_data().dim();
       dim[0] = batch_size();
       this->set_dim(dim);
@@ -61,7 +61,7 @@ namespace larcv3 {
   template<size_t dimension>
   void BatchFillerSparseTensor<dimension>::_batch_end_() {
     if (logger().level() <= msg::kINFO)
-      LARCV_INFO() << "Total data size: " << batch_data().data_size()
+      LARCV_SINFO() << "Total data size: " << batch_data().data_size()
                    << std::endl;
   }
 
@@ -130,11 +130,11 @@ namespace larcv3 {
     auto _tensor_producer       = config["Producer"].    template get<std::string>();
     auto _augment               = config["Augment"].           template get<bool>();
 
-    LARCV_DEBUG() << "start" << std::endl;
+    LARCV_SDEBUG() << "start" << std::endl;
     auto const& voxel_data =
         mgr.get_data<larcv3::EventSparseTensor<dimension>>(_tensor_producer);
     if (!_allow_empty && voxel_data.as_vector().empty()) {
-      LARCV_CRITICAL()
+      LARCV_SCRITICAL()
           << "Could not locate non-empty voxel data w/ producer name "
           << _tensor_producer << std::endl;
       throw larbys();
@@ -194,7 +194,7 @@ namespace larcv3 {
       size_t max_voxel(voxel_set.size());
       if (max_voxel > _max_voxels) {
         max_voxel = _max_voxels;
-        LARCV_INFO() << "Truncating the number of voxels to " << _max_voxels << "!" << std::endl;
+        LARCV_SINFO() << "Truncating the number of voxels to " << _max_voxels << "!" << std::endl;
       }
 
 
@@ -249,7 +249,7 @@ namespace larcv3 {
     }
 
     // record the entry data
-    LARCV_INFO() << "Inserting entry data of size " << _entry_data.size()
+    LARCV_SINFO() << "Inserting entry data of size " << _entry_data.size()
                  << std::endl;
 
     set_entry_data(_entry_data);

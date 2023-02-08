@@ -24,21 +24,21 @@ namespace larcv3 {
     config = augment_default_config(config, cfg);
 
 
-    LARCV_DEBUG() << "start" << std::endl;
+    LARCV_SDEBUG() << "start" << std::endl;
     int _max_boxes               = config["MaxBoxes"].template get<int>();
     std::vector<size_t> _slice_v = config["Channels"].template get<std::vector<size_t>>();
 
     if (_max_boxes == 0){
-      LARCV_CRITICAL() << "Maximum number of voxels must be non zero!" << std::endl;
+      LARCV_SCRITICAL() << "Maximum number of voxels must be non zero!" << std::endl;
       throw larbys();
     }
 
     if (dimension == 3 && _slice_v.size()) {
-      LARCV_WARNING() << "BatchFillerBBox3D is only supported with one channel!" << std::endl;
+      LARCV_SWARNING() << "BatchFillerBBox3D is only supported with one channel!" << std::endl;
     }
 
 
-    LARCV_DEBUG() << "done" << std::endl;
+    LARCV_SDEBUG() << "done" << std::endl;
   }
 
   template<size_t dimension>
@@ -47,7 +47,7 @@ namespace larcv3 {
   template<size_t dimension>
   void BatchFillerBBox<dimension>::_batch_begin_() {
     if(!batch_data().dim().empty() && (int)(batch_size()) != batch_data().dim().front()) {
-      LARCV_INFO() << "Batch size changed " << batch_data().dim().front() << "=>" << batch_size() << std::endl;
+      LARCV_SINFO() << "Batch size changed " << batch_data().dim().front() << "=>" << batch_size() << std::endl;
       auto dim = batch_data().dim();
       dim[0] = batch_size();
       this->set_dim(dim);
@@ -57,7 +57,7 @@ namespace larcv3 {
   template<size_t dimension>
   void BatchFillerBBox<dimension>::_batch_end_() {
     if (logger().level() <= msg::kINFO)
-      LARCV_INFO() << "Total data size: " << batch_data().data_size()
+      LARCV_SINFO() << "Total data size: " << batch_data().data_size()
                    << std::endl;
   }
 
@@ -110,7 +110,7 @@ namespace larcv3 {
     auto const& bbox_data =
         mgr.get_data<larcv3::EventBBox<dimension>>(_bbox_producer);
     // if (!_allow_empty && bbox_data.as_vector().empty()) {
-    //   LARCV_CRITICAL()
+    //   LARCV_SCRITICAL()
     //       << "Could not locate non-empty voxel data w/ producer name "
     //       << _bbox_producer << std::endl;
     //   throw larbys();
@@ -135,7 +135,7 @@ namespace larcv3 {
 
     // Assert that the requested channels are in the bbox vector:
     if (bbox_data.size() < _num_channels){
-      LARCV_CRITICAL() << "Insufficient projections for BBox Filler " << std::endl;
+      LARCV_SCRITICAL() << "Insufficient projections for BBox Filler " << std::endl;
       throw larbys();
     }
 
@@ -152,7 +152,7 @@ namespace larcv3 {
       int max_bbox(bbox_collection.size());
       if (max_bbox > _max_boxes) {
         max_bbox = _max_boxes;
-        LARCV_CRITICAL() << "Truncating the number of boxes to " << _max_boxes << "!" << std::endl;
+        LARCV_SCRITICAL() << "Truncating the number of boxes to " << _max_boxes << "!" << std::endl;
       }
 
 
@@ -183,7 +183,7 @@ namespace larcv3 {
     }
 
     // record the entry data
-    LARCV_INFO() << "Inserting entry data of size " << _entry_data.size()
+    LARCV_SINFO() << "Inserting entry data of size " << _entry_data.size()
                  << std::endl;
 
     set_entry_data(_entry_data);
