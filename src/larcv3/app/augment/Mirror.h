@@ -62,14 +62,14 @@ namespace larcv3 {
         IOManager& mgr,
         std::string producer, 
         std::string output_producer,
-        std::map<size_t, bool>);
+        std::vector<uint>);
 
     template <class dataproduct>
     bool process_sparse_product(
         IOManager& mgr,
         std::string producer, 
         std::string output_producer,
-        std::map<size_t, bool>);
+        std::vector<uint>);
 
   };
 

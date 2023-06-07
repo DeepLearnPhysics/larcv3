@@ -66,12 +66,12 @@ bool Mirror::process(IOManager& mgr) {
   // We pick them in advance and keep them consistent over all projections.
 
   // Select the mirrored axes here:
-  std::map<size_t, bool> mirror_by_axis;
+  std::vector<uint> mirror_by_axis;
+  mirror_by_axis.resize(axes.size());
   for (auto i : axes){
     // Draw a random bool:
     auto rand_int = gen();
-    // Cast to bool implicitly:
-    mirror_by_axis[i] = rand_int == 0;
+    mirror_by_axis[i] = rand_int;
   }
 
   if (product == "sparse2d") 
@@ -104,7 +104,7 @@ bool Mirror::process(IOManager& mgr) {
 template< class dataproduct>
 bool Mirror::process_sparse_product(IOManager& mgr, std::string producer, 
                                           std::string output_producer,
-                                          std::map<size_t, bool> mirror_by_axis){
+                                          std::vector<uint> mirror_by_axis){
 
   auto const ev_input  = mgr.template get_data<dataproduct>(producer);
   auto & ev_output = mgr.template get_data<dataproduct>(output_producer);
@@ -124,13 +124,20 @@ bool Mirror::process_sparse_product(IOManager& mgr, std::string producer,
     // Will fix it if it becomes a bottle neck.
     for (auto & voxel : input.as_vector()){
       
+      // Having an if statement in here is slow.
+      // So, instead havethe mirror be a 0 or a 1 integer, 
+      // with 0 = false and 1 = true
+      // and compute new coord along an axis as:
+      // new_coord = mirror * number_of_voxels + (1 - mirror ) * original_coord
+
       // Get the coordinates of this voxel:
       auto coords = output.meta().coordinates(voxel.id());
       for (size_t axis = 0; axis < coords.size(); axis ++ ){
-        if (mirror_by_axis.count(axis) && mirror_by_axis[axis]){
+        // if (mirror_by_axis.count(axis) && mirror_by_axis[axis]){
           // Then, flip this coordinate:
-          coords[axis] = output.meta().number_of_voxels(axis) - coords[axis];
-        }
+          coords[axis] = mirror_by_axis[axis] * output.meta().number_of_voxels(axis) 
+                         + (1 - mirror_by_axis[axis]) * coords[axis];
+        // }
       }
       auto new_id = output.meta().index(coords);
       output.add(Voxel(new_id, voxel.value()));
@@ -147,7 +154,7 @@ bool Mirror::process_sparse_product(IOManager& mgr, std::string producer,
 template< class dataproduct>
 bool Mirror::process_dense_product(IOManager& mgr, std::string producer, 
                                          std::string output_producer,
-                                         std::map<size_t, bool> mirror_by_axis){
+                                         std::vector<uint> mirror_by_axis){
 
   auto const ev_input  = mgr.template get_data<dataproduct>(producer);
   auto & ev_output = mgr.template get_data<dataproduct>(output_producer);
@@ -164,10 +171,11 @@ bool Mirror::process_dense_product(IOManager& mgr, std::string producer,
       // Get the coordinates of this voxel:
       auto coords = output_object.meta().coordinates(index);
       for (size_t axis = 0; axis < coords.size(); axis ++ ){
-        if (mirror_by_axis.count(axis) && mirror_by_axis[axis]){
+        // if (mirror_by_axis.count(axis) && mirror_by_axis[axis]){
           // Then, flip this coordinate:
-          coords[axis] = output_object.meta().number_of_voxels(axis) - coords[axis];
-        }
+          coords[axis] = mirror_by_axis[axis] * output_object.meta().number_of_voxels(axis) 
+                         + (1 - mirror_by_axis[axis]) * coords[axis];
+        // }
       }
       auto new_id = output_object.meta().index(coords);
       output_object.set_pixel(new_id, input.pixel(index));
