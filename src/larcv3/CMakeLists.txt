@@ -12,6 +12,7 @@ add_library(larcv3 SHARED
     $<TARGET_OBJECTS:queueio>
     $<TARGET_OBJECTS:imagemod>
     $<TARGET_OBJECTS:sbnd_imagemod>
+    $<TARGET_OBJECTS:augment>
     )
 
 

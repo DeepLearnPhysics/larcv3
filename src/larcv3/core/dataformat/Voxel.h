@@ -364,7 +364,7 @@ namespace larcv3 {
     {*((VoxelSet*)this) = vs; this->meta(meta);}
 
     /// Clear everything
-    inline void clear_data() { VoxelSet::clear_data(); _meta = ImageMeta<dimension>(); }
+    inline void clear_data() { VoxelSet::clear_data(); }
 
     /// Meta setter
     void meta(const larcv3::ImageMeta<dimension>& meta, bool check = true);

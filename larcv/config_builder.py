@@ -19,7 +19,8 @@ class ConfigBuilder:
     valid_preprocess = [
         "Downsample", "DenseToSparse", "Embed",
         "SparseToDense", "TensorFromCluster", "Threshold",
-        "BBoxFromParticle", "BBoxFromCluster"
+        "BBoxFromParticle", "BBoxFromCluster", "GaussianBlur",
+        "Mirror", "Translate",
     ]
 
     def __init__(self):

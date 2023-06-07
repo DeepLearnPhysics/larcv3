@@ -4,6 +4,7 @@
 #include "larcv3/app/queueio/queueio.h"
 #include "larcv3/app/imagemod/imagemod.h"
 #include "larcv3/app/sbnd_imagemod/sbnd_imagemod.h"
+#include "larcv3/app/augment/augment.h"
 
 
 PYBIND11_MAKE_OPAQUE(std::vector<larcv3::SparseTensor<2> >);
@@ -35,4 +36,5 @@ PYBIND11_MODULE(pylarcv, m) {
   init_queueio(m);
   init_imagemod(m);
   init_sbnd_imagemod(m);
+  init_augment(m);
 }
