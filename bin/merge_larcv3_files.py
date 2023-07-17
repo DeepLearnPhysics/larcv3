@@ -125,8 +125,11 @@ def copy_data_product(input_file, output_file, group_name):
       if 'extents' in dataset:
 
         # Get the offsets for the new table before resizing:
-        existing_offset = output_table['first'][-1]+ output_table['N'][-1]
         index = len(output_table)
+        if index != 0:
+          existing_offset = output_table['first'][-1]+ output_table['N'][-1]
+        else:
+          existing_offset = 0
 
 
 
