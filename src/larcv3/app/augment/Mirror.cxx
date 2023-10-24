@@ -70,9 +70,14 @@ bool Mirror::process(IOManager& mgr) {
   mirror_by_axis.resize(axes.size());
   for (auto i : axes){
     // Draw a random bool:
-    auto rand_int = gen();
+    auto rand_int = gen() % 2;
+    // std::cout << "Rand int: " << rand_int << std::endl;
     mirror_by_axis[i] = rand_int;
   }
+  // LARCV_CRITICAL() << "Mirror by axis:";
+  // for (auto i : axes){
+  //   LARCV_CRITICAL() << i << " " << mirror_by_axis[i] << "\n";
+  // }
 
   if (product == "sparse2d") 
     process_sparse_product<larcv3::EventSparseTensor2D>(mgr, producer, output_producer, mirror_by_axis);
@@ -133,11 +138,27 @@ bool Mirror::process_sparse_product(IOManager& mgr, std::string producer,
       // Get the coordinates of this voxel:
       auto coords = output.meta().coordinates(voxel.id());
       for (size_t axis = 0; axis < coords.size(); axis ++ ){
-        // if (mirror_by_axis.count(axis) && mirror_by_axis[axis]){
-          // Then, flip this coordinate:
-          coords[axis] = mirror_by_axis[axis] * output.meta().number_of_voxels(axis) 
-                         + (1 - mirror_by_axis[axis]) * coords[axis];
+        // std::cout << "Original coordinate: " << coords[axis];
+        // std::cout << " of " << output.meta().number_of_voxels(axis);
+        // std::cout << ", mirror: " << mirror_by_axis[axis] << "\n";
+        int new_coord = output.meta().number_of_voxels(axis) - coords[axis] - 1;
+        // std::cout << "  new coord 1: " << new_coord << "\n";
+        coords[axis] = mirror_by_axis[axis]*new_coord + (1-mirror_by_axis[axis])*coords[axis];
+        
+        // if (mirror_by_axis[axis]){
+        //   coords[axis] = output.meta().number_of_voxels(axis) - coords[axis] - 1;
         // }
+        //   // Then, flip this coordinate:
+
+        //   auto new_coord = mirror_by_axis[axis] * output.meta().number_of_voxels(axis);
+        //   new_coord = new_coord - mirror_by_axis[axis];
+        //   std::cout << "  new coord 2: " << new_coord << "\n";
+        //   coords[axis] = new_coord + (-1 + 2*mirror_by_axis[axis]) * coords[axis];
+        //   // coords[axis] = mirror_by_axis[axis] * output.meta().number_of_voxels(axis) 
+        //   //                + (1 - mirror_by_axis[axis]) * coords[axis];
+        // std::cout << "  New coordinate: " << coords[axis] << std::endl;;
+        // // }
+
       }
       auto new_id = output.meta().index(coords);
       output.add(Voxel(new_id, voxel.value()));

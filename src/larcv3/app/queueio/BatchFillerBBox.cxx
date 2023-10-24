@@ -136,7 +136,9 @@ namespace larcv3 {
     // Assert that the requested channels are in the bbox vector:
     if (bbox_data.size() < _num_channels){
       LARCV_SCRITICAL() << "Insufficient projections for BBox Filler " << std::endl;
-      throw larbys();
+      // throw larbys();
+      // Quietly let it be empty:
+      return true;
     }
 
 
