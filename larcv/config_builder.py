@@ -20,7 +20,7 @@ class ConfigBuilder:
         "Downsample", "DenseToSparse", "Embed",
         "SparseToDense", "TensorFromCluster", "Threshold",
         "BBoxFromParticle", "BBoxFromCluster", "GaussianBlur",
-        "Mirror", "Translate",
+        "Mirror", "Translate", "Normalize",
     ]
 
     def __init__(self):

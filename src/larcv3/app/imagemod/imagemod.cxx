@@ -8,6 +8,7 @@
 #include "BBoxFromParticle.h"
 #include "BBoxFromCluster.h"
 #include "Embed.h"
+#include "Normalize.h"
 
 
 void init_imagemod(pybind11::module m){
@@ -20,4 +21,5 @@ void init_imagemod(pybind11::module m){
   init_bbox_from_particle(m);
   init_bbox_from_cluster(m);
   init_embed(m);
+  init_normalize(m);
 }
