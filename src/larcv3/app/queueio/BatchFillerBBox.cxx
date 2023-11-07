@@ -151,7 +151,7 @@ namespace larcv3 {
 
       auto & bbox_collection = bbox_data.as_vector().at(_projection);
 
-      int max_bbox(bbox_collection.size());
+      size_t max_bbox(bbox_collection.size());
       if (max_bbox > _max_boxes) {
         max_bbox = _max_boxes;
         LARCV_SCRITICAL() << "Truncating the number of boxes to " << _max_boxes << "!" << std::endl;
